@@ -12,7 +12,7 @@
         <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
         <style>
             * { font-family: 'Inter', sans-serif; }
-            body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
+            body { background-color: #fafaf8; }
         </style>
 
         <!-- Scripts -->

@@ -70,9 +70,8 @@
                     👁️ Voir
                 </a>
                 @if($produit->stock > 0)
-                    <form action="{{ route('panier.ajouter') }}" method="POST" class="flex-1">
+                    <form action="{{ route('panier.ajouter', $produit->id) }}" method="POST" class="flex-1">
                         @csrf
-                        <input type="hidden" name="produit_id" value="{{ $produit->id }}">
                         <input type="hidden" name="quantite" value="1">
                         <button type="submit" class="w-full px-3 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 text-sm">
                             🛒 Ajouter
