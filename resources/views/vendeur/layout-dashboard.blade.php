@@ -15,14 +15,14 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-50">
+        <div class="min-h-screen bg-amber-50">
             <!-- Navigation -->
             @include('layouts.navigation-client')
 
             <!-- Main Content -->
             <div class="flex">
                 <!-- Sidebar -->
-                <aside class="w-64 bg-white shadow-lg min-h-[calc(100vh-64px)]">
+                <aside class="w-64 bg-amber-50 shadow-lg min-h-[calc(100vh-64px)]">
                     <nav class="p-6 space-y-2">
                         <a href="{{ route('vendeur.dashboard') }}" class="block px-4 py-2 rounded-lg font-medium {{ request()->routeIs('vendeur.dashboard') ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100' }}">
                             📊 Tableau de Bord
@@ -69,7 +69,7 @@
             </div>
 
             <!-- Footer -->
-            <footer class="bg-gray-900 text-gray-300 mt-16">
+            <footer class="bg-amber-900 text-amber-100 mt-16">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div class="text-center">
                         <p class="text-sm">&copy; 2026 Supply - Espace Vendeur. Tous droits réservés.</p>

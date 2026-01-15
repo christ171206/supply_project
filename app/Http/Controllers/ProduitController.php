@@ -16,10 +16,22 @@ class ProduitController extends Controller
         $categories = Categorie::all();
         $produits = Produit::with('vendeur')->latest()->limit(8)->get();
 
-        return view('accueil', [
+        // Données pour vendeur
+        $data = [
             'produits' => $produits,
             'categories' => $categories,
-        ]);
+        ];
+
+        // Si vendeur connecté, ajouter ses données
+        if (auth()->check() && auth()->user()->role === 'vendor') {
+            $user = auth()->user();
+            $data['produits_vendeur'] = Produit::where('user_id', $user->id)->count();
+            $data['stock_total'] = Produit::where('user_id', $user->id)->sum('stock');
+            $data['commandes_total'] = 0; // À implémenter
+            $data['mes_produits'] = Produit::where('user_id', $user->id)->latest()->limit(8)->get();
+        }
+
+        return view('accueil', $data);
     }
 
     /**

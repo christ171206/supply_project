@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-indigo-500/30 shadow-lg shadow-slate-900/50 sticky top-0 z-50 backdrop-blur-sm">
+<nav x-data="{ open: false }" class="bg-white border-b border-amber-200 shadow-md sticky top-0 z-50 backdrop-blur-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <!-- Logo/Brand -->
@@ -14,19 +14,19 @@
             <!-- Navigation Desktop -->
             <div class="hidden md:flex items-center gap-1">
                 <!-- Home -->
-                <a href="{{ route('accueil') }}" class="relative px-4 py-2 text-slate-300 hover:text-white font-medium transition duration-200 group">
+                <a href="{{ route('accueil') }}" class="relative px-4 py-2 text-amber-900 hover:text-amber-700 font-medium transition duration-200 group">
                     🏠 Accueil
-                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 group-hover:w-full transition-all duration-300"></span>
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 group-hover:w-full transition-all duration-300"></span>
                 </a>
 
                 <!-- Catalogue -->
-                <a href="{{ route('produits.catalogue') }}" class="relative px-4 py-2 text-slate-300 hover:text-white font-medium transition duration-200 group">
+                <a href="{{ route('produits.catalogue') }}" class="relative px-4 py-2 text-amber-900 hover:text-amber-700 font-medium transition duration-200 group">
                     📦 Catalogue
-                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 group-hover:w-full transition-all duration-300"></span>
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 group-hover:w-full transition-all duration-300"></span>
                 </a>
 
                 <!-- Panier -->
-                <a href="{{ route('panier.index') }}" class="relative px-4 py-2 text-slate-300 hover:text-white font-medium transition duration-200 group">
+                <a href="{{ route('panier.index') }}" class="relative px-4 py-2 text-amber-900 hover:text-amber-700 font-medium transition duration-200 group">
                     🛒 Panier
                     <span id="cart-badge" class="absolute -top-2 -right-1 bg-gradient-to-r from-red-500 to-pink-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg shadow-red-500/50 @if(!auth()->check() || !auth()->user()->panier || auth()->user()->panier->items->count() === 0) hidden @endif">
                         {{ auth()->check() && auth()->user()->panier ? auth()->user()->panier->items->count() : '0' }}

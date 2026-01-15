@@ -23,8 +23,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('produits', function (Blueprint $table) {
-            $table->dropForeignKeyIfExists(['user_id']);
-            $table->dropColumn('user_id');
+            if (Schema::hasColumn('produits', 'user_id')) {
+                // Utiliser la syntaxe correcte pour supprimer une clé étrangère
+                $table->dropForeign('produits_user_id_foreign');
+                $table->dropColumn('user_id');
+            }
         });
     }
 };

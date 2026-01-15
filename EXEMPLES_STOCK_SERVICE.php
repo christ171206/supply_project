@@ -148,11 +148,11 @@ motif            | commande | réapprov | commande | commande
 user_id (FK)     | 1  | 1  | 1  | 1
 commande_id (FK) | 9  | NULL | 11 | 12
 created_at       | 2026-01-08 | 2026-01-08 | 2026-01-08 | 2026-01-08
-*/
 
 
-// LOGIQUE DE VÉRIFICATION
-// =======================
+
+ LOGIQUE DE VÉRIFICATION
+ =======================
 
 // Avant de diminuer le stock:
 if ($produit->stock >= $quantite) {

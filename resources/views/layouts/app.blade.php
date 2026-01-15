@@ -12,13 +12,13 @@
         <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
         <style>
             * { font-family: 'Inter', sans-serif; }
-            body { background-color: #fafaf8; }
+            body { background-color: #f5ede7; }
         </style>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <body class="font-sans antialiased bg-amber-50">
         <div class="min-h-screen flex flex-col">
             <!-- Navigation -->
             @include('layouts.navigation-client')
@@ -29,7 +29,7 @@
             </main>
 
             <!-- Footer -->
-            <footer class="bg-gradient-to-r from-slate-950 to-slate-900 text-slate-300 border-t border-slate-700 mt-20">
+            <footer class="bg-amber-900 text-amber-100 border-t border-amber-800 mt-20">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                         <!-- About -->

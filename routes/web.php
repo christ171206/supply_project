@@ -17,6 +17,24 @@ Route::get('/info', function () {
     return view('info.index');
 })->name('info');
 
+// Diagnostic (dev only)
+Route::get('/diagnostic', function () {
+    return view('diagnostic', [
+        'produits_count' => \App\Models\Produit::count(),
+        'categories_count' => \App\Models\Categorie::count(),
+        'users_count' => \App\Models\User::count(),
+        'produits' => \App\Models\Produit::latest()->limit(8)->get(),
+        'categories' => \App\Models\Categorie::all(),
+    ]);
+});
+
+// Test Images
+Route::get('/test-images', function () {
+    return view('test-images', [
+        'produits' => \App\Models\Produit::all(),
+    ]);
+});
+
 // Panier (accessible sans auth)
 Route::get('/panier', [PanierController::class, 'index'])->name('panier.index');
 Route::get('/panier/count', [PanierController::class, 'count'])->name('panier.count');

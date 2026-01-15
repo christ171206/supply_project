@@ -1,84 +1,73 @@
-@props(['name', 'class' => ''])
+@props(['name' => 'info', 'class' => 'w-6 h-6'])
 
-@switch($name)
-    @case('dollar-sign')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        @break
+@php
+    $iconMap = [
+        // Électronique & Informatique
+        'electronics/desktop-computer' => 'M9 3v2a2 2 0 002 2h2a2 2 0 002-2V3M9 3a2 2 0 012-2h2a2 2 0 012 2m-4 16h6a2 2 0 002-2v-6a2 2 0 00-2-2H7a2 2 0 00-2 2v6a2 2 0 002 2m0-12V5a2 2 0 012-2h6a2 2 0 012 2v4',
+        'electronics/laptop' => 'M9 3v2a2 2 0 002 2h2a2 2 0 002-2V3m-6 16h10a2 2 0 002-2v-6H7v6a2 2 0 002 2z',
+        'electronics/monitor' => 'M7 4a2 2 0 012-2h6a2 2 0 012 2v4a2 2 0 01-2 2H9a2 2 0 01-2-2V4zm8 12H5a2 2 0 01-2-2v-4h14v4a2 2 0 01-2 2z',
+        'electronics/keyboard' => 'M3 6a2 2 0 012-2h14a2 2 0 012 2v6H3V6zm0 8h18v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2z',
+        'electronics/mouse' => 'M6 9a6 6 0 100 12 6 6 0 000-12zm0-2a8 8 0 110 16 8 8 0 010-16z',
+        'electronics/headphones' => 'M9 4v2a2 2 0 01-2 2H5a2 2 0 01-2-2V4a6 6 0 1012 0v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V4m6 6v2m-6-2v2',
+        'electronics/microphone' => 'M12 1a3 3 0 00-3 3v12a3 3 0 106 0V4a3 3 0 00-3-3zm0 16a6 6 0 01-6-6h2a4 4 0 108 0h2a6 6 0 01-6 6z',
+        'electronics/speaker' => 'M9 9h6v8H9V9zm3-8a1 1 0 011 1v2h2V2a1 1 0 10-2 0v1a1 1 0 011-1zm6 6v4a6 6 0 01-12 0v-4',
+        'electronics/usb-drive' => 'M9 4h6v4H9V4zm1 6h4v6h-4v-6z',
+        'electronics/hard-drive' => 'M4 3a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V3zm0 8a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4z',
 
-    @case('package')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 005.646 5.646 9.003 9.003 0 0012 2c4.97 0 9.185 3.364 9.88 7.848.11.647.684 1.012 1.342.894.658-.11 1.012-.684.894-1.342C21.319 4.769 17.193 1 12 1c-5.468 0-10.088 3.829-11.235 8.94-.12.646.28 1.272.94 1.272h.001c.66 0 1.203-.527 1.265-1.180A8.003 8.003 0 0120.354 15.354z"></path>
-        </svg>
-        @break
+        // Statuts & Indicateurs
+        'status/in-stock' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+        'status/low-stock' => 'M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+        'status/out-of-stock' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',
+        'status/new-product' => 'M13 10V3L4 14h7v7l9-11h-7z',
+        'status/best-seller' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z',
+        'status/on-sale' => 'M7 4a1 1 0 110 2 1 1 0 010-2zM5.354 5.354a1 1 0 000 1.414L18.344 19.76a1 1 0 001.414-1.414L6.768 5.354A1 1 0 005.354 5.354zM17 14a1 1 0 110 2 1 1 0 010-2z',
+        'status/verified' => 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z',
 
-    @case('shopping-cart')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-        </svg>
-        @break
+        // Commerce & Panier
+        'commerce/shopping-cart' => 'M3 3h2l.4 2H23l-1.35 9h-12l.6-3h10.29M9 22a1 1 0 11-2 0 1 1 0 012 0zm12 0a1 1 0 11-2 0 1 1 0 012 0z',
+        'commerce/shopping-bag' => 'M16 11h1a3 3 0 013 3v5a3 3 0 01-3 3H6a3 3 0 01-3-3v-5a3 3 0 013-3h1V7a4 4 0 018 0v4zm-6-4v4h4V7a2 2 0 10-4 0z',
+        'commerce/checkout' => 'M3 3h18a1 1 0 011 1v2h-2V5H3v14h18v-1h2v2a1 1 0 01-1 1H3a1 1 0 01-1-1V4a1 1 0 011-1z',
+        'commerce/delivery' => 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zm2-8a1 1 0 00-1-1h-1a6 6 0 00-6-6H5a1 1 0 00-1 1v9h2V4h8a4 4 0 014 4v1h1a1 1 0 011 1v5h-2v-4z',
 
-    @case('check-circle')
-        <svg class="{{ $class }}" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-        </svg>
-        @break
+        // Utilisateur & Compte
+        'user/wishlist' => 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
 
-    @case('clock')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        @break
+        // Navigation
+        'navigation/search' => 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
+        'navigation/menu' => 'M4 6h16M4 12h16M4 18h16',
+        'navigation/close' => 'M6 18L18 6M6 6l12 12',
+        'navigation/back' => 'M15 19l-7-7 7-7',
+        'navigation/forward' => 'M9 5l7 7-7 7',
+        'navigation/filter' => 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z',
 
-    @case('alert-circle')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        @break
+        // Infos
+        'info/info' => 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+        'info/alert' => 'M12 9v2m0 4v2m6.364-4.536l-1.414-1.414M9.172 9.172L7.757 7.757m9.9 2.121l-1.414 1.414M7.757 16.243l1.414 1.414M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+        'info/success' => 'M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z',
+        'info/error' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',
 
-    @case('zap')
-        <svg class="{{ $class }}" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0110 2v5H6a1 1 0 00-.82 1.573l2.5 3.75H6a1 1 0 00-1 1v2a1 1 0 102 0v-1h4v1a1 1 0 102 0v-2a1 1 0 00-1-1h-2.5l2.5-3.75A1 1 0 0010 7v5a1 1 0 102 0V2a1 1 0 00-.7-.954z" clip-rule="evenodd"></path>
-        </svg>
-        @break
+        // Classiques (backward compatibility)
+        'dollar-sign' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+        'package' => 'M20.354 15.354A9 9 0 005.646 5.646 9.003 9.003 0 0012 2c4.97 0 9.185 3.364 9.88 7.848.11.647.684 1.012 1.342.894.658-.11 1.012-.684.894-1.342C21.319 4.769 17.193 1 12 1c-5.468 0-10.088 3.829-11.235 8.94-.12.646.28 1.272.94 1.272h.001c.66 0 1.203-.527 1.265-1.18A8.003 8.003 0 0120.354 15.354z',
+        'shopping-cart' => 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z',
+        'check-circle' => 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z',
+        'clock' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+        'alert-circle' => 'M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+        'zap' => 'M11.3 1.046A1 1 0 0110 2v5H6a1 1 0 00-.82 1.573l2.5 3.75H6a1 1 0 00-1 1v2a1 1 0 102 0v-1h4v1a1 1 0 102 0v-2a1 1 0 00-1-1h-2.5l2.5-3.75A1 1 0 0010 7v5a1 1 0 102 0V2a1 1 0 00-.7-.954z',
+        'plus-circle' => 'M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.5H5.5a1 1 0 100 2H9v3.5a1 1 0 102 0V12h3.5a1 1 0 100-2H11V7z',
+        'edit-2' => 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z',
+        'award' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
+        'store' => 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z',
+        'lock' => 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+        'save' => 'M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4',
 
-    @case('plus-circle')
-        <svg class="{{ $class }}" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.5H5.5a1 1 0 100 2H9v3.5a1 1 0 102 0V12h3.5a1 1 0 100-2H11V7z" clip-rule="evenodd"></path>
-        </svg>
-        @break
+        // Par défaut
+        'info' => 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    ];
 
-    @case('edit-2')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-        </svg>
-        @break
+    $path = $iconMap[$name] ?? $iconMap['info'];
+@endphp
 
-    @case('award')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-        </svg>
-        @break
-
-    @case('store')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-        </svg>
-        @break
-
-    @case('lock')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-        </svg>
-        @break
-
-    @case('save')
-        <svg class="{{ $class }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-        </svg>
-        @break
-
-    @default
-        <span class="{{ $class }}">📦</span>
-@endswitch
+<svg {{ $attributes->merge(['class' => $class]) }} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $path }}" />
+</svg>

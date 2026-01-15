@@ -1,22 +1,20 @@
-<div class="group relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-300 overflow-hidden border border-slate-700/50 hover:border-indigo-500/50">
+<div class="group relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-primary-200 animate-fade-in-up">
     <!-- Image du produit -->
-    <div class="relative h-56 bg-gradient-to-br from-slate-700 to-slate-800 overflow-hidden">
+    <div class="relative h-56 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
         @if($produit->image)
             <img src="{{ asset('storage/produits/' . $produit->image) }}" alt="{{ $produit->nom }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
         @else
-            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500/20 to-violet-500/20">
-                <svg class="w-16 h-16 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
+            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-accent-50">
+                <x-icon name="electronics/desktop-computer" class="w-16 h-16 text-primary-400" />
             </div>
         @endif
-        
-        <!-- Overlay gradient -->
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent opacity-0 group-hover:opacity-80 transition-opacity duration-300"></div>
-        
+
+        <!-- Overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-0 group-hover:opacity-40 transition-opacity duration-300"></div>
+
         <!-- Badge de catégorie -->
         @if($produit->categorie)
-            <div class="absolute top-3 right-3 bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg shadow-indigo-500/50 backdrop-blur-sm">
+            <div class="absolute top-3 right-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg shadow-primary-500/50 backdrop-blur-sm">
                 {{ $produit->categorie->nom }}
             </div>
         @endif
@@ -24,59 +22,76 @@
         <!-- Badge de stock -->
         <div class="absolute top-3 left-3">
             @if($produit->stock <= 0)
-                <span class="inline-block bg-gradient-to-r from-red-600 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg shadow-red-500/50">
-                    ❌ Rupture
+                <span class="inline-flex items-center gap-1.5 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                    <x-icon name="status/out-of-stock" class="w-4 h-4" />
+                    Rupture
                 </span>
             @elseif($produit->stock < 5)
-                <span class="inline-block bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg shadow-amber-500/50">
-                    ⚠️ Limité
+                <span class="inline-flex items-center gap-1.5 bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                    <x-icon name="status/low-stock" class="w-4 h-4" />
+                    Limité
                 </span>
             @else
-                <span class="inline-block bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg shadow-emerald-500/50">
-                    ✓ {{ $produit->stock }} en stock
+                <span class="inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                    <x-icon name="status/in-stock" class="w-4 h-4" />
+                    {{ $produit->stock }} stock
                 </span>
             @endif
         </div>
+
+        <!-- Wishlist button -->
+        <button class="absolute top-3 right-12 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary-50">
+            <x-icon name="user/wishlist" class="w-5 h-5 text-accent-500 hover:text-accent-600" />
+        </button>
     </div>
 
     <!-- Contenu de la carte -->
     <div class="p-5 space-y-4">
         <!-- Nom du produit -->
-        <h3 class="text-lg font-bold text-slate-100 line-clamp-2 group-hover:text-indigo-300 transition-colors duration-300">
+        <h3 class="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-primary-600 transition-colors duration-300">
             {{ $produit->nom }}
         </h3>
 
         <!-- Description courte -->
-        <p class="text-sm text-slate-400 line-clamp-2">
+        <p class="text-sm text-gray-600 line-clamp-2">
             {{ Str::limit($produit->description, 60) }}
         </p>
 
-        <!-- Prix et stock -->
-        <div class="space-y-3 pt-2 border-t border-slate-700/50">
+        <!-- Prix et Réduction -->
+        <div class="space-y-3 pt-2 border-t border-gray-100">
             <div class="flex items-baseline gap-2">
-                <span class="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+                <span class="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
                     {{ number_format($produit->prix, 2, ',', ' ') }} €
                 </span>
                 @if($produit->prix_original && $produit->prix_original > $produit->prix)
-                    <span class="text-xs text-slate-500 line-through">
+                    <span class="text-xs text-gray-500 line-through">
                         {{ number_format($produit->prix_original, 2, ',', ' ') }} €
+                    </span>
+                    <span class="text-xs font-bold text-red-500">
+                        -{{ round(((($produit->prix_original - $produit->prix) / $produit->prix_original) * 100)) }}%
                     </span>
                 @endif
             </div>
 
             <!-- Boutons d'action -->
             <div class="flex gap-2 pt-2">
-                <a href="{{ route('produits.show', $produit->id) }}" class="flex-1 px-3 py-2.5 bg-gradient-to-r from-slate-700 to-slate-600 text-slate-200 font-semibold rounded-lg hover:from-indigo-600 hover:to-violet-600 hover:text-white transition-all duration-300 text-center text-sm">
-                    👁️ Voir
+                <a href="{{ route('produits.show', $produit->id) }}" class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-gray-100 text-gray-900 font-semibold rounded-xl hover:bg-primary-50 hover:text-primary-600 transition-all duration-300 text-sm group/btn">
+                    <x-icon name="navigation/forward" class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    Voir
                 </a>
                 @if($produit->stock > 0)
                     <form action="{{ route('panier.ajouter', $produit->id) }}" method="POST" class="flex-1">
                         @csrf
                         <input type="hidden" name="quantite" value="1">
-                        <button type="submit" class="w-full px-3 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 text-sm">
-                            🛒 Ajouter
+                        <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/50 hover:scale-105 transition-all duration-300 text-sm">
+                            <x-icon name="commerce/shopping-cart" class="w-4 h-4" />
+                            Ajouter
                         </button>
                     </form>
+                @else
+                    <button disabled class="flex-1 px-3 py-2.5 bg-gray-200 text-gray-500 font-semibold rounded-xl cursor-not-allowed text-sm">
+                        Indisponible
+                    </button>
                 @endif
             </div>
         </div>

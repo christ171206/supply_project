@@ -1,98 +1,140 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-slate-900">
-    <!-- Hero Section -->
-    <div class="relative overflow-hidden py-32">
-        <!-- Background gradient -->
-        <div class="absolute inset-0 bg-gradient-to-r from-indigo-600/20 via-violet-600/20 to-pink-600/20"></div>
-        
-        <!-- Animated blobs -->
-        <div class="absolute top-20 right-10 w-72 h-72 bg-indigo-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-20 left-10 w-72 h-72 bg-violet-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+@auth
+    {{-- ========== VENDOR DASHBOARD ========== --}}
+    @if(auth()->user()->role === 'vendor')
+    <div class="bg-gradient-to-b from-primary-50 to-slate-50 min-h-screen">
+        <!-- Header Moderne -->
+        <div class="relative overflow-hidden pt-20 pb-12">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary-100/50 via-transparent to-secondary-100/30"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center space-y-8">
-                <div>
-                    <h1 class="text-6xl md:text-7xl font-black mb-4 leading-tight">
-                        <span class="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
-                            Bienvenue à Supply
-                        </span>
-                    </h1>
-                    <p class="text-2xl md:text-3xl text-slate-300 mb-2">Votre boutique informatique premium</p>
-                    <p class="text-slate-400">Technologie de pointe, qualité supérieure, service d'exception</p>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-                    <a href="{{ route('produits.catalogue') }}" class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-lg overflow-hidden rounded-xl">
-                        <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600 transition-all group-hover:scale-110 duration-300"></div>
-                        <span class="relative text-white flex items-center gap-2">
-                            🚀 Commencer à explorer
-                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                            </svg>
-                        </span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-primary-600 font-semibold">Bienvenue,</p>
+                        <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mt-2">
+                            {{ auth()->user()->shop_name ?? auth()->user()->name }}
+                        </h1>
+                        <p class="text-xl text-gray-600 mt-3">Gérez votre boutique informatique</p>
+                    </div>
 
-    <!-- Catégories -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div class="text-center mb-16 space-y-4">
-            <h2 class="text-5xl font-bold bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">Explorez nos Catégories</h2>
-            <p class="text-slate-400 text-lg">Trouvez exactement ce qu'il vous faut</p>
-        </div>
-        
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            @foreach($categories as $categorie)
-            <a href="{{ route('produits.catalogue', ['categorie' => $categorie->id]) }}" class="group relative block bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-300 transform hover:scale-105">
-                <div class="h-40 flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-800 overflow-hidden relative">
-                    @if($categorie->image)
-                        <img src="{{ asset('storage/categories/' . $categorie->image) }}" alt="{{ $categorie->nom }}" class="w-full h-full object-cover group-hover:scale-125 transition duration-500">
-                    @else
-                        <div class="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-indigo-500/20 to-violet-500/20">
-                            <svg class="w-12 h-12 text-indigo-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                            </svg>
-                            <p class="text-indigo-300 font-semibold text-center text-xs px-2">{{ $categorie->nom }}</p>
+                    <!-- Stats Rapides -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 pt-8">
+                        <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-primary-500">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm font-semibold">Mes Produits</p>
+                                    <p class="text-3xl font-bold text-gray-900 mt-2">{{ $produits_vendeur ?? 0 }}</p>
+                                </div>
+                                <x-icon name="commerce/shopping-bag" class="w-12 h-12 text-primary-500 opacity-50" />
+                            </div>
                         </div>
-                    @endif
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent opacity-0 group-hover:opacity-60 transition duration-300"></div>
+
+                        <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-accent-500">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm font-semibold">Stock Total</p>
+                                    <p class="text-3xl font-bold text-gray-900 mt-2">{{ $stock_total ?? 0 }}</p>
+                                </div>
+                                <x-icon name="electronics/hard-drive" class="w-12 h-12 text-accent-500 opacity-50" />
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-secondary-500">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm font-semibold">Commandes</p>
+                                    <p class="text-3xl font-bold text-gray-900 mt-2">{{ $commandes_total ?? 0 }}</p>
+                                </div>
+                                <x-icon name="commerce/checkout" class="w-12 h-12 text-secondary-500 opacity-50" />
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-md p-6 border-l-4 border-green-500">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-600 text-sm font-semibold">Revenu</p>
+                                    <p class="text-3xl font-bold text-gray-900 mt-2">0 €</p>
+                                </div>
+                                <x-icon name="dollar-sign" class="w-12 h-12 text-green-500 opacity-50" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <p class="font-semibold text-slate-200 p-4 text-center group-hover:text-indigo-300 transition duration-300">{{ $categorie->nom }}</p>
-            </a>
-            @endforeach
+            </div>
         </div>
-    </div>
 
-    <!-- Produits en vedette -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div class="text-center mb-16 space-y-4">
-            <h2 class="text-5xl font-bold bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">Produits en Vedette</h2>
-            <p class="text-slate-400 text-lg">Nos meilleures ventes de la semaine</p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            @foreach($produits as $produit)
-                @include('components.carte-produit', ['produit' => $produit])
-            @endforeach
-        </div>
-    </div>
+        <!-- Actions Rapides -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <a href="{{ route('vendeur.produits.index') }}" class="group relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="relative z-10">
+                        <x-icon name="commerce/shopping-bag" class="w-8 h-8 mb-4" />
+                        <h3 class="text-2xl font-bold mb-2">Gérer les Produits</h3>
+                        <p class="text-primary-100">Ajouter, modifier, supprimer vos produits</p>
+                    </div>
+                </a>
 
-    <!-- CTA Section -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div class="relative bg-gradient-to-r from-indigo-600 to-violet-600 rounded-3xl p-12 md:p-20 overflow-hidden">
-            <div class="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full -mr-48 -mt-48"></div>
-            <div class="relative z-10 text-center space-y-8">
-                <h3 class="text-4xl md:text-5xl font-bold text-white">Rejoignez la communauté Supply</h3>
-                <p class="text-lg text-indigo-100 max-w-2xl mx-auto">Accès exclusif à nos meilleures offres, livraison rapide et support client 24/7</p>
-                <button class="inline-flex items-center gap-2 px-8 py-3 bg-white text-indigo-600 font-bold rounded-xl hover:bg-indigo-50 transition transform hover:scale-105 duration-300">
-                    ✨ Devenir Membre
-                </button>
+                <a href="{{ route('vendeur.commandes') }}" class="group relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="relative z-10">
+                        <x-icon name="commerce/checkout" class="w-8 h-8 mb-4" />
+                        <h3 class="text-2xl font-bold mb-2">Commandes</h3>
+                        <p class="text-accent-100">Voir et gérer vos commandes en attente</p>
+                    </div>
+                </a>
+
+                <a href="{{ route('vendeur.stock') }}" class="group relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-secondary-500 to-secondary-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="relative z-10">
+                        <x-icon name="electronics/hard-drive" class="w-8 h-8 mb-4" />
+                        <h3 class="text-2xl font-bold mb-2">Gestion Stock</h3>
+                        <p class="text-secondary-100">Surveiller et gérer votre inventaire</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Derniers Produits du Vendeur -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="bg-white rounded-2xl shadow-md p-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8">Vos Derniers Produits</h2>
+                @if(isset($mes_produits) && $mes_produits->count() > 0)
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        @foreach($mes_produits as $produit)
+                            @include('components.carte-produit', ['produit' => $produit])
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <x-icon name="commerce/shopping-bag" class="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <p class="text-gray-600 text-lg">Vous n'avez pas encore de produits</p>
+                        <a href="{{ route('vendeur.produits.create') }}" class="btn-primary inline-block mt-4">
+                            Ajouter votre premier produit
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
-</div>
+
+    {{-- ========== CLIENT / NOT CONNECTED ========== --}}
+    @else
+        @include('partials.hero-section')
+        @include('partials.categories-section')
+        @include('partials.produits-vedettes')
+        @include('partials.cta-section')
+    @endif
+@else
+    {{-- ========== NOT AUTHENTICATED ========== --}}
+    @include('partials.hero-section')
+    @include('partials.categories-section')
+    @include('partials.produits-vedettes')
+    @include('partials.cta-section')
+@endauth
 @endsection
+
+
+

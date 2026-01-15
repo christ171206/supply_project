@@ -34,52 +34,57 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:client,vendeur'],
+            'role' => ['required', 'in:client,vendor'],
+            'terms' => ['required'],
         ]);
 
         // Validation supplémentaire pour vendeur
-        if ($request->role === 'vendeur') {
+        if ($request->role === 'vendor') {
             $request->validate([
                 'shop_name' => ['required', 'string', 'max:255'],
                 'phone' => ['required', 'string', 'max:20'],
                 'address' => ['required', 'string', 'max:500'],
-                'id_document' => ['nullable', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:5120'],
+                'id_document' => ['nullable', 'file', 'mimes:jpeg,png,jpg', 'max:5120'],
             ], [
                 'shop_name.required' => 'Le nom de la boutique est obligatoire',
                 'phone.required' => 'Le téléphone est obligatoire',
                 'address.required' => 'L\'adresse est obligatoire',
-                'id_document.file' => 'Le fichier doit être valide',
-                'id_document.mimes' => 'Le document doit être une image (JPEG, PNG) ou un PDF',
+                'id_document.mimes' => 'Le document doit être une image (JPEG, PNG)',
                 'id_document.max' => 'Le fichier ne doit pas dépasser 5MB',
             ]);
         }
 
-        // Créer l'utilisateur
-        $user = User::create([
+        // Préparer les données utilisateur
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
-        ]);
+        ];
 
-        // Sauvegarder les informations vendeur si applicable
-        if ($request->role === 'vendeur') {
+        // Ajouter les informations vendeur si applicable
+        if ($request->role === 'vendor') {
+            $userData['shop_name'] = $request->shop_name;
+            $userData['phone'] = $request->phone;
+            $userData['address'] = $request->address;
+            $userData['vendor_status'] = 'pending'; // En attente de vérification
+
             // Sauvegarder le document d'identité si fourni
             if ($request->hasFile('id_document')) {
                 $path = $request->file('id_document')->store('vendors/id-documents', 'public');
-                // Vous pouvez stocker le chemin dans une table séparée ou dans une colonne JSON
+                $userData['id_document'] = $path;
             }
-
-            // Vous pouvez créer une table séparée pour les vendeurs ou ajouter les colonnes à users
-            // Pour maintenant, on peut utiliser une colonne JSON ou créer une table Vendor
         }
+
+        // Créer l'utilisateur
+        $user = User::create($userData);
 
         event(new Registered($user));
 
         Auth::login($user);
 
         // Redirection basée sur le rôle
-        if ($user->role === 'vendeur') {
+        if ($user->role === 'vendor') {
             return redirect(route('vendeur.dashboard', absolute: false));
         }
 
