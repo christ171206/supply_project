@@ -82,4 +82,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Avis::class);
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function produitsFavoris()
+    {
+        return $this->belongsToMany(Produit::class, 'favorites', 'user_id', 'produit_id');
+    }
 }

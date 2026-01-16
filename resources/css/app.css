@@ -86,6 +86,63 @@ body {
     }
 }
 
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+/* Loader Animation */
+.loader {
+    width: 120px;
+    height: 22px;
+    border-radius: 40px;
+    color: #0ea5e9;
+    border: 2px solid;
+    position: relative;
+    overflow: hidden;
+}
+
+.loader::before {
+    content: "";
+    position: absolute;
+    margin: 2px;
+    width: 14px;
+    top: 0;
+    bottom: 0;
+    left: -20px;
+    border-radius: inherit;
+    background: currentColor;
+    box-shadow: -10px 0 12px 3px currentColor;
+    clip-path: polygon(0 5%, 100% 0, 100% 100%, 0 95%, -30px 50%);
+    animation: l14 1s infinite linear;
+}
+
+@keyframes l14 {
+    100% {
+        left: calc(100% + 20px);
+    }
+}
+
+/* Page Loader Styles */
+#page-loader {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#page-loader.hidden {
+    opacity: 0;
+    pointer-events: none;
 }

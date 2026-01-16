@@ -63,6 +63,16 @@ class Produit extends Model
         return $this->hasMany(StockMouvement::class);
     }
 
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'favorites', 'produit_id', 'user_id');
+    }
+
     // Méthode pour vérifier si le stock est critique
     public function isStockCritique()
     {

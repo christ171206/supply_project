@@ -33,6 +33,14 @@
                     </span>
                     <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 group-hover:w-full transition-all duration-300"></span>
                 </a>
+
+                <!-- Favoris (only for authenticated users) -->
+                @auth
+                <a href="{{ route('favoris.index') }}" class="relative px-4 py-2 text-amber-900 hover:text-amber-700 font-medium transition duration-200 group">
+                    ❤️ Favoris
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-rose-500 to-pink-500 group-hover:w-full transition-all duration-300"></span>
+                </a>
+                @endauth
             </div>
 
             <!-- User Menu & Mobile -->

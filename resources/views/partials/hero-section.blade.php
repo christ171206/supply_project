@@ -12,8 +12,8 @@
             <h1 class="text-6xl md:text-7xl font-bold text-gray-900 leading-tight">
                 Bienvenue à <span class="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">Supply</span>
             </h1>
-            <p class="text-2xl text-gray-700 max-w-3xl mx-auto">Votre boutique informatique premium</p>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Technologie de pointe, qualité supérieure, service d'exception</p>
+            <p class="text-2xl text-gray-700 max-w-3xl mx-auto">Votre boutique informatique de confiance en Côte d'Ivoire</p>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Technologie de qualité, livraison rapide, prix compétitifs en FCFA</p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center pt-6">
                 <a href="{{ route('produits.catalogue') }}" class="btn-primary inline-flex items-center justify-center gap-2">

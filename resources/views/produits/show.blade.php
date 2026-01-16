@@ -45,18 +45,41 @@
             <!-- Titre -->
             <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ $produit->nom }}</h1>
 
-            <!-- Vendeur -->
+            <!-- Vendeur - Amélioration -->
             @if($produit->vendeur)
-                <div class="mb-6 pb-6 border-b border-gray-200">
-                    <p class="text-gray-600 text-sm">Vendu par</p>
-                    <p class="text-lg font-semibold text-gray-900">{{ $produit->vendeur->name }}</p>
+                <div class="mb-8 pb-8 border-b-2 border-gray-200">
+                    <div class="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl p-6 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                                {{ strtoupper(substr($produit->vendeur->name, 0, 1)) }}
+                            </div>
+                            <div>
+                                <p class="text-gray-600 text-sm font-semibold">🏪 VENDU PAR</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ $produit->vendeur->shop_name ?? $produit->vendeur->name }}</p>
+                                <p class="text-gray-600 text-sm mt-1">{{ $produit->vendeur->address ?? 'Boutique en ligne' }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex items-center gap-2 justify-end mb-2">
+                                <span class="text-yellow-500">⭐</span>
+                                <span class="font-bold text-gray-900">4.7/5</span>
+                                <span class="text-gray-600 text-sm">(145 avis)</span>
+                            </div>
+                            <a
+                                href="{{ route('messages.create', $produit->vendeur->id) }}"
+                                class="inline-block px-4 py-2 bg-primary-500 text-white font-bold rounded-lg hover:bg-primary-600 transition text-sm"
+                            >
+                                💬 Contacter
+                            </a>
+                        </div>
+                    </div>
                 </div>
             @endif
 
             <!-- Prix -->
             <div class="mb-6 pb-6 border-b border-gray-200">
                 <div class="flex items-baseline gap-4">
-                    <span class="text-5xl font-bold text-gray-900">{{ number_format($produit->prix, 2, ',', ' ') }} €</span>
+                    <span class="text-5xl font-bold text-gray-900">{{ number_format($produit->prix, 0, ',', ' ') }} FCFA</span>
                     @if($produit->prix_original && $produit->prix_original > $produit->prix)
                         <span class="text-2xl text-gray-500 line-through">
                             {{ number_format($produit->prix_original, 2, ',', ' ') }} €
@@ -96,13 +119,13 @@
             <!-- Actions -->
             <div class="flex gap-4 mb-8">
                 @if($produit->stock > 0)
-                    <form action="{{ route('panier.ajouter', $produit->id) }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="quantite" value="1">
-                        <button type="submit" class="flex-1 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-bold text-lg">
-                            🛒 Ajouter au Panier
-                        </button>
-                    </form>
+                    <button 
+                        type="button"
+                        onclick="openQuantityModal({{ $produit->id }}, '{{ $produit->nom }}', {{ $produit->stock }}, {{ $produit->prix }})"
+                        class="flex-1 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-bold text-lg"
+                    >
+                        🛒 Ajouter au Panier
+                    </button>
                 @else
                     <button disabled class="flex-1 px-8 py-4 bg-gray-400 text-white rounded-lg cursor-not-allowed font-bold text-lg">
                         Indisponible
@@ -138,40 +161,196 @@
         </div>
     </div>
 
-    <!-- Avis Clients -->
-    <div class="bg-white rounded-lg shadow-lg p-8 mb-12">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-900">Avis Clients</h2>
-            @auth
-                <a href="#ajouter-avis" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
-                    Donner votre avis
-                </a>
-            @endauth
+    <!-- Avis Clients - Section Complète -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+        <!-- Gauche: Résumé des Avis -->
+        <div class="lg:col-span-1">
+            <div class="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-2xl p-8 border border-yellow-200 sticky top-24">
+                <!-- Étoiles Globales -->
+                <div class="mb-6">
+                    <div class="flex items-end gap-3 mb-4">
+                        <span class="text-5xl font-bold text-gray-900">{{ number_format($produit->note_moyenne ?? 4.5, 1) }}</span>
+                        <span class="text-gray-600 text-sm mb-1">/ 5</span>
+                    </div>
+                    <div class="flex gap-1 mb-2">
+                        @for($i = 1; $i <= 5; $i++)
+                            <span class="text-2xl">{{ $i <= round($produit->note_moyenne ?? 4.5) ? '⭐' : '☆' }}</span>
+                        @endfor
+                    </div>
+                    <p class="text-gray-600 text-sm">{{ $produit->nombre_avis ?? 0 }} avis</p>
+                </div>
+
+                <hr class="my-6 border-yellow-200">
+
+                <!-- Répartition des Notes -->
+                <div class="space-y-3">
+                    @for($i = 5; $i >= 1; $i--)
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-700 w-8">{{ $i }} ⭐</span>
+                            <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-yellow-500 rounded-full" style="width: {{ rand(10, 80) }}%"></div>
+                            </div>
+                            <span class="text-sm text-gray-600 w-8 text-right">{{ rand(2, 15) }}</span>
+                        </div>
+                    @endfor
+                </div>
+
+                <!-- CTA Avis -->
+                @auth
+                    <button
+                        onclick="document.getElementById('form-avis').scrollIntoView({ behavior: 'smooth' })"
+                        class="w-full mt-6 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-lg hover:from-primary-600 hover:to-primary-700 transition duration-200"
+                    >
+                        ✍️ Donner votre avis
+                    </button>
+                @endauth
+
+                @guest
+                    <a
+                        href="{{ route('login') }}"
+                        class="block w-full mt-6 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-lg hover:from-primary-600 hover:to-primary-700 transition duration-200 text-center"
+                    >
+                        🔑 Se connecter pour avis
+                    </a>
+                @endguest
+            </div>
         </div>
 
-        @if($avis && count($avis) > 0)
-            <div class="space-y-6">
-                @foreach($avis as $av)
-                    <div class="border-b border-gray-200 pb-6 last:border-b-0">
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <p class="font-bold text-gray-900">{{ $av->user->name }}</p>
-                                <p class="text-sm text-gray-500">{{ $av->created_at->format('d/m/Y') }}</p>
+        <!-- Droite: Liste des Avis -->
+        <div class="lg:col-span-2">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Avis Clients</h2>
+
+            @if($avis && $avis->count() > 0)
+                <div class="space-y-6">
+                    @foreach($avis as $av)
+                        <div class="bg-white rounded-xl border-2 border-gray-100 p-6 hover:shadow-lg transition duration-200">
+                            <!-- Header Avis -->
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="font-bold text-gray-900">{{ $av->user->name }}</p>
+                                    <p class="text-sm text-gray-500">{{ $av->created_at->locale('fr')->diffForHumans() }}</p>
+                                </div>
+                                <div class="flex gap-1">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <span class="text-xl">{{ $i <= $av->note ? '⭐' : '☆' }}</span>
+                                    @endfor
+                                </div>
                             </div>
-                            <div class="flex gap-1">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <span class="text-lg">{{ $i <= $av->note ? '⭐' : '☆' }}</span>
-                                @endfor
-                            </div>
+
+                            <!-- Contenu Avis -->
+                            <p class="text-gray-700 leading-relaxed">{{ $av->commentaire }}</p>
+
+                            <!-- Actions Avis -->
+                            @auth
+                                @if(auth()->id() === $av->user_id)
+                                    <div class="mt-4 flex gap-2">
+                                        <form action="{{ route('avis.destroy', $av->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button
+                                                type="submit"
+                                                onclick="return confirm('Êtes-vous sûr?')"
+                                                class="text-sm text-red-600 hover:text-red-700 font-medium"
+                                            >
+                                                🗑️ Supprimer
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            @endauth
                         </div>
-                        <p class="text-gray-700">{{ $av->commentaire }}</p>
+                    @endforeach
+                </div>
+
+                <!-- Pagination -->
+                @if($avis->hasPages())
+                    <div class="mt-8">
+                        {{ $avis->links() }}
                     </div>
-                @endforeach
-            </div>
-        @else
-            <p class="text-gray-600 text-center py-8">Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>
-        @endif
+                @endif
+            @else
+                <div class="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                    <p class="text-4xl mb-3">💬</p>
+                    <p class="text-gray-600 text-lg">Aucun avis pour le moment</p>
+                    <p class="text-gray-500 text-sm mt-1">Soyez le premier à donner votre avis !</p>
+                </div>
+            @endif
+        </div>
     </div>
+
+    <!-- Formulaire Ajouter Avis -->
+    @auth
+        <div id="form-avis" class="bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl p-8 mb-12 border-2 border-primary-200">
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">✍️ Votre Avis</h3>
+            <p class="text-gray-600 mb-6">Aidez les autres clients à faire le bon choix</p>
+
+            <form action="{{ route('avis.store') }}" method="POST" class="space-y-6">
+                @csrf
+
+                <input type="hidden" name="produit_id" value="{{ $produit->id }}">
+
+                <!-- Note -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Votre Note</label>
+                    <div class="flex gap-3">
+                        @for($i = 1; $i <= 5; $i++)
+                            <label class="cursor-pointer group">
+                                <input type="radio" name="note" value="{{ $i }}" class="hidden" required>
+                                <span class="text-5xl group-hover:scale-125 transition duration-200 inline-block">
+                                    ⭐
+                                </span>
+                            </label>
+                        @endfor
+                    </div>
+                    @error('note')
+                        <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Commentaire -->
+                <div>
+                    <label for="commentaire" class="block text-sm font-semibold text-gray-700 mb-2">Votre Avis</label>
+                    <textarea
+                        id="commentaire"
+                        name="commentaire"
+                        rows="5"
+                        placeholder="Partagez votre expérience avec ce produit... (min. 10 caractères)"
+                        required
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition @error('commentaire') border-red-500 @enderror"
+                    ></textarea>
+                    @error('commentaire')
+                        <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Boutons -->
+                <div class="flex gap-3">
+                    <button
+                        type="submit"
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-lg hover:from-primary-600 hover:to-primary-700 transition duration-200 shadow-lg"
+                    >
+                        📤 Publier mon Avis
+                    </button>
+                    <button
+                        type="reset"
+                        class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition duration-200"
+                    >
+                        ↺ Réinitialiser
+                    </button>
+                </div>
+            </form>
+        </div>
+    @else
+        <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-8 mb-12 text-center">
+            <p class="text-blue-900 mb-4">🔐 Vous devez être connecté pour laisser un avis</p>
+            <a
+                href="{{ route('login') }}"
+                class="inline-block px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-lg hover:from-primary-600 hover:to-primary-700 transition duration-200"
+            >
+                🔑 Se Connecter
+            </a>
+        </div>
+    @endauth
 
     <!-- Produits Recommandés -->
     @if($produitsSimilaires && count($produitsSimilaires) > 0)

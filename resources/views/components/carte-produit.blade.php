@@ -23,18 +23,15 @@
         <div class="absolute top-3 left-3">
             @if($produit->stock <= 0)
                 <span class="inline-flex items-center gap-1.5 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                    <x-icon name="status/out-of-stock" class="w-4 h-4" />
-                    Rupture
+                    🔴 Rupture
                 </span>
             @elseif($produit->stock < 5)
                 <span class="inline-flex items-center gap-1.5 bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                    <x-icon name="status/low-stock" class="w-4 h-4" />
-                    Limité
+                    🟡 Stock faible
                 </span>
             @else
                 <span class="inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                    <x-icon name="status/in-stock" class="w-4 h-4" />
-                    {{ $produit->stock }} stock
+                    🟢 {{ $produit->stock }} stock
                 </span>
             @endif
         </div>
@@ -46,7 +43,7 @@
     </div>
 
     <!-- Contenu de la carte -->
-    <div class="p-5 space-y-4">
+    <div class="p-5 space-y-3">
         <!-- Nom du produit -->
         <h3 class="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-primary-600 transition-colors duration-300">
             {{ $produit->nom }}
@@ -57,11 +54,31 @@
             {{ Str::limit($produit->description, 60) }}
         </p>
 
+        <!-- Vendeur -->
+        @if($produit->vendeur)
+            <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                <span class="text-sm">🏪</span>
+                <span class="text-xs text-gray-700">
+                    <span class="font-semibold">{{ $produit->vendeur->shop_name ?? $produit->vendeur->name }}</span>
+                </span>
+            </div>
+        @endif
+
+        <!-- Note et Avis -->
+        <div class="flex items-center gap-2">
+            <div class="flex gap-0.5">
+                @for($i = 1; $i <= 5; $i++)
+                    <span class="text-sm">{{ $i <= round($produit->note_moyenne ?? 4.5) ? '⭐' : '☆' }}</span>
+                @endfor
+            </div>
+            <span class="text-xs text-gray-600">({{ $produit->nombre_avis ?? 0 }} avis)</span>
+        </div>
+
         <!-- Prix et Réduction -->
         <div class="space-y-3 pt-2 border-t border-gray-100">
             <div class="flex items-baseline gap-2">
                 <span class="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-                    {{ number_format($produit->prix, 2, ',', ' ') }} €
+                    {{ number_format($produit->prix, 0, ',', ' ') }} FCFA
                 </span>
                 @if($produit->prix_original && $produit->prix_original > $produit->prix)
                     <span class="text-xs text-gray-500 line-through">
@@ -80,14 +97,14 @@
                     Voir
                 </a>
                 @if($produit->stock > 0)
-                    <form action="{{ route('panier.ajouter', $produit->id) }}" method="POST" class="flex-1">
-                        @csrf
-                        <input type="hidden" name="quantite" value="1">
-                        <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/50 hover:scale-105 transition-all duration-300 text-sm">
-                            <x-icon name="commerce/shopping-cart" class="w-4 h-4" />
-                            Ajouter
-                        </button>
-                    </form>
+                    <button
+                        type="button"
+                        onclick="openQuantityModal({{ $produit->id }}, '{{ $produit->nom }}', {{ $produit->stock }}, {{ $produit->prix }})"
+                        class="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/50 hover:scale-105 transition-all duration-300 text-sm cursor-pointer"
+                    >
+                        <x-icon name="commerce/shopping-cart" class="w-4 h-4" />
+                        Ajouter
+                    </button>
                 @else
                     <button disabled class="flex-1 px-3 py-2.5 bg-gray-200 text-gray-500 font-semibold rounded-xl cursor-not-allowed text-sm">
                         Indisponible
@@ -97,3 +114,4 @@
         </div>
     </div>
 </div>
+

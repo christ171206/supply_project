@@ -5,6 +5,7 @@ use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\PanierController;
 use App\Http\Controllers\CommandeController;
 use App\Http\Controllers\AvisController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\VendeurProduitController;
 use App\Http\Controllers\ClientDashboardController;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProduitController::class, 'index'])->name('accueil');
 Route::get('/produits', [ProduitController::class, 'catalogue'])->name('produits.catalogue');
 Route::get('/produits/{id}', [ProduitController::class, 'show'])->name('produits.show');
+Route::get('/test-debug', function () {
+    $produits = \App\Models\Produit::latest()->limit(8)->get();
+    return view('test-debug', ['produits' => $produits]);
+});
 Route::get('/info', function () {
     return view('info.index');
 })->name('info');
@@ -25,6 +30,16 @@ Route::get('/diagnostic', function () {
         'users_count' => \App\Models\User::count(),
         'produits' => \App\Models\Produit::latest()->limit(8)->get(),
         'categories' => \App\Models\Categorie::all(),
+    ]);
+});
+
+// Debug Images
+Route::get('/debug-images', function () {
+    return view('debug-images', [
+        'total_produits' => \App\Models\Produit::count(),
+        'avec_image' => \App\Models\Produit::whereNotNull('image')->where('image', '!=', '')->count(),
+        'sans_image' => \App\Models\Produit::whereNull('image')->orWhere('image', '=', '')->count(),
+        'produits' => \App\Models\Produit::latest()->get(),
     ]);
 });
 
@@ -68,6 +83,11 @@ Route::middleware('auth')->group(function () {
     // Avis
     Route::post('/avis', [AvisController::class, 'store'])->name('avis.store');
     Route::delete('/avis/{avis}', [AvisController::class, 'destroy'])->name('avis.destroy');
+
+    // Favoris
+    Route::get('/favoris', [FavoriteController::class, 'index'])->name('favoris.index');
+    Route::post('/favoris/{productId}/toggle', [FavoriteController::class, 'toggle'])->name('favoris.toggle');
+    Route::get('/favoris/{productId}/check', [FavoriteController::class, 'isFavorited'])->name('favoris.check');
 });
 
 // Routes Vendeur
