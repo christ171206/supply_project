@@ -257,11 +257,25 @@
             // Listen for cart updates
             document.addEventListener('cart-updated', updateCartBadge);
 
-            // Favoris functionality
+            // Favoris functionality with localStorage support
+            function getFavoritesFromStorage() {
+                const favs = localStorage.getItem('favorites');
+                return favs ? JSON.parse(favs) : [];
+            }
+
+            function saveFavoritesToStorage(favorites) {
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+            }
+
+            function isFavoritedLocally(productId) {
+                return getFavoritesFromStorage().includes(productId);
+            }
+
             async function toggleFavorite(productId, event) {
                 event.preventDefault();
 
                 @auth
+                    // Utilisateur connecté: sauvegarder en BD
                     try {
                         const response = await fetch(`/favoris/${productId}/toggle`, {
                             method: 'POST',
@@ -280,8 +294,19 @@
                         console.error('Error toggling favorite:', error);
                     }
                 @else
-                    // Redirect to login if not authenticated
-                    window.location.href = "{{ route('login') }}";
+                    // Utilisateur non connecté: utiliser localStorage
+                    const favorites = getFavoritesFromStorage();
+                    const isFavorited = favorites.includes(productId);
+
+                    if (isFavorited) {
+                        const index = favorites.indexOf(productId);
+                        favorites.splice(index, 1);
+                    } else {
+                        favorites.push(productId);
+                    }
+
+                    saveFavoritesToStorage(favorites);
+                    updateFavoriteButton(productId, !isFavorited);
                 @endauth
             }
 
@@ -302,17 +327,43 @@
             }
 
             // Check favorite status on load
-            async function checkFavoriteStatus(productId) {
+            function checkFavoriteStatus(productId) {
                 @auth
-                    try {
-                        const response = await fetch(`/favoris/${productId}/check`);
-                        const data = await response.json();
-                        updateFavoriteButton(productId, data.is_favorited);
-                    } catch (error) {
-                        console.error('Error checking favorite status:', error);
-                    }
+                    // Utilisateur connecté: vérifier en BD
+                    fetch(`/favoris/${productId}/check`)
+                        .then(response => response.json())
+                        .then(data => updateFavoriteButton(productId, data.is_favorited))
+                        .catch(error => console.error('Error checking favorite status:', error));
+                @else
+                    // Utilisateur non connecté: vérifier localStorage
+                    const isFavorited = isFavoritedLocally(productId);
+                    updateFavoriteButton(productId, isFavorited);
                 @endauth
             }
+
+            // Synchroniser les favoris localStorage vers la BD si l'utilisateur se connecte
+            @auth
+            function syncLocalFavoritesToDatabase() {
+                const localFavorites = getFavoritesFromStorage();
+                if (localFavorites.length > 0) {
+                    localFavorites.forEach(productId => {
+                        fetch(`/favoris/${productId}/toggle`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Content-Type': 'application/json',
+                            },
+                        }).catch(error => console.error('Error syncing favorite:', error));
+                    });
+                    // Vider localStorage après sync
+                    saveFavoritesToStorage([]);
+                }
+            }
+
+            // Sync on page load if user just logged in
+            document.addEventListener('DOMContentLoaded', syncLocalFavoritesToDatabase);
+            @endauth
+        </script>
         </script>
 
         @yield('scripts')

@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProduitController::class, 'index'])->name('accueil');
 Route::get('/produits', [ProduitController::class, 'catalogue'])->name('produits.catalogue');
 Route::get('/produits/{id}', [ProduitController::class, 'show'])->name('produits.show');
+
+// API Routes
+Route::get('/api/produits/{ids}', function ($ids) {
+    $idArray = explode(',', $ids);
+    $produits = \App\Models\Produit::whereIn('id', $idArray)->get(['id', 'nom', 'prix', 'image']);
+    return response()->json($produits);
+});
+
 Route::get('/test-debug', function () {
     $produits = \App\Models\Produit::latest()->limit(8)->get();
     return view('test-debug', ['produits' => $produits]);

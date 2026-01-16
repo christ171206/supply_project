@@ -43,7 +43,7 @@
                                         </a>
                                     </h3>
                                     <p class="text-gray-600 text-sm mb-3">{{ Str::limit($item->produit->description, 100) }}</p>
-                                    <p class="text-2xl font-bold text-gray-900">{{ number_format($item->prix_unitaire, 2, ',', ' ') }} €</p>
+                                    <p class="text-2xl font-bold text-gray-900">{{ number_format($item->prix_unitaire, 0, '', ' ') }} F CFA</p>
                                 </div>
 
                                 <!-- Quantité et Actions -->
@@ -52,11 +52,11 @@
                                         @csrf
                                         @method('PATCH')
                                         <label for="quantite_{{ $item->id }}" class="text-sm font-medium text-gray-700">Qté:</label>
-                                        <input type="number" 
+                                        <input type="number"
                                                id="quantite_{{ $item->id }}"
-                                               name="quantite" 
-                                               value="{{ $item->quantite }}" 
-                                               min="1" 
+                                               name="quantite"
+                                               value="{{ $item->quantite }}"
+                                               min="1"
                                                max="{{ $item->produit->stock }}"
                                                class="w-16 px-2 py-1 border border-gray-300 rounded text-center"
                                                onchange="this.form.submit()">
@@ -64,7 +64,7 @@
 
                                     <div class="text-right">
                                         <p class="text-sm text-gray-600">Sous-total</p>
-                                        <p class="text-lg font-bold text-gray-900">{{ number_format($item->quantite * $item->prix_unitaire, 2, ',', ' ') }} €</p>
+                                        <p class="text-lg font-bold text-gray-900">{{ number_format($item->quantite * $item->prix_unitaire, 0, '', ' ') }} F CFA</p>
                                     </div>
 
                                     <form action="{{ route('panier.supprimer', $item->id) }}" method="POST">
@@ -119,7 +119,7 @@
                     </div>
                     <div class="flex justify-between text-gray-700">
                         <span>Sous-total</span>
-                        <span class="font-semibold">{{ number_format($total ?? 0, 2, ',', ' ') }} €</span>
+                        <span class="font-semibold">{{ number_format($total ?? 0, 0, '', ' ') }} F CFA</span>
                     </div>
                     <div class="flex justify-between text-gray-700">
                         <span>Frais de livraison</span>
@@ -127,7 +127,7 @@
                             @if(($total ?? 0) > 100)
                                 Gratuit
                             @else
-                                {{ number_format($fraisLivraison ?? 9.99, 2, ',', ' ') }} €
+                                2 500 F CFA
                             @endif
                         </span>
                     </div>
@@ -138,7 +138,7 @@
 
                 <div class="flex justify-between text-xl font-bold text-gray-900 mb-6">
                     <span>Total</span>
-                    <span>{{ number_format(($total ?? 0) + (($total ?? 0) > 100 ? 0 : ($fraisLivraison ?? 9.99)), 2, ',', ' ') }} €</span>
+                    <span>{{ number_format(($total ?? 0) + (($total ?? 0) > 100 ? 0 : 2500), 0, '', ' ') }} F CFA</span>
                 </div>
 
                 @if($items && count($items) > 0)
