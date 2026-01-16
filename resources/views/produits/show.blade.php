@@ -292,16 +292,32 @@
                 <!-- Note -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-3">Votre Note</label>
-                    <div class="flex gap-3">
-                        @for($i = 1; $i <= 5; $i++)
-                            <label class="cursor-pointer group">
-                                <input type="radio" name="note" value="{{ $i }}" class="hidden" required>
-                                <span class="text-5xl group-hover:scale-125 transition duration-200 inline-block">
-                                    ⭐
-                                </span>
+                    <div class="flex gap-2" style="direction: rtl;">
+                        @for($i = 5; $i >= 1; $i--)
+                            <input 
+                                type="radio" 
+                                name="note" 
+                                value="{{ $i }}" 
+                                id="rating-{{ $i }}" 
+                                class="hidden peer/rating-{{ $i }}" 
+                                required
+                            >
+                            <label 
+                                for="rating-{{ $i }}" 
+                                class="cursor-pointer text-4xl transition-all duration-200 hover:scale-125 peer/rating-{{ $i }}:text-yellow-400 text-gray-300"
+                            >
+                                ⭐
                             </label>
                         @endfor
                     </div>
+                    <style>
+                        input[name="note"]:checked ~ label,
+                        input[name="note"]:checked ~ label ~ label,
+                        label:hover,
+                        label:hover ~ label {
+                            color: #FBBF24;
+                        }
+                    </style>
                     @error('note')
                         <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                     @enderror
@@ -351,6 +367,116 @@
             </a>
         </div>
     @endauth
+
+    <!-- Contacter le Vendeur -->
+    @if($produit->vendeur)
+        <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 mb-12 border-2 border-purple-200">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center text-2xl">
+                    📧
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900">Contacter le Vendeur</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <!-- Info Vendeur -->
+                <div class="md:col-span-1 bg-white rounded-xl p-6 border border-purple-100">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-3xl">
+                            👤
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Vendeur</p>
+                            <p class="text-lg font-bold text-gray-900">{{ $produit->vendeur->name }}</p>
+                        </div>
+                    </div>
+
+                    @if($produit->vendeur->phone)
+                        <div class="mb-4 pb-4 border-b border-gray-200">
+                            <p class="text-xs text-gray-600 mb-2">📞 Téléphone</p>
+                            <a href="tel:{{ $produit->vendeur->phone }}" class="text-purple-600 font-semibold hover:text-purple-700">
+                                {{ $produit->vendeur->phone }}
+                            </a>
+                        </div>
+                    @endif
+
+                    <div>
+                        <p class="text-xs text-gray-600 mb-2">📧 Email</p>
+                        <a href="mailto:{{ $produit->vendeur->email }}" class="text-purple-600 font-semibold hover:text-purple-700 break-all">
+                            {{ $produit->vendeur->email }}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Formulaire de Contact -->
+                <div class="md:col-span-2">
+                    @auth
+                        <form action="{{ route('messages.store') }}" method="POST" class="bg-white rounded-xl p-6 border border-purple-100 space-y-4">
+                            @csrf
+                            <input type="hidden" name="destinataire_id" value="{{ $produit->vendeur->id }}">
+                            <input type="hidden" name="produit_id" value="{{ $produit->id }}">
+
+                            <!-- Sujet -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Sujet</label>
+                                <input
+                                    type="text"
+                                    name="sujet"
+                                    value="{{ old('sujet', 'Demande d\'information sur : ' . $produit->nom) }}"
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition @error('sujet') border-red-500 @enderror"
+                                >
+                                @error('sujet')
+                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Message -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+                                <textarea
+                                    name="contenu"
+                                    rows="4"
+                                    placeholder="Votre message..."
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none @error('contenu') border-red-500 @enderror"
+                                >{{ old('contenu') }}</textarea>
+                                @error('contenu')
+                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Bouton -->
+                            <button
+                                type="submit"
+                                class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 rounded-lg transition transform hover:scale-105 shadow-lg"
+                            >
+                                📤 Envoyer le Message
+                            </button>
+                        </form>
+                    @else
+                        <div class="bg-white rounded-xl p-8 border border-purple-100 text-center">
+                            <p class="text-gray-600 mb-6">🔐 Connectez-vous pour contacter le vendeur</p>
+                            <div class="flex gap-4 justify-center">
+                                <a
+                                    href="{{ route('login') }}"
+                                    class="inline-block px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg hover:from-purple-600 hover:to-pink-600 transition"
+                                >
+                                    🔑 Se Connecter
+                                </a>
+                                <a
+                                    href="{{ route('register') }}"
+                                    class="inline-block px-6 py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition"
+                                >
+                                    📝 S'inscrire
+                                </a>
+                            </div>
+                        </div>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    @endif
 
     <!-- Produits Recommandés -->
     @if($produitsSimilaires && count($produitsSimilaires) > 0)

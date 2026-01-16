@@ -163,6 +163,11 @@
                     <div class="text-4xl mb-3 group-hover:scale-110 transition">🛒</div>
                     <span>Voir Panier</span>
                 </a>
+                <a href="{{ route('messages.index') }}"
+                   class="group bg-gradient-to-br from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white rounded-xl shadow-lg p-8 text-center font-bold transition transform hover:scale-105">
+                    <div class="text-4xl mb-3 group-hover:scale-110 transition">💬</div>
+                    <span>Messages</span>
+                </a>
                 <a href="{{ route('client.commandes') }}"
                    class="group bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl shadow-lg p-8 text-center font-bold transition transform hover:scale-105">
                     <div class="text-4xl mb-3 group-hover:scale-110 transition">📦</div>

@@ -8,6 +8,7 @@ use App\Http\Controllers\AvisController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\VendeurProduitController;
 use App\Http\Controllers\ClientDashboardController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
 // Routes publiques
@@ -81,6 +82,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/commandes/paiement', [CommandeController::class, 'create'])->name('commandes.create');
     Route::get('/commandes/{id}', [CommandeController::class, 'show'])->name('commandes.show');
     Route::get('/commandes/{id}/facture', [CommandeController::class, 'facture'])->name('commandes.facture');
+    Route::get('/commandes/{id}/download-pdf', [CommandeController::class, 'downloadPDF'])->name('commandes.download-pdf');
     Route::post('/commandes', [CommandeController::class, 'store'])->name('commandes.store');
 
     // Profil (Breeze)
@@ -96,6 +98,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/favoris', [FavoriteController::class, 'index'])->name('favoris.index');
     Route::post('/favoris/{productId}/toggle', [FavoriteController::class, 'toggle'])->name('favoris.toggle');
     Route::get('/favoris/{productId}/check', [FavoriteController::class, 'isFavorited'])->name('favoris.check');
+
+    // Messages
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{userId}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::post('/messages/{userId}/reply', [MessageController::class, 'reply'])->name('messages.reply');
+    Route::delete('/messages/{messageId}', [MessageController::class, 'destroy'])->name('messages.destroy');
+    Route::get('/messages/unread/count', [MessageController::class, 'unreadCount'])->name('messages.unread-count');
 });
 
 // Routes Vendeur

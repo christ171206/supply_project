@@ -100,7 +100,7 @@
                         <span>Frais de livraison</span>
                         <span class="font-semibold">
                             @php
-                                $frais = $commande->montant_total - $sousTotal;
+                                $frais = $sousTotal > 100000 ? 0 : 2500;
                             @endphp
                             @if($frais == 0)
                                 Gratuit
@@ -130,6 +130,9 @@
 
                 <!-- Actions -->
                 <div class="mt-6 space-y-3">
+                    <a href="{{ route('commandes.download-pdf', $commande->id) }}" class="w-full block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-bold text-center">
+                        � Voir la Facture
+                    </a>
                     <a href="{{ route('commandes.index') }}" class="w-full block px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-bold text-center">
                         Mes Commandes
                     </a>

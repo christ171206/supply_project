@@ -202,4 +202,27 @@ class CommandeController extends Controller
 
         return view('commandes.facture', compact('commande', 'lignes', 'payment'));
     }
+
+    /**
+     * Afficher la facture pour impression/téléchargement
+     */
+    public function downloadPDF($id)
+    {
+        $commande = Commande::findOrFail($id);
+
+        // Vérifier que l'utilisateur est propriétaire
+        if (auth()->user()->id !== $commande->user_id) {
+            abort(403);
+        }
+
+        $lignes = $commande->ligneCommandes()->with('produit')->get();
+        $payment = $commande->payment;
+
+        // Calculer les sous-totaux
+        $sousTotal = $lignes->sum(fn($l) => $l->quantite * $l->prix_unitaire);
+        $frais = $sousTotal > 100000 ? 0 : 2500;
+        $total = $sousTotal + $frais;
+
+        return view('commandes.facture-pdf', compact('commande', 'lignes', 'sousTotal', 'frais', 'total', 'payment'));
+    }
 }

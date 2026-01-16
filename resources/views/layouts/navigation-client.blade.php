@@ -75,6 +75,9 @@
                                 </a>
                             @endif
 
+                            <a href="{{ route('messages.index') }}" class="block px-4 py-2.5 text-slate-300 hover:bg-indigo-500/20 hover:text-indigo-300 transition">
+                                💬 Messages
+                            </a>
                             <a href="{{ route('client.profil') }}" class="block px-4 py-2.5 text-slate-300 hover:bg-indigo-500/20 hover:text-indigo-300 transition">
                                 👤 Mon Profil
                             </a>
