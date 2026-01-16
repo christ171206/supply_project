@@ -17,7 +17,7 @@ class FavoriteController extends Controller
     {
         $user = auth()->user();
         $favoris = $user->produitsFavoris()->with('categorie', 'vendeur')->paginate(12);
-        
+
         return view('favoris.index', compact('favoris'));
     }
 

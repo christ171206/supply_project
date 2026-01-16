@@ -37,8 +37,13 @@
         </div>
 
         <!-- Wishlist button -->
-        <button class="absolute top-3 right-12 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary-50">
-            <x-icon name="user/wishlist" class="w-5 h-5 text-accent-500 hover:text-accent-600" />
+        <!-- Wishlist button -->
+        <button
+            onclick="toggleFavorite({{ $produit->id }}, event)"
+            data-favorite-btn="{{ $produit->id }}"
+            class="absolute top-3 right-12 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary-50 text-2xl"
+        >
+            🤍
         </button>
     </div>
 
@@ -115,3 +120,9 @@
     </div>
 </div>
 
+<script>
+    // Check favorite status for this product when component loads
+    document.addEventListener('DOMContentLoaded', function() {
+        checkFavoriteStatus({{ $produit->id }});
+    }, { once: true });
+</script>

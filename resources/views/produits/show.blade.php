@@ -119,7 +119,7 @@
             <!-- Actions -->
             <div class="flex gap-4 mb-8">
                 @if($produit->stock > 0)
-                    <button 
+                    <button
                         type="button"
                         onclick="openQuantityModal({{ $produit->id }}, '{{ $produit->nom }}', {{ $produit->stock }}, {{ $produit->prix }})"
                         class="flex-1 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-bold text-lg"

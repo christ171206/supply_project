@@ -260,7 +260,7 @@
             // Favoris functionality
             async function toggleFavorite(productId, event) {
                 event.preventDefault();
-                
+
                 @auth
                     try {
                         const response = await fetch(`/favoris/${productId}/toggle`, {
@@ -272,7 +272,7 @@
                         });
 
                         const data = await response.json();
-                        
+
                         if (data.success) {
                             updateFavoriteButton(productId, data.is_favorited);
                         }
