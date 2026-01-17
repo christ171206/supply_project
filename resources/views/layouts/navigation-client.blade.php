@@ -39,6 +39,22 @@
                     ❤️ Favoris
                     <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-rose-500 to-pink-500 group-hover:w-full transition-all duration-300"></span>
                 </a>
+
+                <!-- Messages (for authenticated users only) -->
+                @auth
+                    <a href="{{ route('client.messages') }}" class="relative px-4 py-2 text-amber-900 hover:text-amber-700 font-medium transition duration-200 group">
+                        💬 Messages
+                        @php
+                            $unreadCount = \App\Models\Message::where('to_user_id', Auth::id())->where('lu', false)->count();
+                        @endphp
+                        @if($unreadCount > 0)
+                            <span class="absolute -top-2 -right-1 bg-gradient-to-r from-red-500 to-pink-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg shadow-red-500/50">
+                                {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                            </span>
+                        @endif
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                @endauth
             </div>
 
             <!-- User Menu & Mobile -->
@@ -75,7 +91,7 @@
                                 </a>
                             @endif
 
-                            <a href="{{ route('messages.index') }}" class="block px-4 py-2.5 text-slate-300 hover:bg-indigo-500/20 hover:text-indigo-300 transition">
+                            <a href="{{ route('client.messages') }}" class="block px-4 py-2.5 text-slate-300 hover:bg-indigo-500/20 hover:text-indigo-300 transition">
                                 💬 Messages
                             </a>
                             <a href="{{ route('client.profil') }}" class="block px-4 py-2.5 text-slate-300 hover:bg-indigo-500/20 hover:text-indigo-300 transition">

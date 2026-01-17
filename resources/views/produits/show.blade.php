@@ -65,12 +65,7 @@
                                 <span class="font-bold text-gray-900">4.7/5</span>
                                 <span class="text-gray-600 text-sm">(145 avis)</span>
                             </div>
-                            <a
-                                href="{{ route('messages.create', $produit->vendeur->id) }}"
-                                class="inline-block px-4 py-2 bg-primary-500 text-white font-bold rounded-lg hover:bg-primary-600 transition text-sm"
-                            >
-                                💬 Contacter
-                            </a>
+
                         </div>
                     </div>
                 </div>
@@ -292,36 +287,56 @@
                 <!-- Note -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-3">Votre Note</label>
-                    <div class="flex gap-2" style="direction: rtl;">
-                        @for($i = 5; $i >= 1; $i--)
-                            <input 
-                                type="radio" 
-                                name="note" 
-                                value="{{ $i }}" 
-                                id="rating-{{ $i }}" 
-                                class="hidden peer/rating-{{ $i }}" 
-                                required
-                            >
-                            <label 
-                                for="rating-{{ $i }}" 
-                                class="cursor-pointer text-4xl transition-all duration-200 hover:scale-125 peer/rating-{{ $i }}:text-yellow-400 text-gray-300"
-                            >
-                                ⭐
+                    <div class="flex gap-3" id="rating-stars">
+                        @for($i = 1; $i <= 5; $i++)
+                            <label class="cursor-pointer group" data-rating="{{ $i }}">
+                                <input type="radio" name="note" value="{{ $i }}" class="hidden rating-input" required>
+                                <span class="text-5xl group-hover:scale-125 transition duration-200 inline-block rating-star">
+                                    ☆
+                                </span>
                             </label>
                         @endfor
                     </div>
-                    <style>
-                        input[name="note"]:checked ~ label,
-                        input[name="note"]:checked ~ label ~ label,
-                        label:hover,
-                        label:hover ~ label {
-                            color: #FBBF24;
-                        }
-                    </style>
                     @error('note')
                         <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const ratingStars = document.getElementById('rating-stars');
+                        const ratingInputs = ratingStars.querySelectorAll('.rating-input');
+                        const ratingSpans = ratingStars.querySelectorAll('.rating-star');
+                        const labels = ratingStars.querySelectorAll('label');
+
+                        // Hover effect
+                        labels.forEach((label, index) => {
+                            label.addEventListener('mouseenter', () => {
+                                ratingSpans.forEach((span, i) => {
+                                    span.textContent = i <= index ? '⭐' : '☆';
+                                });
+                            });
+
+                            // Click to select
+                            label.addEventListener('click', () => {
+                                ratingInputs[index].checked = true;
+                                updateStars(index);
+                            });
+                        });
+
+                        // Reset when leaving
+                        ratingStars.addEventListener('mouseleave', () => {
+                            const selectedIndex = Array.from(ratingInputs).findIndex(input => input.checked);
+                            updateStars(selectedIndex);
+                        });
+
+                        function updateStars(selectedIndex) {
+                            ratingSpans.forEach((span, i) => {
+                                span.textContent = i <= selectedIndex ? '⭐' : '☆';
+                            });
+                        }
+                    });
+                </script>
 
                 <!-- Commentaire -->
                 <div>

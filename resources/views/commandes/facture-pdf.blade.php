@@ -341,8 +341,8 @@
         <!-- Pied de page -->
         <div class="footer">
             <p>
-                Merci pour votre achat ! | 
-                Facture générée le {{ now()->format('d/m/Y H:i') }} | 
+                Merci pour votre achat ! |
+                Facture générée le {{ now()->format('d/m/Y H:i') }} |
                 Gestion E-commerce Supply
             </p>
         </div>

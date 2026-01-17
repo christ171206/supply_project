@@ -26,7 +26,7 @@ class MessageController extends Controller
         ->get()
         ->unique(function ($message) {
             // Créer une clé unique pour chaque conversation (peu importe la direction)
-            return $message->from_user_id === Auth::id() 
+            return $message->from_user_id === Auth::id()
                 ? min(Auth::id(), $message->to_user_id) . '-' . max(Auth::id(), $message->to_user_id)
                 : min($message->from_user_id, Auth::id()) . '-' . max($message->from_user_id, Auth::id());
         })

@@ -23,42 +23,6 @@ Route::get('/api/produits/{ids}', function ($ids) {
     return response()->json($produits);
 });
 
-Route::get('/test-debug', function () {
-    $produits = \App\Models\Produit::latest()->limit(8)->get();
-    return view('test-debug', ['produits' => $produits]);
-});
-Route::get('/info', function () {
-    return view('info.index');
-})->name('info');
-
-// Diagnostic (dev only)
-Route::get('/diagnostic', function () {
-    return view('diagnostic', [
-        'produits_count' => \App\Models\Produit::count(),
-        'categories_count' => \App\Models\Categorie::count(),
-        'users_count' => \App\Models\User::count(),
-        'produits' => \App\Models\Produit::latest()->limit(8)->get(),
-        'categories' => \App\Models\Categorie::all(),
-    ]);
-});
-
-// Debug Images
-Route::get('/debug-images', function () {
-    return view('debug-images', [
-        'total_produits' => \App\Models\Produit::count(),
-        'avec_image' => \App\Models\Produit::whereNotNull('image')->where('image', '!=', '')->count(),
-        'sans_image' => \App\Models\Produit::whereNull('image')->orWhere('image', '=', '')->count(),
-        'produits' => \App\Models\Produit::latest()->get(),
-    ]);
-});
-
-// Test Images
-Route::get('/test-images', function () {
-    return view('test-images', [
-        'produits' => \App\Models\Produit::all(),
-    ]);
-});
-
 // Panier (accessible sans auth)
 Route::get('/panier', [PanierController::class, 'index'])->name('panier.index');
 Route::get('/panier/count', [PanierController::class, 'count'])->name('panier.count');
@@ -73,7 +37,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
     Route::get('/mes-commandes', [ClientDashboardController::class, 'commandes'])->name('client.commandes');
     Route::get('/commande/{id}', [ClientDashboardController::class, 'commandeDetail'])->name('client.commande-detail');
-    Route::get('/messages', [ClientDashboardController::class, 'messages'])->name('client.messages');
     Route::get('/mon-profil', [ClientDashboardController::class, 'profil'])->name('client.profil');
     Route::put('/mon-profil', [ClientDashboardController::class, 'updateProfil'])->name('client.profil.update');
 
@@ -100,7 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/favoris/{productId}/check', [FavoriteController::class, 'isFavorited'])->name('favoris.check');
 
     // Messages
-    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages', [MessageController::class, 'index'])->name('client.messages');
     Route::get('/messages/{userId}', [MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::post('/messages/{userId}/reply', [MessageController::class, 'reply'])->name('messages.reply');

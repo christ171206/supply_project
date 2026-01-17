@@ -168,6 +168,12 @@
                             <span class="text-3xl font-bold text-green-600">{{ number_format($commande->total, 0, ',', ' ') }} FCFA</span>
                         </div>
                     </div>
+
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <a href="{{ route('commandes.download-pdf', $commande->id) }}" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg font-bold transition">
+                            📄 Télécharger la Facture
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Actions -->
