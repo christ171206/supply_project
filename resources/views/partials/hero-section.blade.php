@@ -12,17 +12,22 @@
             <h1 class="text-6xl md:text-7xl font-bold text-gray-900 leading-tight">
                 Bienvenue à <span class="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">Supply</span>
             </h1>
-            <p class="text-2xl text-gray-700 max-w-3xl mx-auto">Votre boutique informatique de confiance en Côte d'Ivoire</p>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Technologie de qualité, livraison rapide, prix compétitifs en FCFA</p>
+            <p class="text-2xl text-gray-900 max-w-3xl mx-auto font-bold drop-shadow-md">Accédez aux meilleurs produits informatiques</p>
+            <p class="text-lg text-gray-800 max-w-2xl mx-auto font-semibold drop-shadow">Livraison rapide à Abidjan et partout en Côte d'Ivoire • Prix compétitifs en FCFA • Service client réactif</p>
 
-            <div class="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-                <a href="{{ route('produits.catalogue') }}" class="btn-primary inline-flex items-center justify-center gap-2">
-                    Explorer la boutique
+            <div class="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                <a href="{{ route('produits.catalogue') }}" class="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg font-bold hover:from-primary-700 hover:to-primary-800 transition-all duration-150 shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 inline-flex items-center justify-center gap-2 text-lg border-2 border-primary-800">
+                    🛍️ Explorer la boutique
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                     </svg>
                 </a>
-                <a href="{{ route('register') }}" class="btn-secondary">Devenir vendeur</a>
+                <a href="{{ route('register') }}" class="px-8 py-4 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white font-bold rounded-lg border-2 border-accent-700 transition-all duration-150 shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 inline-flex items-center justify-center gap-2 text-lg">
+                    ✍️ Créer un Compte
+                </a>
+                <a href="{{ route('register') }}" class="px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg border-2 border-gray-950 transition-all duration-150 shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 inline-flex items-center justify-center gap-2 text-lg">
+                    🏪 Devenir Vendeur
+                </a>
             </div>
         </div>
     </div>

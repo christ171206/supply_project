@@ -121,24 +121,32 @@
                         <span>Sous-total</span>
                         <span class="font-semibold">{{ number_format($total ?? 0, 0, '', ' ') }} F CFA</span>
                     </div>
-                    <div class="flex justify-between text-gray-700">
-                        <span>Frais de livraison</span>
-                        <span class="font-semibold">
-                            @if(($total ?? 0) > 100)
-                                Gratuit
-                            @else
-                                2 500 F CFA
-                            @endif
-                        </span>
-                    </div>
-                    @if($total > 0 && ($total ?? 0) <= 100)
-                        <p class="text-xs text-gray-500">Livraison gratuite à partir de 100 €</p>
+                    @if($items && count($items) > 0)
+                        <div class="flex justify-between text-gray-700">
+                            <span>Frais de livraison</span>
+                            <span class="font-semibold">
+                                @if(($total ?? 0) > 100)
+                                    Gratuit
+                                @else
+                                    2 500 F CFA
+                                @endif
+                            </span>
+                        </div>
+                        @if($total > 0 && ($total ?? 0) <= 100)
+                            <p class="text-xs text-gray-500">Livraison gratuite à partir de 100 €</p>
+                        @endif
                     @endif
                 </div>
 
                 <div class="flex justify-between text-xl font-bold text-gray-900 mb-6">
                     <span>Total</span>
-                    <span>{{ number_format(($total ?? 0) + (($total ?? 0) > 100 ? 0 : 2500), 0, '', ' ') }} F CFA</span>
+                    <span>
+                        @if($items && count($items) > 0)
+                            {{ number_format(($total ?? 0) + (($total ?? 0) > 100 ? 0 : 2500), 0, '', ' ') }} F CFA
+                        @else
+                            0 F CFA
+                        @endif
+                    </span>
                 </div>
 
                 @if($items && count($items) > 0)

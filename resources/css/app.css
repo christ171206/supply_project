@@ -2,83 +2,174 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Variables CSS personnalisées pour la palette moderne */
+/* Variables CSS personnalisées pour Modern Corporate + Clean UI */
 :root {
-    --color-primary: #0ea5e9;
-    --color-primary-light: #7dd3fc;
-    --color-primary-dark: #0369a1;
-    --color-accent: #ec4899;
-    --color-accent-light: #f472b6;
-    --color-accent-dark: #be185d;
-    --color-secondary: #8b5cf6;
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
+    --color-primary: #3b82f6;
+    --color-primary-light: #60a5fa;
+    --color-primary-dark: #1e40af;
+    --color-accent: #22c55e;
+    --color-accent-light: #4ade80;
+    --color-accent-dark: #15803d;
+    --color-secondary: #6b7280;
+    --color-success: #22c55e;
+    --color-warning: #eab308;
     --color-danger: #ef4444;
 }
 
-/* Fond moderne doux */
+/* Fond moderne épuré */
 body {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background: #f9fafb;
     min-height: 100vh;
+    color: #1f2937;
 }
 
-/* Composants personnalisés modernes */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Composants personnalisés modernes et épurés */
 @layer components {
+    /* Boutons - Design épuré et minimaliste */
     .btn-primary {
-        @apply px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200;
+        @apply px-6 py-3 bg-primary-600 text-white font-medium rounded-lg shadow-sm hover:bg-primary-700 hover:shadow-md transition-all duration-150;
+    }
+
+    .btn-primary:active {
+        @apply translate-y-0.5;
     }
 
     .btn-secondary {
-        @apply px-6 py-3 bg-white text-gray-800 border-2 border-gray-200 font-semibold rounded-xl hover:border-primary-500 hover:text-primary-600 transition-all duration-200;
+        @apply px-6 py-3 bg-white text-gray-700 border border-gray-300 font-medium rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-150;
+    }
+
+    .btn-secondary:active {
+        @apply bg-gray-100;
     }
 
     .btn-accent {
-        @apply px-6 py-3 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200;
+        @apply px-6 py-3 bg-accent-600 text-white font-medium rounded-lg shadow-sm hover:bg-accent-700 hover:shadow-md transition-all duration-150;
     }
 
+    .btn-accent:active {
+        @apply translate-y-0.5;
+    }
+
+    .btn-outline {
+        @apply px-6 py-3 bg-transparent text-primary-600 border border-primary-600 font-medium rounded-lg hover:bg-primary-50 transition-all duration-150;
+    }
+
+    .btn-danger {
+        @apply px-6 py-3 bg-danger-600 text-white font-medium rounded-lg shadow-sm hover:bg-danger-700 hover:shadow-md transition-all duration-150;
+    }
+
+    /* Cartes - Design épuré avec ombres subtiles */
     .card {
-        @apply bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition-all duration-300;
+        @apply bg-white rounded-lg shadow-sm border border-gray-100 p-6 transition-all duration-150;
+    }
+
+    .card:hover {
+        @apply shadow-md border-gray-200;
     }
 
     .card-hover {
-        @apply card hover:border-primary-200 hover:-translate-y-1;
+        @apply card cursor-pointer;
     }
 
+    .card-hover:hover {
+        @apply shadow-md border-primary-200;
+    }
+
+    /* Badges */
     .badge-primary {
-        @apply inline-block px-4 py-2 bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700 rounded-full text-sm font-semibold border border-primary-200;
+        @apply inline-flex items-center px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium border border-primary-200;
     }
 
     .badge-accent {
-        @apply inline-block px-4 py-2 bg-gradient-to-r from-accent-100 to-accent-50 text-accent-700 rounded-full text-sm font-semibold border border-accent-200;
+        @apply inline-flex items-center px-3 py-1 bg-accent-100 text-accent-700 rounded-full text-xs font-medium border border-accent-200;
     }
 
+    .badge-secondary {
+        @apply inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium border border-gray-200;
+    }
+
+    .badge-success {
+        @apply inline-flex items-center px-3 py-1 bg-accent-100 text-accent-700 rounded-full text-xs font-medium border border-accent-200;
+    }
+
+    .badge-warning {
+        @apply inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium border border-yellow-200;
+    }
+
+    .badge-danger {
+        @apply inline-flex items-center px-3 py-1 bg-danger-100 text-danger-700 rounded-full text-xs font-medium border border-danger-200;
+    }
+
+    /* Champs de formulaire - Design épuré */
     .input-field {
-        @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+        @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-150;
+    }
+
+    .input-field::placeholder {
+        @apply text-gray-400;
+    }
+
+    .textarea-field {
+        @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-150 resize-y;
+    }
+
+    /* Sections principales */
+    .section-header {
+        @apply text-2xl font-bold text-gray-900 mb-6;
+    }
+
+    .section-subheader {
+        @apply text-lg font-semibold text-gray-800 mb-4;
+    }
+
+    .divider {
+        @apply border-t border-gray-200;
     }
 }
 
-/* Dégradés modernes */
-.gradient-primary {
-    background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+/* Typographie - Modern Corporate */
+h1 {
+    @apply text-4xl font-bold text-gray-900 tracking-tight;
 }
 
-.gradient-accent {
-    background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+h2 {
+    @apply text-3xl font-bold text-gray-900 tracking-tight;
 }
 
-.gradient-secondary {
-    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+h3 {
+    @apply text-xl font-semibold text-gray-800;
 }
 
-.gradient-hero {
-    background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%);
+h4 {
+    @apply text-lg font-semibold text-gray-800;
 }
 
-/* Animations fluides */
+p {
+    @apply text-gray-700 leading-relaxed;
+}
+
+a {
+    @apply text-primary-600 hover:text-primary-700 transition-colors duration-150;
+}
+
+/* Espacements généreux - Clean whitespace */
+.space-y-relaxed {
+    @apply space-y-8;
+}
+
+.container-relaxed {
+    @apply container mx-auto px-4 py-8 lg:px-8 lg:py-12;
+}
+
+/* Animations fluides et discrètes */
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(12px);
     }
     to {
         opacity: 1;
@@ -86,10 +177,19 @@ body {
     }
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 @keyframes scaleIn {
     from {
         opacity: 0;
-        transform: scale(0.9);
+        transform: scale(0.95);
     }
     to {
         opacity: 1;
@@ -98,18 +198,23 @@ body {
 }
 
 .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
 }
 
 .animate-scale-in {
     animation: scaleIn 0.3s ease-out;
 }
-/* Loader Animation */
+
+/* Loader Animation - Style moderne */
 .loader {
     width: 120px;
     height: 22px;
     border-radius: 40px;
-    color: #0ea5e9;
+    color: #3b82f6;
     border: 2px solid;
     position: relative;
     overflow: hidden;
@@ -145,4 +250,27 @@ body {
 #page-loader.hidden {
     opacity: 0;
     pointer-events: none;
+}
+
+/* Hover effects subtils */
+.transition-subtle {
+    @apply transition-all duration-150;
+}
+
+/* Grid et Layout utilitaires */
+.grid-clean {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.flex-center {
+    @apply flex items-center justify-center;
+}
+
+.flex-between {
+    @apply flex items-center justify-between;
+}
+
+/* Éléments de sépération */
+.separator {
+    @apply h-px bg-gray-200;
 }

@@ -31,6 +31,9 @@ Route::patch('/panier/{itemId}', [PanierController::class, 'modifier'])->name('p
 Route::delete('/panier/{itemId}', [PanierController::class, 'supprimer'])->name('panier.supprimer');
 Route::post('/panier/vider', [PanierController::class, 'vider'])->name('panier.vider');
 
+// Favoris (accessible sans auth - affichage des favoris)
+Route::get('/favoris', [FavoriteController::class, 'index'])->name('favoris.index');
+
 // Routes authentifiées
 Route::middleware('auth')->group(function () {
     // Dashboard Client
@@ -57,8 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/avis', [AvisController::class, 'store'])->name('avis.store');
     Route::delete('/avis/{avis}', [AvisController::class, 'destroy'])->name('avis.destroy');
 
-    // Favoris
-    Route::get('/favoris', [FavoriteController::class, 'index'])->name('favoris.index');
+    // Favoris (toggle et check authentifiés)
     Route::post('/favoris/{productId}/toggle', [FavoriteController::class, 'toggle'])->name('favoris.toggle');
     Route::get('/favoris/{productId}/check', [FavoriteController::class, 'isFavorited'])->name('favoris.check');
 

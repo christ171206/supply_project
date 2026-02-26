@@ -1,153 +1,126 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-gradient-to-br from-gray-50 via-gray-50 to-blue-50 min-h-screen py-12">
-    <div class="max-w-7xl mx-auto px-4">
-        <!-- Header Moderne -->
-        <div class="mb-12">
-            <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-3xl shadow-lg">
-                    <x-icon name="bar-chart-2" class="w-8 h-8 text-blue-600" />
-                </div>
-                <div>
-                    <h1 class="text-4xl font-bold text-gray-900">Tableau de Bord</h1>
-                    <p class="text-gray-600 mt-2">Bienvenue, <span class="font-semibold text-blue-600">{{ Auth::user()->name }}</span> 👋</p>
-                </div>
-            </div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Header -->
+    <div class="mb-10">
+        <h1 class="text-3xl font-bold text-gray-900">Tableau de Bord</h1>
+        <p class="text-gray-600 mt-1">Bienvenue, <span class="font-semibold text-primary-600">{{ Auth::user()->name }}</span></p>
+    </div>
+
+    <!-- Résumé Cartes -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        <!-- Total Commandes -->
+        <div class="card p-6 hover:shadow-md transition">
+            <p class="text-gray-600 text-sm font-semibold">Commandes</p>
+            <p class="text-3xl font-bold text-primary-600 mt-2">{{ $commandesTotal }}</p>
+            <p class="text-xs text-gray-500 mt-2">Total depuis votre inscription</p>
         </div>
 
-        <!-- Bloc Résumé - Amélioré -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <!-- Total Commandes -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition hover:scale-105">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-medium">📦 Total Commandes</p>
-                        <p class="text-4xl font-bold text-blue-600 mt-3">{{ $commandesTotal }}</p>
-                        <p class="text-xs text-gray-500 mt-2">Au total depuis votre inscription</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Commandes en Cours -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition hover:scale-105">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-medium flex items-center gap-1"><x-icon name="clock" class="w-4 h-4" /> En Cours</p>
-                        <p class="text-4xl font-bold text-yellow-500 mt-3">{{ $commandesEnCours }}</p>
-                        <p class="text-xs text-gray-500 mt-2">À livrer bientôt</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Dépensé -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition hover:scale-105">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-medium">💰 Total Dépensé</p>
-                        <p class="text-3xl font-bold text-green-600 mt-3">{{ number_format($montantTotal, 0, ',', ' ') }}</p>
-                        <p class="text-xs text-gray-500 mt-2">FCFA</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Dernier Achat -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition hover:scale-105">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-medium">📅 Dernier Achat</p>
-                        <p class="text-2xl font-bold text-purple-600 mt-3">
-                            @if($commandesRecentes->first())
-                                {{ $commandesRecentes->first()->created_at->format('d/m') }}
-                            @else
-                                —
-                            @endif
-                        </p>
-                        <p class="text-xs text-gray-500 mt-2">
-                            @if($commandesRecentes->first())
-                                il y a {{ $commandesRecentes->first()->created_at->diffForHumans() }}
-                            @else
-                                Pas encore d'achat
-                            @endif
-                        </p>
-                    </div>
-                </div>
-            </div>
+        <!-- En Cours -->
+        <div class="card p-6 hover:shadow-md transition">
+            <p class="text-gray-600 text-sm font-semibold">En Cours</p>
+            <p class="text-3xl font-bold text-accent-600 mt-2">{{ $commandesEnCours }}</p>
+            <p class="text-xs text-gray-500 mt-2">À livrer bientôt</p>
         </div>
 
-        <!-- Mes 5 Dernières Commandes - Amélioré -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 mb-12 hover:shadow-xl transition">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-lg">
-                    📦
-                </div>
-                <h2 class="text-2xl font-bold text-gray-900">Mes 5 Dernières Commandes</h2>
-            </div>
+        <!-- Total Dépensé -->
+        <div class="card p-6 hover:shadow-md transition">
+            <p class="text-gray-600 text-sm font-semibold">Total Dépensé</p>
+            <p class="text-3xl font-bold text-secondary-600 mt-2">{{ number_format($montantTotal, 0, ',', ' ') }}</p>
+            <p class="text-xs text-gray-500 mt-2">FCFA</p>
+        </div>
 
-            @if($commandesRecentes->count() > 0)
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b-2 border-gray-200">
-                                <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">N° Commande</th>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Date</th>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Montant</th>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Paiement</th>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Statut</th>
-                                <th class="px-6 py-4 text-center text-sm font-bold text-gray-700">Action</th>
+        <!-- Dernier Achat -->
+        <div class="card p-6 hover:shadow-md transition">
+            <p class="text-gray-600 text-sm font-semibold">Dernier Achat</p>
+            <p class="text-3xl font-bold text-danger-600 mt-2">
+                @if($commandesRecentes->first())
+                    {{ $commandesRecentes->first()->created_at->format('d/m') }}
+                @else
+                    —
+                @endif
+            </p>
+            <p class="text-xs text-gray-500 mt-2">
+                @if($commandesRecentes->first())
+                    {{ $commandesRecentes->first()->created_at->diffForHumans() }}
+                @else
+                    Pas d'achat
+                @endif
+            </p>
+        </div>
+    </div>
+
+    <!-- Dernières Commandes -->
+    <div class="card p-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-6">Dernières Commandes</h2>
+
+        @if($commandesRecentes->count() > 0)
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-4 font-semibold text-gray-900">N°</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-900">Date</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-900">Montant</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-900">Paiement</th>
+                            <th class="text-left py-3 px-4 font-semibold text-gray-900">Statut</th>
+                            <th class="text-center py-3 px-4 font-semibold text-gray-900">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @foreach($commandesRecentes as $commande)
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="py-4 px-4 font-semibold text-gray-900">#{{ $commande->id }}</td>
+                                <td class="py-4 px-4 text-gray-700">{{ $commande->created_at->format('d/m/Y') }}</td>
+                                <td class="py-4 px-4 font-semibold text-primary-600">{{ number_format($commande->total, 0, ',', ' ') }} FCFA</td>
+                                <td class="py-4 px-4">
+                                    <span class="text-xs font-semibold
+                                        @if($commande->mode_paiement == 'mobile_money') text-accent-700
+                                        @elseif($commande->mode_paiement == 'carte_bancaire') text-secondary-700
+                                        @else text-danger-700 @endif">
+                                        @if($commande->mode_paiement == 'mobile_money') Mobile Money
+                                        @elseif($commande->mode_paiement == 'carte_bancaire') Carte
+                                        @else À la livraison @endif
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4">
+                                    @switch($commande->statut)
+                                        @case('en_attente')
+                                            <span class="text-xs font-semibold text-warning-700">⏳ En attente</span>
+                                        @break
+                                        @case('confirmee')
+                                            <span class="text-xs font-semibold text-primary-700">✓ Confirmée</span>
+                                        @break
+                                        @case('expediee')
+                                            <span class="text-xs font-semibold text-accent-700">🚚 Expédiée</span>
+                                        @break
+                                        @case('livree')
+                                            <span class="text-xs font-semibold text-success-700">✓ Livrée</span>
+                                        @break
+                                        @default
+                                            <span class="text-xs font-semibold text-danger-700">✗ Annulée</span>
+                                    @endswitch
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    <a href="{{ route('client.commande-detail', $commande->id) }}" class="text-primary-600 hover:text-primary-700 font-semibold text-xs">
+                                        Voir
+                                    </a>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            @foreach($commandesRecentes as $commande)
-                                <tr class="hover:bg-blue-50 transition">
-                                    <td class="px-6 py-4 font-bold text-gray-900">#{{ $commande->id }}</td>
-                                    <td class="px-6 py-4 text-gray-700">{{ $commande->created_at->format('d/m/Y') }}</td>
-                                    <td class="px-6 py-4 font-bold text-green-600">{{ number_format($commande->total, 0, ',', ' ') }} FCFA</td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
-                                            @if($commande->mode_paiement == 'mobile_money') bg-blue-100 text-blue-800
-                                            @elseif($commande->mode_paiement == 'carte_bancaire') bg-green-100 text-green-800
-                                            @else bg-purple-100 text-purple-800 @endif">
-                                            @if($commande->mode_paiement == 'mobile_money') <x-icon name="smartphone" class="w-4 h-4 inline mr-1" /> Mobile Money
-                                            @elseif($commande->mode_paiement == 'carte_bancaire') 💳 Carte
-                                            @else 🚚 À la livraison @endif
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
-                                            @if($commande->statut == 'en_attente') bg-yellow-100 text-yellow-800
-                                            @elseif($commande->statut == 'confirmee') bg-blue-100 text-blue-800
-                                            @elseif($commande->statut == 'expediee') bg-indigo-100 text-indigo-800
-                                            @elseif($commande->statut == 'livree') bg-green-100 text-green-800
-                                            @else bg-red-100 text-red-800 @endif">
-                                            @switch($commande->statut)
-                                                @case('en_attente') <x-icon name="clock" class="w-4 h-4 inline mr-1" /> En attente @break
-                                                @case('confirmee') <x-icon name="check-circle" class="w-4 h-4 inline mr-1" /> Confirmée @break
-                                                @case('expediee') 🚚 Expédiée @break
-                                                @case('livree') ✓ Livrée @break
-                                                @case('annulee') ❌ Annulée @break
-                                            @endswitch
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-center">
-                                        <a href="{{ route('client.commande-detail', $commande->id) }}" class="text-blue-600 hover:text-blue-700 font-bold hover:underline transition">
-                                            Détails →
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="text-center py-12">
-                    <p class="text-gray-500 text-lg mb-4">Vous n'avez pas encore de commandes</p>
-                    <a href="{{ route('produits.catalogue') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition transform hover:scale-105">
-                        🛍️ Commencer à acheter
-                    </a>
-                </div>
-            @endif
-        </div>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="text-center py-12">
+                <p class="text-gray-600 mb-4">Vous n'avez pas encore de commandes</p>
+                <a href="{{ route('produits.catalogue') }}" class="btn-primary inline-block">
+                    Commencer à acheter
+                </a>
+            </div>
+        @endif
+    </div>
 
         <!-- Raccourcis Rapides - Améliorés -->
         <div>

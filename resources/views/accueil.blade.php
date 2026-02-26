@@ -125,6 +125,7 @@
         @include('partials.hero-section')
         @include('partials.categories-section')
         @include('partials.produits-vedettes')
+        @include('partials.favoris-section')
         @include('partials.cta-section')
     @endif
 @else
@@ -132,6 +133,7 @@
     @include('partials.hero-section')
     @include('partials.categories-section')
     @include('partials.produits-vedettes')
+    @include('partials.favoris-section')
     @include('partials.cta-section')
 @endauth
 @endsection
