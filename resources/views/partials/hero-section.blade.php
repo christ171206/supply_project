@@ -22,12 +22,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                     </svg>
                 </a>
+                @guest
                 <a href="{{ route('register') }}" class="px-8 py-4 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white font-bold rounded-lg border-2 border-accent-700 transition-all duration-150 shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 inline-flex items-center justify-center gap-2 text-lg">
                     ✍️ Créer un Compte
                 </a>
                 <a href="{{ route('register') }}" class="px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg border-2 border-gray-950 transition-all duration-150 shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 inline-flex items-center justify-center gap-2 text-lg">
                     🏪 Devenir Vendeur
                 </a>
+                @endguest
             </div>
         </div>
     </div>

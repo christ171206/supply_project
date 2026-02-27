@@ -23,6 +23,9 @@ Route::get('/api/produits/{ids}', function ($ids) {
     return response()->json($produits);
 });
 
+// API Messages (for WebSocket server)
+Route::post('/api/messages/store', [MessageController::class, 'apiStore']);
+
 // Panier (accessible sans auth)
 Route::get('/panier', [PanierController::class, 'index'])->name('panier.index');
 Route::get('/panier/count', [PanierController::class, 'count'])->name('panier.count');

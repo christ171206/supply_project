@@ -1,0 +1,9 @@
+/* Styles personnalisés pour les modales */
+
+.modal-hidden {
+    display: none !important;
+}
+
+.modal-shown {
+    display: flex !important;
+}

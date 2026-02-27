@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <!-- Logo/Brand -->
-            <div class="flex items-center">
+            <div class="flex items-center -ml-4">
                 <a href="{{ route('accueil') }}" class="flex items-center gap-2 group">
                     <div class="bg-primary-600 p-2 rounded-lg group-hover:bg-primary-700 transition duration-200">
                         <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -39,7 +39,7 @@
                 <!-- Panier -->
                 <a href="{{ route('panier.index') }}" class="relative px-4 py-2 text-gray-800 hover:text-primary-600 font-medium transition duration-150">
                     🛒 Panier
-                    <span id="cart-badge" class="absolute -top-2 -right-1 bg-danger-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm @if(!auth()->check() || !auth()->user()->panier || auth()->user()->panier->items->count() === 0) hidden @endif">
+                    <span id="cart-badge" class="absolute -top-2 -right-1 bg-danger-600 text-white text-xs rounded-full w-5 h-5 items-center justify-center font-bold shadow-sm @if(!auth()->check() || !auth()->user()->panier || auth()->user()->panier->items->count() === 0) modal-hidden @else modal-shown @endif">
                         {{ auth()->check() && auth()->user()->panier ? auth()->user()->panier->items->count() : '0' }}
                     </span>
                 </a>
@@ -56,7 +56,7 @@
                         @php
                             $unreadCount = \App\Models\Message::where('to_user_id', Auth::id())->where('lu', false)->count();
                         @endphp
-                        <span id="messages-badge" class="absolute -top-2 -right-1 bg-danger-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm transition-transform group-hover:scale-110 @if($unreadCount === 0) hidden @endif">
+                        <span id="messages-badge" class="absolute -top-2 -right-1 bg-danger-600 text-white text-xs rounded-full w-5 h-5 items-center justify-center font-bold shadow-sm transition-transform group-hover:scale-110 @if($unreadCount === 0) modal-hidden @else modal-shown @endif">
                             <span id="unread-count">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
                         </span>
                     </a>
@@ -67,8 +67,8 @@
                             // Charger le nombre initial
                             updateMessagesBadge();
 
-                            // Mettre à jour toutes les 5 secondes (fallback sans Socket.io)
-                            setInterval(updateMessagesBadge, 5000);
+                            // Mettre à jour toutes les 3 secondes
+                            setInterval(updateMessagesBadge, 3000);
                         });
 
                         function updateMessagesBadge() {
@@ -79,35 +79,40 @@
                                     const countSpan = document.getElementById('unread-count');
 
                                     if (data.count > 0) {
-                                        badge.classList.remove('hidden');
+                                        badge.classList.remove('modal-hidden');
+                                        badge.classList.add('modal-shown');
                                         countSpan.textContent = data.count > 9 ? '9+' : data.count;
                                     } else {
-                                        badge.classList.add('hidden');
+                                        badge.classList.remove('modal-shown');
+                                        badge.classList.add('modal-hidden');
                                     }
                                 })
-                                .catch(error => console.log('Erreur mise à jour badge:', error));
+                                .catch(error => console.error('Erreur mise à jour badge:', error));
                         }
 
                         // Avec Socket.io si disponible
                         if (typeof io !== 'undefined') {
-                            const socket = io('{{ env('SOCKET_IO_URL', 'http://localhost:3000') }}');
+                            try {
+                                const socket = io('{{ env('SOCKET_IO_URL', 'http://localhost:3000') }}');
 
-                            socket.emit('user-connect', {
-                                userId: {{ Auth::id() }},
-                                name: '{{ Auth::user()->name }}'
-                            });
+                                socket.emit('user-connect', {
+                                    userId: {{ Auth::id() }},
+                                    name: '{{ Auth::user()->name }}'
+                                });
 
-                            socket.on('message-notification', function(data) {
-                                console.log('💬 Nouveau message de:', data.from_user_id);
-                                updateMessagesBadge();
+                                socket.on('message-notification', function(data) {
+                                    console.log('💬 Nouveau message!');
+                                    updateMessagesBadge();
 
-                                // Animation du badge
-                                const badge = document.getElementById('messages-badge');
-                                if (badge) {
-                                    badge.classList.add('animate-pulse');
-                                    setTimeout(() => badge.classList.remove('animate-pulse'), 2000);
-                                }
-                            });
+                                    // Animation du badge
+                                    const badge = document.getElementById('messages-badge');
+                                    if (badge) {
+                                        badge.style.animation = 'pulse 1s infinite';
+                                    }
+                                });
+                            } catch (e) {
+                                console.log('Socket.io non disponible');
+                            }
                         }
                     </script>
                 @endauth

@@ -323,7 +323,10 @@
                 <!-- Info Vendeur -->
                 <div class="p-5 bg-gray-50 rounded-lg border border-gray-200">
                     <p class="text-xs text-gray-600 mb-1">VENDEUR</p>
-                    <p class="font-semibold text-gray-900 mb-4">{{ $produit->vendeur->shop_name ?? $produit->vendeur->name }}</p>
+                    <div class="flex items-center gap-2 mb-4">
+                        <p class="font-semibold text-gray-900">{{ $produit->vendeur->shop_name ?? $produit->vendeur->name }}</p>
+                        <span id="vendor-online-{{ $produit->vendeur->id }}" class="inline-block w-2 h-2 rounded-full bg-gray-300" title="Statut inconnu"></span>
+                    </div>
 
                     @if($produit->vendeur->phone)
                         <div class="mb-3">
@@ -378,7 +381,7 @@
     @endif
 
     <!-- Modal Contacter Vendeur -->
-    <div id="contactVendorModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="closeContactModal(event)">
+    <div id="contactVendorModal" class="modal-hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4" onclick="closeContactModal(event)">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
             <!-- Header du modal -->
             <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
@@ -392,10 +395,25 @@
             <!-- Corps du modal -->
             <div class="p-6">
                 @auth
-                    <form id="contactForm" action="{{ route('messages.store') }}" method="POST" class="space-y-4">
+                    <!-- Message de succès -->
+                    <div id="successMessage" class="hidden mb-4 p-4 bg-green-50 border border-green-300 text-green-700 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">✓</span>
+                            <div>
+                                <p class="font-semibold">Message envoyé avec succès!</p>
+                                <p class="text-sm mt-1">Vous pouvez consulter votre conversation dans <a href="{{ route('client.messages') }}" class="underline font-semibold">Mes Messages</a></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="contactForm" class="space-y-4" onsubmit="return submitContactForm(event)">
                         @csrf
                         <input type="hidden" name="destinataire_id" id="modalVendorId" value="">
                         <input type="hidden" name="produit_id" id="modalProduitId" value="">
+
+                        <div id="formError" class="p-4 bg-red-50 border border-red-300 text-red-700 rounded-lg hidden" role="alert">
+                            <p id="errorMessage"></p>
+                        </div>
 
                         <!-- Objet du message -->
                         <div>
@@ -417,10 +435,12 @@
                                 name="contenu"
                                 rows="5"
                                 placeholder="Posez votre question au vendeur..."
+                                minlength="5"
                                 required
+                                oninput="validateMessageLength(this)"
                                 class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors text-sm resize-none"
                             ></textarea>
-                            <p class="text-xs text-gray-500 mt-1">Minimum 5 caractères</p>
+                            <p id="charWarning" class="text-xs text-gray-500 mt-1">Minimum 5 caractères requis</p>
                         </div>
 
                         <!-- Boutons -->
@@ -428,7 +448,8 @@
                             <button type="button" onclick="closeContactModal()" class="flex-1 px-4 py-2 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition">
                                 Annuler
                             </button>
-                            <button type="submit" class="flex-1 px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition">
+                            <button type="submit" id="submitContactBtn" class="flex-1 px-4 py-2 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                                 Envoyer
                             </button>
                         </div>
@@ -450,7 +471,9 @@
         // Fonction pour ouvrir le modal de contact vendeur
         function openContactModal(vendorId, vendorName, productId, productName) {
             @auth
-                document.getElementById('contactVendorModal').classList.remove('hidden');
+                const modal = document.getElementById('contactVendorModal');
+                modal.classList.remove('modal-hidden');
+                modal.classList.add('modal-shown');
                 document.getElementById('modalVendorName').textContent = vendorName;
                 document.getElementById('modalVendorId').value = vendorId;
                 document.getElementById('modalProduitId').value = productId;
@@ -464,14 +487,17 @@
 
         // Fonction pour fermer le modal
         function closeContactModal(event) {
+            const modal = document.getElementById('contactVendorModal');
             // Si on clique en dehors du modal, le fermer
             if (event && event.target.id === 'contactVendorModal') {
-                document.getElementById('contactVendorModal').classList.add('hidden');
+                modal.classList.remove('modal-shown');
+                modal.classList.add('modal-hidden');
                 document.body.style.overflow = 'auto';
             }
             // Si on clique sur le bouton X, le fermer
             else if (!event) {
-                document.getElementById('contactVendorModal').classList.add('hidden');
+                modal.classList.remove('modal-shown');
+                modal.classList.add('modal-hidden');
                 document.body.style.overflow = 'auto';
             }
         }
@@ -479,10 +505,122 @@
         // Fermer le modal avec Escape
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
-                document.getElementById('contactVendorModal').classList.add('hidden');
+                const modal = document.getElementById('contactVendorModal');
+                modal.classList.remove('modal-shown');
+                modal.classList.add('modal-hidden');
                 document.body.style.overflow = 'auto';
             }
         });
+
+        // Valider la longueur du message
+        function validateMessageLength(textarea) {
+            const warning = document.getElementById('charWarning');
+            const submitBtn = document.getElementById('submitContactBtn');
+            const length = textarea.value.trim().length;
+
+            if (length < 5) {
+                warning.textContent = `Vous avez ${length} caractère(s), minimum 5 requis`;
+                warning.className = 'text-xs text-red-600 mt-1 font-semibold';
+                submitBtn.disabled = true;
+            } else {
+                warning.textContent = '✓ Message valide';
+                warning.className = 'text-xs text-green-600 mt-1 font-semibold';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Ajouter l'événement typing au textarea du modal
+        document.getElementById('message').addEventListener('input', function() {
+            validateMessageLength(this);
+        });
+
+        // Valider le formulaire de contact avant envoi
+        async function submitContactForm(event) {
+            event.preventDefault();
+
+            const message = document.getElementById('message').value.trim();
+            const vendorId = document.getElementById('modalVendorId').value;
+            const productId = document.getElementById('modalProduitId').value;
+            const errorDiv = document.getElementById('formError');
+            const errorMessage = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            const submitBtn = document.getElementById('submitContactBtn');
+            const csrfToken = document.querySelector('[name="_token"]').value;
+
+            // Réinitialiser les messages
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+            errorMessage.textContent = '';
+
+            // Vérifier le message
+            if (message.length < 5) {
+                errorMessage.textContent = 'Le message doit contenir au moins 5 caractères';
+                errorDiv.classList.remove('hidden');
+                return false;
+            }
+
+            // Vérifier le vendeur
+            if (!vendorId || vendorId === '') {
+                errorMessage.textContent = 'Erreur: impossible de trouver le vendeur';
+                errorDiv.classList.remove('hidden');
+                return false;
+            }
+
+            // Afficher un message de chargement
+            submitBtn.disabled = true;
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="animate-spin">⌛</span> Envoi...';
+
+            try {
+                // Envoyer le message via AJAX
+                const response = await fetch('{{ route("messages.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        destinataire_id: vendorId,
+                        produit_id: productId,
+                        contenu: message
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Si c'est une erreur de validation, afficher les messages d'erreur
+                    if (data.errors) {
+                        const errorMessages = Object.values(data.errors).flat().join(', ');
+                        throw new Error(errorMessages);
+                    }
+                    throw new Error(data.message || 'Erreur lors de l\'envoi du message');
+                }
+
+                // Afficher le message de succès
+                successDiv.classList.remove('hidden');
+                document.getElementById('message').value = '';
+                validateMessageLength(document.getElementById('message'));
+
+                // Fermer le modal après 3 secondes
+                setTimeout(() => {
+                    closeContactModal();
+                    successDiv.classList.add('hidden');
+                }, 3000);
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                errorMessage.textContent = error.message || 'Erreur lors de l\'envoi du message. Veuillez réessayer.';
+                errorDiv.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHTML;
+            }
+
+            return false;
+        }
     </script>
 
     <!-- Produits Similaires -->

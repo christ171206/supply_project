@@ -16,8 +16,8 @@
         </style>
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        
+        @vite(['resources/css/app.css', 'resources/css/modals.css', 'resources/js/app.js'])
+
         <!-- Socket.io Client Library -->
         <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
         <script>
@@ -96,7 +96,7 @@
         </div>
 
         <!-- Modal Quantité Global -->
-        <div id="quantity-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 hidden">
+        <div id="quantity-modal" class="modal-hidden fixed inset-0 bg-black/50 backdrop-blur-sm items-center justify-center z-50 p-4">
             <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-8 animate-scale-in border border-gray-200">
                 <!-- Header -->
                 <h3 class="text-2xl font-bold text-gray-900 mb-6">Ajouter au panier</h3>
@@ -185,12 +185,16 @@
                 document.getElementById('modal-quantity').max = stock;
 
                 updateModalPrice();
-                modal.classList.remove('hidden');
+                modal.classList.remove('modal-hidden');
+                modal.classList.add('modal-shown');
             }
 
             function closeQuantityModal() {
                 const modal = document.getElementById('quantity-modal');
-                if(modal) modal.classList.add('hidden');
+                if(modal) {
+                    modal.classList.remove('modal-shown');
+                    modal.classList.add('modal-hidden');
+                }
             }
 
             function decreaseQuantity() {
@@ -275,9 +279,11 @@
                         if (badge) {
                             if (data.count > 0) {
                                 badge.textContent = data.count;
-                                badge.classList.remove('hidden');
+                                badge.classList.remove('modal-hidden');
+                                badge.classList.add('modal-shown');
                             } else {
-                                badge.classList.add('hidden');
+                                badge.classList.remove('modal-shown');
+                                badge.classList.add('modal-hidden');
                             }
                         }
                     });

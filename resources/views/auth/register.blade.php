@@ -18,6 +18,16 @@
                 ← Retour à l'accueil
             </a>
 
+            <!-- Logo mobile -->
+            <div class="mb-8 lg:hidden">
+                <a href="{{ route('accueil') }}" class="inline-flex items-center gap-2">
+                    <div class="bg-primary-600 p-2 rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">Supply</span>
+                </a>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
 
                 <!-- Section gauche - Bénéfices -->

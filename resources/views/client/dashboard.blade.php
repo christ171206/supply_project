@@ -75,10 +75,7 @@
                                 <td class="py-4 px-4 text-gray-700">{{ $commande->created_at->format('d/m/Y') }}</td>
                                 <td class="py-4 px-4 font-semibold text-primary-600">{{ number_format($commande->total, 0, ',', ' ') }} FCFA</td>
                                 <td class="py-4 px-4">
-                                    <span class="text-xs font-semibold
-                                        @if($commande->mode_paiement == 'mobile_money') text-accent-700
-                                        @elseif($commande->mode_paiement == 'carte_bancaire') text-secondary-700
-                                        @else text-danger-700 @endif">
+                                    <span class="text-xs font-semibold text-gray-700">
                                         @if($commande->mode_paiement == 'mobile_money') Mobile Money
                                         @elseif($commande->mode_paiement == 'carte_bancaire') Carte
                                         @else À la livraison @endif

@@ -13,9 +13,10 @@ class MessageController extends Controller
     /**
      * Afficher les conversations de l'utilisateur
      */
-    public function index()
+    public function index($userId = null)
     {
         $userId = Auth::id();
+        $selectedUserId = request()->route('userId');
 
         // Récupérer toutes les conversations (derniers messages avec chaque utilisateur)
         $conversations = Message::where(function ($query) use ($userId) {
@@ -69,29 +70,65 @@ class MessageController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'destinataire_id' => 'required|exists:users,id|different:from_user_id',
-            'contenu' => 'required|string|min:1|max:5000',
-            'sujet' => 'nullable|string|max:255',
-            'produit_id' => 'nullable|exists:produits,id',
-        ]);
+        try {
+            $validated = $request->validate([
+                'destinataire_id' => 'required|integer|exists:users,id',
+                'contenu' => 'required|string|min:1|max:5000',
+                'sujet' => 'nullable|string|max:255',
+                'produit_id' => 'nullable|integer|exists:produits,id',
+            ]);
 
-        // Créer le message
-        $message = Message::create([
-            'from_user_id' => Auth::id(),
-            'to_user_id' => $validated['destinataire_id'],
-            'contenu' => $validated['contenu'],
-            'lu' => false,
-        ]);
+            // Vérifier que l'utilisateur ne s'envoie pas un message à lui-même
+            if ($validated['destinataire_id'] == Auth::id()) {
+                if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Vous ne pouvez pas vous envoyer un message à vous-même'
+                    ], 422);
+                }
+                return back()->withErrors(['destinataire_id' => 'Vous ne pouvez pas vous envoyer un message à vous-même']);
+            }
 
-        // Si on vient d'une page produit, rediriger vers la conversation
-        if ($request->has('produit_id')) {
+            // Créer le message
+            $message = Message::create([
+                'from_user_id' => Auth::id(),
+                'to_user_id' => $validated['destinataire_id'],
+                'contenu' => $validated['contenu'],
+                'lu' => false,
+            ]);
+
+            // Si c'est une requête AJAX, retourner JSON
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => true,
+                    'message' => '✓ Message envoyé avec succès!',
+                    'messageId' => $message->id,
+                    'redirectUrl' => route('messages.show', $validated['destinataire_id'])
+                ], 201);
+            }
+
+            // Sinon, rediriger vers la conversation
             return redirect()->route('messages.show', $validated['destinataire_id'])
-                ->with('success', '✓ Message envoyé au vendeur !');
-        }
+                ->with('success', '✓ Message envoyé avec succès!');
 
-        return redirect()->route('messages.show', $validated['destinataire_id'])
-            ->with('success', '✓ Message envoyé !');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $e->errors(),
+                    'message' => 'Erreur de validation'
+                ], 422);
+            }
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erreur serveur: ' . $e->getMessage()
+                ], 500);
+            }
+            return back()->with('error', 'Erreur: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -143,5 +180,38 @@ class MessageController extends Controller
                        ->count();
 
         return response()->json(['count' => $count]);
+    }
+
+    /**
+     * API endpoint for WebSocket server to store messages
+     */
+    public function apiStore(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'from_user_id' => 'required|integer|exists:users,id',
+                'to_user_id' => 'required|integer|exists:users,id|different:from_user_id',
+                'contenu' => 'required|string|min:1|max:5000',
+            ]);
+
+            // Create the message
+            $message = Message::create([
+                'from_user_id' => $validated['from_user_id'],
+                'to_user_id' => $validated['to_user_id'],
+                'contenu' => $validated['contenu'],
+                'lu' => false,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'id' => $message->id,
+                'message' => 'Message saved successfully'
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 }

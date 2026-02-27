@@ -16,16 +16,16 @@
     </head>
     <body class="font-sans text-gray-900 antialiased bg-gray-50">
         <div class="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div class="w-full max-w-md mx-auto">
+            <div class="w-full max-w-md">
                 <!-- Logo & En-tête -->
-                <div class="text-center mb-8">
-                    <a href="/" class="inline-flex items-center gap-3 justify-center">
+                <div class="mb-8">
+                    <a href="/" class="inline-flex items-center gap-3">
                         <div class="w-12 h-12 rounded-lg bg-primary-600 flex items-center justify-center text-white text-2xl font-bold">
                             S
                         </div>
                         <span class="text-3xl font-bold text-gray-900">Supply</span>
                     </a>
-                    <p class="mt-4 text-gray-600 text-center">Votre boutique informatique en ligne</p>
+                    <p class="mt-4 text-gray-600">Votre boutique informatique en ligne</p>
                 </div>
 
                 <!-- Carte principale -->
