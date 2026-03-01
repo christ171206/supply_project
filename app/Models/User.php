@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -27,6 +28,11 @@ class User extends Authenticatable
         'address',
         'vendor_status',
         'id_document',
+        'profile_photo',
+        'delivery_latitude',
+        'delivery_longitude',
+        'lastname',
+        'firstname',
     ];
 
     /**
@@ -91,5 +97,10 @@ class User extends Authenticatable
     public function produitsFavoris()
     {
         return $this->belongsToMany(Produit::class, 'favorites', 'user_id', 'produit_id');
+    }
+
+    public function securityLogs(): HasMany
+    {
+        return $this->hasMany(SecurityLog::class);
     }
 }

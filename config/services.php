@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'exchangerate' => [
+        'api_key' => env('EXCHANGE_RATE_API_KEY'),
+        'base_currency' => env('BASE_CURRENCY', 'XOF'),
+    ],
+
+    'whatsapp' => [
+        'business_phone' => env('WHATSAPP_BUSINESS_PHONE'),
+        'contact_phone' => env('WHATSAPP_CONTACT_PHONE', '225769237065'),
+    ],
+
 ];

@@ -23,7 +23,7 @@
                             <p id="typing-indicator" class="text-xs text-primary-600 italic font-semibold mt-1 min-h-4 transition-all"></p>
                         </div>
                     </div>
-                    <a href="{{ route('messages.index') }}" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-semibold transition">
+                    <a href="{{ route('client.messages') }}" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-semibold transition">
                         ← Retour
                     </a>
                 </div>

@@ -11,7 +11,7 @@
         "@tailwindcss/vite": "^4.0.0",
         "alpinejs": "^3.4.2",
         "autoprefixer": "^10.4.23",
-        "axios": "^1.11.0",
+        "axios": "^1.13.6",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
         "postcss": "^8.5.6",
@@ -19,10 +19,14 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "apexcharts": "^5.6.0",
         "cors": "^2.8.5",
         "express": "^5.2.1",
         "feather-icons": "^4.29.2",
+        "intl-tel-input": "^26.7.6",
+        "leaflet": "^1.9.4",
         "socket.io": "^4.8.3",
-        "socket.io-client": "^4.8.3"
+        "socket.io-client": "^4.8.3",
+        "sweetalert2": "^11.26.21"
     }
 }

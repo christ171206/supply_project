@@ -51,6 +51,12 @@
         </div>
     </div>
 
+    <!-- Graphique Dépenses -->
+    <div class="card p-8 mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-6">📊 Vos Dépenses (7 derniers jours)</h2>
+        <div id="expensesChart" style="height: 300px;"></div>
+    </div>
+
     <!-- Dernières Commandes -->
     <div class="card p-8">
         <h2 class="text-lg font-semibold text-gray-900 mb-6">Dernières Commandes</h2>
@@ -84,19 +90,19 @@
                                 <td class="py-4 px-4">
                                     @switch($commande->statut)
                                         @case('en_attente')
-                                            <span class="text-xs font-semibold text-warning-700">⏳ En attente</span>
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">⏳ En attente</span>
                                         @break
                                         @case('confirmee')
-                                            <span class="text-xs font-semibold text-primary-700">✓ Confirmée</span>
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">✓ Confirmée</span>
                                         @break
                                         @case('expediee')
-                                            <span class="text-xs font-semibold text-accent-700">🚚 Expédiée</span>
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">🚚 Expédiée</span>
                                         @break
                                         @case('livree')
-                                            <span class="text-xs font-semibold text-success-700">✓ Livrée</span>
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">✓ Livrée</span>
                                         @break
                                         @default
-                                            <span class="text-xs font-semibold text-danger-700">✗ Annulée</span>
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">✗ Annulée</span>
                                     @endswitch
                                 </td>
                                 <td class="py-4 px-4 text-center">
@@ -152,4 +158,72 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@latest"></script>
+<script>
+    // Graphique des dépenses
+    const expensesData = @json($graph_data);
+    const dates = Object.keys(expensesData).map(date => {
+        const d = new Date(date);
+        return d.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' });
+    });
+    const amounts = Object.values(expensesData);
+
+    const options = {
+        series: [{
+            name: 'Dépenses (FCFA)',
+            data: amounts
+        }],
+        chart: {
+            type: 'area',
+            height: 300,
+            toolbar: {
+                show: true
+            },
+            animations: {
+                enabled: true
+            }
+        },
+        colors: ['#3b82f6'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                opacityFrom: 0.45,
+                opacityTo: 0.05
+            }
+        },
+        xaxis: {
+            categories: dates,
+            labels: {
+                style: {
+                    fontSize: '12px'
+                }
+            }
+        },
+        yaxis: {
+            title: {
+                text: 'Montant (FCFA)'
+            },
+            labels: {
+                formatter: function(value) {
+                    return (value / 1000).toFixed(0) + 'K';
+                }
+            }
+        },
+        tooltip: {
+            y: {
+                formatter: function(value) {
+                    return new Intl.NumberFormat('fr-FR').format(value) + ' FCFA';
+                }
+            }
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 2
+        }
+    };
+
+    const chart = new ApexCharts(document.querySelector("#expensesChart"), options);
+    chart.render();
+</script>
 @endsection

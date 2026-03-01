@@ -36,6 +36,70 @@
             </div>
         </div>
 
+        <!-- Suivi de la Commande - Stepper -->
+        <div class="mb-12 bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-900 mb-8">📍 Suivi de votre commande</h2>
+
+            <div class="flex items-center justify-between relative">
+                <!-- Ligne de progression -->
+                <div class="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 h-1 bg-gray-200"></div>
+
+                @php
+                    $steps = [
+                        'en_attente' => ['label' => 'Validée', 'icon' => '✓', 'color' => 'yellow'],
+                        'confirmee' => ['label' => 'Confirmée', 'icon' => '✓', 'color' => 'blue'],
+                        'expediee' => ['label' => 'Expédiée', 'icon' => '🚚', 'color' => 'indigo'],
+                        'livree' => ['label' => 'Livrée', 'icon' => '📦', 'color' => 'green']
+                    ];
+
+                    $statusOrder = ['en_attente', 'confirmee', 'expediee', 'livree'];
+                    $currentIndex = array_search($commande->statut, $statusOrder);
+                @endphp
+
+                @foreach($statusOrder as $index => $status)
+                    @php
+                        $isActive = $index <= $currentIndex;
+                        $isCurrent = $status === $commande->statut;
+                        $step = $steps[$status];
+                        $bgColor = $isActive ? 'bg-' . $step['color'] . '-500' : 'bg-gray-300';
+                        $textColor = $isActive ? 'text-' . $step['color'] . '-600' : 'text-gray-600';
+                    @endphp
+
+                    <div class="flex flex-col items-center relative z-10">
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3 {{ $bgColor }} transition-all duration-300 {{ $isCurrent ? 'ring-4 ring-' . $step['color'] . '-200 scale-125' : '' }}">
+                            {{ $step['icon'] }}
+                        </div>
+                        <p class="text-xs font-semibold text-center {{ $textColor }} max-w-20">{{ $step['label'] }}</p>
+                        @if($isCurrent)
+                            <p class="text-xs text-indigo-600 font-bold mt-1">Actuellement ici</p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Message de statut -->
+            <div class="mt-8 p-4 rounded-lg {{ $commande->statut === 'livree' ? 'bg-green-50 border border-green-200' : 'bg-blue-50 border border-blue-200' }}">
+                <p class="text-sm font-semibold {{ $commande->statut === 'livree' ? 'text-green-700' : 'text-blue-700' }}">
+                    @switch($commande->statut)
+                        @case('en_attente')
+                            ⏳ Votre commande est en cours de traitement. Elle sera confirmée très bientôt.
+                        @break
+                        @case('confirmee')
+                            ✓ Votre commande a été confirmée et sera expédiée dans les prochaines 24h.
+                        @break
+                        @case('expediee')
+                            🚚 Votre commande est en route! Elle devrait arriver entre 2 et 5 jours.
+                        @break
+                        @case('livree')
+                            ✓ Commande livrée avec succès! Merci de votre achat. Avez-vous apprécié ce produit? Laissez un avis!
+                        @break
+                        @default
+                            ℹ️ Statut: {{ $commande->statut }}
+                    @endswitch
+                </p>
+            </div>
+        </div>
+
         <!-- Grille Principale -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             <!-- Colonne Gauche - Infos et Articles -->

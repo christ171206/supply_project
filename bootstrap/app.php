@@ -11,9 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Enregistrer les middlewares alias
         $middleware->alias([
             'vendeur' => \App\Http\Middleware\VendeurMiddleware::class,
         ]);
+
+        // Ajouter le middleware global pour la sécurité logging
+        $middleware->web(\App\Http\Middleware\LogSecurityEvents::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

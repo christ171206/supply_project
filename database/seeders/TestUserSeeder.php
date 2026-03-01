@@ -20,7 +20,7 @@ class TestUserSeeder extends Seeder
                 'email' => 'client@test.com',
                 'password' => Hash::make('password'),
                 'role' => 'client',
-                'phone' => '+225 01 23 45 67',
+                'phone' => '+225 0',
                 'address' => '123 Rue Test, Abidjan, Côte d\'Ivoire',
                 'email_verified_at' => now(),
             ]

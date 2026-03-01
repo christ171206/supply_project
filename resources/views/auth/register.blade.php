@@ -143,15 +143,25 @@
                                 <label for="email" class="block text-sm font-semibold text-gray-900 mb-2">
                                     📧 Email
                                 </label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value="{{ old('email') }}"
-                                    required
-                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors bg-gray-50 text-gray-900 placeholder-gray-500 font-medium"
-                                    placeholder="votre@email.com"
-                                >
+                                <div class="relative">
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        value="{{ old('email') }}"
+                                        required
+                                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors bg-gray-50 text-gray-900 placeholder-gray-500 font-medium pr-12"
+                                        placeholder="votre@email.com"
+                                        @change="validateEmail()"
+                                    >
+                                    <div id="email-spinner" class="hidden absolute right-4 top-3.5">
+                                        <svg class="animate-spin h-5 w-5 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div id="email-message" class="mt-2 text-sm font-medium hidden"></div>
                                 @error('email')
                                     <p class="mt-2 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
@@ -432,6 +442,67 @@
 
         // Ajouter l'event listener au champ password
         document.getElementById('password').addEventListener('input', validatePasswordLength);
+
+        // AJAX Email Validation
+        let emailValidationTimeout;
+        function validateEmail() {
+            const emailInput = document.getElementById('email');
+            const emailMessage = document.getElementById('email-message');
+            const emailSpinner = document.getElementById('email-spinner');
+            const email = emailInput.value.trim();
+
+            // Clear timeout if exists
+            if (emailValidationTimeout) {
+                clearTimeout(emailValidationTimeout);
+            }
+
+            // Reset if empty
+            if (!email) {
+                emailMessage.classList.add('hidden');
+                emailSpinner.classList.add('hidden');
+                emailInput.classList.remove('border-red-500', 'border-green-500');
+                emailInput.classList.add('border-gray-200');
+                return;
+            }
+
+            // Show spinner
+            emailSpinner.classList.remove('hidden');
+
+            // Debounce: wait 500ms before making the request
+            emailValidationTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch('{{ route("validate.email") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ email: email })
+                    });
+
+                    const data = await response.json();
+                    emailSpinner.classList.add('hidden');
+
+                    // Update UI based on validation result
+                    if (data.valid) {
+                        emailInput.classList.remove('border-gray-200', 'border-red-500');
+                        emailInput.classList.add('border-green-500');
+                        emailMessage.classList.remove('hidden', 'text-danger-600');
+                        emailMessage.classList.add('text-green-600');
+                        emailMessage.innerHTML = '✅ ' + data.message;
+                    } else {
+                        emailInput.classList.remove('border-gray-200', 'border-green-500');
+                        emailInput.classList.add('border-red-500');
+                        emailMessage.classList.remove('hidden', 'text-green-600');
+                        emailMessage.classList.add('text-danger-600');
+                        emailMessage.innerHTML = '❌ ' + data.message;
+                    }
+                } catch (error) {
+                    console.error('Validation error:', error);
+                    emailSpinner.classList.add('hidden');
+                }
+            }, 500);
+        }
     </script>
 </body>
 </html>

@@ -71,15 +71,42 @@ class MessageController extends Controller
     public function store(Request $request)
     {
         try {
-            $validated = $request->validate([
-                'destinataire_id' => 'required|integer|exists:users,id',
+            // Validation basique
+            $request->validate([
+                'destinataire_id' => 'required|integer',
                 'contenu' => 'required|string|min:1|max:5000',
                 'sujet' => 'nullable|string|max:255',
-                'produit_id' => 'nullable|integer|exists:produits,id',
+                'produit_id' => 'nullable|integer',
             ]);
 
+            $destinataireId = (int) $request->input('destinataire_id');
+            $contenu = $request->input('contenu');
+
+            // Validation du destinataire_id
+            if (!$destinataireId || $destinataireId <= 0) {
+                if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'ID destinataire invalide: ' . $destinataireId
+                    ], 422);
+                }
+                return back()->withErrors(['destinataire_id' => 'ID destinataire invalide']);
+            }
+
+            // Vérifier que le destinataire existe
+            $destinataire = \App\Models\User::find($destinataireId);
+            if (!$destinataire) {
+                if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Le destinataire avec l\'ID ' . $destinataireId . ' n\'existe pas'
+                    ], 422);
+                }
+                return back()->withErrors(['destinataire_id' => 'Le destinataire n\'existe pas']);
+            }
+
             // Vérifier que l'utilisateur ne s'envoie pas un message à lui-même
-            if ($validated['destinataire_id'] == Auth::id()) {
+            if ($destinataireId == Auth::id()) {
                 if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                     return response()->json([
                         'success' => false,
@@ -92,8 +119,8 @@ class MessageController extends Controller
             // Créer le message
             $message = Message::create([
                 'from_user_id' => Auth::id(),
-                'to_user_id' => $validated['destinataire_id'],
-                'contenu' => $validated['contenu'],
+                'to_user_id' => $destinataireId,
+                'contenu' => $contenu,
                 'lu' => false,
             ]);
 
@@ -103,12 +130,12 @@ class MessageController extends Controller
                     'success' => true,
                     'message' => '✓ Message envoyé avec succès!',
                     'messageId' => $message->id,
-                    'redirectUrl' => route('messages.show', $validated['destinataire_id'])
+                    'redirectUrl' => route('messages.show', $destinataireId)
                 ], 201);
             }
 
             // Sinon, rediriger vers la conversation
-            return redirect()->route('messages.show', $validated['destinataire_id'])
+            return redirect()->route('messages.show', $destinataireId)
                 ->with('success', '✓ Message envoyé avec succès!');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -116,7 +143,7 @@ class MessageController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => $e->errors(),
-                    'message' => 'Erreur de validation'
+                    'message' => 'Erreur de validation: ' . json_encode($e->errors())
                 ], 422);
             }
             return back()->withErrors($e->errors())->withInput();
@@ -124,7 +151,8 @@ class MessageController extends Controller
             if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Erreur serveur: ' . $e->getMessage()
+                    'message' => 'Erreur serveur: ' . $e->getMessage(),
+                    'exception' => get_class($e)
                 ], 500);
             }
             return back()->with('error', 'Erreur: ' . $e->getMessage())->withInput();

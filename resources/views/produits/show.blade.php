@@ -157,6 +157,16 @@
                 >
                     💬 Contacter le Vendeur
                 </button>
+
+                <!-- Bouton WhatsApp -->
+                <a
+                    href="https://wa.me/{{ config('services.whatsapp.contact_phone') }}?text=Je suis intéressé par : {{ urlencode($produit->nom) }} - {{ url(route('produits.show', $produit->id)) }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="w-full py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-green-500/50 transition-all duration-200 text-center block"
+                >
+                    💚 Contacter sur WhatsApp
+                </a>
             </div>
 
             <!-- Informations -->
@@ -406,6 +416,21 @@
                         </div>
                     </div>
 
+                    <!-- Aperçu du Produit -->
+                    <div id="productPreview" class="hidden mb-6 p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg">
+                        <p class="text-xs font-semibold text-blue-600 mb-2">📦 PRODUIT</p>
+                        <div class="flex gap-3">
+                            <div id="productImage" class="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden flex items-center justify-center">
+                                <span class="text-2xl">📦</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p id="productNamePreview" class="font-semibold text-gray-900 text-sm truncate"></p>
+                                <p id="productPricePreview" class="text-xs text-blue-600 mt-1"></p>
+                                <p id="productStockPreview" class="text-xs text-gray-500 mt-1"></p>
+                            </div>
+                        </div>
+                    </div>
+
                     <form id="contactForm" class="space-y-4" onsubmit="return submitContactForm(event)">
                         @csrf
                         <input type="hidden" name="destinataire_id" id="modalVendorId" value="">
@@ -471,6 +496,18 @@
         // Fonction pour ouvrir le modal de contact vendeur
         function openContactModal(vendorId, vendorName, productId, productName) {
             @auth
+                // Convertir en nombre si c'est une chaîne
+                vendorId = parseInt(vendorId);
+                productId = parseInt(productId);
+
+                console.log('Ouverture du modal avec:', { vendorId, vendorName, productId, productName });
+
+                // Vérifier que le vendeur ID est valide
+                if (!vendorId || vendorId === 0) {
+                    alert('Erreur: Ce produit n\'a pas de vendeur associé');
+                    return;
+                }
+
                 const modal = document.getElementById('contactVendorModal');
                 modal.classList.remove('modal-hidden');
                 modal.classList.add('modal-shown');
@@ -480,6 +517,40 @@
                 document.getElementById('sujet').value = '📦 Demande sur: ' + productName;
                 document.getElementById('message').focus();
                 document.body.style.overflow = 'hidden';
+
+                // Récupérer les informations du produit et afficher l'aperçu
+                if (productId > 0) {
+                    const productPreview = document.getElementById('productPreview');
+                    const productNamePreview = document.getElementById('productNamePreview');
+                    const productPricePreview = document.getElementById('productPricePreview');
+                    const productStockPreview = document.getElementById('productStockPreview');
+                    const productImage = document.getElementById('productImage');
+
+                    // Afficher le nom du produit immédiatement
+                    productNamePreview.textContent = productName;
+                    productPreview.classList.remove('hidden');
+
+                    // Récupérer les détails via AJAX
+                    fetch(`/api/produits/${productId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const produit = data.data;
+                                productPricePreview.textContent = `💰 ${new Intl.NumberFormat('fr-FR').format(produit.prix)} F CFA`;
+                                productStockPreview.textContent = `📊 Stock: ${produit.stock}`;
+
+                                // Afficher l'image du produit si disponible
+                                if (produit.image) {
+                                    productImage.innerHTML = `<img src="{{ asset('storage/produits') }}/${produit.image}" alt="${produit.nom}" class="w-full h-full object-cover rounded-lg">`;
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.log('Erreur récupération produit:', error);
+                            // Si erreur, afficher juste le nom et prix par défaut
+                            productPricePreview.textContent = '💰 Prix non disponible';
+                        });
+                }
             @else
                 window.location.href = '{{ route('login') }}';
             @endauth
@@ -539,13 +610,22 @@
             event.preventDefault();
 
             const message = document.getElementById('message').value.trim();
-            const vendorId = document.getElementById('modalVendorId').value;
-            const productId = document.getElementById('modalProduitId').value;
+            const vendorIdInput = document.getElementById('modalVendorId').value;
+            const vendorId = parseInt(vendorIdInput);
+            const productIdInput = document.getElementById('modalProduitId').value;
+            const productId = parseInt(productIdInput);
             const errorDiv = document.getElementById('formError');
             const errorMessage = document.getElementById('errorMessage');
             const successDiv = document.getElementById('successMessage');
             const submitBtn = document.getElementById('submitContactBtn');
             const csrfToken = document.querySelector('[name="_token"]').value;
+
+            console.log('Envoi du message:', {
+                vendorId,
+                productId,
+                message: message.substring(0, 50) + '...',
+                csrfToken: csrfToken ? 'OK' : 'MISSING'
+            });
 
             // Réinitialiser les messages
             errorDiv.classList.add('hidden');
@@ -560,8 +640,8 @@
             }
 
             // Vérifier le vendeur
-            if (!vendorId || vendorId === '') {
-                errorMessage.textContent = 'Erreur: impossible de trouver le vendeur';
+            if (!vendorId || vendorId === 0 || isNaN(vendorId)) {
+                errorMessage.textContent = 'Erreur: ID vendeur invalide (' + vendorIdInput + ')';
                 errorDiv.classList.remove('hidden');
                 return false;
             }
@@ -590,6 +670,8 @@
 
                 const data = await response.json();
 
+                console.log('Réponse du serveur:', { status: response.status, data });
+
                 if (!response.ok) {
                     // Si c'est une erreur de validation, afficher les messages d'erreur
                     if (data.errors) {
@@ -611,7 +693,7 @@
                 }, 3000);
 
             } catch (error) {
-                console.error('Erreur:', error);
+                console.error('Erreur AJAX:', error);
                 errorMessage.textContent = error.message || 'Erreur lors de l\'envoi du message. Veuillez réessayer.';
                 errorDiv.classList.remove('hidden');
             } finally {

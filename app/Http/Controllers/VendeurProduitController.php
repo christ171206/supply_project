@@ -12,6 +12,7 @@ use App\Services\StockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class VendeurProduitController extends Controller
@@ -21,7 +22,7 @@ class VendeurProduitController extends Controller
      */
     public function dashboard()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // 💰 Statistiques de base
         $totalVentes = Commande::where('user_id', $user->id)->sum('total');
@@ -38,17 +39,17 @@ class VendeurProduitController extends Controller
 
         // 🚨 Produits avec stock faible (pour l'alerte détaillée)
         $produitsStockFaible = Produit::where('user_id', $user->id)
-                                      ->whereRaw('stock <= stock_minimum')
-                                      ->orderBy('stock', 'asc')
-                                      ->limit(5)
-                                      ->get();
+            ->whereRaw('stock <= stock_minimum')
+            ->orderBy('stock', 'asc')
+            ->limit(5)
+            ->get();
 
         // 📋 Dernières commandes (avec détails client)
         $derniereCommandes = Commande::with('user')
-                                    ->where('user_id', $user->id)
-                                    ->orderBy('created_at', 'desc')
-                                    ->limit(10)
-                                    ->get();
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
 
         // 📊 Statut des commandes
         $commandesEnAttente = Commande::where('user_id', $user->id)->where('statut', 'en_attente')->count();
@@ -59,9 +60,9 @@ class VendeurProduitController extends Controller
         $topProduits = Produit::where('user_id', $user->id)
             ->with('categorie', 'ligneCommandes')
             ->get()
-            ->map(function($p) {
+            ->map(function ($p) {
                 $p->ventes_nombre = $p->ligneCommandes->count();
-                $p->ventes_total = $p->ligneCommandes->sum(function($lc) {
+                $p->ventes_total = $p->ligneCommandes->sum(function ($lc) {
                     return $lc->quantite * $lc->prix_unitaire;
                 });
                 return $p;
@@ -70,12 +71,12 @@ class VendeurProduitController extends Controller
             ->take(5);
 
         // ⭐ Avis clients récents
-        $avisRecents = Avis::whereHas('produit', function($q) use ($user) {
+        $avisRecents = Avis::whereHas('produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->with('user', 'produit')
-          ->latest()
-          ->limit(5)
-          ->get();
+            ->latest()
+            ->limit(5)
+            ->get();
 
         return view('vendeur.dashboard', compact(
             'totalVentes',
@@ -100,7 +101,7 @@ class VendeurProduitController extends Controller
      */
     public function apercu()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Statistiques de base
         $totalVentes = Commande::where('user_id', $user->id)->sum('total');
@@ -109,10 +110,10 @@ class VendeurProduitController extends Controller
         $panierMoyen = $nombreCommandes > 0 ? $totalVentes / $nombreCommandes : 0;
 
         // Avis
-        $noteMoyenne = Avis::whereHas('produit', function($q) use ($user) {
+        $noteMoyenne = Avis::whereHas('produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->avg('note') ?? 0;
-        $nombreAvis = Avis::whereHas('produit', function($q) use ($user) {
+        $nombreAvis = Avis::whereHas('produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->count();
 
@@ -135,22 +136,31 @@ class VendeurProduitController extends Controller
             ->with('categorie')
             ->limit(5)
             ->get()
-            ->map(function($p) {
+            ->map(function ($p) {
                 $p->ventes_nombre = $p->ligneCommandes->count();
                 $p->ventes_total = $p->ligneCommandes->sum('prix_unitaire');
                 return $p;
             });
 
         // Avis récents
-        $avisRecents = Avis::whereHas('produit', function($q) use ($user) {
+        $avisRecents = Avis::whereHas('produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->with('user', 'produit')->latest()->limit(5)->get();
 
         return view('vendeur.apercu', compact(
-            'totalVentes', 'nombreCommandes', 'nombreProduits', 'panierMoyen',
-            'noteMoyenne', 'nombreAvis', 'tauxCompletion', 'commandesEnAttente',
-            'commandesConfirmees', 'commandesExpediees', 'commandeslivrees',
-            'topProduits', 'avisRecents'
+            'totalVentes',
+            'nombreCommandes',
+            'nombreProduits',
+            'panierMoyen',
+            'noteMoyenne',
+            'nombreAvis',
+            'tauxCompletion',
+            'commandesEnAttente',
+            'commandesConfirmees',
+            'commandesExpediees',
+            'commandeslivrees',
+            'topProduits',
+            'avisRecents'
         ));
     }
 
@@ -160,8 +170,8 @@ class VendeurProduitController extends Controller
     public function index()
     {
         $produits = Produit::with('categorie')
-                          ->latest()
-                          ->paginate(10);
+            ->latest()
+            ->paginate(10);
 
         return view('vendeur.produits.index', compact('produits'));
     }
@@ -192,7 +202,7 @@ class VendeurProduitController extends Controller
         ]);
 
         $data = [
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'nom' => $validated['nom'],
             'slug' => Str::slug($validated['nom']),
             'description' => $validated['description'],
@@ -210,7 +220,7 @@ class VendeurProduitController extends Controller
         $produit = Produit::create($data);
 
         return redirect()->route('vendeur.produits.index')
-                       ->with('success', 'Produit créé avec succès!');
+            ->with('success', 'Produit créé avec succès!');
     }
 
     /**
@@ -272,7 +282,7 @@ class VendeurProduitController extends Controller
         $produit->update($data);
 
         return redirect()->route('vendeur.produits.index')
-                       ->with('success', 'Produit mis à jour avec succès!');
+            ->with('success', 'Produit mis à jour avec succès!');
     }
 
     /**
@@ -290,7 +300,7 @@ class VendeurProduitController extends Controller
         $produit->delete();
 
         return redirect()->route('vendeur.produits.index')
-                       ->with('success', 'Produit supprimé avec succès!');
+            ->with('success', 'Produit supprimé avec succès!');
     }
 
     /**
@@ -306,7 +316,7 @@ class VendeurProduitController extends Controller
      */
     public function updateProfil(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -320,7 +330,32 @@ class VendeurProduitController extends Controller
         $user->update($validated);
 
         return redirect()->route('vendeur.profil')
-                       ->with('success', 'Profil mis à jour avec succès!');
+            ->with('success', 'Profil mis à jour avec succès!');
+    }
+
+    /**
+     * Mettre à jour la photo de profil du vendeur
+     */
+    public function updateProfilPhoto(Request $request)
+    {
+        $validated = $request->validate([
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $user = Auth::user();
+
+        // Supprimer l'ancienne photo si elle existe
+        if ($validated['profile_photo'] ?? false) {
+            if ($user->profile_photo && Storage::exists($user->profile_photo)) {
+                Storage::delete($user->profile_photo);
+            }
+
+            // Stocker la nouvelle photo
+            $path = $request->file('profile_photo')->store('profils/vendeurs', 'public');
+            $user->update(['profile_photo' => $path]);
+        }
+
+        return redirect()->route('vendeur.profil')->with('success', 'Photo de profil mise à jour avec succès !');
     }
 
     /**
@@ -328,23 +363,24 @@ class VendeurProduitController extends Controller
      */
     public function stock(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $query = Produit::where('user_id', $user->id);
 
         // Filtrage
         if ($request->filled('search')) {
-            $query->where('nom', 'like', '%' . $request->search . '%');
+            $query->where('nom', 'like', '%' . $request->input('search') . '%');
         }
         if ($request->filled('categorie')) {
-            $query->where('categorie_id', $request->categorie);
+            $query->where('categorie_id', $request->input('categorie'));
         }
         if ($request->filled('statut')) {
-            if ($request->statut === 'critique') {
+            $statut = $request->input('statut');
+            if ($statut === 'critique') {
                 $query->where('stock', 0);
-            } elseif ($request->statut === 'faible') {
+            } elseif ($statut === 'faible') {
                 $query->whereBetween('stock', [1, DB::raw('stock_minimum')]);
-            } elseif ($request->statut === 'suffisant') {
+            } elseif ($statut === 'suffisant') {
                 $query->whereRaw('stock > stock_minimum');
             }
         }
@@ -364,7 +400,7 @@ class VendeurProduitController extends Controller
      */
     public function statistiques(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $periode = (int)$request->get('periode', 7);
         $dateDebut = now()->subDays($periode);
 
@@ -392,14 +428,14 @@ class VendeurProduitController extends Controller
 
         // Top produits
         $topProduits = Produit::where('user_id', $user->id)
-            ->with(['ligneCommandes' => function($q) {
-                $q->whereHas('commande', function($q2) {
+            ->with(['ligneCommandes' => function ($q) {
+                $q->whereHas('commande', function ($q2) {
                     $q2->where('created_at', '>=', now()->subDays(request('periode', 7)));
                 });
             }])
             ->limit(5)
             ->get()
-            ->map(function($p) {
+            ->map(function ($p) {
                 $p->ventes_nombre = $p->ligneCommandes->count();
                 $p->ventes_total = $p->ligneCommandes->sum('prix_unitaire');
                 return $p;
@@ -412,14 +448,22 @@ class VendeurProduitController extends Controller
         $commandeslivrees = Commande::where('user_id', $user->id)->where('statut', 'livree')->count();
 
         // Ventes par catégorie
-        $ventesCategories = Categorie::with(['produits' => function($q) use ($user) {
+        $ventesCategories = Categorie::with(['produits' => function ($q) use ($user) {
             $q->where('user_id', $user->id);
         }])->get();
 
         return view('vendeur.statistiques', compact(
-            'totalCA', 'nombreCommandes', 'panierMoyen', 'noteMoyenne', 'nombreAvis',
-            'topProduits', 'commandesEnAttente', 'commandesConfirmees', 'commandesExpediees',
-            'commandeslivrees', 'ventesCategories'
+            'totalCA',
+            'nombreCommandes',
+            'panierMoyen',
+            'noteMoyenne',
+            'nombreAvis',
+            'topProduits',
+            'commandesEnAttente',
+            'commandesConfirmees',
+            'commandesExpediees',
+            'commandeslivrees',
+            'ventesCategories'
         ));
     }
 
@@ -428,7 +472,7 @@ class VendeurProduitController extends Controller
      */
     public function messages(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $filtre = $request->get('filtre', 'tous');
 
         $query = Message::where('to_user_id', $user->id);
@@ -449,7 +493,7 @@ class VendeurProduitController extends Controller
      */
     public function avis(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $avis = DB::table('avis')
             ->join('produits', 'avis.produit_id', '=', 'produits.id')
@@ -460,21 +504,21 @@ class VendeurProduitController extends Controller
             ->paginate(15);
 
         // Récupérer les avis complets avec relations
-        $avisComplets = Avis::whereHas('produit', function($q) use ($user) {
+        $avisComplets = Avis::whereHas('produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->with('user', 'produit')->latest()->paginate(15);
 
-        $noteMoyenne = Avis::whereHas('produit', function($q) use ($user) {
+        $noteMoyenne = Avis::whereHas('produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->avg('note') ?? 0;
 
-        $nombreAvis = Avis::whereHas('produit', function($q) use ($user) {
+        $nombreAvis = Avis::whereHas('produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->count();
 
         $avisParNote = [];
         for ($i = 1; $i <= 5; $i++) {
-            $avisParNote[$i] = Avis::whereHas('produit', function($q) use ($user) {
+            $avisParNote[$i] = Avis::whereHas('produit', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })->where('note', $i)->count();
         }
@@ -495,7 +539,7 @@ class VendeurProduitController extends Controller
      */
     public function updateParametres(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $validated = $request->validate([
             'boutique_nom' => 'nullable|string|max:255',
@@ -508,7 +552,7 @@ class VendeurProduitController extends Controller
         $user->update($validated);
 
         return redirect()->route('vendeur.parametres')
-                       ->with('success', 'Paramètres mis à jour avec succès!');
+            ->with('success', 'Paramètres mis à jour avec succès!');
     }
 
     /**
@@ -516,7 +560,7 @@ class VendeurProduitController extends Controller
      */
     public function deleteShop()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         // Supprimer tous les produits
         Produit::where('user_id', $user->id)->delete();
@@ -524,7 +568,7 @@ class VendeurProduitController extends Controller
         // Marquer le compte comme inactif (optionnel - laisser tracer)
         // $user->delete();
 
-        auth()->logout();
+        \Illuminate\Support\Facades\Auth::logout();
 
         return redirect('/')->with('success', 'Votre boutique a été supprimée avec succès.');
     }
@@ -534,7 +578,7 @@ class VendeurProduitController extends Controller
      */
     public function historique(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $stockService = new StockService();
 
         // Récupérer les produits du vendeur
@@ -547,15 +591,15 @@ class VendeurProduitController extends Controller
 
         // Appliquer les filtres
         if ($request->filled('produit_id')) {
-            $query->where('produit_id', $request->produit_id);
+            $query->where('produit_id', $request->input('produit_id'));
         }
 
         if ($request->filled('type')) {
-            $query->where('type', $request->type);
+            $query->where('type', $request->input('type'));
         }
 
         if ($request->filled('motif')) {
-            $query->where('motif', $request->motif);
+            $query->where('motif', $request->input('motif'));
         }
 
         // Paginer les résultats

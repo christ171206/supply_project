@@ -9,6 +9,9 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\VendeurProduitController;
 use App\Http\Controllers\ClientDashboardController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ValidationController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\VendorStatisticsController;
 use Illuminate\Support\Facades\Route;
 
 // Routes publiques
@@ -17,11 +20,46 @@ Route::get('/produits', [ProduitController::class, 'catalogue'])->name('produits
 Route::get('/produits/{id}', [ProduitController::class, 'show'])->name('produits.show');
 
 // API Routes
-Route::get('/api/produits/{ids}', function ($ids) {
-    $idArray = explode(',', $ids);
-    $produits = \App\Models\Produit::whereIn('id', $idArray)->get(['id', 'nom', 'prix', 'image']);
-    return response()->json($produits);
+Route::get('/api/produits/{id}', function ($id) {
+    $produit = \App\Models\Produit::findOrFail($id, ['id', 'nom', 'prix', 'image', 'stock', 'description']);
+    return response()->json([
+        'success' => true,
+        'data' => $produit
+    ]);
 });
+
+// Currency Converter API
+Route::get('/api/currency/rates', function () {
+    $service = new \App\Services\CurrencyConverterService();
+    $rates = $service->fetchRates();
+    return response()->json($rates);
+});
+
+Route::post('/api/currency/convert', function (\Illuminate\Http\Request $request) {
+    $amount = $request->input('amount', 0);
+    $from = $request->input('from', 'XOF');
+    $to = $request->input('to', 'EUR');
+
+    $service = new \App\Services\CurrencyConverterService();
+    $converted = $service->convert($amount, $from, $to);
+
+    return response()->json([
+        'original_amount' => $amount,
+        'original_currency' => $from,
+        'converted_amount' => round($converted, 2),
+        'target_currency' => $to,
+        'timestamp' => now()->timestamp,
+    ]);
+});
+
+// AJAX Validation Routes (Real-time form validation)
+Route::post('/api/validate/email', [ValidationController::class, 'validateEmail'])->name('validate.email');
+Route::post('/api/validate/username', [ValidationController::class, 'validateUsername'])->name('validate.username');
+Route::post('/api/validate/password', [ValidationController::class, 'validatePassword'])->name('validate.password');
+
+// Real-Time Search Routes
+Route::post('/api/search/live', [SearchController::class, 'liveSearch'])->name('search.live');
+Route::post('/api/search/suggestions', [SearchController::class, 'getSuggestions'])->name('search.suggestions');
 
 // API Messages (for WebSocket server)
 Route::post('/api/messages/store', [MessageController::class, 'apiStore']);
@@ -45,6 +83,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/commande/{id}', [ClientDashboardController::class, 'commandeDetail'])->name('client.commande-detail');
     Route::get('/mon-profil', [ClientDashboardController::class, 'profil'])->name('client.profil');
     Route::put('/mon-profil', [ClientDashboardController::class, 'updateProfil'])->name('client.profil.update');
+    Route::patch('/mon-profil/photo', [ClientDashboardController::class, 'updateProfilPhoto'])->name('client.profil.photo');
 
     // Commandes (Client)
     Route::get('/commandes', [CommandeController::class, 'index'])->name('commandes.index');
@@ -101,9 +140,15 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
     Route::get('/historique', [VendeurProduitController::class, 'historique'])->name('historique');
     Route::get('/profil', [VendeurProduitController::class, 'profil'])->name('profil');
     Route::put('/profil', [VendeurProduitController::class, 'updateProfil'])->name('profil.update');
+    Route::patch('/profil/photo', [VendeurProduitController::class, 'updateProfilPhoto'])->name('vendeur.profil.photo');
     Route::resource('produits', VendeurProduitController::class);
     Route::get('/commandes', [CommandeController::class, 'vendeurCommandes'])->name('commandes');
     Route::get('/commandes/{id}', [CommandeController::class, 'vendeurCommandeDetail'])->name('commandes.show');
+
+    // Vendor Statistics (Premium Feature)
+    Route::get('/api/statistics/sales', [VendorStatisticsController::class, 'getSalesData'])->name('statistics.sales');
+    Route::get('/api/statistics/inventory', [VendorStatisticsController::class, 'getInventoryStatus'])->name('statistics.inventory');
+    Route::get('/api/statistics/customers', [VendorStatisticsController::class, 'getCustomerMetrics'])->name('statistics.customers');
 });
 
 require __DIR__.'/auth.php';

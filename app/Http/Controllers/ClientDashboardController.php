@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ClientDashboardController extends Controller
 {
@@ -18,11 +19,22 @@ class ClientDashboardController extends Controller
         $montantTotal = $user->commandes()->sum('total');
         $commandesEnCours = $user->commandes()->whereIn('statut', ['en_attente', 'confirmee', 'expediee'])->count();
 
+        // Données pour le graphique - Dépenses des 7 derniers jours
+        $graph_data = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $amount = $user->commandes()
+                ->whereDate('created_at', $date)
+                ->sum('total');
+            $graph_data[$date] = $amount;
+        }
+
         return view('client.dashboard', compact(
             'commandesTotal',
             'commandesRecentes',
             'montantTotal',
-            'commandesEnCours'
+            'commandesEnCours',
+            'graph_data'
         ));
     }
 
@@ -76,14 +88,41 @@ class ClientDashboardController extends Controller
     public function updateProfil(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . Auth::id(),
-            'telephone' => 'nullable|string|max:20',
-            'adresse' => 'nullable|string|max:500',
+            'lastname' => 'nullable|string|max:255',
+            'firstname' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'delivery_latitude' => 'nullable|numeric|between:-90,90',
+            'delivery_longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         Auth::user()->update($validated);
 
-        return redirect()->route('client.dashboard')->with('success', 'Profil mis à jour avec succès !');
+        return redirect()->route('client.profil')->with('success', 'Profil mis à jour avec succès !');
+    }
+
+    /**
+     * Mettre à jour la photo de profil
+     */
+    public function updateProfilPhoto(Request $request)
+    {
+        $validated = $request->validate([
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $user = Auth::user();
+
+        // Supprimer l'ancienne photo si elle existe
+        if ($validated['profile_photo'] ?? false) {
+            if ($user->profile_photo && Storage::exists($user->profile_photo)) {
+                Storage::delete($user->profile_photo);
+            }
+
+            // Stocker la nouvelle photo
+            $path = $request->file('profile_photo')->store('profils/clients', 'public');
+            $user->update(['profile_photo' => $path]);
+        }
+
+        return redirect()->route('client.profil')->with('success', 'Photo de profil mise à jour avec succès !');
     }
 }
