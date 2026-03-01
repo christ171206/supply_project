@@ -99,13 +99,7 @@
                                 {{ $log->ip_address }}
                             </td>
                             <td class="px-6 py-4">
-                                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold
-                                    @if($log->status === 'success')
-                                        bg-green-100 text-green-800
-                                    @else
-                                        bg-red-100 text-red-800
-                                    @endif
-                                ">
+                                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold" style="background-color: @if($log->status === 'success') #dcfce7 @else #fee2e2 @endif; color: @if($log->status === 'success') #166534 @else #991b1b @endif;">
                                     {{ $log->status === 'success' ? '✅ Succès' : '❌ Échoué' }}
                                 </span>
                             </td>

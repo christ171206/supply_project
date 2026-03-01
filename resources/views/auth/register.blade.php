@@ -138,6 +138,41 @@
                                 @enderror
                             </div>
 
+                            <!-- Pays avec Drapeaux -->
+                            <div>
+                                <label for="country" class="block text-sm font-semibold text-gray-900 mb-2">
+                                    🌍 Pays
+                                </label>
+                                <select
+                                    id="country"
+                                    name="country"
+                                    value="{{ old('country', 'CI') }}"
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors bg-gray-50 text-gray-900 placeholder-gray-500 font-medium"
+                                >
+                                    <option value="">-- Sélectionner un pays --</option>
+                                    <option value="CI" selected>🇨🇮 Côte d'Ivoire</option>
+                                    <option value="SN">🇸🇳 Sénégal</option>
+                                    <option value="BF">🇧🇫 Burkina Faso</option>
+                                    <option value="ML">🇲🇱 Mali</option>
+                                    <option value="NE">🇳🇪 Niger</option>
+                                    <option value="BJ">🇧🇯 Bénin</option>
+                                    <option value="TG">🇹🇬 Togo</option>
+                                    <option value="GH">🇬🇭 Ghana</option>
+                                    <option value="LR">🇱🇷 Liberia</option>
+                                    <option value="SL">🇸🇱 Sierra Leone</option>
+                                    <option value="GN">🇬🇳 Guinée</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="BE">🇧🇪 Belgique</option>
+                                    <option value="CH">🇨🇭 Suisse</option>
+                                    <option value="DE">🇩🇪 Allemagne</option>
+                                    <option value="US">🇺🇸 États-Unis</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                </select>
+                                @error('country')
+                                    <p class="mt-2 text-sm text-danger-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
                             <!-- Email -->
                             <div>
                                 <label for="email" class="block text-sm font-semibold text-gray-900 mb-2">

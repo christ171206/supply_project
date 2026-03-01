@@ -33,6 +33,9 @@ class User extends Authenticatable
         'delivery_longitude',
         'lastname',
         'firstname',
+        'email_verification_code',
+        'email_verification_code_sent_at',
+        'country',
     ];
 
     /**

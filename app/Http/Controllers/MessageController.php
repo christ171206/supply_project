@@ -21,17 +21,17 @@ class MessageController extends Controller
         // Récupérer toutes les conversations (derniers messages avec chaque utilisateur)
         $conversations = Message::where(function ($query) use ($userId) {
             $query->where('from_user_id', $userId)
-                  ->orWhere('to_user_id', $userId);
+                ->orWhere('to_user_id', $userId);
         })
-        ->latest()
-        ->get()
-        ->unique(function ($message) {
-            // Créer une clé unique pour chaque conversation (peu importe la direction)
-            return $message->from_user_id === Auth::id()
-                ? min(Auth::id(), $message->to_user_id) . '-' . max(Auth::id(), $message->to_user_id)
-                : min($message->from_user_id, Auth::id()) . '-' . max($message->from_user_id, Auth::id());
-        })
-        ->values();
+            ->latest()
+            ->get()
+            ->unique(function ($message) {
+                // Créer une clé unique pour chaque conversation (peu importe la direction)
+                return $message->from_user_id === Auth::id()
+                    ? min(Auth::id(), $message->to_user_id) . '-' . max(Auth::id(), $message->to_user_id)
+                    : min($message->from_user_id, Auth::id()) . '-' . max($message->from_user_id, Auth::id());
+            })
+            ->values();
 
         return view('messages.inbox', ['conversations' => $conversations]);
     }
@@ -47,16 +47,16 @@ class MessageController extends Controller
         // Récupérer les messages de cette conversation
         $messages = Message::where(function ($query) use ($currentUser, $userId) {
             $query->where('from_user_id', $currentUser->id)->where('to_user_id', $userId)
-                  ->orWhere('from_user_id', $userId)->where('to_user_id', $currentUser->id);
+                ->orWhere('from_user_id', $userId)->where('to_user_id', $currentUser->id);
         })
-        ->orderBy('created_at', 'asc')
-        ->get();
+            ->orderBy('created_at', 'asc')
+            ->get();
 
         // Marquer les messages reçus comme lus
         Message::where('from_user_id', $userId)
-               ->where('to_user_id', $currentUser->id)
-               ->where('lu', false)
-               ->update(['lu' => true]);
+            ->where('to_user_id', $currentUser->id)
+            ->where('lu', false)
+            ->update(['lu' => true]);
 
         return view('messages.conversation', [
             'otherUser' => $otherUser,
@@ -137,7 +137,6 @@ class MessageController extends Controller
             // Sinon, rediriger vers la conversation
             return redirect()->route('messages.show', $destinataireId)
                 ->with('success', '✓ Message envoyé avec succès!');
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
                 return response()->json([
@@ -204,8 +203,8 @@ class MessageController extends Controller
     public function unreadCount()
     {
         $count = Message::where('to_user_id', Auth::id())
-                       ->where('lu', false)
-                       ->count();
+            ->where('lu', false)
+            ->count();
 
         return response()->json(['count' => $count]);
     }

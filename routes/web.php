@@ -92,6 +92,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/commandes/{id}/facture', [CommandeController::class, 'facture'])->name('commandes.facture');
     Route::get('/commandes/{id}/download-pdf', [CommandeController::class, 'downloadPDF'])->name('commandes.download-pdf');
     Route::post('/commandes', [CommandeController::class, 'store'])->name('commandes.store');
+    Route::get('/commandes/{id}/payment-success', [CommandeController::class, 'paymentSuccess'])->name('commandes.payment-success');
 
     // Profil (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -151,4 +152,4 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
     Route::get('/api/statistics/customers', [VendorStatisticsController::class, 'getCustomerMetrics'])->name('statistics.customers');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

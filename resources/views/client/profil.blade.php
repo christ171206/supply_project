@@ -72,15 +72,14 @@
                         <!-- Input Fichier -->
                         <div>
                             <label for="profile-photo-input" class="block text-sm font-semibold text-gray-700 mb-3">Choisir une photo</label>
-                            <input type="file" id="profile-photo-input" name="profile_photo" accept="image/*" class="w-full px-4 py-3 border-2 border-dashed rounded-lg focus:border-purple-500 @error('profile_photo') border-red-500 @else border-purple-300 @enderror"
-                                onchange="previewPhoto(event)">
+                            <input type="file" id="profile-photo-input" name="profile_photo" accept="image/*" class="w-full px-4 py-3 border-2 border-dashed rounded-lg focus:border-purple-500" style="border-color: @error('profile_photo') #ef4444 @else #c4b5fd @enderror;" onchange="previewPhoto(event)">
                             @error('profile_photo')
                                 <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                             @enderror
                             <p class="text-gray-500 text-xs mt-2">📁 JPG, PNG, GIF - Max 2 MB</p>
                         </div>
 
-                        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 shadow-sm">
+                        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 shadow-sm" id="photo-submit-btn">
                             💾 Mettre à jour la photo
                         </button>
                     </form>
@@ -442,10 +441,15 @@
     });
 
     // Rafraîchir la page après upload de photo pour mettre à jour l'avatar dans la navbar
-    document.getElementById('photo-form').addEventListener('submit', function() {
+    document.getElementById('photo-form').addEventListener('submit', function(e) {
+        // Désactiver le bouton pour éviter les doubles submissions
+        document.getElementById('photo-submit-btn').disabled = true;
+        document.getElementById('photo-submit-btn').textContent = '⏳ Mise à jour...';
+
+        // Rafraîchir après 1.5 secondes (temps de traitement du serveur)
         setTimeout(function() {
             window.location.reload();
-        }, 500);
+        }, 1500);
     });
 </script>
 @endsection

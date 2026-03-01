@@ -56,7 +56,7 @@
                         @php
                             $unreadCount = \App\Models\Message::where('to_user_id', Auth::id())->where('lu', false)->count();
                         @endphp
-                        <span id="messages-badge" class="absolute -top-2 -right-1 bg-danger-600 text-white text-xs rounded-full w-5 h-5 items-center justify-center font-bold shadow-sm transition-transform group-hover:scale-110 @if($unreadCount === 0) hidden @else flex @endif">
+                        <span id="messages-badge" class="absolute -top-2 -right-1 bg-danger-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm transition-transform group-hover:scale-110" style="display: {{ $unreadCount === 0 ? 'none' : 'flex' }};">
                             <span id="unread-count">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
                         </span>
                     </a>
@@ -123,7 +123,11 @@
                 @auth
                     <div class="relative hidden md:block" x-data="{ open: false }">
                         <button @click="open = !open" class="flex items-center gap-1 px-2 py-2 text-gray-700 hover:text-primary-600 transition duration-150 whitespace-nowrap">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ urlencode(Auth::user()->email) }}" alt="{{ Auth::user()->name }}" class="w-8 h-8 rounded-lg border border-gray-200 object-cover flex-shrink-0">
+                            @if(Auth::user()->profile_photo)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->name }}" class="w-8 h-8 rounded-lg border border-gray-200 object-cover flex-shrink-0">
+                            @else
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ urlencode(Auth::user()->email) }}" alt="{{ Auth::user()->name }}" class="w-8 h-8 rounded-lg border border-gray-200 object-cover flex-shrink-0">
+                            @endif
                             <span class="font-medium text-sm truncate max-w-24" :title="'{{ Auth::user()->name }}'">{{ Auth::user()->name }}</span>
                             <svg class="w-4 h-4 text-gray-400 transition duration-200 flex-shrink-0" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>

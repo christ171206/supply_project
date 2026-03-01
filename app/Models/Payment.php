@@ -12,6 +12,12 @@ class Payment extends Model
         'montant',
         'typePayement',
         'statut',
+        'payment_code',
+        'provider_transaction_id',
+        'payment_status',
+        'response_data',
+        'payment_initiated_at',
+        'payment_confirmed_at',
     ];
 
     public function commande()

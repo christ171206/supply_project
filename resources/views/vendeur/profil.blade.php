@@ -38,8 +38,7 @@
                 <!-- Input Fichier -->
                 <div>
                     <label for="vendor-profile-photo" class="block text-sm font-semibold text-gray-700 mb-3">Choisir une photo</label>
-                    <input type="file" id="vendor-profile-photo" name="profile_photo" accept="image/*" class="w-full px-4 py-3 border-2 border-dashed rounded-lg focus:border-purple-500 @error('profile_photo') border-red-500 @else border-purple-300 @enderror"
-                        onchange="previewVendorPhoto(event)">
+                    <input type="file" id="vendor-profile-photo" name="profile_photo" accept="image/*" class="w-full px-4 py-3 border-2 border-dashed rounded-lg focus:border-purple-500" style="border-color: @error('profile_photo') #ef4444 @else #c4b5fd @enderror;" onchange="previewVendorPhoto(event)">
                     @error('profile_photo')
                         <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                     @enderror
@@ -69,7 +68,7 @@
                             id="name"
                             name="name"
                             value="{{ old('name', Auth::user()->name) }}"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @else border-gray-300 @enderror"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('name') #ef4444 @else #d1d5db @enderror;"
                         >
                         @error('name')
                             <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -84,7 +83,7 @@
                             id="email"
                             name="email"
                             value="{{ old('email', Auth::user()->email) }}"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('email') border-red-500 @else border-gray-300 @enderror"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('email') #ef4444 @else #d1d5db @enderror;"
                         >
                         @error('email')
                             <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -116,7 +115,7 @@
                             name="shop_name"
                             value="{{ old('shop_name', Auth::user()->shop_name ?? '') }}"
                             placeholder="Ex: Ma Boutique Électronique"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('shop_name') border-red-500 @else border-gray-300 @enderror"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('shop_name') #ef4444 @else #d1d5db @enderror;"
                         >
                         @error('shop_name')
                             <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -132,7 +131,7 @@
                             name="phone"
                             value="{{ old('phone', Auth::user()->phone ?? '') }}"
                             placeholder="Ex: +221 77 123 45 67"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('phone') border-red-500 @else border-gray-300 @enderror"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('phone') #ef4444 @else #d1d5db @enderror;"
                         >
                         @error('phone')
                             <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -148,7 +147,7 @@
                         name="address"
                         rows="3"
                         placeholder="Votre adresse complète"
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('address') border-red-500 @else border-gray-300 @enderror"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('address') #ef4444 @else #d1d5db @enderror;"
                     >{{ old('address', Auth::user()->address ?? '') }}</textarea>
                     @error('address')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -163,7 +162,7 @@
                         name="description"
                         rows="3"
                         placeholder="Parlez un peu de vous et de votre boutique..."
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('description') border-red-500 @else border-gray-300 @enderror"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('description') #ef4444 @else #d1d5db @enderror;"
                     >{{ old('description', Auth::user()->description ?? '') }}</textarea>
                     @error('description')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>

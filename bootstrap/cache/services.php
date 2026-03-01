@@ -34,6 +34,7 @@
     30 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
     31 => 'Spatie\\Permission\\PermissionServiceProvider',
     32 => 'App\\Providers\\AppServiceProvider',
+    33 => 'App\\Providers\\EventServiceProvider',
   ),
   'eager' => 
   array (
@@ -54,6 +55,7 @@
     14 => 'Spatie\\MediaLibrary\\MediaLibraryServiceProvider',
     15 => 'Spatie\\Permission\\PermissionServiceProvider',
     16 => 'App\\Providers\\AppServiceProvider',
+    17 => 'App\\Providers\\EventServiceProvider',
   ),
   'deferred' => 
   array (

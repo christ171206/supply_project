@@ -14,6 +14,9 @@ class Commande extends Model
         'mode_paiement',
         'paiement_confirme',
         'adresse_livraison',
+        'adresse_detail',
+        'telephone_livraison',
+        'quartier_id',
         'notes',
     ];
 
@@ -39,5 +42,10 @@ class Commande extends Model
     public function payment()
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public function quartier()
+    {
+        return $this->belongsTo(Quartier::class);
     }
 }

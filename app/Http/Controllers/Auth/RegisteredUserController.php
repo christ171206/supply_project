@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailVerificationCodeMail;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -32,7 +34,8 @@ class RegisteredUserController extends Controller
         // Validation commune
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'country' => ['required', 'string', 'max:2'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:client,vendor'],
             'terms' => ['required'],
@@ -57,6 +60,7 @@ class RegisteredUserController extends Controller
         // Préparer les données utilisateur
         $userData = [
             'name' => $request->name,
+            'country' => $request->country,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
@@ -79,15 +83,25 @@ class RegisteredUserController extends Controller
         // Créer l'utilisateur
         $user = User::create($userData);
 
-        event(new Registered($user));
+        // Générer un code de vérification (6 chiffres)
+        $verificationCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        Auth::login($user);
+        // Sauvegarder le code de vérification
+        $user->update([
+            'email_verification_code' => $verificationCode,
+            'email_verification_code_sent_at' => now(),
+        ]);
 
-        // Redirection basée sur le rôle
-        if ($user->role === 'vendor') {
-            return redirect(route('vendeur.dashboard', absolute: false));
-        }
+        // Envoyer l'email avec le code
+        Mail::send(new EmailVerificationCodeMail($user, $verificationCode));
 
-        return redirect(route('accueil', absolute: false));
+        // Sauvegarder l'email et le code en session pour la vérification
+        session([
+            'registration_email' => $user->email,
+            'verification_code_debug' => config('app.env') === 'local' ? $verificationCode : null,
+        ]);
+
+        // Rediriger vers la page de vérification du code
+        return redirect()->route('verification.code.show');
     }
 }

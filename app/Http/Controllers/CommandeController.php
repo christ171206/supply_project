@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Commande;
 use App\Models\LigneCommande;
 use App\Models\Payment;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -74,7 +75,29 @@ class CommandeController extends Controller
 
         $request->validate([
             'payment_method' => 'required|in:wave,orange_money,mtn_money,moov_money,cash',
-            'adresse_livraison' => 'required|string',
+            'quartier_id' => 'required|exists:ci_quartiers,id',
+            'adresse_detail' => 'required|string|min:5',
+            'telephone_livraison' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    // Extraire seulement les chiffres
+                    $digitsOnly = preg_replace('/\D/', '', $value);
+                    if (strlen($digitsOnly) < 10) {
+                        $fail('Le téléphone doit contenir au moins 10 chiffres.');
+                    }
+                }
+            ],
+            'accept_conditions' => 'required|accepted',
+            'phone_payment' => 'required_if:payment_method,wave,orange_money,mtn_money,moov_money|string',
+        ], [
+            'quartier_id.required' => 'Veuillez sélectionner un quartier',
+            'quartier_id.exists' => 'Le quartier sélectionné n\'existe pas',
+            'adresse_detail.required' => 'L\'adresse détaillée est obligatoire',
+            'adresse_detail.min' => 'L\'adresse doit contenir au moins 5 caractères',
+            'telephone_livraison.required' => 'Le téléphone de livraison est obligatoire',
+            'accept_conditions.required' => 'Vous devez accepter les conditions',
+            'phone_payment.required_if' => 'Le numéro de téléphone est obligatoire pour ce mode de paiement',
         ]);
 
         $user = auth()->user();
@@ -97,14 +120,21 @@ class CommandeController extends Controller
 
             \Log::info('Total calculé', ['total' => $total]);
 
+            // Construire l'adresse complète
+            $quartier = \App\Models\CiQuartier::find($request->quartier_id);
+            $adresseLivraison = $quartier->name . ', ' . $quartier->commune->name;
+
             // Créer la commande
             $commande = Commande::create([
                 'user_id' => $user->id,
                 'total' => $total,
                 'statut' => 'en_attente',
                 'payment_method' => $request->payment_method,
-                'adresse_livraison' => $request->adresse_livraison,
-                'notes' => $request->notes,
+                'quartier_id' => $request->quartier_id,
+                'adresse_livraison' => $adresseLivraison,
+                'adresse_detail' => $request->adresse_detail,
+                'telephone_livraison' => $request->telephone_livraison,
+                'notes' => $request->input('notes', null),
             ]);
 
             \Log::info('Commande créée', ['commande_id' => $commande->id]);
@@ -129,15 +159,17 @@ class CommandeController extends Controller
 
             \Log::info('Lignes commande créées');
 
-            // Créer le paiement (simulé)
-            Payment::create([
+            // Créer le paiement
+            $paymentCode = 'PAY-' . strtoupper(\Illuminate\Support\Str::random(12));
+            $payment = Payment::create([
                 'commande_id' => $commande->id,
                 'montant' => $commande->total,
                 'typePayement' => $request->payment_method,
-                'statut' => $request->payment_method === 'cash' ? 'en_attente' : 'confirme',
+                'payment_code' => $paymentCode,
+                'payment_status' => $request->payment_method === 'cash' ? 'initialisee' : 'en_attente',
             ]);
 
-            \Log::info('Paiement créé');
+            \Log::info('Paiement créé', ['payment_id' => $payment->id, 'code' => $paymentCode]);
 
             // Vider le panier
             $panier->items()->delete();
@@ -148,8 +180,59 @@ class CommandeController extends Controller
 
             \Log::info('Commande complète - succès', ['commande_id' => $commande->id]);
 
-            return redirect()->route('commandes.show', $commande->id)
-                           ->with('success', 'Commande créée avec succès!');
+            // Rediriger vers la page de confirmation avec possibilité de paiement
+            $redirectUrl = route('commandes.show', $commande->id);
+
+            // Si paiement mobile, initier la transaction de paiement
+            if (in_array($request->payment_method, ['wave', 'orange_money', 'mtn_money', 'moov_money'])) {
+                try {
+                    $paymentService = new PaymentService();
+
+                    $paymentData = [
+                        'transaction_id' => $paymentCode,
+                        'amount' => intval($commande->total),
+                        'currency' => 'XOF',
+                        'description' => "Commande #" . $commande->id . " - Supply Market",
+                        'customer_name' => auth()->user()->name,
+                        'customer_email' => auth()->user()->email,
+                        'customer_phone' => $request->phone_payment,
+                        'return_url' => route('commandes.show', $commande->id),
+                        'notify_url' => route('api.payment-webhook'),
+                    ];
+
+                    // Mapper les méthodes de paiement
+                    $paymentMethods = [
+                        'wave' => 'createWavePayment',
+                        'orange_money' => 'createOrangeMoneyPayment',
+                        'mtn_money' => 'createMobileMoneyPayment',
+                        'moov_money' => 'createMobileMoneyPayment',
+                    ];
+
+                    $method = $paymentMethods[$request->payment_method] ?? 'createPayment';
+                    $response = $paymentService->$method($paymentData);
+
+                    \Log::info('Réponse API Paiement', $response);
+
+                    // Si succès, rediriger vers la plateforme de paiement
+                    if (isset($response['code']) && $response['code'] == 'SUCCESFUL') {
+                        return redirect()->to($response['payment_url'] ?? $redirectUrl)
+                            ->with('success', 'Veuillez confirmer votre paiement');
+                    } else {
+                        // En cas de problème, rediriger vers la commande avec un message
+                        return redirect()->to($redirectUrl)
+                            ->with('warning', 'Paiement en attente de confirmation');
+                    }
+                } catch (\Exception $paymentError) {
+                    \Log::error('Erreur API Paiement: ' . $paymentError->getMessage());
+                    // Rediriger vers la commande même en cas d'erreur API
+                    return redirect()->to($redirectUrl)
+                        ->with('warning', 'Commande créée mais vérification paiement échouée. Veuillez réessayer.');
+                }
+            } else {
+                // Paiement à la livraison (cash)
+                return redirect()->to($redirectUrl)
+                    ->with('success', 'Commande créée avec succès! Vous paierez à la livraison.');
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Erreur création commande: ' . $e->getMessage(), [
@@ -167,8 +250,8 @@ class CommandeController extends Controller
     public function vendeurCommandes()
     {
         $commandes = Commande::with('user', 'ligneCommandes')
-                             ->latest()
-                             ->paginate(10);
+            ->latest()
+            ->paginate(10);
 
         return view('vendeur.commandes', compact('commandes'));
     }
@@ -224,5 +307,28 @@ class CommandeController extends Controller
         $total = $sousTotal + $frais;
 
         return view('commandes.facture-pdf', compact('commande', 'lignes', 'sousTotal', 'frais', 'total', 'payment'));
+    }
+
+    /**
+     * Retour de succès après paiement CinetPay
+     */
+    public function paymentSuccess($id)
+    {
+        $commande = Commande::findOrFail($id);
+
+        // Vérifier que l'utilisateur est propriétaire
+        if (auth()->user()->id !== $commande->user_id) {
+            abort(403);
+        }
+
+        $lignes = $commande->ligneCommandes()->with('produit')->get();
+        $payment = $commande->payment;
+
+        // Si le paiement n'est pas confirmé, on attend ou on affiche un message d'attente
+        if ($payment && $payment->payment_status === 'EN_ATTENTE') {
+            return view('commandes.payment-pending', compact('commande', 'lignes', 'payment'));
+        }
+
+        return view('commandes.show', compact('commande', 'lignes', 'payment'));
     }
 }

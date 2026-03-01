@@ -17,13 +17,19 @@
                     <p class="text-gray-600 mt-2">{{ $commande->created_at->format('d M Y à H:i') }}</p>
                 </div>
                 <div class="text-right">
-                    <span class="px-4 py-2 rounded-full text-sm font-bold inline-block
-                        @if($commande->statut === 'livree') bg-green-100 text-green-800
-                        @elseif($commande->statut === 'expediee') bg-blue-100 text-blue-800
-                        @elseif($commande->statut === 'confirmee') bg-yellow-100 text-yellow-800
-                        @elseif($commande->statut === 'annulee') bg-red-100 text-red-800
-                        @else bg-gray-100 text-gray-800
-                        @endif">
+                    <span class="px-4 py-2 rounded-full text-sm font-bold inline-block" style="
+                        background-color: @switch($commande->statut)
+                            @case('livree')#dbeafe @break
+                            @case('expediee') #dbeafe @break
+                            @case('confirmee') #fef3c7 @break
+                            @case('annulee') #fee2e2 @break
+                            @default #f3f4f6 @endswitch;
+                        color: @switch($commande->statut)
+                            @case('livree') #065f46 @break
+                            @case('expediee') #1e40af @break
+                            @case('confirmee') #92400e @break
+                            @case('annulee') #991b1b @break
+                            @default #111827 @endswitch;">
                         @switch($commande->statut)
                             @case('en_attente') <x-icon name="clock" class="w-4 h-4 inline mr-1" /> En attente @break
                             @case('confirmee') <x-icon name="check-circle" class="w-4 h-4 inline mr-1" /> Confirmée @break
