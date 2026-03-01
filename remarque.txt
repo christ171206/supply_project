@@ -1,2 +1,1 @@
 quand on cree un compte et qu'on rentre l'email on doit recevoir un code par email qu'on va entrer dans une page qui va s'ouvrir pour confirmer l'inscription
-

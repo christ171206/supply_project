@@ -1,0 +1,1157 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    DOCUMENTATION COMPLÈTE - SECTION CLIENT
+                        Supply - Plateforme E-Commerce
+═══════════════════════════════════════════════════════════════════════════════
+
+TABLE DES MATIÈRES:
+1. Pages Publiques (Accessibles sans authentification)
+2. Fonctionnalités Authentifiées (Nécessite inscription/connexion)
+3. Section Client - Dashboard et Profil
+4. Gestion des Commandes
+5. Système de Paiement
+6. Panier d'Achat
+7. Favoris
+8. Avis et Évaluations
+9. Messages et Communication avec Vendeurs
+10. Pages Affiliées aux Vendeurs
+
+═══════════════════════════════════════════════════════════════════════════════
+1. PAGES PUBLIQUES (SANS AUTHENTIFICATION)
+═══════════════════════════════════════════════════════════════════════════════
+
+1.1 ACCUEIL (/)
+Route: GET /
+Vue: resources/views/accueil.blade.php
+Contenu:
+    - Page d'accueil principale de la plateforme
+    - Affichage de produits en vedette
+    - Options de recherche et navigation
+    - Accès au catalogue général
+
+1.2 CATALOGUE DE PRODUITS (/produits)
+Route: GET /produits
+Vue: resources/views/produits/
+Contenu:
+    - Liste complète des produits disponibles
+    - Filtres par catégorie
+    - Filtres par prix
+    - Recherche par mot-clé
+    - Pagination des résultats
+    - Tri (populaire, nouveau, prix...)
+
+1.3 DÉTAIL PRODUIT (/produits/{id})
+Route: GET /produits/{id}
+Vue: resources/views/produits/show.blade.php
+Contenu:
+    - Images du produit (galerie)
+    - Description détaillée
+    - Prix et promotions applicables
+    - Stock disponible
+    - Avis et évaluations des clients
+    - Informations du vendeur
+    - Bouton "Ajouter au panier"
+    - Bouton "Ajouter aux favoris" (avec icône cœur)
+    - Bouton "Contacter le Vendeur" (modale de contact)
+    - Formulaire pour laisser un avis (authentification requise)
+
+1.4 FAVORIS (/favoris)
+Route: GET /favoris
+Vue: resources/views/favoris/index.blade.php
+Contenu:
+    - Liste de tous les produits marqués en favoris
+    - Clic sur le cœur pour ajouter/retirer des favoris
+    - Affichage du prix et disponibilité
+    - Lien vers la page détail du produit
+    - Bouton "Ajouter au panier" pour chaque favori
+    - Messages: "Vos favoris est vide" si aucun favori
+
+1.5 PANIER (/panier)
+Route: GET /panier
+Vue: resources/views/panier/index.blade.php
+Contenu:
+    - Liste des articles du panier
+    - Quantité pour chaque produit (avec + et -)
+    - Prix unitaire et sous-total pour chaque article
+    - Bouton "Supprimer" pour retirer un article
+    - Sous-total du panier
+    - Frais de livraison (calculés selon le montant)
+    - Total TTC
+    - Bouton "Vider le panier"
+    - Bouton "Continuer le shopping"
+    - Bouton "Passer la commande" (redirection vers /commandes/paiement)
+
+═══════════════════════════════════════════════════════════════════════════════
+2. FONCTIONNALITÉS AUTHENTIFIÉES
+═══════════════════════════════════════════════════════════════════════════════
+
+2.1 CONNEXION & INSCRIPTION
+Routes:
+    - GET /login - Page de connexion
+    - POST /login - Traitement du formulaire
+    - GET /register - Page d'inscription
+    - POST /register - Création de compte
+
+Contenu:
+    - Formulaire d'authentification
+    - Options de connexion sociale (si configurées)
+    - Lien "Mot de passe oublié"
+    - Lien "S'inscrire" depuis la page login
+    - Confirmation d'email (si activée)
+
+═══════════════════════════════════════════════════════════════════════════════
+3. SECTION CLIENT - DASHBOARD ET PROFIL
+═══════════════════════════════════════════════════════════════════════════════
+
+3.1 TABLEAU DE BORD CLIENT (/dashboard)
+Route: GET /dashboard
+Vue: resources/views/client/dashboard.blade.php
+Contenu:
+    - Titres: "Tableau de Bord" avec message de bienvenue personnalisé
+    - Cartes Récapitulatives (4 cartes statistiques):
+        • Total Commandes: Nombre total de commandes depuis inscription
+        • En Cours: Nombre de commandes en cours de livraison
+        • Total Dépensé: Montant total cumulé dépensé (en FCFA)
+        • Dernier Achat: Date du dernier achat avec texte relatif
+
+    - Section "Commandes Récentes":
+        • Liste des 5 dernières commandes
+        • Date de la commande
+        • Statut (En attente, Confirmée, Livrée, Annulée)
+        • Montant total
+        • Nombre d'articles
+        • Lien "Voir détails" pour chaque commande
+        • Bouton "Voir toutes mes commandes"
+
+    - Section "Tendances d'Achat":
+        • Graphique des dépenses mensuelles
+        • Catégories les plus achetées
+        • Articles les plus achetés
+
+    - Liens Rapides:
+        • Aller au panier
+        • Voir tous les favoris
+        • Accéder aux messages
+        • Modifier le profil
+        • Télécharger les factures
+
+3.2 MON PROFIL (/mon-profil)
+Route: GET /mon-profil
+Vue: resources/views/client/profil.blade.php
+Contenu:
+
+    ✓ SECTION PHOTO DE PROFIL:
+        • Affichage de la photo actuelle (ou avatar généré)
+        • Upload d'une nouvelle photo
+        • Aperçu en temps réel avant upload
+        • Format accepté: JPG, PNG, GIF (Max 2 MB)
+        • Bouton "Mettre à jour la photo"
+
+    ✓ SECTION ZONE DE LIVRAISON:
+        • Carte interactive Leaflet
+        • Clic sur la carte pour marquer une zone préférée
+        • Affichage des coordonnées GPS sélectionnées
+        • Sélecteur de région/district/commune/quartier
+        • Sauvegarde automatique
+
+    ✓ SECTION INFORMATIONS PERSONNELLES:
+        • Nom complet (éditable)
+        • Email (éditable)
+        • Téléphone (éditable)
+        • Date d'inscription (lecture seule)
+        • Statut du compte (lecture seule)
+        • Bouton "Enregistrer les modifications"
+
+    ✓ SECTION ADRESSES:
+        • Adresse de livraison principale
+        • Possibilité d'ajouter plusieurs adresses
+        • Adresse par défaut (checkbox)
+        • Bouton "Ajouter une adresse"
+        • Bouton "Modifier" pour chaque adresse
+        • Bouton "Supprimer" pour chaque adresse
+
+    ✓ SECTION PARAMÈTRES DE SÉCURITÉ:
+        • Modifier le mot de passe
+        • Historique de connexion
+        • Sessions actives
+        • Déconnexion d'autres sessions
+        • Authentification à deux facteurs (si activée)
+
+    ✓ SECTION PRÉFÉRENCES:
+        • Notifications par email (checkbox pour chaque type)a
+        • Notifications SMS (si disponible)
+        • Langue préférée
+        • Devise (XOF, EUR, USD...)
+        • Thème (Clair/Sombre)
+
+    ✓ SECTION SUPPRESSION DE COMPTE:
+        • Bouton "Supprimer mon compte"
+        • Confirmation requise
+        • Avertissement sur perte des données
+
+3.3 MODIFICATION DU PROFIL (/mon-profil UPDATE)
+Route: PUT /mon-profil
+Contenu:
+    - Mise à jour des informations personnelles
+    - Validation des champs
+    - Messages de succès/erreur
+    - Redirection vers le profil
+
+3.4 UPLOAD PHOTO DE PROFIL (/mon-profil/photo)
+Route: PATCH /mon-profil/photo
+Contenu:
+    - Upload et traitement de la photo
+    - Validation du format et taille
+    - Stockage dans le dossier storage
+    - Redirection avec message de succès
+
+═══════════════════════════════════════════════════════════════════════════════
+4. GESTION DES COMMANDES
+═══════════════════════════════════════════════════════════════════════════════
+
+4.1 MES COMMANDES (Liste) (/commandes)
+Route: GET /commandes
+Vue: resources/views/client/commandes.blade.php
+Contenu:
+    - Liste paginée de toutes les commandes du client
+    - Pour chaque commande:
+        • Numéro de commande (#ID)
+        • Date de commande
+        • Statut (En attente, Confirmée, Livrée, Annulée)
+        • Montant total
+        • Nombre d'articles
+        • Affichage des images des produits
+        • Lien "Voir détails"
+        • Lien "Télécharger la facture (PDF)"
+
+    - Filtres:
+        • Par statut (En attente, Confirmée, Livrée, Annulée)
+        • Par date (Plus récentes, Plus anciennes)
+        • Recherche par numéro de commande
+
+    - Pagination: 10 commandes par page
+    - Message si aucune commande
+
+4.2 DÉTAIL D'UNE COMMANDE (/commandes/{id})
+Route: GET /commandes/{id}
+Vue: resources/views/commandes/show.blade.php
+Contenu:
+    ✓ BANNEAU DE SUCCÈS (en haut):
+        • Icône ✓ et message "Commande créée avec succès!"
+
+    ✓ EN-TÊTE:
+        • Numéro de commande (#ID)
+        • Date et heure de création
+        • Badge Statut (couleur selon le statut)
+
+    ✓ SECTION PRODUITS:
+        • Liste de tous les articles commandés
+        • Pour chaque article:
+            - Nom du produit
+            - Nom du vendeur
+            - Quantité
+            - Prix unitaire
+            - Sous-total
+            - Image du produit (vignette)
+
+    ✓ SECTION ADRESSE DE LIVRAISON (encadré vert):
+        • Adresse complète
+        • Code postal/Région
+        • Téléphone de livraison
+        • Date de livraison estimée (si disponible)
+
+    ✓ SECTION PAIEMENT:
+        • Numéro de transaction (payment_code)
+        • Statut du paiement (EN_ATTENTE, CONFIRMÉE, ÉCHOUÉE)
+        • Méthode de paiement utilisée
+        • Montant payé
+
+    ✓ BARRE LATÉRALE (Sticky - droite):
+        • Sous-total
+        • Frais de livraison
+        • Total TTC (en gros)
+        • Méthode de paiement (icône + texte)
+        • Statut de la commande
+
+    ✓ BOUTONS D'ACTIONS:
+        • Télécharger la facture (PDF)
+        • Continuer le shopping
+        • Voir mes commandes
+
+    ✓ NOTE IMPORTANTE:
+        • "Vous paierez à la livraison" si paiement cash
+        • "Veuillez confirmer votre paiement" si paiement mobile
+
+4.3 DÉTAIL COMMANDE - VUE CLIENT (/commande/{id})
+Route: GET /commande/{id}
+Vue: resources/views/client/commande-detail.blade.php
+Contenu:
+    - Même contenu que /commandes/{id} mais interface différente
+    - Historique du statut de la commande
+    - Timeline de la commande
+    - Boutons de support/contact vendeur
+
+4.4 FORMULAIRE DE PAIEMENT (/commandes/paiement)
+Route: GET /commandes/paiement
+Vue: resources/views/commandes/create.blade.php
+Contenu:
+
+    ✓ EN-TÊTE:
+        • Titre: "🛍️ Finaliser votre Commande"
+        • Indicateurs de progression (3 étapes): Livraison → Paiement → Confirmation
+
+    ✓ SECTION ADRESSE DE LIVRAISON:
+        Deux onglets: "🔍 Recherche Rapide" et "📍 Sélection Manuelle"
+
+        TAB 1 - RECHERCHE RAPIDE:
+        • Champ de recherche texte
+        • Auto-complétion API
+        • Résultats groupés par type:
+            - Régions
+            - Districts
+            - Communes
+            - Quartiers (affichés en bleu en priorité)
+        • Clic sur résultat remplit les champs cachés
+        • Scroll au champ d'adresse détaillée après sélection
+
+        TAB 2 - SÉLECTION MANUELLE:
+        • Dropdown "Région / Ville" (chargement au démarrage)
+        • Dropdown "District" (se remplit après région)
+        • Dropdown "Commune" (se remplit après district)
+        • Dropdown "Quartier" (se remplit après commune)
+
+        CHAMPS OBLIGATOIRES:
+        • Champ caché: hidden-quartier-id (ID du quartier sélectionné)
+        • Champ caché: hidden-adresse-livraison (adresse depuis recherche)
+        • Textarea "Adresse détaillée" (min 5 caractères)
+        • Champ "Téléphone livraison" (tel, min 10 chiffres)
+
+    ✓ SECTION MÉTHODE DE PAIEMENT:
+        5 Options de Paiement (Radios avec images):
+
+        1. WAVE
+            • Image: public/images/payments/wave.png
+            • Confirmation: "✓ WAVE sélectionné"
+            • Affiche champ "Numéro de Téléphone (paiement mobile)"
+
+        2. ORANGE MONEY
+            • Image: public/images/payments/orange money.png
+            • Confirmation: "✓ ORANGE MONEY sélectionné"
+            • Affiche champ "Numéro de Téléphone (paiement mobile)"
+
+        3. MTN MONEY
+            • Image: public/images/payments/mtn money.png
+            • Confirmation: "✓ MTN MONEY sélectionné"
+            • Affiche champ "Numéro de Téléphone (paiement mobile)"
+
+        4. MOOV MONEY
+            • Image: public/images/payments/moov money.png
+            • Confirmation: "✓ MOOV MONEY sélectionné"
+            • Affiche champ "Numéro de Téléphone (paiement mobile)"
+
+        5. À LA LIVRAISON (ESPÈCES)
+            • Image: public/images/payments/a la livraison.jfif
+            • Confirmation: "✓ À LA LIVRAISON sélectionné"
+            • N'affiche PAS le champ de téléphone
+
+        CHAMP CONDITIONNEL:
+        • Téléphone paiement: Affiché seulement si paiement mobile
+        • Format: +225 01 23 45 67 89
+        • Requis si paiement mobile
+
+    ✓ SECTION CONDITIONS:
+        • Checkbox: "J'accepte les conditions d'utilisation"
+        • Lien vers conditions générales
+        • Lien vers politique de confidentialité
+
+    ✓ CHAMPS CACHÉS:
+        • hidden-quartier-id (name="quartier_id")
+        • hidden-adresse-livraison (name="adresse_livraison")
+        • CSRF token
+
+    ✓ BOUTONS D'ACTION:
+        • ← Retour au Panier (bouton gris)
+        • ✓ Confirmer la Commande (bouton bleu gradient)
+          - Texte change à "⏳ Traitement..." pendant le traitement
+          - Bouton désactivé pendant le traitement
+
+    ✓ RÉSUMÉ RÉCAPITULATIF (Sidebar - Sticky):
+        • Titre: "📦 Résumé"
+        • Liste des produits du panier:
+            - Nom du produit
+            - Quantité
+            - Prix unitaire
+            - Sous-total par article
+            - Scroll max-height: 400px
+
+        • Sous-total
+        • Frais de livraison (2500 F si < 100 000, gratuit si >= 100 000)
+        • TOTAL TTC (en gros texte, gradient bleu-indigo)
+
+        • Informations Client (lecture seule):
+            - 👤 Nom: [Nom de l'utilisateur]
+            - 📧 Email: [Email de l'utilisateur]
+
+        • Badge Sécurité: "🔒 Paiement Sécurisé & Chiffré"
+
+    ✓ NOTIFICATIONS TOAST:
+        • Apparaissent en haut-droite
+        • Types: Success (vert), Error (rouge), Info (bleu), Warning (jaune)
+        • Auto-fermeture après 4 secondes
+        • Animation slide-in/slide-out
+
+    ✓ VALIDATIONS (Client-side avec Logging):
+        • Quartier ID: Obligatoire (recherche OU manuel)
+        • Adresse détaillée: Min 5 caractères
+        • Téléphone livraison: Min 10 chiffres (accepte +225)
+        • Méthode de paiement: Obligatoire
+        • Téléphone paiement: Obligatoire si paiement mobile
+        • Conditions: Checkbox obligatoire
+
+        Logging Console:
+        • "📋 Validation du formulaire en cours..."
+        • Détail de chaque champ validé
+        • Erreurs listées avec Toast notification
+        • Message "✓ Commande validée, envoi en cours..."
+
+4.5 TRAITEMENT DE COMMANDE (/commandes POST)
+Route: POST /commandes
+Contenu:
+    - Validation serveur des données
+    - Création de la commande
+    - Création des lignes de commande
+    - Création du paiement
+    - Vidage du panier
+    - Redirection selon type de paiement:
+        • Paiement mobile → Redirection vers CinetPay
+        • Espèces → Redirection vers /commandes/{id} (résumé)
+
+    - Gestion des erreurs:
+        • Mode paiement invalide
+        • Quartier non trouvé
+        • Panier vide
+        • Erreurs API paiement
+
+4.6 RETOUR PAIEMENT (/commandes/{id}/payment-success)
+Route: GET /commandes/{id}/payment-success
+Vue: resources/views/commandes/show.blade.php (ou payment-pending.blade.php)
+Contenu:
+    - Affichage du résumé de commande
+    - Statut du paiement
+    - Messages de confirmation
+    - Options de retour (continuer shopping, voir commandes...)
+
+4.7 FACTURE (/commandes/{id}/facture)
+Route: GET /commandes/{id}/facture
+Vue: resources/views/commandes/facture.blade.php
+Contenu:
+    - Affichage présentable de la facture
+    - En-tête avec logo
+    - Numéro et date de commande
+    - Adresse de livraison
+    - Détail des articles
+    - Calculs (sous-total, frais, TVA, total)
+    - Méthode de paiement
+    - Numéro de transaction
+
+4.8 TÉLÉCHARGEMENT PDF (/commandes/{id}/download-pdf)
+Route: GET /commandes/{id}/download-pdf
+Contenu:
+    - Génération d'un PDF de la facture
+    - Téléchargement automatique
+    - Format: facture_commande_{id}_{date}.pdf
+
+═══════════════════════════════════════════════════════════════════════════════
+5. SYSTÈME DE PAIEMENT (INTÉGRATION CINETPAY)
+═══════════════════════════════════════════════════════════════════════════════
+
+MÉTHODES SUPPORTÉES:
+    1. Wave
+    2. Orange Money
+    3. MTN Money
+    4. Moov Money
+    5. Paiement à la Livraison (Espèces)
+
+FLUX DE PAIEMENT MOBILE:
+    1. Client sélectionne une méthode mobile (Wave, Orange Money, etc.)
+    2. Client entre son numéro de téléphone
+    3. Client confirme la commande
+    4. Redirection vers CinetPay
+    5. CinetPay envoie un prompt de paiement au client
+    6. Client confirme et paye via son portefeuille mobile
+    7. CinetPay renvoie la notification de paiement (webhook)
+    8. Statut de la commande mis à jour
+
+FLUX PAIEMENT À LA LIVRAISON:
+    1. Client sélectionne "À la Livraison"
+    2. Pas de champ téléphone mobile
+    3. Client confirme la commande
+    4. Redirection vers /commandes/{id}
+    5. Affichage: "Vous paierez à la livraison"
+    6. Livreur collecte le paiement
+
+═══════════════════════════════════════════════════════════════════════════════
+6. PANIER D'ACHAT
+═══════════════════════════════════════════════════════════════════════════════
+
+ACTIONS DISPONIBLES:
+
+6.1 AJOUTER UN PRODUIT AU PANIER (/panier/ajouter/{produitId})
+Route: POST /panier/ajouter/{produitId}
+Bouton: "Ajouter au panier" sur page détail produit
+Contenu:
+    - Ajout du produit au panier
+    - Gestion de la quantité
+    - Message de succès/erreur Toast
+    - Icône panier may affiche le nombre d'articles
+
+6.2 MODIFIER LA QUANTITÉ (/panier/{itemId} PATCH)
+Route: PATCH /panier/{itemId}
+Contenu:
+    - Boutons +/- pour modifier la quantité
+    - Input de quantité directe
+    - Mise à jour du sous-total en temps réel
+    - Mise à jour du total TTC
+    - Vérification du stock disponible
+
+6.3 SUPPRIMER UN ARTICLE (/panier/{itemId} DELETE)
+Route: DELETE /panier/{itemId}
+Contenu:
+    - Bouton "Supprimer" rouge pour chaque article
+    - Confirmation avant suppression (optionnel)
+    - Mise à jour du total
+    - Message de confirmation
+
+6.4 VIDER LE PANIER (/panier/vider POST)
+Route: POST /panier/vider
+Contenu:
+    - Bouton "Vider le panier"
+    - Confirmation requise
+    - Suppression de tous les articles
+    - Message de confirmation
+
+6.5 AFFICHAGE DU PANIER (/panier GET)
+Route: GET /panier
+Contenu:
+    - Message si panier vide: "Votre panier est vide"
+    - Pour chaque article:
+        • Image du produit
+        • Nom du produit
+        • Vendeur
+        • Prix unitaire
+        • Quantité (avec +/-)
+        • Sous-total
+        • Bouton Supprimer
+
+    - Calculs:
+        • Sous-total
+        • Frais de livraison (2500 F si montant < 100 000)
+        • Total TTC
+
+    - Boutons:
+        • Continuer le shopping
+        • Vider le panier
+        • Passer la commande (vers /commandes/paiement)
+
+═══════════════════════════════════════════════════════════════════════════════
+7. FAVORIS (LISTE DE SOUHAITS)
+═══════════════════════════════════════════════════════════════════════════════
+
+7.1 AJOUTER AUX FAVORIS (/favoris/{productId}/toggle POST)
+Route: POST /favoris/{productId}/toggle
+Déclencheur: Clic sur l'icône cœur (sur page détail ou catalogue)
+Contenu:
+    - Ajout/Retrait du favori
+    - Icône cœur devient rouge/pleine
+    - Requête AJAX sans rechargement
+    - Toast: "Ajouté aux favoris" ou "Retiré des favoris"
+
+7.2 VÉRIFIER SI FAVORI (/favoris/{productId}/check GET)
+Route: GET /favoris/{productId}/check
+Contenu:
+    - Vérification si un produit est en favoris
+    - Réponse JSON: {favorited: true/false}
+    - Mise à jour visuelle de l'icône cœur
+
+7.3 AFFICHER LES FAVORIS (/favoris GET)
+Route: GET /favoris
+Vue: resources/views/favoris/index.blade.php
+Contenu:
+    - Titre: "Mes Favoris"
+    - Nombre de favoris
+
+    - Grid display des favoris:
+        • Image du produit
+        • Nom du produit
+        • Prix
+        • Vendeur
+        • Icône cœur rouge (remplie)
+        • Stock disponible
+        • Bouton "Ajouter au panier"
+
+    - Message si aucun favori: "Vous n'avez pas de favoris"
+    - Lien "Continuer le shopping"
+    - Possibilité de trier/filtrer les favoris
+
+═══════════════════════════════════════════════════════════════════════════════
+8. AVIS ET ÉVALUATIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+8.1 LAISSER UN AVIS (/avis POST)
+Route: POST /avis
+Déclencheur: Formulaire sur page détail produit (authentification requise)
+Contenu du Formulaire:
+    - Évaluation: Notation étoiles (1-5)
+    - Titre d'avis: Champ texte court
+    - Contenu d'avis: Textarea
+    - Peut inclure une photo
+
+Traitement:
+    - Validation des données
+    - Création de l'avis en base
+    - Message de succès
+    - Avis visible immédiatement
+
+8.2 SUPPRIMER UN AVIS (/avis/{avis} DELETE)
+Route: DELETE /avis/{avis}
+Contenu:
+    - Bouton "Supprimer" sur son propre avis
+    - Confirmation requise
+    - Suppression logique ou physique
+
+8.3 AFFICHAGE DES AVIS
+Localisation: Page détail produit (/produits/{id})
+Contenu:
+    - Section "Avis Clients"
+    - Statistiques:
+        • Note moyenne (étoiles)
+        • Nombre total d'avis
+        • Nombre d'avis par note (1⭐, 2⭐, etc.)
+        • Graphique de répartition
+
+    - Liste des avis (paginée):
+        • Pseudonyme du client
+        • Date de l'avis
+        • Note (étoiles)
+        • Titre d'avis
+        • Contenu (troncable)
+        • Photo s'il y en a une
+        • Nombre d'utiles (thumb up)
+        • Bouton "Modifier" (si c'est mon avis)
+        • Bouton "Supprimer" (si c'est mon avis)
+
+    - Tri: Plus récents, Plus utiles, Plus hauts notés, Plus bas notés
+    - Filtre: Par note (1⭐ à 5⭐)
+
+8.4 FORMULAIRE AVIS (Page détail produit)
+Contenu:
+    - Titre: "Donnez votre avis"
+    - Message si non authentifié:
+        "Connectez-vous pour laisser un avis"
+    - Button: "Se Connecter"
+
+    - Si authentifié:
+        • Sélection de notation (1-5 étoiles, clickable)
+        • Input: Titre d'avis (max 100 caractères)
+        • Textarea: Contenu d'avis (min 10, max 1000 caractères)
+        • Upload: Photo (optionnel, max 5 MB)
+        • Checkbox: "Cet avis m'a aidé" (après publication)
+        • Bouton "Publier"
+        • Bouton "Réinitialiser"
+
+═══════════════════════════════════════════════════════════════════════════════
+9. MESSAGES ET COMMUNICATION AVEC VENDEURS
+═══════════════════════════════════════════════════════════════════════════════
+
+9.1 CONTACTER UN VENDEUR (Page détail produit)
+Localisation: /produits/{id} - Bouton "Contacter le Vendeur"
+Contenu:
+    - Modale de contact
+    - Affichage des infos du vendeur:
+        • Nom/Pseudo du vendeur
+        • Statut en ligne (point vert/rouge)
+        • Téléphone (cliquable tel:)
+        • Email (cliquable mailto:)
+
+    - Formulaire de message:
+        • Textarea: Message (min 5 caractères)
+        • Champ caché: destinataire_id
+        • Champ caché: produit_id
+        • Bouton "Envoyer"
+
+    - Ou (alternative): Lien WhatsApp direct si numéro saisi
+
+9.2 MESSAGES (/messages GET)
+Route: GET /messages
+Vue: resources/views/messages/... (Vue client)
+Contenu:
+    - Titre: "Mes Messages"
+    - Vue liste + détail (deux colonnes)
+
+    COLONNE GAUCHE (Conversations):
+        • Liste des conversations
+        • Chaque conversation affiche:
+            - Photo de profil du vendeur
+            - Nom du vendeur
+            - Dernier message (aperçu)
+            - Date du dernier message
+            - Badge "non lu" avec nombre
+
+    COLONNE DROITE (Détail):
+        • Nom du vendeur en haut
+        • Historique des messages (scrollable)
+        • Messages reçus (à gauche, gris)
+        • Messages envoyés (à droite, bleu)
+        • Timestamps sur chaque message
+
+        • Zone de saisie en bas:
+            - Textarea pour nouveau message
+            - Bouton "Envoyer"
+            - Icône emoji (si disponible)
+            - Attachment (photo/document optionnel)
+
+9.3 VOIR UNE CONVERSATION (/messages/{userId} GET)
+Route: GET /messages/{userId}
+Contenu:
+    - Affichage détaillé de la conversation
+    - Historique complet des messages
+    - Marquer comme lu
+    - Options: Signaler, Bloquer, Archiver
+
+9.4 ENVOYER UN MESSAGE (/messages POST)
+Route: POST /messages
+Contenu:
+    - Validation du message
+    - Création du message en base
+    - Notification au destinataire
+    - Affichage immédiat du message
+
+9.5 RÉPONDRE À UN MESSAGE (/messages/{userId}/reply POST)
+Route: POST /messages/{userId}/reply
+Contenu:
+    - Réponse à un message spécifique
+    - Conservation du context (produit, etc.)
+    - Notification avec contexte
+
+9.6 SUPPRIMER UN MESSAGE (/messages/{messageId} DELETE)
+Route: DELETE /messages/{messageId}
+Contenu:
+    - Suppression du message
+    - Possible seulement sur ses propres messages
+    - Confirmation avant suppression
+
+9.7 COMPTEUR MESSAGES NON LUS (/messages/unread/count GET)
+Route: GET /messages/unread/count
+Contenu:
+    - Requête AJAX
+    - Réponse JSON avec nombre de messages non lus
+    - Mise à jour du badge en temps réel
+
+═══════════════════════════════════════════════════════════════════════════════
+10. PAGES AFFILIÉES AUX VENDEURS (SECTION VENDEUR)
+═══════════════════════════════════════════════════════════════════════════════
+
+⚠️ IMPORTANT: Ces pages sont EXCLUSIVEMENT pour les vendeurs authentifiés
+Routes: /vendeur/... (middleware: auth + vendeur)
+
+10.1 TABLEAU DE BORD VENDEUR (/vendeur/dashboard)
+Route: GET /vendeur/dashboard
+Vue: resources/views/vendeur/dashboard.blade.php (ou apercu)
+Contenu:
+    - Titre: "Tableau de Bord Vendeur"
+    - Statistiques en cartes:
+        • Nombre total de produits
+        • Nombre de ventes ce mois
+        • Revenu ce mois
+        • Évaluation moyenne
+        • Nombre de messages non lus
+        • Nombre de commandes en attente
+
+    - Graphique des ventes (derniers 30 jours)
+    - Produits à faible stock (alerte rouge)
+    - Commandes récentes (non traitées)
+    - Avis clients récents
+    - Lien vers chaque section
+
+10.2 APERÇU DU MAGASIN (/vendeur/apercu)
+Route: GET /vendeur/apercu
+Contenu:
+    - Vue générale du magasin
+    - Nom du magasin
+    - Logo/bannière
+    - Description
+    - Évaluation globale
+    - Nombre de followers
+    - Catégories principaux
+    - Produits vedettes
+    - Nombre total de ventes
+
+10.3 GESTION DES PRODUITS (/vendeur/produits)
+Route: Module resourceful: /vendeur/produits
+Contenu:
+
+    10.3.1 LISTE DES PRODUITS (GET /vendeur/produits):
+        - Tableau de tous les produits du vendeur
+        - Colonnes:
+            • Image
+            • Nom du produit
+            • Catégorie
+            • Prix
+            • Stock disponible
+            • Nombre de ventes
+            • Évaluation moyenne
+            • Statut (Publié, Brouillon, Désactivé)
+            • Bouton "Modifier"
+            • Bouton "Supprimer"
+            • Bouton "Voir"
+        - Filtres: Par catégorie, par statut
+        - Tri: Par date, par ventes, par stock
+        - Pagination
+        - Bouton "+ Ajouter un produit"
+
+    10.3.2 AJOUTER UN PRODUIT (GET/POST /vendeur/produits/create & store):
+        Formulaire:
+            • Nom du produit
+            • Description longue
+            • Catégorie (dropdown)
+            • Sous-catégorie
+            • Prix
+            • Prix promo (optionnel)
+            • Stock initial
+            • Code SKU
+            • Poids (kg)
+            • Dimensions
+            • Images (multiple)
+            • Métadonnées SEO
+            • Statut (Brouillon, Publié)
+
+        Validations:
+            • Nom: Requis, min 3, max 255
+            • Prix: Requis, numérique > 0
+            • Stock: Requis, entier >= 0
+            • Images: Au moins 1, max 5 MB par image
+
+        Actions:
+            • Bouton "Enregistrer comme Brouillon"
+            • Bouton "Publier"
+            • Bouton "Annuler"
+
+    10.3.3 MODIFIER UN PRODUIT (GET/PUT /vendeur/produits/{id}/edit & update):
+        - Même formulaire que création
+        - Préremplissage avec données actuelles
+        - Historique des modifications
+        - Bouton "Historique"
+        - Bouton "Supprimer"
+
+    10.3.4 SUPPRIMER UN PRODUIT (DELETE /vendeur/produits/{id}):
+        - Confirmation requise
+        - Option: Supprimer définitivement ou désactiver
+        - Suppression logique par défaut
+
+10.4 GESTION DU STOCK (/vendeur/stock)
+Route: GET /vendeur/stock
+Contenu:
+    - Tableau des stocks
+    - Colonnes:
+        • Nom du produit
+        • Stock actuel
+        • Seuil d'alerte (stock minimum)
+        • Entrées récentes
+        • Sorties récentes
+        • Dernier ajustement
+        • Bouton "Ajuster le stock"
+
+    - Filtres:
+        • Stock faible (< 5)
+        • En rupture (0)
+        • Surstocké (> 100)
+
+    - Historique des mouvements
+    - Import/Export CSV des stocks
+    - Bouton "Ajuster le stock" pour chaque produit
+
+10.5 MESSAGES VENDEUR (/vendeur/messages)
+Route: GET /vendeur/messages
+Contenu:
+    - Même interface que client
+    - Messages reçus des clients
+    - Badge "non lu"
+    - Réponse et gestion des conversations
+    - Notification des nouveaux messages
+    - Option pour mettre en place un message d'absence
+
+10.6 AVIS CLIENTS (/vendeur/avis)
+Route: GET /vendeur/avis
+Contenu:
+    - Tableau des avis reçus
+    - Filtres: Par produit, par note, par date
+    - Colonnes:
+        • Client (anonyme ou pseudo)
+        • Produit
+        • Note (étoiles)
+        • Texte court
+        • Date
+        • Status: Signalé, Approuvé, En attente
+        • Bouton "Voir complet"
+        • Bouton "Répondre"
+        • Bouton "Signaler comme inapproprié"
+
+    - Statistiques:
+        • Note moyenne globale
+        • Répartition par note
+        • Avis positifs / négatifs
+        • Tendance (amélioration/dégradation)
+
+    - Réponse aux avis
+    - Suppression/Signalement impropiés
+
+10.7 COMMANDES VENDEUR (/vendeur/commandes)
+Route: GET /vendeur/commandes
+Contenu:
+    - Tableau des commandes reçues
+    - Colonnes:
+        • Numéro de commande
+        • Date
+        • Client (nom)
+        • Produits commandés (icones)
+        • Montant
+        • Statut de la commande
+        • Statut de livraison
+        • Bouton "Voir détails"
+        • Bouton "Marquer comme traité"
+
+    - Filtres:
+        • Par statut (En attente, En préparation, À livrer, Livré)
+        • Par mois
+        • Client
+
+    - Actions:
+        • Imprimer l'étiquette d'expédition
+        • Marquer comme expédié
+        • Ajouter numéro de suivi
+        • Communiquer avec le client
+
+10.8 DÉTAIL D'UNE COMMANDE (/vendeur/commandes/{id})
+Route: GET /vendeur/commandes/{id}
+Contenu:
+    - Détail complet de la commande
+    - Infos client:
+        • Nom, email, téléphone
+        • Adresse de livraison
+
+    - Articles commandés (du vendeur):
+        • Produit
+        • Quantité
+        • Prix
+        • Total
+
+    - Statut de la commande
+    - Statut de paiement
+    - Numéro de transaction
+    - Historique des statuts
+    - Boutons:
+        • Marquer comme "En préparation"
+        • Marquer comme "À livrer"
+        • Marquer comme "Livré"
+        • Imprimer l'étiquette de colis
+        • Contacter le client
+        • Annuler (si possible)
+
+10.9 PARAMÈTRES DU MAGASIN (/vendeur/parametres)
+Route: GET/PUT/DELETE /vendeur/parametres
+Contenu:
+
+    FORMULAIRE DE PARAMÈTRES:
+        • Nom du magasin (éditable)
+        • Description du magasin (textarea)
+        • Logo du magasin (upload)
+        • Bannière (upload)
+        • Contact:
+            - Email du magasin
+            - Téléphone du magasin
+            - WhatsApp (optionnel)
+
+        • Adresse du magasin:
+            - Rue
+            - Ville/Région
+            - Code postal
+            - Pays
+
+        • Horaires d'ouverture
+        • Photos de la boutique (galerie)
+        • Modalités de paiement acceptées
+        • Délai de retour (jours)
+        • Politique de livraison
+        • Documents: Certificat SARL, RCC, etc.
+
+        • Notifications:
+            - Email pour chaque commande
+            - SMS pour commandes importantes
+            - Rappel de stocks faibles
+
+    - Bouton "Sauvegarder"
+    - Bouton "Annuler"
+    - Message de succès/erreur
+
+    BOUTON SUPPRESSION:
+        • "Supprimer mon magasin"
+        • Confirmation requise
+        • Blocage de 30 jours avant suppression définitive
+
+10.10 PROFIL VENDEUR (/vendeur/profil)
+Route: GET/PUT/PATCH /vendeur/profil
+Contenu:
+
+    PHOTO DE PROFIL:
+        • Upload avec aperçu
+        • Format JPG, PNG (max 2 MB)
+        • Crop tool
+
+    INFOS PERSONNELLES:
+        • Prénom, Nom
+        • Email
+        • Téléphone personnel
+        • Date de naissance
+        • Documents d'identité (scan)
+
+    INFOS BANCAIRES (sécurisés):
+        • Nom du titulaire
+        • IBAN / RIB
+        • Nom de la banque
+
+    PARAMÈTRES DE SÉCURITÉ:
+        • Changer le mot de passe
+        • Authentification 2FA
+        • Historique de connexion
+        • Sessions actives
+
+10.11 HISTORIQUE (/vendeur/historique)
+Route: GET /vendeur/historique
+Contenu:
+    - Historique complet des actions
+    - Tableau:
+        • Date/Heure
+        • Action (Produit ajouté, Commande reçue, Stock ajusté, etc.)
+        • Détails
+        • Résultat (Succès, Erreur)
+
+    - Filtres: Par type d'action, par date
+    - Export CSV
+
+10.12 STATISTIQUES (/vendeur/statistiques)
+Route: GET /vendeur/statistiques
+Contenu:
+    - Dashboard analytique complète
+
+    STATISTIQUES VENTES:
+        • Nombre total de ventes
+        • Revenu total
+        • Panier moyen
+        • Nombre de clients uniques
+        • Taux de conversion (si fourni)
+
+    GRAPHIQUES:
+        • Ventes par jour (30 derniers jours)
+        • Ventes par cathégorie
+        • Ventes par produit
+        • Évolution du revenu
+
+    STATISTIQUES CLIENTS:
+        • Nombre de clients actifs ce mois
+        • Clients récurrents
+        • Clients nouveaux
+        • Fidélité
+
+    STATISTIQUES PRODUITS:
+        • Produits les plus vendus
+        • Produits moins vendus
+        • Taux de rupture de stock
+        • Rotation des stocks
+
+    ÉVALUATION:
+        • Note globale
+        • Évolution de la note
+        • Nombre d'avis ce mois
+
+    DONNÉES FINANCIÈRES:
+        • Chiffre d'affaires
+        • Bénéfice estimé
+        • Frais appliqués
+        • Prévisions (forecast)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+RÉSUMÉ DES ACTIONS CLIENT:
+
+☑️ NAVIGATION PUBLIQUE:
+    ✓ Consulter l'accueil
+    ✓ Parcourir le catalogue
+    ✓ Voir les détails des produits
+    ✓ Consulter les favoris publiquement
+
+☑️ PANIER:
+    ✓ Ajouter au panier
+    ✓ Modifier les quantités
+    ✓ Supprimer des articles
+    ✓ Vider le panier
+    ✓ Voir le résumé du panier
+
+☑️ AUTHENTIFICATION REQUISE:
+    ✓ S'inscrire avec email
+    ✓ Se connecter
+    ✓ Réinitialiser le mot de passe
+    ✓ Profil d'utilisateur
+
+☑️ TABLEAU DE BORD CLIENT:
+    ✓ Voir le dashboard personnalisé
+    ✓ Voir les statistiques de dépenses
+    ✓ Consulter les commandes récentes
+    ✓ Accéder aux tendances d'achat
+
+☑️ PROFIL CLIENT:
+    ✓ Modifier photo de profil
+    ✓ Modifier informations personnelles
+    ✓ Ajouter/modifier adresses de livraison
+    ✓ Changer mot de passe
+    ✓ Gérer notifications
+    ✓ Supprimer le compte
+
+☑️ COMMANDES:
+    ✓ Passer une commande
+    ✓ Financer le formulaire de paiement
+    ✓ Choisir méthode de paiement (Wave, Orange, MTN, Moov, Espèces)
+    ✓ Voir ses commandes
+    ✓ Consulter les détails d'une commande
+    ✓ Télécharger facture PDF
+    ✓ Annuler une commande (si possible)
+
+☑️ PAIEMENT:
+    ✓ Paiement mobile (via CinetPay)
+    ✓ Paiement à la livraison
+    ✓ Voir le statut du paiement
+
+☑️ FAVORIS:
+    ✓ Ajouter/retirer des favoris
+    ✓ Consulter la liste de favoris
+    ✓ Ajouter un favori au panier
+
+☑️ AVIS:
+    ✓ Laisser un avis sur un produit
+    ✓ Modifier son avis
+    ✓ Supprimer son avis
+    ✓ Consulter les avis des autres
+    ✓ Voter "utile" sur un avis
+
+☑️ COMMUNICATION:
+    ✓ Contacter un vendeur via message privé
+    ✓ Voir ses conversations
+    ✓ Recevoir des réponses
+    ✓ Marquer comme lu/non lu
+    ✓ Supprimer un message
+
+═══════════════════════════════════════════════════════════════════════════════
+
+FIN DE LA DOCUMENTATION COMPLÈTE
+
+Pour toute question ou mise à jour, veuillez consulter le code source ou contacter l'administrateur.
+Date de création: 1 Mars 2026
+Plateforme: Supply
