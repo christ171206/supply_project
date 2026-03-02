@@ -1,8 +1,0 @@
-1. Il faut que quand on appui sur contacter via whatsapp on envoie sur le numero 0769237065
-2.Pour les produits il doit etre possible d'ajouter maximum 5 images pour un article
-3.Quand on envoi un message à un vendeur dans contacter le vendeur dans details des produits on peut envoyer tout est propre mais dans http://127.0.0.1:8000/messages/14 quand on envoie message rien ne se passe
-4. Dans adresse de livraison que ce soit dans recherche rapide ou selection manuelle  je veux toutes les villes ou quartier ou commune de côte d'ivoire ou du moins le maximum possible
-5. Dans http://127.0.0.1:8000/commandes les commandes su superposent les unes su les autres et tout les montants sont à 0
-6.On à déjà message dans la navbar pas besoin qu'il soit dans la liste deroulante
-7.Pour deconnecter on doit avoir un message de confirmation
-8.Dans http://127.0.0.1:8000/commande/13 le client doit avoir la possibilité d'annuler sa commande sous 10 minutes 

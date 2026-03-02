@@ -19,13 +19,6 @@ Route::get('/', [ProduitController::class, 'index'])->name('accueil');
 Route::get('/produits', [ProduitController::class, 'catalogue'])->name('produits.catalogue');
 Route::get('/produits/{id}', [ProduitController::class, 'show'])->name('produits.show');
 
-// DEBUG ROUTE (tmp)
-Route::get('/debug-user', function () {
-    $user = auth()->user();
-    if (!$user) return 'Non authentifié';
-    return "User: {$user->name} (ID: {$user->id}) | Role: {$user->role}";
-});
-
 // API Routes
 Route::get('/api/produits/{id}', function ($id) {
     $produit = \App\Models\Produit::findOrFail($id, ['id', 'nom', 'prix', 'image', 'stock', 'description']);
