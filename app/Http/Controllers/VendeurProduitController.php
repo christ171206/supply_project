@@ -7,6 +7,7 @@ use App\Models\Categorie;
 use App\Models\Commande;
 use App\Models\Message;
 use App\Models\Avis;
+use App\Models\User;
 use App\Models\StockMouvement;
 use App\Services\StockService;
 use Illuminate\Http\Request;
@@ -24,13 +25,22 @@ class VendeurProduitController extends Controller
     {
         $user = Auth::user();
 
-        // 💰 Statistiques de base
-        $totalVentes = Commande::where('user_id', $user->id)->sum('total');
-        $nombreCommandes = Commande::where('user_id', $user->id)->count();
+        // 💰 Statistiques de base - Récupérer les commandes qui contiennent les produits du vendeur
+        $totalVentes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->sum('total');
+        
+        $nombreCommandes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->distinct()->count('commandes.id');
+        
         $panierMoyen = $nombreCommandes > 0 ? $totalVentes / $nombreCommandes : 0;
 
         // 📊 Taux de complétion des commandes (livrées vs total)
-        $commandeslivrees = Commande::where('user_id', $user->id)->where('statut', 'livree')->count();
+        $commandeslivrees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'livree')->distinct()->count('commandes.id');
+        
         $tauxCompletion = $nombreCommandes > 0 ? round(($commandeslivrees / $nombreCommandes) * 100) : 0;
 
         // 📦 Produits et stock
@@ -45,16 +55,27 @@ class VendeurProduitController extends Controller
             ->get();
 
         // 📋 Dernières commandes (avec détails client)
-        $derniereCommandes = Commande::with('user')
-            ->where('user_id', $user->id)
+        $derniereCommandes = Commande::with('user', 'ligneCommandes.produit')
+            ->whereHas('ligneCommandes.produit', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
             ->orderBy('created_at', 'desc')
+            ->distinct()
             ->limit(10)
             ->get();
 
         // 📊 Statut des commandes
-        $commandesEnAttente = Commande::where('user_id', $user->id)->where('statut', 'en_attente')->count();
-        $commandesConfirmees = Commande::where('user_id', $user->id)->where('statut', 'confirmee')->count();
-        $commandesExpediees = Commande::where('user_id', $user->id)->where('statut', 'expediee')->count();
+        $commandesEnAttente = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'en_attente')->distinct()->count('commandes.id');
+        
+        $commandesConfirmees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'confirmee')->distinct()->count('commandes.id');
+        
+        $commandesExpediees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'expediee')->distinct()->count('commandes.id');
 
         // 🏆 Top 5 produits les plus vendus
         $topProduits = Produit::where('user_id', $user->id)
@@ -103,9 +124,15 @@ class VendeurProduitController extends Controller
     {
         $user = Auth::user();
 
-        // Statistiques de base
-        $totalVentes = Commande::where('user_id', $user->id)->sum('total');
-        $nombreCommandes = Commande::where('user_id', $user->id)->count();
+        // Statistiques de base - Récupérer les commandes qui contiennent les produits du vendeur
+        $totalVentes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->sum('total');
+        
+        $nombreCommandes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->distinct()->count('commandes.id');
+        
         $nombreProduits = Produit::where('user_id', $user->id)->count();
         $panierMoyen = $nombreCommandes > 0 ? $totalVentes / $nombreCommandes : 0;
 
@@ -119,26 +146,39 @@ class VendeurProduitController extends Controller
 
         // Taux de complétude du profil
         $tauxCompletion = 0;
-        if ($user->boutique_nom) $tauxCompletion += 20;
-        if ($user->boutique_description) $tauxCompletion += 20;
-        if ($user->telephone) $tauxCompletion += 20;
-        if ($user->adresse) $tauxCompletion += 20;
-        if ($user->avatar) $tauxCompletion += 20;
+        if ($user->shop_name) $tauxCompletion += 20;
+        if ($user->description) $tauxCompletion += 20;
+        if ($user->phone) $tauxCompletion += 20;
+        if ($user->address) $tauxCompletion += 20;
+        if ($user->profile_photo) $tauxCompletion += 20;
 
         // Commandes par statut
-        $commandesEnAttente = Commande::where('user_id', $user->id)->where('statut', 'en_attente')->count();
-        $commandesConfirmees = Commande::where('user_id', $user->id)->where('statut', 'confirmee')->count();
-        $commandesExpediees = Commande::where('user_id', $user->id)->where('statut', 'expediee')->count();
-        $commandeslivrees = Commande::where('user_id', $user->id)->where('statut', 'livree')->count();
+        $commandesEnAttente = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'en_attente')->distinct()->count('commandes.id');
+        
+        $commandesConfirmees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'confirmee')->distinct()->count('commandes.id');
+        
+        $commandesExpediees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'expediee')->distinct()->count('commandes.id');
+        
+        $commandeslivrees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'livree')->distinct()->count('commandes.id');
 
         // Top produits
         $topProduits = Produit::where('user_id', $user->id)
-            ->with('categorie')
+            ->with('categorie', 'ligneCommandes')
             ->limit(5)
             ->get()
             ->map(function ($p) {
                 $p->ventes_nombre = $p->ligneCommandes->count();
-                $p->ventes_total = $p->ligneCommandes->sum('prix_unitaire');
+                $p->ventes_total = $p->ligneCommandes->sum(function ($lc) {
+                    return $lc->quantite * $lc->prix_unitaire;
+                });
                 return $p;
             });
 
@@ -169,11 +209,15 @@ class VendeurProduitController extends Controller
      */
     public function index()
     {
-        $produits = Produit::with('categorie')
+        $user = Auth::user();
+        $produits = Produit::where('user_id', $user->id)
+            ->with('categorie')
             ->latest()
-            ->paginate(10);
+            ->paginate(15);
 
-        return view('vendeur.produits.index', compact('produits'));
+        $categories = Categorie::all();
+
+        return view('vendeur.produits.index', compact('produits', 'categories'));
     }
 
     /**
@@ -181,8 +225,9 @@ class VendeurProduitController extends Controller
      */
     public function create()
     {
+        $produit = null;
         $categories = Categorie::all();
-        return view('vendeur.produits.form', compact('categories'));
+        return view('vendeur.produits.form', compact('categories', 'produit'));
     }
 
     /**
@@ -228,7 +273,8 @@ class VendeurProduitController extends Controller
      */
     public function show($id)
     {
-        $produit = Produit::findOrFail($id);
+        $user = Auth::user();
+        $produit = Produit::where('user_id', $user->id)->findOrFail($id);
         return view('vendeur.produits.show', compact('produit'));
     }
 
@@ -237,7 +283,8 @@ class VendeurProduitController extends Controller
      */
     public function edit($id)
     {
-        $produit = Produit::findOrFail($id);
+        $user = Auth::user();
+        $produit = Produit::where('user_id', $user->id)->findOrFail($id);
         $categories = Categorie::all();
         return view('vendeur.produits.form', compact('produit', 'categories'));
     }
@@ -247,7 +294,8 @@ class VendeurProduitController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $produit = Produit::findOrFail($id);
+        $user = Auth::user();
+        $produit = Produit::where('user_id', $user->id)->findOrFail($id);
 
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
@@ -290,7 +338,8 @@ class VendeurProduitController extends Controller
      */
     public function destroy($id)
     {
-        $produit = Produit::findOrFail($id);
+        $user = Auth::user();
+        $produit = Produit::where('user_id', $user->id)->findOrFail($id);
 
         // Supprimer l'image si elle existe
         if ($produit->image && Storage::disk('public')->exists($produit->image)) {
@@ -404,15 +453,20 @@ class VendeurProduitController extends Controller
         $periode = (int)$request->get('periode', 7);
         $dateDebut = now()->subDays($periode);
 
-        // CA Total
-        $totalCA = Commande::where('user_id', $user->id)
+        // CA Total - Commandes contenant les produits du vendeur
+        $totalCA = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
             ->where('created_at', '>=', $dateDebut)
             ->sum('total');
 
         // Nombre de commandes
-        $nombreCommandes = Commande::where('user_id', $user->id)
+        $nombreCommandes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
             ->where('created_at', '>=', $dateDebut)
-            ->count();
+            ->distinct()
+            ->count('commandes.id');
 
         // Panier moyen
         $panierMoyen = $nombreCommandes > 0 ? $totalCA / $nombreCommandes : 0;
@@ -428,29 +482,82 @@ class VendeurProduitController extends Controller
 
         // Top produits
         $topProduits = Produit::where('user_id', $user->id)
-            ->with(['ligneCommandes' => function ($q) {
-                $q->whereHas('commande', function ($q2) {
-                    $q2->where('created_at', '>=', now()->subDays(request('periode', 7)));
+            ->with(['ligneCommandes' => function ($q) use ($periode) {
+                $q->whereHas('commande', function ($q2) use ($periode) {
+                    $q2->where('created_at', '>=', now()->subDays($periode));
                 });
             }])
             ->limit(5)
             ->get()
             ->map(function ($p) {
                 $p->ventes_nombre = $p->ligneCommandes->count();
-                $p->ventes_total = $p->ligneCommandes->sum('prix_unitaire');
+                $p->ventes_total = $p->ligneCommandes->sum(function ($lc) {
+                    return $lc->quantite * $lc->prix_unitaire;
+                });
                 return $p;
             });
 
         // Commandes par statut
-        $commandesEnAttente = Commande::where('user_id', $user->id)->where('statut', 'en_attente')->count();
-        $commandesConfirmees = Commande::where('user_id', $user->id)->where('statut', 'confirmee')->count();
-        $commandesExpediees = Commande::where('user_id', $user->id)->where('statut', 'expediee')->count();
-        $commandeslivrees = Commande::where('user_id', $user->id)->where('statut', 'livree')->count();
+        $commandesEnAttente = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'en_attente')->distinct()->count('commandes.id');
+        
+        $commandesConfirmees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'confirmee')->distinct()->count('commandes.id');
+        
+        $commandesExpediees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'expediee')->distinct()->count('commandes.id');
+        
+        $commandeslivrees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('statut', 'livree')->distinct()->count('commandes.id');
 
         // Ventes par catégorie
         $ventesCategories = Categorie::with(['produits' => function ($q) use ($user) {
             $q->where('user_id', $user->id);
         }])->get();
+
+        // 📊 Données pour les graphiques
+        // Évolution du CA par jour
+        $ventesParJour = Commande::selectRaw('DATE(created_at) as date, SUM(total) as montant')
+            ->whereHas('ligneCommandes.produit', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->where('created_at', '>=', $dateDebut)
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $chartDates = $ventesParJour->pluck('date')->map(fn($d) => date('d/m', strtotime($d)))->toArray();
+        $chartVentes = $ventesParJour->pluck('montant')->toArray();
+
+        // Ventes par catégorie
+        $ventesParCategorie = [];
+        $donneesCategories = [];
+        $couleursCategories = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+        
+        foreach ($ventesCategories as $index => $categorie) {
+            $produitsCat = $categorie->produits->filter(function($p) use ($user) {
+                return $p->user_id === $user->id;
+            });
+            
+            if ($produitsCat->count() > 0) {
+                $montant = 0;
+                foreach ($produitsCat as $p) {
+                    $montant += $p->ligneCommandes->sum(function ($lc) {
+                        return $lc->quantite * $lc->prix_unitaire;
+                    });
+                }
+                $ventesParCategorie[$categorie->nom] = $montant;
+                $donneesCategories[] = [
+                    'label' => $categorie->nom,
+                    'value' => $montant,
+                    'color' => $couleursCategories[$index % count($couleursCategories)]
+                ];
+            }
+        }
 
         return view('vendeur.statistiques', compact(
             'totalCA',
@@ -463,7 +570,12 @@ class VendeurProduitController extends Controller
             'commandesConfirmees',
             'commandesExpediees',
             'commandeslivrees',
-            'ventesCategories'
+            'ventesCategories',
+            'chartDates',
+            'chartVentes',
+            'ventesParCategorie',
+            'donneesCategories',
+            'periode'
         ));
     }
 
@@ -475,17 +587,126 @@ class VendeurProduitController extends Controller
         $user = Auth::user();
         $filtre = $request->get('filtre', 'tous');
 
-        $query = Message::where('to_user_id', $user->id);
+        // Récupérer toutes les conversations avec les clients
+        $conversations = Message::where(function ($query) use ($user) {
+            $query->where('from_user_id', $user->id)
+                ->orWhere('to_user_id', $user->id);
+        })
+            ->latest()
+            ->get()
+            ->unique(function ($message) use ($user) {
+                // Créer une clé unique pour chaque conversation
+                return $message->from_user_id === $user->id
+                    ? min($user->id, $message->to_user_id) . '-' . max($user->id, $message->to_user_id)
+                    : min($message->from_user_id, $user->id) . '-' . max($message->from_user_id, $user->id);
+            })
+            ->values()
+            ->map(function ($message) use ($user) {
+                // Récupérer l'autre utilisateur de la conversation
+                $otherUserId = $message->from_user_id === $user->id ? $message->to_user_id : $message->from_user_id;
+                $otherUser = User::find($otherUserId);
+                
+                // Récupérer le dernier message
+                $lastMessage = Message::where(function ($query) use ($user, $otherUserId) {
+                    $query->where('from_user_id', $user->id)->where('to_user_id', $otherUserId)
+                        ->orWhere('from_user_id', $otherUserId)->where('to_user_id', $user->id);
+                })->latest()->first();
+                
+                // Récupérer le nombre de messages non lus
+                $unreadCount = Message::where('from_user_id', $otherUserId)
+                    ->where('to_user_id', $user->id)
+                    ->where('lu', false)
+                    ->count();
+                
+                return [
+                    'other_user' => $otherUser,
+                    'last_message' => $lastMessage,
+                    'unread_count' => $unreadCount,
+                ];
+            });
 
+        // Filtrer si demandé
         if ($filtre === 'non_lus') {
-            $query->where('lu', false);
+            $conversations = $conversations->filter(function ($conv) {
+                return $conv['unread_count'] > 0;
+            });
         }
 
-        $messages = $query->with('fromUser')->latest()->paginate(20);
         $messagesNonLus = Message::where('to_user_id', $user->id)->where('lu', false)->count();
-        $messagesTotal = Message::where('to_user_id', $user->id)->count();
+        $messagesTotal = Message::where(function ($query) use ($user) {
+            $query->where('from_user_id', $user->id)
+                ->orWhere('to_user_id', $user->id);
+        })->count();
 
-        return view('vendeur.messages', compact('messages', 'messagesNonLus', 'messagesTotal'));
+        return view('vendeur.messages', compact('conversations', 'messagesNonLus', 'messagesTotal'));
+    }
+
+    /**
+     * Afficher une conversation détaillée avec un client
+     */
+    public function messagesShow($userId)
+    {
+        $user = Auth::user();
+        $client = User::findOrFail($userId);
+
+        // Récupérer les messages de cette conversation
+        $messages = Message::where(function ($query) use ($user, $userId) {
+            $query->where('from_user_id', $user->id)->where('to_user_id', $userId)
+                ->orWhere('from_user_id', $userId)->where('to_user_id', $user->id);
+        })
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // Marquer les messages reçus comme lus
+        Message::where('from_user_id', $userId)
+            ->where('to_user_id', $user->id)
+            ->where('lu', false)
+            ->update(['lu' => true]);
+
+        return view('vendeur.messages.show', compact('client', 'messages', 'user'));
+    }
+
+    /**
+     * Envoyer un message à un client
+     */
+    public function messageSend(Request $request, $userId)
+    {
+        $validated = $request->validate([
+            'contenu' => 'required|string|min:1|max:5000',
+        ]);
+
+        $user = Auth::user();
+        $client = User::findOrFail($userId);
+
+        Message::create([
+            'from_user_id' => $user->id,
+            'to_user_id' => $userId,
+            'contenu' => $validated['contenu'],
+            'lu' => false,
+        ]);
+
+        return redirect()->route('vendeur.messages.show', $userId)
+            ->with('success', '✓ Message envoyé avec succès!');
+    }
+
+    /**
+     * Supprimer un message
+     */
+    public function messageDelete($messageId)
+    {
+        $user = Auth::user();
+        $message = Message::findOrFail($messageId);
+
+        // Vérifier que l'utilisateur est l'auteur ou le destinataire
+        if ($message->from_user_id !== $user->id && $message->to_user_id !== $user->id) {
+            return redirect()->back()->with('error', '❌ Vous n\'avez pas la permission de supprimer ce message');
+        }
+
+        $userId = $message->from_user_id === $user->id ? $message->to_user_id : $message->from_user_id;
+        $message->delete();
+
+        return redirect()->route('vendeur.messages.show', $userId)
+            ->with('success', '✓ Message supprimé!');
     }
 
     /**

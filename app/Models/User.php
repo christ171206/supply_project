@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->hasOne(Panier::class);
     }
 
+    public function produits()
+    {
+        return $this->hasMany(Produit::class);
+    }
+
     public function messagesEnvoyes()
     {
         return $this->hasMany(Message::class, 'from_user_id');

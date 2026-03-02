@@ -129,6 +129,9 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
 
     // Messages
     Route::get('/messages', [VendeurProduitController::class, 'messages'])->name('messages');
+    Route::get('/messages/{userId}', [VendeurProduitController::class, 'messagesShow'])->name('messages.show');
+    Route::post('/messages/{userId}', [VendeurProduitController::class, 'messageSend'])->name('messages.send');
+    Route::delete('/messages/{messageId}', [VendeurProduitController::class, 'messageDelete'])->name('messages.delete');
 
     // Avis
     Route::get('/avis', [VendeurProduitController::class, 'avis'])->name('avis');
@@ -141,10 +144,13 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
     Route::get('/historique', [VendeurProduitController::class, 'historique'])->name('historique');
     Route::get('/profil', [VendeurProduitController::class, 'profil'])->name('profil');
     Route::put('/profil', [VendeurProduitController::class, 'updateProfil'])->name('profil.update');
-    Route::patch('/profil/photo', [VendeurProduitController::class, 'updateProfilPhoto'])->name('vendeur.profil.photo');
+    Route::patch('/profil/photo', [VendeurProduitController::class, 'updateProfilPhoto'])->name('profil.photo');
     Route::resource('produits', VendeurProduitController::class);
     Route::get('/commandes', [CommandeController::class, 'vendeurCommandes'])->name('commandes');
     Route::get('/commandes/{id}', [CommandeController::class, 'vendeurCommandeDetail'])->name('commandes.show');
+    Route::patch('/commandes/{id}/status', [CommandeController::class, 'updateCommandeStatus'])->name('commandes.update-status');
+    Route::post('/commandes/{id}/cancel', [CommandeController::class, 'cancelCommande'])->name('commandes.cancel');
+    Route::delete('/commandes/{id}', [CommandeController::class, 'deleteCommande'])->name('commandes.delete');
 
     // Vendor Statistics (Premium Feature)
     Route::get('/api/statistics/sales', [VendorStatisticsController::class, 'getSalesData'])->name('statistics.sales');

@@ -1,4 +1,4 @@
-@extends('vendeur.layout')
+@extends('vendeur.layout-dashboard')
 
 @section('content')
 <div>

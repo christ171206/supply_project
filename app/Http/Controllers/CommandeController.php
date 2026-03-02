@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Commande;
 use App\Models\LigneCommande;
+use App\Models\Produit;
 use App\Models\Payment;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
@@ -247,13 +248,32 @@ class CommandeController extends Controller
     /**
      * Afficher les commandes reçues (pour vendeur)
      */
-    public function vendeurCommandes()
+    public function vendeurCommandes(Request $request)
     {
-        $commandes = Commande::with('user', 'ligneCommandes')
-            ->latest()
-            ->paginate(10);
+        $user = auth()->user();
+        
+        // Récupérer les commandes contenant les produits du vendeur
+        $query = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->with('user', 'ligneCommandes.produit');
 
-        return view('vendeur.commandes', compact('commandes'));
+        // Filtrer par statut si demandé
+        if ($request->filled('statut')) {
+            $query->where('statut', $request->statut);
+        }
+
+        // Rechercher par numéro de commande
+        if ($request->filled('search')) {
+            $query->where('id', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('user', function ($q) use ($request) {
+                      $q->where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('email', 'like', '%' . $request->search . '%');
+                  });
+        }
+
+        $derniereCommandes = $query->latest()->paginate(15);
+
+        return view('vendeur.commandes.index', compact('derniereCommandes'));
     }
 
     /**
@@ -261,11 +281,45 @@ class CommandeController extends Controller
      */
     public function vendeurCommandeDetail($id)
     {
-        $commande = Commande::with('user', 'ligneCommandes.produit')->findOrFail($id);
-        $lignes = $commande->ligneCommandes;
-        $payment = $commande->payment;
+        $user = auth()->user();
+        $commande = Commande::with('user', 'ligneCommandes.produit', 'payment')->findOrFail($id);
 
-        return view('vendeur.commandes-detail', compact('commande', 'lignes', 'payment'));
+        // Vérifier que le vendeur a au moins un produit dans cette commande
+        $hasVendorProduct = $commande->ligneCommandes->some(function ($ligne) use ($user) {
+            return $ligne->produit->user_id === $user->id;
+        });
+
+        if (!$hasVendorProduct) {
+            abort(403, 'Non autorisé');
+        }
+
+        return view('vendeur.commandes.show', compact('commande'));
+    }
+
+    /**
+     * Mettre à jour le statut d'une commande
+     */
+    public function updateCommandeStatus(Request $request, $id)
+    {
+        $user = auth()->user();
+        $commande = Commande::findOrFail($id);
+
+        // Vérifier que le vendeur a au moins un produit dans cette commande
+        $hasVendorProduct = $commande->ligneCommandes->some(function ($ligne) use ($user) {
+            return $ligne->produit->user_id === $user->id;
+        });
+
+        if (!$hasVendorProduct) {
+            abort(403, 'Non autorisé');
+        }
+
+        $request->validate([
+            'statut' => 'required|in:en_attente,confirmee,expediee,livree'
+        ]);
+
+        $commande->update(['statut' => $request->statut]);
+
+        return redirect()->back()->with('success', 'Statut de la commande mis à jour avec succès!');
     }
 
     /**
@@ -330,5 +384,96 @@ class CommandeController extends Controller
         }
 
         return view('commandes.show', compact('commande', 'lignes', 'payment'));
+    }
+
+    /**
+     * Annuler une commande (côté vendeur)
+     */
+    public function cancelCommande($id)
+    {
+        $user = auth()->user();
+        $commande = Commande::findOrFail($id);
+
+        // Vérifier que le vendeur a au moins un produit dans cette commande
+        $hasVendorProduct = $commande->ligneCommandes->some(function ($ligne) use ($user) {
+            return $ligne->produit->user_id === $user->id;
+        });
+
+        if (!$hasVendorProduct) {
+            return redirect()->back()->with('error', '❌ Non autorisé');
+        }
+
+        // Une commande livrée ne peut pas être annulée
+        if ($commande->statut === 'livree') {
+            return redirect()->back()->with('error', '❌ Impossible d\'annuler une commande livrée');
+        }
+
+        // Une commande terminée/annulée ne peut pas être re-annulée
+        if ($commande->statut === 'annulee') {
+            return redirect()->back()->with('error', '❌ Cette commande est déjà annulée');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Rétablir le stock pour les produits du vendeur seulement
+            foreach ($commande->ligneCommandes as $ligne) {
+                if ($ligne->produit->user_id === $user->id) {
+                    $ligne->produit->increment('stock', $ligne->quantite);
+                }
+            }
+
+            // Marquer la commande comme annulée avec une raison
+            $commande->update(['statut' => 'annulee']);
+
+            DB::commit();
+            return redirect()->back()->with('success', '✓ Commande annulée et stock rétabli');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', '❌ Erreur lors de l\'annulation: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Supprimer une commande (côté vendeur)
+     */
+    public function deleteCommande($id)
+    {
+        $user = auth()->user();
+        $commande = Commande::findOrFail($id);
+
+        // Vérifier que le vendeur a au moins un produit dans cette commande
+        $hasVendorProduct = $commande->ligneCommandes->some(function ($ligne) use ($user) {
+            return $ligne->produit->user_id === $user->id;
+        });
+
+        if (!$hasVendorProduct) {
+            return redirect()->back()->with('error', '❌ Non autorisé');
+        }
+
+        // On ne peut supprimer que les commandes en attente ou annulées
+        if (!in_array($commande->statut, ['en_attente', 'annulee'])) {
+            return redirect()->back()->with('error', '❌ Impossible de supprimer une commande ' . $commande->statut);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Rétablir le stock avant suppression
+            foreach ($commande->ligneCommandes as $ligne) {
+                if ($ligne->produit->user_id === $user->id) {
+                    $ligne->produit->increment('stock', $ligne->quantite);
+                }
+            }
+
+            // Supprimer la commande
+            $commande->ligneCommandes()->delete();
+            $commande->payment()->delete();
+            $commande->delete();
+
+            DB::commit();
+            return redirect()->route('vendeur.commandes')->with('success', '✓ Commande supprimée avec succès');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', '❌ Erreur lors de la suppression: ' . $e->getMessage());
+        }
     }
 }

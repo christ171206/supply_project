@@ -15,7 +15,7 @@ class VendeurMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->role === 'vendeur') {
+        if (auth()->check() && auth()->user()->role === 'vendor') {
             return $next($request);
         }
 

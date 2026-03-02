@@ -144,42 +144,12 @@
 
                     <!-- Actions -->
                     <div class="flex gap-3 pt-4 border-t border-gray-200">
-                        @if($avis->note <= 2)
-                            <button
-                                class="px-4 py-2 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition text-sm"
-                                onclick="showReply('{{ $avis->id }}')"
-                            >
-                                💬 Répondre
-                            </button>
-                        @endif
                         <a
                             href="{{ route('produits.show', $avis->produit->id) }}"
                             class="px-4 py-2 bg-primary-50 text-primary-600 font-bold rounded-lg hover:bg-primary-100 transition text-sm"
                         >
                             👁️ Voir Produit
                         </a>
-                    </div>
-
-                    <!-- Formulaire Réponse (caché par défaut) -->
-                    <div id="reply-{{ $avis->id }}" class="hidden mt-4 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
-                        <p class="font-bold text-gray-900 mb-3">Répondre à {{ $avis->user->name }}</p>
-                        <form action="{{ route('avis.reply', $avis->id) }}" method="POST">
-                            @csrf
-                            <textarea
-                                name="reponse"
-                                rows="3"
-                                placeholder="Votre réponse..."
-                                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 mb-3"
-                            ></textarea>
-                            <div class="flex gap-2">
-                                <button type="submit" class="px-4 py-2 bg-primary-500 text-white font-bold rounded-lg hover:bg-primary-600">
-                                    ✓ Envoyer
-                                </button>
-                                <button type="button" onclick="hideReply('{{ $avis->id }}')" class="px-4 py-2 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400">
-                                    ✕ Annuler
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
             @endforeach
@@ -214,14 +184,6 @@
 
             item.style.display = (matchText && matchNote) ? 'block' : 'none';
         });
-    }
-
-    function showReply(avisId) {
-        document.getElementById('reply-' + avisId).classList.remove('hidden');
-    }
-
-    function hideReply(avisId) {
-        document.getElementById('reply-' + avisId).classList.add('hidden');
     }
 </script>
 @endsection

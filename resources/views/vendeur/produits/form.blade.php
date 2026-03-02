@@ -1,6 +1,6 @@
 @extends('vendeur.layout-dashboard')
 
-@section('vendeur-content')
+@section('content')
 <div class="max-w-3xl mx-auto">
     <!-- Header -->
     <div class="mb-8">

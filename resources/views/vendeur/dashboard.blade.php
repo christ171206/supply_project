@@ -1,6 +1,6 @@
 @extends('vendeur.layout-dashboard')
 
-@section('vendeur-content')
+@section('content')
 <div class="space-y-8">
     <!-- Header -->
     <div>

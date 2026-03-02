@@ -1,6 +1,6 @@
 @extends('vendeur.layout-dashboard')
 
-@section('vendeur-content')
+@section('content')
 <div class="p-8">
     <!-- Header -->
     <div class="mb-12 flex justify-between items-center">
