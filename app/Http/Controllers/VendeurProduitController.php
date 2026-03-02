@@ -29,18 +29,18 @@ class VendeurProduitController extends Controller
         $totalVentes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->sum('total');
-        
+
         $nombreCommandes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->distinct()->count('commandes.id');
-        
+
         $panierMoyen = $nombreCommandes > 0 ? $totalVentes / $nombreCommandes : 0;
 
         // 📊 Taux de complétion des commandes (livrées vs total)
         $commandeslivrees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'livree')->distinct()->count('commandes.id');
-        
+
         $tauxCompletion = $nombreCommandes > 0 ? round(($commandeslivrees / $nombreCommandes) * 100) : 0;
 
         // 📦 Produits et stock
@@ -68,11 +68,11 @@ class VendeurProduitController extends Controller
         $commandesEnAttente = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'en_attente')->distinct()->count('commandes.id');
-        
+
         $commandesConfirmees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'confirmee')->distinct()->count('commandes.id');
-        
+
         $commandesExpediees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'expediee')->distinct()->count('commandes.id');
@@ -128,11 +128,11 @@ class VendeurProduitController extends Controller
         $totalVentes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->sum('total');
-        
+
         $nombreCommandes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->distinct()->count('commandes.id');
-        
+
         $nombreProduits = Produit::where('user_id', $user->id)->count();
         $panierMoyen = $nombreCommandes > 0 ? $totalVentes / $nombreCommandes : 0;
 
@@ -156,15 +156,15 @@ class VendeurProduitController extends Controller
         $commandesEnAttente = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'en_attente')->distinct()->count('commandes.id');
-        
+
         $commandesConfirmees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'confirmee')->distinct()->count('commandes.id');
-        
+
         $commandesExpediees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'expediee')->distinct()->count('commandes.id');
-        
+
         $commandeslivrees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'livree')->distinct()->count('commandes.id');
@@ -244,6 +244,8 @@ class VendeurProduitController extends Controller
             'est_actif' => 'required|boolean',
             'categorie_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
         $data = [
@@ -258,8 +260,27 @@ class VendeurProduitController extends Controller
             'categorie_id' => $validated['categorie_id'],
         ];
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('produits', 'public');
+        // Traiter les images multiples
+        $imagesPaths = [];
+
+        if ($request->hasFile('images')) {
+            $uploadedImages = $request->file('images');
+            // Limiter à 5 images
+            foreach (array_slice($uploadedImages, 0, 5) as $image) {
+                if ($image->isValid()) {
+                    $imagesPaths[] = $image->store('produits', 'public');
+                }
+            }
+        }
+
+        // Si pas d'images multiples mais une image unique (legacy)
+        if (!$imagesPaths && $request->hasFile('image')) {
+            $imagesPaths[] = $request->file('image')->store('produits', 'public');
+            $data['image'] = $imagesPaths[0];
+        }
+
+        if ($imagesPaths) {
+            $data['images'] = $imagesPaths;
         }
 
         $produit = Produit::create($data);
@@ -306,6 +327,8 @@ class VendeurProduitController extends Controller
             'est_actif' => 'required|boolean',
             'categorie_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
         $data = [
@@ -319,12 +342,38 @@ class VendeurProduitController extends Controller
             'categorie_id' => $validated['categorie_id'],
         ];
 
-        if ($request->hasFile('image')) {
+        // Traiter les images multiples
+        if ($request->hasFile('images')) {
+            // Supprimer les anciennes images
+            if ($produit->images && is_array($produit->images)) {
+                foreach ($produit->images as $oldImage) {
+                    if (Storage::disk('public')->exists($oldImage)) {
+                        Storage::disk('public')->delete($oldImage);
+                    }
+                }
+            }
+
+            $imagesPaths = [];
+            $uploadedImages = $request->file('images');
+            // Limiter à 5 images
+            foreach (array_slice($uploadedImages, 0, 5) as $image) {
+                if ($image->isValid()) {
+                    $imagesPaths[] = $image->store('produits', 'public');
+                }
+            }
+
+            if ($imagesPaths) {
+                $data['images'] = $imagesPaths;
+                $data['image'] = $imagesPaths[0]; // Définir la première image comme image principale
+            }
+        } else if ($request->hasFile('image')) {
             // Supprimer l'ancienne image
             if ($produit->image && Storage::disk('public')->exists($produit->image)) {
                 Storage::disk('public')->delete($produit->image);
             }
-            $data['image'] = $request->file('image')->store('produits', 'public');
+            $newImage = $request->file('image')->store('produits', 'public');
+            $data['image'] = $newImage;
+            $data['images'] = [$newImage];
         }
 
         $produit->update($data);
@@ -341,8 +390,15 @@ class VendeurProduitController extends Controller
         $user = Auth::user();
         $produit = Produit::where('user_id', $user->id)->findOrFail($id);
 
-        // Supprimer l'image si elle existe
-        if ($produit->image && Storage::disk('public')->exists($produit->image)) {
+        // Supprimer les images multiples
+        if ($produit->images && is_array($produit->images)) {
+            foreach ($produit->images as $image) {
+                if (Storage::disk('public')->exists($image)) {
+                    Storage::disk('public')->delete($image);
+                }
+            }
+        } else if ($produit->image && Storage::disk('public')->exists($produit->image)) {
+            // Supprimer l'image legacy si elle existe
             Storage::disk('public')->delete($produit->image);
         }
 
@@ -501,15 +557,15 @@ class VendeurProduitController extends Controller
         $commandesEnAttente = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'en_attente')->distinct()->count('commandes.id');
-        
+
         $commandesConfirmees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'confirmee')->distinct()->count('commandes.id');
-        
+
         $commandesExpediees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'expediee')->distinct()->count('commandes.id');
-        
+
         $commandeslivrees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->where('statut', 'livree')->distinct()->count('commandes.id');
@@ -537,12 +593,12 @@ class VendeurProduitController extends Controller
         $ventesParCategorie = [];
         $donneesCategories = [];
         $couleursCategories = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
-        
+
         foreach ($ventesCategories as $index => $categorie) {
-            $produitsCat = $categorie->produits->filter(function($p) use ($user) {
+            $produitsCat = $categorie->produits->filter(function ($p) use ($user) {
                 return $p->user_id === $user->id;
             });
-            
+
             if ($produitsCat->count() > 0) {
                 $montant = 0;
                 foreach ($produitsCat as $p) {
@@ -605,23 +661,34 @@ class VendeurProduitController extends Controller
                 // Récupérer l'autre utilisateur de la conversation
                 $otherUserId = $message->from_user_id === $user->id ? $message->to_user_id : $message->from_user_id;
                 $otherUser = User::find($otherUserId);
-                
+
                 // Récupérer le dernier message
                 $lastMessage = Message::where(function ($query) use ($user, $otherUserId) {
                     $query->where('from_user_id', $user->id)->where('to_user_id', $otherUserId)
                         ->orWhere('from_user_id', $otherUserId)->where('to_user_id', $user->id);
                 })->latest()->first();
-                
+
                 // Récupérer le nombre de messages non lus
                 $unreadCount = Message::where('from_user_id', $otherUserId)
                     ->where('to_user_id', $user->id)
                     ->where('lu', false)
                     ->count();
-                
+
+                // Récupérer le produit associé (via la commande)
+                $produit = null;
+                if ($message->commande_id && $message->commande) {
+                    // Obtenir le premier produit de la commande
+                    $ligneCommande = $message->commande->ligneCommandes()->first();
+                    if ($ligneCommande) {
+                        $produit = $ligneCommande->produit;
+                    }
+                }
+
                 return [
                     'other_user' => $otherUser,
                     'last_message' => $lastMessage,
                     'unread_count' => $unreadCount,
+                    'produit' => $produit,
                 ];
             });
 
@@ -657,13 +724,33 @@ class VendeurProduitController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
+        // Récupérer le produit associé à cette conversation (du premier message avec commande_id)
+        $produit = null;
+        $firstMessageWithCommande = $messages->where('commande_id', '!=', null)->first();
+        if ($firstMessageWithCommande && $firstMessageWithCommande->commande) {
+            $ligneCommande = $firstMessageWithCommande->commande->ligneCommandes()->first();
+            if ($ligneCommande) {
+                $produit = $ligneCommande->produit;
+            }
+        }
+
+        // Récupérer les commandes du client contenant les produits du vendeur
+        $commandes = Commande::where('user_id', $userId)
+            ->whereHas('ligneCommandes.produit', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->with('ligneCommandes.produit')
+            ->latest()
+            ->limit(5)
+            ->get();
+
         // Marquer les messages reçus comme lus
         Message::where('from_user_id', $userId)
             ->where('to_user_id', $user->id)
             ->where('lu', false)
             ->update(['lu' => true]);
 
-        return view('vendeur.messages.show', compact('client', 'messages', 'user'));
+        return view('vendeur.messages.show', compact('client', 'messages', 'user', 'produit', 'commandes'));
     }
 
     /**
@@ -830,5 +917,32 @@ class VendeurProduitController extends Controller
             'mouvements' => $mouvements,
             'produits' => $produits,
         ]);
+    }
+
+    /**
+     * Basculer vers le mode client
+     */
+    public function switchToClient(Request $request)
+    {
+        $user = Auth::user();
+
+        // Vérifier que l'utilisateur est authentifié et est vendeur
+        if (!$user || $user->role !== 'vendor') {
+            return redirect('/login');
+        }
+
+        try {
+            // Changer le rôle de l'utilisateur à client
+            $user->update(['role' => 'client']);
+
+            // Recharger l'utilisateur
+            $user = $user->fresh();
+            Auth::login($user, true);
+
+            return redirect('/dashboard')->with('success', 'Vous êtes maintenant en mode client.');
+        } catch (\Exception $e) {
+            \Log::error('Erreur basculement mode client: ' . $e->getMessage());
+            return redirect('/')->with('error', 'Erreur lors du basculement en mode client.');
+        }
     }
 }

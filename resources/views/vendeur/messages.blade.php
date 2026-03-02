@@ -62,10 +62,11 @@
         <div class="space-y-4">
             @foreach($conversations as $conv)
                 <a href="{{ route('vendeur.messages.show', $conv['other_user']->id) }}" class="block bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition {{ $conv['unread_count'] > 0 ? 'border-l-4 border-orange-500 bg-orange-50' : '' }}">
-                    <div class="flex items-start justify-between">
+                    <div class="flex items-start justify-between gap-4">
+                        <!-- Avatar et info client -->
                         <div class="flex-1">
                             <div class="flex items-center gap-3 mb-2">
-                                <div class="w-12 h-12 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-white font-bold">
+                                <div class="w-12 h-12 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                                     {{ strtoupper(substr($conv['other_user']->name, 0, 1)) }}
                                 </div>
                                 <div>
@@ -73,6 +74,14 @@
                                     <p class="text-xs text-gray-600">{{ $conv['other_user']->email }}</p>
                                 </div>
                             </div>
+
+                            <!-- Produit associé -->
+                            @if($conv['produit'])
+                                <div class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                    <p class="text-xs text-blue-600 font-semibold">📦 Produit:</p>
+                                    <p class="text-sm font-bold text-gray-900 line-clamp-1">{{ $conv['produit']->nom }}</p>
+                                </div>
+                            @endif
 
                             @if($conv['last_message'])
                                 <p class="text-sm text-gray-700 mt-3 line-clamp-2">
@@ -86,7 +95,7 @@
                             @if($conv['last_message'])
                                 <p class="text-sm text-gray-600 whitespace-nowrap">{{ $conv['last_message']->created_at->format('d/m H:i') }}</p>
                             @endif
-                            
+
                             @if($conv['unread_count'] > 0)
                                 <span class="inline-block mt-2 px-3 py-1 bg-orange-600 text-white text-xs font-bold rounded-full">
                                     🔔 {{ $conv['unread_count'] }} nouveau{{ $conv['unread_count'] > 1 ? 'x' : '' }}

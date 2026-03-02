@@ -32,12 +32,20 @@ class SearchController extends Controller
             ->limit(8)
             ->get(['id', 'nom', 'prix', 'image', 'stock', 'wishlistCount'])
             ->map(function ($produit) {
+                // Déterminer l'image à afficher
+                $imageUrl = asset('images/default-product.jpg');
+                if ($produit->images && is_array($produit->images) && count($produit->images) > 0) {
+                    $imageUrl = asset('storage/' . $produit->images[0]);
+                } elseif ($produit->image) {
+                    $imageUrl = asset('storage/' . $produit->image);
+                }
+
                 return [
                     'id' => $produit->id,
                     'nom' => $produit->nom,
                     'prix' => number_format($produit->prix, 0, ',', ' ') . ' XOF',
                     'prixRaw' => $produit->prix,
-                    'image' => $produit->image ? asset('storage/' . $produit->image) : asset('images/default-product.jpg'),
+                    'image' => $imageUrl,
                     'stock' => $produit->stock,
                     'inStock' => $produit->stock > 0,
                     'url' => route('produits.show', $produit->id),

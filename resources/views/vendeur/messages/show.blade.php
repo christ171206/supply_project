@@ -27,6 +27,43 @@
         </div>
     @endif
 
+    <!-- Produit associé -->
+    @if($produit)
+        <div class="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 border border-blue-200">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">📦 Produit discuté</h3>
+            <div class="flex gap-4">
+                @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
+                    <img src="{{ asset('storage/' . $produit->images[0]) }}" alt="{{ $produit->nom }}" class="w-24 h-24 object-cover rounded-lg">
+                @elseif($produit->image)
+                    <img src="{{ asset('storage/produits/' . $produit->image) }}" alt="{{ $produit->nom }}" class="w-24 h-24 object-cover rounded-lg">
+                @else
+                    <div class="w-24 h-24 bg-gray-300 rounded-lg flex items-center justify-center text-gray-600">
+                        📷
+                    </div>
+                @endif
+                <div class="flex-1">
+                    <h4 class="text-xl font-bold text-gray-900">{{ $produit->nom }}</h4>
+                    <p class="text-gray-700 line-clamp-2">{{ $produit->description }}</p>
+                    <div class="flex gap-4 mt-3">
+                        <div>
+                            <p class="text-xs text-gray-600">Prix</p>
+                            <p class="text-2xl font-bold text-primary-600">{{ number_format($produit->prix, 0, ',', ' ') }} FCFA</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600">Stock</p>
+                            <p class="text-lg font-bold {{ $produit->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $produit->stock > 0 ? $produit->stock . ' unité(s)' : 'Rupture' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ route('produits.show', $produit->slug) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold h-fit whitespace-nowrap">
+                    Voir produit
+                </a>
+            </div>
+        </div>
+    @endif
+
     <!-- Zone de conversation -->
     <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
         <!-- Messages -->
@@ -38,7 +75,7 @@
                         <p class="text-xs mt-2 {{ $msg->from_user_id === auth()->id() ? 'text-primary-100' : 'text-gray-600' }}">
                             {{ $msg->created_at->format('H:i') }}
                         </p>
-                        
+
                         @if($msg->from_user_id === auth()->id())
                             <form action="{{ route('vendeur.messages.delete', $msg->id) }}" method="POST" class="mt-2" onsubmit="return confirm('Êtes-vous sûr?')">
                                 @csrf
@@ -62,14 +99,14 @@
         <div class="border-t border-gray-200 p-6 bg-gray-50">
             <form action="{{ route('vendeur.messages.send', $client->id) }}" method="POST" class="flex gap-3">
                 @csrf
-                <textarea 
+                <textarea
                     name="contenu"
                     placeholder="Écrivez votre message..."
                     class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                     rows="3"
                     required
                 ></textarea>
-                <button 
+                <button
                     type="submit"
                     class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold whitespace-nowrap h-fit"
                 >
@@ -109,12 +146,9 @@
         </div>
 
         <div class="bg-white rounded-xl shadow-lg p-6 md:col-span-2">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">🛒 Commandes du Client</h3>
-            @php
-                $commandes = \App\Models\Commande::where('user_id', $client->id)->latest()->limit(5)->get();
-            @endphp
-            
-            @if($commandes->count() > 0)
+            <h3 class="text-lg font-bold text-gray-900 mb-4">🛒 Commandes de ce Client</h3>
+
+            @if(isset($commandes) && $commandes->count() > 0)
                 <div class="space-y-3">
                     @foreach($commandes as $cmd)
                         <a href="{{ route('vendeur.commandes.show', $cmd->id) }}" class="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition border-l-4 border-primary-600">
@@ -125,7 +159,7 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="font-bold text-primary-600">{{ number_format($cmd->total, 0, ',', ' ') }} CFA</p>
-                                    <p class="text-xs font-semibold 
+                                    <p class="text-xs font-semibold
                                         {{ $cmd->statut === 'livree' ? 'text-green-600' : ($cmd->statut === 'expediee' ? 'text-blue-600' : ($cmd->statut === 'confirmee' ? 'text-yellow-600' : 'text-red-600')) }}
                                     ">
                                         {{ ucfirst(str_replace('_', ' ', $cmd->statut)) }}
@@ -136,7 +170,10 @@
                     @endforeach
                 </div>
             @else
-                <p class="text-gray-600 text-center py-6">Aucune commande de ce client</p>
+                <div class="text-center py-8 bg-gray-50 rounded-lg">
+                    <p class="text-gray-600 mb-2">📦 Aucune commande en commun</p>
+                    <p class="text-xs text-gray-500">Ce client n'a pas de commande contenant vos produits</p>
+                </div>
             @endif
         </div>
     </div>

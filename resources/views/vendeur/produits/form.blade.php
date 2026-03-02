@@ -130,28 +130,50 @@
                     </div>
                 </div>
 
-                <!-- ROW 5: Image (Drag & Drop) -->
+                <!-- ROW 5: Images (Drag & Drop Multi-fichiers) -->
                 <div>
-                    <label class="block text-sm font-bold text-gray-900 mb-3">Image du produit</label>
-                    <p class="text-xs text-gray-500 mb-3">📁 Stockée en : <code class="bg-gray-100 px-2 py-1 rounded text-xs">storage/app/public/produits/</code></p>
+                    <label class="block text-sm font-bold text-gray-900 mb-3">Images du produit (Maximum 5 images)</label>
+                    <p class="text-xs text-gray-500 mb-3">📁 Stockées en : <code class="bg-gray-100 px-2 py-1 rounded text-xs">storage/app/public/produits/</code></p>
 
-                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition cursor-pointer" id="dropZone">
-                        @if(isset($produit) && $produit->image && file_exists(storage_path('app/public/produits/' . $produit->image)))
-                            <div class="mb-4">
-                                <img src="{{ asset('storage/produits/' . $produit->image) }}" alt="{{ $produit->nom }}" class="h-32 object-cover rounded mx-auto">
-                                <p class="text-sm text-gray-600 mt-3">Image actuelle</p>
+                    <!-- Images actuelles -->
+                    @if(isset($produit) && $produit->images && is_array($produit->images))
+                        <div class="mb-6">
+                            <p class="text-sm text-gray-700 font-semibold mb-3">📷 Images actuelles ({{ count($produit->images) }}/5)</p>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                @foreach($produit->images as $index => $imagePath)
+                                    @if(file_exists(storage_path('app/public/' . $imagePath)))
+                                        <div class="relative group">
+                                            <img src="{{ asset('storage/' . $imagePath) }}" alt="Image {{ $index + 1 }}" class="h-32 w-full object-cover rounded border border-gray-200">
+                                            <div class="absolute inset-0 bg-black bg-opacity-50 rounded opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                                <span class="text-white text-xs font-semibold">Image {{ $index + 1 }}</span>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
                             </div>
-                        @else
-                            <p class="text-4xl mb-3">📷</p>
-                            <p class="text-gray-700 font-semibold">Glissez une image ici ou cliquez</p>
-                            <p class="text-xs text-gray-500 mt-2">JPG, PNG • Max 5MB</p>
-                        @endif
+                            <p class="text-xs text-gray-500 mt-3">Les nouvelles images remplaceront les existantes</p>
+                        </div>
+                    @endif
+
+                    <!-- Zone de dépôt pour nouvelles images -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition cursor-pointer" id="dropZone">
+                        <p class="text-4xl mb-3">🖼️</p>
+                        <p class="text-gray-700 font-semibold">Glissez jusqu'à 5 images ici ou cliquez</p>
+                        <p class="text-xs text-gray-500 mt-2">JPG, PNG • Max 5MB chacune</p>
                     </div>
 
-                    <input type="file" name="image" id="image" accept="image/jpeg,image/png"
+                    <!-- Preview des images sélectionnées -->
+                    <div id="preview-container" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Les aperçus vont ici -->
+                    </div>
+
+                    <input type="file" name="images[]" id="images" accept="image/jpeg,image/png" multiple
                            class="hidden" id="fileInput">
 
-                    @error('image')
+                    @error('images')
+                        <p class="text-red-500 text-sm mt-2">❌ {{ $message }}</p>
+                    @enderror
+                    @error('images.*')
                         <p class="text-red-500 text-sm mt-2">❌ {{ $message }}</p>
                     @enderror
                 </div>
@@ -173,13 +195,16 @@
         </div>
     </div>
 
-    <!-- Script pour Drag & Drop et Toggle -->
+    <!-- Script pour Drag & Drop Multi-images et Toggle -->
     <script>
-        // ====== DRAG & DROP ======
+        // ====== DRAG & DROP MULTI-IMAGES ======
         const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('image');
+        const fileInput = document.getElementById('images');
+        const previewContainer = document.getElementById('preview-container');
+        const MAX_IMAGES = 5;
+        let selectedFiles = new DataTransfer();
 
-        // Click to select file
+        // Click to select files
         dropZone.addEventListener('click', () => fileInput.click());
 
         // Drag & Drop events
@@ -196,33 +221,71 @@
             e.preventDefault();
             dropZone.classList.remove('border-blue-500', 'bg-blue-50');
 
-            const files = e.dataTransfer.files;
-            if (files.length) {
-                fileInput.files = files;
-                showFilePreview(files[0]);
-            }
+            const droppedFiles = e.dataTransfer.files;
+            handleFiles(droppedFiles);
         });
 
-        // Preview image on selection
+        // Preview images on selection
         fileInput.addEventListener('change', () => {
-            if (fileInput.files.length) {
-                showFilePreview(fileInput.files[0]);
-            }
+            handleFiles(fileInput.files);
         });
 
-        function showFilePreview(file) {
-            const reader = new FileReader();
+        function handleFiles(files) {
+            // Limiter à 5 fichiers
+            const filesToAdd = Array.from(files).slice(0, MAX_IMAGES);
 
-            reader.onload = (e) => {
+            // Ajouter les fichiers au DataTransfer
+            selectedFiles = new DataTransfer();
+            filesToAdd.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    selectedFiles.items.add(file);
+                }
+            });
+
+            // Limiter à 5 au total
+            if (selectedFiles.items.length > MAX_IMAGES) {
+                for (let i = selectedFiles.items.length - 1; i >= MAX_IMAGES; i--) {
+                    selectedFiles.items.remove(i);
+                }
+            }
+
+            // Mettre à jour l'input file
+            fileInput.files = selectedFiles.files;
+
+            // Afficher les aperçus
+            showPreviews(selectedFiles.files);
+        }
+
+        function showPreviews(files) {
+            previewContainer.innerHTML = '';
+
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'relative group';
+                    previewDiv.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview ${index + 1}" class="h-32 w-full object-cover rounded border-2 border-green-400">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <span class="text-white text-xs font-semibold">Image ${index + 1}</span>
+                        </div>
+                    `;
+                    previewContainer.appendChild(previewDiv);
+                };
+
+                reader.readAsDataURL(file);
+            });
+
+            // Mettre à jour le compteur
+            const currentCount = files.length;
+            const imageCount = dropZone.querySelector('p:first-child');
+            if (currentCount > 0) {
                 dropZone.innerHTML = `
-                    <div class="flex flex-col items-center">
-                        <img src="${e.target.result}" alt="Preview" class="h-32 object-cover rounded mb-3">
-                        <p class="text-sm text-green-600 font-semibold">✅ ${file.name}</p>
-                    </div>
+                    <p class="text-lg text-green-600 font-semibold">✅ ${currentCount} image(s) sélectionnée(s) (${currentCount}/${MAX_IMAGES})</p>
+                    <p class="text-xs text-gray-500 mt-2">Glissez d'autres images pour les ajouter</p>
                 `;
-            };
-
-            reader.readAsDataURL(file);
+            }
         }
 
         // ====== TOGGLE SWITCH ======

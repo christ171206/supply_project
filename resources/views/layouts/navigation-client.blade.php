@@ -138,13 +138,19 @@
                         <div x-show="open" x-transition @click.outside="open = false"
                              class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-md py-2 z-50">
 
-                            @if(Auth::user()->role === 'vendeur')
+                            @if(Auth::user()->role === 'vendor')
                                 <a href="{{ route('vendeur.dashboard') }}" class="block px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition font-semibold border-b border-gray-100">
                                     🏪 Espace Vendeur
                                 </a>
                                 <a href="{{ route('client.dashboard') }}" class="block px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition">
                                     📊 Mes Commandes
                                 </a>
+                                <form method="POST" action="{{ route('vendeur.switch-client') }}" class="border-t border-gray-100">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2.5 text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition font-semibold">
+                                        → Passer en mode client
+                                    </button>
+                                </form>
                             @else
                                 <a href="{{ route('client.dashboard') }}" class="block px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition font-semibold border-b border-gray-100">
                                     📊 Mon Compte
@@ -154,13 +160,10 @@
                                 </a>
                             @endif
 
-                            <a href="{{ route('client.messages') }}" class="block px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition">
-                                💬 Messages
-                            </a>
                             <a href="{{ route('client.profil') }}" class="block px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition">
                                 👤 Mon Profil
                             </a>
-                            <form method="POST" action="{{ route('logout') }}" class="border-t border-gray-100">
+                            <form method="POST" action="{{ route('logout') }}" class="border-t border-gray-100" onsubmit="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?')">
                                 @csrf
                                 <button type="submit" class="w-full text-left px-4 py-2.5 text-danger-600 hover:bg-danger-50 transition font-semibold">
                                     🚪 Déconnexion
@@ -204,7 +207,7 @@
                 <a href="{{ route('client.dashboard') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary-600 rounded transition">
                     📊 Mon Compte
                 </a>
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?')">
                     @csrf
                     <button type="submit" class="w-full text-left px-4 py-2 text-danger-600 hover:bg-danger-50 rounded transition">
                         🚪 Déconnexion

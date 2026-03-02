@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PaymentCinemaController extends Controller
 {
@@ -349,7 +350,7 @@ class PaymentCinemaController extends Controller
      */
     public function webhook(Request $request)
     {
-        \Log::info('Webhook paiement reçu', $request->all());
+        Log::info('Webhook paiement reçu', $request->all());
 
         try {
             $transaction_id = $request->input('transaction_id');
@@ -359,7 +360,7 @@ class PaymentCinemaController extends Controller
             $payment = Payment::where('payment_code', $transaction_id)->first();
 
             if (!$payment) {
-                \Log::warning('Paiement non trouvé pour transaction_id: ' . $transaction_id);
+                Log::warning('Paiement non trouvé pour transaction_id: ' . $transaction_id);
                 return response()->json(['status' => 'error', 'message' => 'Paiement non trouvé'], 404);
             }
 
@@ -373,17 +374,17 @@ class PaymentCinemaController extends Controller
                 // Mettre à jour le statut de la commande
                 $payment->commande->update(['statut' => 'confirmée']);
 
-                \Log::info('Paiement confirmé', ['payment_id' => $payment->id, 'commande_id' => $payment->commande_id]);
+                Log::info('Paiement confirmé', ['payment_id' => $payment->id, 'commande_id' => $payment->commande_id]);
             } else {
                 $payment->update(['payment_status' => 'ÉCHOUÉE']);
                 $payment->commande->update(['statut' => 'paiement_échoué']);
 
-                \Log::warning('Paiement échoué', ['payment_id' => $payment->id, 'status' => $status]);
+                Log::warning('Paiement échoué', ['payment_id' => $payment->id, 'status' => $status]);
             }
 
             return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
-            \Log::error('Erreur webhook paiement: ' . $e->getMessage());
+            Log::error('Erreur webhook paiement: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }

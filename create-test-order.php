@@ -41,7 +41,7 @@ foreach ($produits as $produit) {
     $quantite = 2;
     $prix_unitaire = $produit->prix;
     $sous_total = $quantite * $prix_unitaire;
-    
+
     LigneCommande::create([
         'commande_id' => $commande->id,
         'produit_id' => $produit->id,
@@ -49,7 +49,7 @@ foreach ($produits as $produit) {
         'prix_unitaire' => $prix_unitaire,
         'sous_total' => $sous_total
     ]);
-    
+
     $total += $sous_total;
 }
 

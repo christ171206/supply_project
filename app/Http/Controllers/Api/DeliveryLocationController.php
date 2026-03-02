@@ -9,6 +9,7 @@ use App\Models\CiQuartier;
 use App\Models\CiRegion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DeliveryLocationController extends Controller
 {
@@ -24,7 +25,7 @@ class DeliveryLocationController extends Controller
                 'data' => $regions,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Erreur getRegions:', ['error' => $e->getMessage()]);
+            Log::error('Erreur getRegions:', ['error' => $e->getMessage()]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Erreur lors du chargement des régions',
@@ -44,7 +45,7 @@ class DeliveryLocationController extends Controller
                 'data' => $districts,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Erreur getDistricts:', ['error' => $e->getMessage()]);
+            Log::error('Erreur getDistricts:', ['error' => $e->getMessage()]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Erreur lors du chargement des districts',
@@ -64,7 +65,7 @@ class DeliveryLocationController extends Controller
                 'data' => $communes,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Erreur getCommunes:', ['error' => $e->getMessage()]);
+            Log::error('Erreur getCommunes:', ['error' => $e->getMessage()]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Erreur lors du chargement des communes',
@@ -84,7 +85,7 @@ class DeliveryLocationController extends Controller
                 'data' => $quartiers,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Erreur getQuartiers:', ['error' => $e->getMessage()]);
+            Log::error('Erreur getQuartiers:', ['error' => $e->getMessage()]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Erreur lors du chargement des quartiers',
@@ -227,7 +228,7 @@ class DeliveryLocationController extends Controller
                 'data' => $results,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Erreur search:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            Log::error('Erreur search:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Erreur lors de la recherche: ' . $e->getMessage(),

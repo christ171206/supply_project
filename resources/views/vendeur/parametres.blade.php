@@ -37,7 +37,7 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Nom de la Boutique
                         </label>
-                        <input type="text" name="shop_name" 
+                        <input type="text" name="shop_name"
                                value="{{ auth()->user()->shop_name ?? '' }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                placeholder="Entrez le nom de votre boutique">
@@ -64,7 +64,7 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Téléphone
                         </label>
-                        <input type="tel" name="phone" 
+                        <input type="tel" name="phone"
                                value="{{ auth()->user()->phone ?? '' }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                placeholder="+225 XX XX XX XX XX">
@@ -78,7 +78,7 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Adresse
                         </label>
-                        <input type="text" name="address" 
+                        <input type="text" name="address"
                                value="{{ auth()->user()->address ?? '' }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                placeholder="Votre adresse complète">
@@ -92,7 +92,7 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Stock Minimum par Défaut
                         </label>
-                        <input type="number" name="stock_minimum_defaut" 
+                        <input type="number" name="stock_minimum_defaut"
                                value="{{ auth()->user()->stock_minimum_defaut ?? 10 }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                placeholder="10">
@@ -116,7 +116,7 @@
             <!-- Compte -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h3 class="text-lg font-bold text-gray-900 mb-4">👤 Compte</h3>
-                
+
                 <div class="space-y-3">
                     <div class="text-sm">
                         <p class="text-gray-600 text-xs">Email</p>
@@ -146,7 +146,7 @@
             <!-- Danger Zone -->
             <div class="bg-red-50 rounded-xl shadow-lg p-6 border-l-4 border-red-500">
                 <h3 class="text-lg font-bold text-red-900 mb-4">🚨 Zone Dangereuse</h3>
-                
+
                 <p class="text-sm text-red-800 mb-4">
                     Attention: Ces actions sont irréversibles!
                 </p>
@@ -163,7 +163,7 @@
             <!-- Aide -->
             <div class="bg-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
                 <h3 class="text-lg font-bold text-blue-900 mb-4">❓ Aide</h3>
-                
+
                 <ul class="space-y-2 text-sm text-blue-800">
                     <li>✓ Complétez votre profil pour plus de confianceClient</li>
                     <li>✓ Utilisez des photos de bonne qualité</li>

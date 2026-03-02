@@ -167,12 +167,21 @@ class MessageController extends Controller
             'contenu' => 'required|string|min:1|max:5000',
         ]);
 
-        Message::create([
+        $message = Message::create([
             'from_user_id' => Auth::id(),
             'to_user_id' => $userId,
             'contenu' => $validated['contenu'],
             'lu' => false,
         ]);
+
+        // Si c'est une requête AJAX, retourner JSON
+        if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json([
+                'success' => true,
+                'message' => 'Message envoyé avec succès',
+                'data' => $message
+            ], 201);
+        }
 
         return redirect()->route('messages.show', $userId)
             ->with('success', '✓ Message envoyé !');

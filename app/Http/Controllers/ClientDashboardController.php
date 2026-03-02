@@ -60,6 +60,38 @@ class ClientDashboardController extends Controller
     }
 
     /**
+     * Annuler une commande (seulement dans les 10 minutes)
+     */
+    public function cancelCommande(Request $request, $id)
+    {
+        $commande = Auth::user()->commandes()->findOrFail($id);
+
+        // Vérifier que la commande est en attente
+        if ($commande->statut !== 'en_attente') {
+            return redirect()->back()->with('error', 'Seules les commandes en attente peuvent être annulées');
+        }
+
+        // Vérifier que moins de 10 minutes se sont écoulées
+        $minutesEcoulees = now()->diffInMinutes($commande->created_at);
+        if ($minutesEcoulees > 10) {
+            return redirect()->back()->with('error', 'Le délai d\'annulation de 10 minutes est dépassé');
+        }
+
+        // Annuler la commande
+        $commande->update(['statut' => 'annulee']);
+
+        // Optionnel: Remettre le stock s'il avait été décrémenté
+        foreach ($commande->ligneCommandes as $ligne) {
+            if ($ligne->produit) {
+                $ligne->produit->increment('stock', $ligne->quantite);
+            }
+        }
+
+        return redirect()->route('client.commandes')
+            ->with('success', 'Votre commande a été annulée avec succès');
+    }
+
+    /**
      * Afficher les messages
      */
     public function messages()

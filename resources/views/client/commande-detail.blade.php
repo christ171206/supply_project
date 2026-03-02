@@ -244,6 +244,25 @@
                             📄 Télécharger la Facture
                         </a>
                     </div>
+
+                    @php
+                        $secondesEcoulees = now()->diffInSeconds($commande->created_at);
+                        $minutesEcoulees = $secondesEcoulees / 60;
+                        $minutesRestantes = 10 - $minutesEcoulees;
+                        $peutAnnuler = $commande->statut === 'en_attente' && $minutesEcoulees < 10;
+                    @endphp
+
+                    @if($peutAnnuler)
+                        <div class="mt-4">
+                            <form action="{{ route('client.commande.cancel', $commande->id) }}" method="POST" class="w-full">
+                                @csrf
+                                <button type="submit" class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-bold transition" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette commande?')">
+                                    ❌ Annuler la commande
+                                </button>
+                            </form>
+                            <p class="text-xs text-red-600 mt-2 text-center">⏰ Vous avez {{ round($minutesRestantes, 1) }} minute(s) pour annuler</p>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Actions -->

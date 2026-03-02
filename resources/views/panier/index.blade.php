@@ -26,7 +26,9 @@
                             <div class="p-6 flex gap-4 hover:bg-gray-50 transition">
                                 <!-- Image Produit -->
                                 <div class="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                                    @if($item->produit->image)
+                                    @if($item->produit->images && is_array($item->produit->images) && count($item->produit->images) > 0)
+                                        <img src="{{ asset('storage/' . $item->produit->images[0]) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover">
+                                    @elseif($item->produit->image)
                                         <img src="{{ asset('storage/produits/' . $item->produit->image) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center bg-gray-300">

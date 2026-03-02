@@ -27,90 +27,45 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
-                    <!-- Produit 1 - OK -->
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-semibold text-slate-800">Clavier Mécanique RGB</td>
-                        <td class="px-6 py-4 text-slate-700">
-                            <span class="font-bold text-lg text-sky-500">15</span> unités
-                        </td>
-                        <td class="px-6 py-4 text-slate-700">5 unités</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold border border-emerald-300">
-                                ✅ OK
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <button class="text-sky-500 hover:text-sky-700 font-bold text-sm hover:underline">✏️ Modifier</button>
-                        </td>
-                    </tr>
+                    @forelse($produits as $produit)
+                        @php
+                            $etat = 'OK';
+                            $statut_classe = 'emerald';
+                            $icon = '✅';
 
-                    <!-- Produit 2 - Faible -->
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-semibold text-slate-800">Souris Sans Fil</td>
-                        <td class="px-6 py-4 text-slate-700">
-                            <span class="font-bold text-lg text-sky-500">3</span> unités
-                        </td>
-                        <td class="px-6 py-4 text-slate-700">5 unités</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-300">
-                                ⚠️ Faible
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <button class="text-sky-500 hover:text-sky-700 font-bold text-sm hover:underline">✏️ Modifier</button>
-                        </td>
-                    </tr>
-
-                    <!-- Produit 3 - Rupture -->
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-semibold text-slate-800">Câble HDMI 2.1</td>
-                        <td class="px-6 py-4 text-slate-700">
-                            <span class="font-bold text-lg text-sky-500">0</span> unités
-                        </td>
-                        <td class="px-6 py-4 text-slate-700">10 unités</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold border border-red-300">
-                                ❌ Rupture
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <button class="text-sky-500 hover:text-sky-700 font-bold text-sm hover:underline">✏️ Modifier</button>
-                        </td>
-                    </tr>
-
-                    <!-- Produit 4 - OK -->
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-semibold text-slate-800">Monitor 4K 27"</td>
-                        <td class="px-6 py-4 text-slate-700">
-                            <span class="font-bold text-lg text-sky-500">8</span> unités
-                        </td>
-                        <td class="px-6 py-4 text-slate-700">3 unités</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold border border-emerald-300">
-                                ✅ OK
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <button class="text-sky-500 hover:text-sky-700 font-bold text-sm hover:underline">✏️ Modifier</button>
-                        </td>
-                    </tr>
-
-                    <!-- Produit 5 - Faible -->
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-semibold text-slate-800">Casque Bluetooth</td>
-                        <td class="px-6 py-4 text-slate-700">
-                            <span class="font-bold text-lg text-sky-500">2</span> unités
-                        </td>
-                        <td class="px-6 py-4 text-slate-700">4 unités</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-300">
-                                ⚠️ Faible
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <button class="text-sky-500 hover:text-sky-700 font-bold text-sm hover:underline">✏️ Modifier</button>
-                        </td>
-                    </tr>
+                            if ($produit->stock == 0) {
+                                $etat = 'Rupture';
+                                $statut_classe = 'red';
+                                $icon = '❌';
+                            } elseif ($produit->stock <= $produit->stock_minimum) {
+                                $etat = 'Faible';
+                                $statut_classe = 'amber';
+                                $icon = '⚠️';
+                            }
+                        @endphp
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4 font-semibold text-slate-800">{{ $produit->nom }}</td>
+                            <td class="px-6 py-4 text-slate-700">
+                                <span class="font-bold text-lg text-sky-500">{{ $produit->stock }}</span> unités
+                            </td>
+                            <td class="px-6 py-4 text-slate-700">{{ $produit->stock_minimum }} unités</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-block px-3 py-1 bg-{{ $statut_classe }}-100 text-{{ $statut_classe }}-700 rounded-full text-xs font-bold border border-{{ $statut_classe }}-300">
+                                    {{ $icon }} {{ $etat }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <a href="{{ route('vendeur.produits.edit', $produit->id) }}" class="text-sky-500 hover:text-sky-700 font-bold text-sm hover:underline">✏️ Modifier</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-slate-600">
+                                <p class="text-lg mb-2">📦 Aucun produit</p>
+                                <p class="text-sm">Vous n'avez pas encore ajouté de produit</p>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

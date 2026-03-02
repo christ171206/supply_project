@@ -240,16 +240,27 @@
                         </div>
                     </div>
 
-                    <!-- Comptes de test (développement) -->
-                    @if (app()->environment('local'))
-                        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl text-sm">
-                            <p class="font-semibold text-blue-900 mb-3">🧪 Comptes de test :</p>
-                            <div class="space-y-2 text-blue-800">
-                                <p><strong>Client :</strong> <code class="bg-blue-100 px-2 py-1 rounded">client@test.com</code> / <code class="bg-blue-100 px-2 py-1 rounded">password</code></p>
-                                <p><strong>Vendeur :</strong> <code class="bg-blue-100 px-2 py-1 rounded">vendeur@test.com</code> / <code class="bg-blue-100 px-2 py-1 rounded">password</code></p>
+                        <!-- Comptes de test (développement) -->
+                        <div class="mt-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-300 rounded-xl">
+                            <p class="font-bold text-blue-900 mb-4 text-center">🧪 Comptes de test disponibles</p>
+                            <div class="space-y-3">
+                                <!-- Compte Vendeur -->
+                                <button type="button" onclick="fillTestAccount('testshop@supply.ci', 'testshop123')" class="w-full text-left p-3 bg-white hover:bg-blue-50 border border-blue-200 rounded-lg transition cursor-pointer hover:shadow-md">
+                                    <p class="font-bold text-blue-900 mb-1">🏪 Vendeur Test</p>
+                                    <p class="text-sm text-gray-700"><code class="bg-blue-100 px-2 py-1 rounded text-xs">testshop@supply.ci</code></p>
+                                    <p class="text-sm text-gray-700 mt-1"><code class="bg-blue-100 px-2 py-1 rounded text-xs">testshop123</code></p>
+                                    <p class="text-xs text-blue-600 mt-2">Cliquez pour remplir</p>
+                                </button>
+
+                                <!-- Compte Client -->
+                                <button type="button" onclick="fillTestAccount('client@test.com', 'password')" class="w-full text-left p-3 bg-white hover:bg-blue-50 border border-blue-200 rounded-lg transition cursor-pointer hover:shadow-md">
+                                    <p class="font-bold text-blue-900 mb-1">👤 Client Test</p>
+                                    <p class="text-sm text-gray-700"><code class="bg-blue-100 px-2 py-1 rounded text-xs">client@test.com</code></p>
+                                    <p class="text-sm text-gray-700 mt-1"><code class="bg-blue-100 px-2 py-1 rounded text-xs">password</code></p>
+                                    <p class="text-xs text-blue-600 mt-2">Cliquez pour remplir</p>
+                                </button>
                             </div>
                         </div>
-                    @endif
                 </div>
 
             </div>
@@ -271,6 +282,14 @@
                 // Icône oeil fermé
                 eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
             }
+        }
+
+        // Remplissage auto des comptes de test
+        function fillTestAccount(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+            document.getElementById('password').type = 'text'; // Afficher le mot de passe
+            document.getElementById('email').focus();
         }
     </script>
 </body>

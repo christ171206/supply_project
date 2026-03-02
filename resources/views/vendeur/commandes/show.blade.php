@@ -34,7 +34,7 @@
             <!-- Articles commandés -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-6">📦 Articles Commandés</h2>
-                
+
                 @if($commande->ligneCommandes->count() > 0)
                     <div class="space-y-4">
                         @foreach($commande->ligneCommandes as $ligne)
@@ -53,7 +53,7 @@
                                         <p class="text-sm text-gray-700 mb-3">
                                             {{ Str::limit($produit->description, 100) }}
                                         </p>
-                                        
+
                                         <div class="grid grid-cols-3 gap-4">
                                             <div>
                                                 <p class="text-xs text-gray-600">Quantité</p>
@@ -86,7 +86,7 @@
             <!-- Paiement -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-6">💳 Informations de Paiement</h2>
-                
+
                 @if($commande->payment)
                     <div class="space-y-4">
                         <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
@@ -119,7 +119,7 @@
             <!-- Résumé commande -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-6">📊 Résumé</h2>
-                
+
                 <div class="space-y-4">
                     <div class="flex justify-between pb-4 border-b-2 border-gray-200">
                         <p class="text-gray-700">Sous-total</p>
@@ -138,7 +138,7 @@
             <!-- Statut et Actions -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-6">⚙️ Statut</h2>
-                
+
                 @php
                     $colors = [
                         'en_attente' => 'bg-red-100 text-red-700',
@@ -154,75 +154,97 @@
                     ];
                 @endphp
 
-                <div class="mb-6">
-                    <span class="inline-block px-4 py-2 rounded-lg text-sm font-bold {{ $colors[$commande->statut] ?? 'bg-gray-100 text-gray-700' }}">
-                        {{ $labels[$commande->statut] ?? $commande->statut }}
-                    </span>
+                <div class="mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-600 font-semibold mb-2">STATUT ACTUEL</p>
+                            <span class="inline-block px-4 py-2 rounded-full text-sm font-bold {{ $colors[$commande->statut] ?? 'bg-gray-100 text-gray-700' }}">
+                                {{ $labels[$commande->statut] ?? $commande->statut }}
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-gray-600 font-semibold mb-2">PROGRESSION</p>
+                            <div class="flex gap-1">
+                                <div class="w-8 h-8 rounded-full {{ in_array($commande->statut, ['en_attente','confirmee','expediee','livree']) ? 'bg-red-500' : 'bg-gray-300' }} text-white text-xs flex items-center justify-center font-bold">1</div>
+                                <div class="w-8 h-8 rounded-full {{ in_array($commande->statut, ['confirmee','expediee','livree']) ? 'bg-yellow-500' : 'bg-gray-300' }} text-white text-xs flex items-center justify-center font-bold">2</div>
+                                <div class="w-8 h-8 rounded-full {{ in_array($commande->statut, ['expediee','livree']) ? 'bg-blue-500' : 'bg-gray-300' }} text-white text-xs flex items-center justify-center font-bold">3</div>
+                                <div class="w-8 h-8 rounded-full {{ $commande->statut === 'livree' ? 'bg-green-500' : 'bg-gray-300' }} text-white text-xs flex items-center justify-center font-bold">4</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Boutons d'action pour changer le statut -->
-                <div class="space-y-2">
-                    @if($commande->statut == 'en_attente')
-                        <form method="POST" action="{{ route('vendeur.commandes.update-status', $commande->id) }}" style="display: inline;">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="statut" value="confirmee">
-                            <button type="submit" class="w-full px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition font-semibold text-sm">
-                                ✓ Confirmer
-                            </button>
-                        </form>
-                    @endif
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+                    <p class="text-sm font-bold text-gray-900 mb-4">🎯 Actions Disponibles</p>
+                    <div class="space-y-3">
+                        @if($commande->statut == 'en_attente')
+                            <form method="POST" action="{{ route('vendeur.commandes.update-status', $commande->id) }}" style="display: block;">
+                                @csrf
+                                @method('PATCH')
+                                <input type="hidden" name="statut" value="confirmee">
+                                <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105">
+                                    ✓ CONFIRMER LA COMMANDE
+                                </button>
+                                <p class="text-xs text-gray-700 mt-2">La commande passe du statut "En Attente" à "Confirmée"</p>
+                            </form>
+                        @endif
 
                     @if(in_array($commande->statut, ['confirmee']))
-                        <form method="POST" action="{{ route('vendeur.commandes.update-status', $commande->id) }}" style="display: inline;">
+                        <form method="POST" action="{{ route('vendeur.commandes.update-status', $commande->id) }}" style="display: block;">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="statut" value="expediee">
-                            <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm">
-                                📦 Expédier
+                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105">
+                                📦 EXPÉDIER LA COMMANDE
                             </button>
+                            <p class="text-xs text-gray-700 mt-2">La commande passe du statut "Confirmée" à "Expédiée"</p>
                         </form>
                     @endif
 
                     @if(in_array($commande->statut, ['expediee']))
-                        <form method="POST" action="{{ route('vendeur.commandes.update-status', $commande->id) }}" style="display: inline;">
+                        <form method="POST" action="{{ route('vendeur.commandes.update-status', $commande->id) }}" style="display: block;">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="statut" value="livree">
-                            <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold text-sm">
-                                ✓ Marquer Livrée
+                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105">
+                                ✓ MARQUER COMME LIVRÉE
                             </button>
+                            <p class="text-xs text-gray-700 mt-2">La commande passe du statut "Expédiée" à "Livrée"</p>
                         </form>
                     @endif
+                    </div>
 
                     <!-- Boutons d'annulation et suppression -->
-                    <div class="border-t border-gray-300 pt-4 mt-4">
-                        @if($commande->statut !== 'livree' && $commande->statut !== 'annulee')
+                    @if($commande->statut !== 'livree' && $commande->statut !== 'annulee')
+                        <div class="border-t-2 border-gray-200 pt-4 mt-4">
                             <form method="POST" action="{{ route('vendeur.commandes.cancel', $commande->id) }}" onsubmit="return confirm('Êtes-vous sûr d\'annuler cette commande? Le stock sera rétabli.');">
                                 @csrf
-                                <button type="submit" class="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold text-sm mb-2">
-                                    ⛔ Annuler la commande
+                                <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition font-bold text-base shadow-lg hover:shadow-xl">
+                                    ⛔ Annuler la Commande
                                 </button>
                             </form>
-                        @endif
+                        </div>
+                    @endif
 
-                        @if(in_array($commande->statut, ['en_attente', 'annulee']))
+                    @if(in_array($commande->statut, ['en_attente', 'annulee']))
+                        <div class="border-t-2 border-gray-200 pt-4 mt-4">
                             <form method="POST" action="{{ route('vendeur.commandes.delete', $commande->id) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande? Cette action est irréversible.');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-sm">
-                                    🗑️ Supprimer la commande
+                                <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition font-bold text-base shadow-lg hover:shadow-xl">
+                                    🗑️ Supprimer la Commande
                                 </button>
                             </form>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
             <!-- Infos Client -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-lg font-bold text-gray-900 mb-4">👤 Infos Client</h2>
-                
+
                 <div class="space-y-3 text-sm">
                     <div>
                         <p class="text-gray-600 text-xs">Nom</p>

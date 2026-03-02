@@ -54,7 +54,7 @@ class ProduitController extends Controller
         if ($request->has('recherche') && $request->recherche) {
             $terme = $request->recherche;
             $query->where('nom', 'like', "%{$terme}%")
-                  ->orWhere('description', 'like', "%{$terme}%");
+                ->orWhere('description', 'like', "%{$terme}%");
         }
 
         // Tri
@@ -88,13 +88,13 @@ class ProduitController extends Controller
     {
         $produit = Produit::with('vendeur')->findOrFail($id);
         $produitsSimilaires = Produit::where('categorie_id', $produit->categorie_id)
-                                     ->where('id', '!=', $id)
-                                     ->limit(4)
-                                     ->get();
+            ->where('id', '!=', $id)
+            ->limit(4)
+            ->get();
         $avis = $produit->avis()
-                       ->with('user')
-                       ->latest()
-                       ->paginate(5);
+            ->with('user')
+            ->latest()
+            ->paginate(5);
 
         return view('produits.show', [
             'produit' => $produit,

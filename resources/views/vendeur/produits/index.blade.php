@@ -29,10 +29,10 @@
     <!-- Filters -->
     <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
         <form method="GET" class="flex flex-wrap gap-4">
-            <input type="text" name="search" placeholder="Rechercher un produit..." 
+            <input type="text" name="search" placeholder="Rechercher un produit..."
                    class="flex-1 min-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                    value="{{ request('search') }}">
-            
+
             <select name="categorie" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
                 <option value="">Toutes les catégories</option>
                 @foreach($categories as $cat)
@@ -55,9 +55,13 @@
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
                     <!-- Image du produit -->
                     <div class="relative h-48 bg-gray-100 overflow-hidden">
-                        @if($produit->image)
-                            <img src="{{ asset('storage/' . $produit->image) }}" 
-                                 alt="{{ $produit->nom }}" 
+                        @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
+                            <img src="{{ asset('storage/' . $produit->images[0]) }}"
+                                 alt="{{ $produit->nom }}"
+                                 class="w-full h-full object-cover hover:scale-105 transition">
+                        @elseif($produit->image)
+                            <img src="{{ asset('storage/' . $produit->image) }}"
+                                 alt="{{ $produit->nom }}"
                                  class="w-full h-full object-cover hover:scale-105 transition">
                         @else
                             <div class="w-full h-full flex items-center justify-center text-4xl text-gray-300">
@@ -128,11 +132,11 @@
 
                         <!-- Actions -->
                         <div class="flex gap-2">
-                            <a href="{{ route('vendeur.produits.edit', $produit->id) }}" 
+                            <a href="{{ route('vendeur.produits.edit', $produit->id) }}"
                                class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold text-center">
                                 ✏️ Éditer
                             </a>
-                            <button onclick="confirmDelete({{ $produit->id }})" 
+                            <button onclick="confirmDelete({{ $produit->id }})"
                                     class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold">
                                 🗑️ Supprimer
                             </button>

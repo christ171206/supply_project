@@ -15,9 +15,9 @@ class UserSeeder extends Seeder
     {
         // Créer un compte vendeur de test
         User::create([
-            'name' => 'Vendeur Test',
-            'email' => 'vendeur@test.com',
-            'password' => Hash::make('password'),
+            'name' => 'Test Shop',
+            'email' => 'testshop@supply.ci',
+            'password' => Hash::make('testshop123'),
             'role' => 'vendor',
             'email_verified_at' => now(),
         ]);

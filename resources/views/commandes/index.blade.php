@@ -26,7 +26,7 @@
                             <p class="text-gray-600 text-sm">{{ $commande->created_at->format('d/m/Y H:i') }}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-2xl font-bold text-gray-900">{{ number_format($commande->montant_total, 0, '', ' ') }} F CFA</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ number_format($commande->total, 0, ',', ' ') }} CFA</p>
                             <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold mt-2
                                 @if($commande->statut === 'en_attente') bg-yellow-100 text-yellow-800
                                 @elseif($commande->statut === 'payée') bg-green-100 text-green-800
@@ -50,11 +50,11 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-start">
+                    <div class="flex justify-between items-end">
                         <a href="{{ route('commandes.show', $commande->id) }}" class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
                             Voir les détails →
                         </a>
-                        <p class="text-2xl font-bold text-gray-900">{{ number_format($commande->montant_total, 0, '', ' ') }} F CFA</p>
+                    </div>
                 </div>
             @endforeach
         </div>

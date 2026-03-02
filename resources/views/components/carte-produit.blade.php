@@ -1,12 +1,14 @@
 <div class="group relative bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
     <!-- Image du produit - Optimisée -->
     <div class="relative h-72 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex items-center justify-center">
-        @if($produit->image)
+        @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
+            <img src="{{ asset('storage/' . $produit->images[0]) }}" alt="{{ $produit->nom }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+        @elseif($produit->image)
             <img src="{{ asset('storage/produits/' . $produit->image) }}" alt="{{ $produit->nom }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
         @endif
 
         <!-- Placeholder par défaut (SVG Supply Discret) -->
-        <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-gray-100 group-hover:to-gray-150 transition-colors duration-300" id="placeholder-{{ $produit->id }}" @if($produit->image) style="display: none;" @endif>
+        <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-gray-100 group-hover:to-gray-150 transition-colors duration-300" id="placeholder-{{ $produit->id }}" @if($produit->images && is_array($produit->images) && count($produit->images) > 0 || $produit->image) style="display: none;" @endif>
             <svg class="w-32 h-32 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>

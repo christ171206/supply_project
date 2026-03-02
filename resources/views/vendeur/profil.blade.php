@@ -1,105 +1,142 @@
 @extends('vendeur.layout-dashboard')
 
 @section('content')
-<div>
-    <!-- Header -->
-    <div class="mb-12">
-        <h1 class="text-4xl font-bold text-gray-900">⚙️ Mon Profil</h1>
-        <p class="text-gray-600 mt-2">Gérez vos informations personnelles et votre boutique</p>
-    </div>
+<div class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-12">
+            <h1 class="text-5xl font-bold text-gray-900">⚙️ Profil Vendeur</h1>
+            <p class="text-gray-600 mt-3 text-lg">Gérez vos informations personnelles et professionnelles</p>
+        </div>
 
+        <!-- Messages -->
         @if ($errors->any())
-            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <ul class="text-red-700 text-sm">
-                    @foreach ($errors->all() as $error)
-                        <li>❌ {{ $error }}</li>
-                    @endforeach
-                </ul>
+            <div class="mb-8 p-4 bg-red-50 border border-red-300 rounded-xl flex gap-3">
+                <span class="text-2xl flex-shrink-0">⚠️</span>
+                <div>
+                    <p class="text-red-900 font-bold mb-2">Erreurs détectées</p>
+                    <ul class="text-red-700 text-sm space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>❌ {{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
         @endif
 
-        <!-- Photo de Profil -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 p-8 mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">📸 Photo de Profil</h2>
+        @if (session('success'))
+            <div class="mb-8 p-4 bg-green-50 border border-green-300 rounded-xl flex gap-3">
+                <span class="text-2xl flex-shrink-0">✅</span>
+                <div>
+                    <p class="text-green-900 font-bold">{{ session('success') }}</p>
+                </div>
+            </div>
+        @endif
+
+        <!-- Section Photo de Profil -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-10 mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-xl">
+                    📸
+                </div>
+                Photo de Profil
+            </h2>
 
             <form action="{{ route('vendeur.profil.photo') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PATCH')
 
                 <!-- Aperçu Photo -->
-                <div class="flex flex-col items-center">
+                <div class="flex flex-col items-center mb-8">
                     @if(Auth::user()->profile_photo)
-                        <img id="vendor-photo-preview" src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Photo de profil" class="w-40 h-40 rounded-full object-cover shadow-lg border-4 border-purple-400 mb-6">
+                        <img id="vendor-photo-preview" src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Photo de profil" class="w-48 h-48 rounded-2xl object-cover shadow-2xl border-4 border-purple-300 transition-transform hover:scale-105">
                     @else
-                        <img id="vendor-photo-preview" src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ urlencode(Auth::user()->email) }}" alt="Avatar" class="w-40 h-40 rounded-full object-cover shadow-lg border-4 border-purple-400 mb-6">
+                        <div class="w-48 h-48 rounded-2xl bg-gradient-to-br from-purple-200 to-blue-200 flex items-center justify-center text-6xl shadow-xl border-4 border-purple-300">
+                            👤
+                        </div>
                     @endif
                 </div>
 
-                <!-- Input Fichier -->
-                <div>
-                    <label for="vendor-profile-photo" class="block text-sm font-semibold text-gray-700 mb-3">Choisir une photo</label>
-                    <input type="file" id="vendor-profile-photo" name="profile_photo" accept="image/*" class="w-full px-4 py-3 border-2 border-dashed rounded-lg focus:border-purple-500" style="border-color: @error('profile_photo') #ef4444 @else #c4b5fd @enderror;" onchange="previewVendorPhoto(event)">
-                    @error('profile_photo')
-                        <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
-                    @enderror
-                    <p class="text-gray-500 text-xs mt-2">📁 JPG, PNG, GIF - Max 2 MB</p>
+                <!-- Zone de dépôt -->
+                <div class="border-2 border-dashed border-purple-300 rounded-2xl p-8 text-center hover:border-purple-500 hover:bg-purple-50 transition cursor-pointer" id="dropZone">
+                    <input type="file" id="vendor-profile-photo" name="profile_photo" accept="image/*" class="hidden" onchange="previewVendorPhoto(event)">
+
+                    <p class="text-4xl mb-3">🖼️</p>
+                    <p class="text-gray-900 font-bold text-lg">Glissez votre photo ici ou cliquez</p>
+                    <p class="text-gray-500 text-sm mt-2">JPG, PNG, GIF • Max 2 MB</p>
                 </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 shadow-sm">
-                    💾 Mettre à jour la photo
+                @error('profile_photo')
+                    <p class="text-red-600 text-sm text-center mt-2">{{ $message }}</p>
+                @enderror
+
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-4 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl text-lg">
+                    💾 Enregistrer la photo
                 </button>
             </form>
         </div>
 
-        <!-- Infos Personnelles -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 p-8 mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">📋 Informations Personnelles</h2>
+        <!-- Section Informations Personnelles -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-10 mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-xl">
+                    👤
+                </div>
+                Informations Personnelles
+            </h2>
 
             <form action="{{ route('vendeur.profil.update') }}" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Nom -->
+                    <!-- Nom Complet -->
                     <div>
-                        <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Nom Complet</label>
+                        <label for="name" class="block text-sm font-bold text-gray-900 mb-3">Nom Complet</label>
                         <input
                             type="text"
                             id="name"
                             name="name"
                             value="{{ old('name', Auth::user()->name) }}"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('name') #ef4444 @else #d1d5db @enderror;"
+                            placeholder="Jean Dupont"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-gray-50"
                         >
                         @error('name')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Email -->
                     <div>
-                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                        <label for="email" class="block text-sm font-bold text-gray-900 mb-3">Email</label>
                         <input
                             type="email"
                             id="email"
                             name="email"
                             value="{{ old('email', Auth::user()->email) }}"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('email') #ef4444 @else #d1d5db @enderror;"
+                            placeholder="votre@email.com"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-gray-50"
                         >
                         @error('email')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 shadow-sm">
-                    <x-icon name="check-circle" class="w-4 h-4 inline mr-1" /> Mettre à jour
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl">
+                    ✓ Mettre à jour
                 </button>
             </form>
         </div>
 
-        <!-- Infos Boutique -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 p-8 mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-icon name="store" class="w-6 h-6 text-blue-600" /> Informations Boutique</h2>
+        <!-- Section Informations Boutique -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-10 mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-xl">
+                    🏪
+                </div>
+                Informations Boutique
+            </h2>
 
             <form action="{{ route('vendeur.profil.update') }}" method="POST" class="space-y-6">
                 @csrf
@@ -108,111 +145,142 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Nom Boutique -->
                     <div>
-                        <label for="shop_name" class="block text-sm font-semibold text-gray-700 mb-2">Nom de la Boutique</label>
+                        <label for="shop_name" class="block text-sm font-bold text-gray-900 mb-3">Nom de la Boutique *</label>
                         <input
                             type="text"
                             id="shop_name"
                             name="shop_name"
                             value="{{ old('shop_name', Auth::user()->shop_name ?? '') }}"
-                            placeholder="Ex: Ma Boutique Électronique"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('shop_name') #ef4444 @else #d1d5db @enderror;"
+                            placeholder="Ma Boutique Électronique"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition bg-gray-50"
                         >
                         @error('shop_name')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Téléphone -->
                     <div>
-                        <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">Téléphone</label>
+                        <label for="phone" class="block text-sm font-bold text-gray-900 mb-3">Téléphone *</label>
                         <input
                             type="tel"
                             id="phone"
                             name="phone"
                             value="{{ old('phone', Auth::user()->phone ?? '') }}"
-                            placeholder="Ex: +221 77 123 45 67"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('phone') #ef4444 @else #d1d5db @enderror;"
+                            placeholder="+225 07 69 23 70 65"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition bg-gray-50"
                         >
                         @error('phone')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
                 <!-- Adresse -->
                 <div>
-                    <label for="address" class="block text-sm font-semibold text-gray-700 mb-2">Adresse</label>
+                    <label for="address" class="block text-sm font-bold text-gray-900 mb-3">Adresse *</label>
                     <textarea
                         id="address"
                         name="address"
                         rows="3"
-                        placeholder="Votre adresse complète"
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('address') #ef4444 @else #d1d5db @enderror;"
+                        placeholder="Votre adresse complète (rue, commune, quartier)"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition bg-gray-50"
                     >{{ old('address', Auth::user()->address ?? '') }}</textarea>
                     @error('address')
-                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Description -->
                 <div>
-                    <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Description (Bio)</label>
+                    <label for="description" class="block text-sm font-bold text-gray-900 mb-3">Description de Votre Boutique</label>
                     <textarea
                         id="description"
                         name="description"
-                        rows="3"
-                        placeholder="Parlez un peu de vous et de votre boutique..."
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: @error('description') #ef4444 @else #d1d5db @enderror;"
+                        rows="4"
+                        placeholder="Parlez de votre boutique, vos spécialités, votre expérience..."
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 transition bg-gray-50"
                     >{{ old('description', Auth::user()->description ?? '') }}</textarea>
+                    <p class="text-gray-500 text-xs mt-2">Cette description sera affichée sur votre profil</p>
                     @error('description')
-                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 shadow-sm">
-                    <x-icon name="check-circle" class="w-4 h-4 inline mr-1" /> Mettre à jour la boutique
+                <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl">
+                    ✓ Mettre à jour la boutique
                 </button>
             </form>
         </div>
 
-        <!-- Sécurité -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 p-8 mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-icon name="lock" class="w-6 h-6 text-red-600" /> Sécurité</h2>
+        <!-- Section Sécurité -->
+        <div class="bg-gradient-to-r from-red-50 to-orange-50 rounded-2xl shadow-xl border border-red-200 p-10 mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-xl">
+                    🔐
+                </div>
+                Sécurité & Confidentialité
+            </h2>
 
-            <a href="{{ route('profile.edit') }}" class="inline-flex items-center bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 shadow-sm">
-                🔑 Changer mon mot de passe
-            </a>
+            <div class="space-y-4">
+                <p class="text-gray-700">Gérez la sécurité de votre compte et changez votre mot de passe.</p>
+                <a href="{{ route('profile.edit') }}" class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl">
+                    🔑 Changer mon mot de passe
+                </a>
+            </div>
         </div>
 
         <!-- Conseil -->
-        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
-            <p class="text-blue-700">
-                💡 <strong>Conseil :</strong> Maintenez vos informations à jour pour que vos clients puissent vous contacter facilement !
-            </p>
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border-2 border-blue-300 p-8">
+            <div class="flex gap-4">
+                <span class="text-4xl flex-shrink-0">💡</span>
+                <div>
+                    <p class="text-blue-900 font-bold text-lg mb-2">Conseil Important</p>
+                    <p class="text-blue-800">Maintenez vos informations à jour pour que vos clients puissent vous trouver facilement et vous contacter. Une boutique bien complétée inspire confiance et obtient plus de commandes!</p>
+                </div>
+            </div>
         </div>
-
+    </div>
 </div>
 
 <script>
+    // Drag & Drop
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('vendor-profile-photo');
+
+    if (dropZone) {
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-purple-500', 'bg-purple-50');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-purple-500', 'bg-purple-50');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-purple-500', 'bg-purple-50');
+            fileInput.files = e.dataTransfer.files;
+            previewVendorPhoto({ target: { files: e.dataTransfer.files } });
+        });
+    }
+
     function previewVendorPhoto(event) {
         const file = event.target.files[0];
-        const preview = document.getElementById('vendor-photo-preview');
+        if (!file) return;
 
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                if (preview.tagName === 'IMG') {
-                    preview.src = e.target.result;
-                } else {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'w-40 h-40 rounded-full object-cover shadow-lg border-4 border-purple-400';
-                    preview.innerHTML = '';
-                    preview.appendChild(img);
-                }
-            };
-            reader.readAsDataURL(file);
-        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('vendor-photo-preview');
+            if (preview) {
+                preview.src = e.target.result;
+                preview.className = 'w-48 h-48 rounded-2xl object-cover shadow-2xl border-4 border-purple-300 transition-transform hover:scale-105';
+            }
+        };
+        reader.readAsDataURL(file);
     }
 </script>
 @endsection

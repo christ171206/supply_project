@@ -57,4 +57,23 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Switch vendor role to client mode.
+     */
+    public function switchToClient(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Vérifier que l'utilisateur est authentifié
+        if (!$user) {
+            return Redirect::route('login');
+        }
+
+        // Changer le rôle de l'utilisateur à client
+        $user->update(['role' => 'client']);
+
+        // Message de succès
+        return Redirect::route('client.dashboard')->with('success', 'Vous êtes maintenant en mode client.');
+    }
 }

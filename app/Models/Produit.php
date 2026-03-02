@@ -17,10 +17,12 @@ class Produit extends Model
         'stock_minimum',
         'est_actif',
         'image',
+        'images',
     ];
 
     protected $casts = [
         'est_actif' => 'boolean',
+        'images' => 'array',
     ];
 
     public function categorie()

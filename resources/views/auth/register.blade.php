@@ -430,10 +430,22 @@
         function toggleVendorFields() {
             const vendorFields = document.getElementById('vendorFields');
             const roleVendor = document.getElementById('role_vendor').checked;
+            const shopNameInput = document.getElementById('shop_name');
+            const phoneInput = document.getElementById('phone');
+            const addressInput = document.getElementById('address');
+
             if (roleVendor) {
                 vendorFields.classList.remove('hidden');
+                // Ajouter les attributs required
+                shopNameInput.required = true;
+                phoneInput.required = true;
+                addressInput.required = true;
             } else {
                 vendorFields.classList.add('hidden');
+                // Supprimer les attributs required et vider les champs
+                shopNameInput.required = false;
+                phoneInput.required = false;
+                addressInput.required = false;
             }
         }
 

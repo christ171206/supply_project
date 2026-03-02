@@ -61,10 +61,12 @@
 
             <!-- Formulaire d'envoi avec validation -->
             <div class="border-t border-gray-200 p-6 bg-gray-50">
-                <form id="message-form" class="space-y-3">
+                <form id="message-form" action="{{ route('messages.reply', $otherUser->id) }}" method="POST" class="space-y-3">
+                    @csrf
                     <div class="flex gap-3">
                         <textarea
                             id="message-input"
+                            name="contenu"
                             placeholder="Écrivez votre message (minimum 1 caractère)..."
                             rows="2"
                             minlength="1"
@@ -81,6 +83,7 @@
                     </div>
                     <p id="char-count" class="text-xs text-gray-500 text-right"></p>
                 </form>
+                <div id="alert" class="mt-3 hidden"></div>
             </div>
 
         </div>
@@ -193,12 +196,72 @@
 
         if (content.length < 1) return;
 
-        // Émettre le message
-        socket.emit('send-message', {
-            from_user_id: currentUserId,
-            to_user_id: otherUserId,
-            contenu: content,
-            timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+        // Désactiver le bouton d'envoi
+        sendBtn.disabled = true;
+        sendBtn.textContent = '⏳ Envoi...';
+
+        // Envoyer le message via AJAX
+        fetch('{{ route('messages.reply', $otherUser->id) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                contenu: content
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur lors de l\'envoi du message');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Message envoyé avec succès
+            const messageElement = document.createElement('div');
+            messageElement.className = `flex justify-end`;
+            messageElement.innerHTML = `
+                <div class="max-w-xs lg:max-w-md bg-primary-600 text-white rounded-3xl rounded-tr-none px-5 py-3 shadow-md">
+                    <p class="text-sm leading-relaxed">${escapeHtml(content)}</p>
+                    <div class="flex items-center gap-2 mt-2 justify-end">
+                        <p class="text-xs text-primary-100">
+                            ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                        <span class="text-xs text-primary-400 font-semibold">✓</span>
+                    </div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Réinitialiser le formulaire
+            messageInput.value = '';
+            messageInput.focus();
+            charCount.textContent = '';
+            sendBtn.disabled = false;
+            sendBtn.textContent = '📤 Envoyer';
+
+            // Afficher confirmation
+            const alert = document.getElementById('alert');
+            alert.className = 'mt-3 p-3 bg-green-100 text-green-700 rounded-lg';
+            alert.textContent = '✓ Message envoyé avec succès';
+            alert.classList.remove('hidden');
+            setTimeout(() => alert.classList.add('hidden'), 3000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            sendBtn.disabled = false;
+            sendBtn.textContent = '📤 Envoyer';
+
+            // Afficher erreur
+            const alert = document.getElementById('alert');
+            alert.className = 'mt-3 p-3 bg-red-100 text-red-700 rounded-lg';
+            alert.textContent = '❌ Erreur lors de l\'envoi du message';
+            alert.classList.remove('hidden');
+            setTimeout(() => alert.classList.add('hidden'), 3000);
         });
 
         // Arrêter l'indicateur de typing
@@ -209,11 +272,6 @@
             isTyping: false
         });
         typingIndicator.textContent = '';
-
-        // Réinitialiser le formulaire
-        messageInput.value = '';
-        messageInput.focus();
-        charCount.textContent = '';
         clearTimeout(typingTimeout);
     });
 

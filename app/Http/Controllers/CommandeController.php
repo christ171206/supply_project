@@ -251,7 +251,7 @@ class CommandeController extends Controller
     public function vendeurCommandes(Request $request)
     {
         $user = auth()->user();
-        
+
         // Récupérer les commandes contenant les produits du vendeur
         $query = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
             $q->where('user_id', $user->id);
@@ -262,13 +262,15 @@ class CommandeController extends Controller
             $query->where('statut', $request->statut);
         }
 
-        // Rechercher par numéro de commande
+        // Rechercher par numéro de commande ou client (en gardant le filtre des produits)
         if ($request->filled('search')) {
-            $query->where('id', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('user', function ($q) use ($request) {
-                      $q->where('name', 'like', '%' . $request->search . '%')
-                        ->orWhere('email', 'like', '%' . $request->search . '%');
-                  });
+            $query->where(function ($subQuery) use ($request) {
+                $subQuery->where('id', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('user', function ($q) use ($request) {
+                        $q->where('name', 'like', '%' . $request->search . '%')
+                            ->orWhere('email', 'like', '%' . $request->search . '%');
+                    });
+            });
         }
 
         $derniereCommandes = $query->latest()->paginate(15);

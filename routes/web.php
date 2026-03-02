@@ -19,6 +19,13 @@ Route::get('/', [ProduitController::class, 'index'])->name('accueil');
 Route::get('/produits', [ProduitController::class, 'catalogue'])->name('produits.catalogue');
 Route::get('/produits/{id}', [ProduitController::class, 'show'])->name('produits.show');
 
+// DEBUG ROUTE (tmp)
+Route::get('/debug-user', function () {
+    $user = auth()->user();
+    if (!$user) return 'Non authentifié';
+    return "User: {$user->name} (ID: {$user->id}) | Role: {$user->role}";
+});
+
 // API Routes
 Route::get('/api/produits/{id}', function ($id) {
     $produit = \App\Models\Produit::findOrFail($id, ['id', 'nom', 'prix', 'image', 'stock', 'description']);
@@ -81,6 +88,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
     Route::get('/mes-commandes', [ClientDashboardController::class, 'commandes'])->name('client.commandes');
     Route::get('/commande/{id}', [ClientDashboardController::class, 'commandeDetail'])->name('client.commande-detail');
+    Route::post('/commande/{id}/cancel', [ClientDashboardController::class, 'cancelCommande'])->name('client.commande.cancel');
     Route::get('/mon-profil', [ClientDashboardController::class, 'profil'])->name('client.profil');
     Route::put('/mon-profil', [ClientDashboardController::class, 'updateProfil'])->name('client.profil.update');
     Route::patch('/mon-profil/photo', [ClientDashboardController::class, 'updateProfilPhoto'])->name('client.profil.photo');
@@ -156,6 +164,9 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
     Route::get('/api/statistics/sales', [VendorStatisticsController::class, 'getSalesData'])->name('statistics.sales');
     Route::get('/api/statistics/inventory', [VendorStatisticsController::class, 'getInventoryStatus'])->name('statistics.inventory');
     Route::get('/api/statistics/customers', [VendorStatisticsController::class, 'getCustomerMetrics'])->name('statistics.customers');
+
+    // Role Switching - Vendeur to Client only
+    Route::post('/switch-client', [VendeurProduitController::class, 'switchToClient'])->name('switch-client');
 });
 
 require __DIR__ . '/auth.php';

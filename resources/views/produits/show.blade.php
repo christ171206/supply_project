@@ -23,7 +23,14 @@
             <div class="bg-white rounded-lg overflow-hidden sticky top-20 border border-gray-200 shadow-md">
                 <!-- Image Principale -->
                 <div class="bg-gray-100 flex items-center justify-center aspect-square overflow-hidden" id="main-image-container">
-                    @if($produit->image)
+                    @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
+                        <img
+                            src="{{ asset('storage/' . $produit->images[0]) }}"
+                            alt="{{ $produit->nom }}"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            id="main-image"
+                        >
+                    @elseif($produit->image)
                         <img
                             src="{{ asset('storage/produits/' . $produit->image) }}"
                             alt="{{ $produit->nom }}"
@@ -42,10 +49,21 @@
                     @endif
                 </div>
 
-                <!-- Miniatures (Placeholder pour futures images multiples) -->
+                <!-- Miniatures (Galerie d'images) -->
                 <div class="bg-white p-3 border-t border-gray-200">
                     <div class="flex gap-2 overflow-x-auto">
-                        @if($produit->image)
+                        @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
+                            @foreach($produit->images as $index => $imagePath)
+                                <button
+                                    class="flex-shrink-0 w-16 h-16 rounded-lg border-2 {{ $index === 0 ? 'border-primary-500' : 'border-gray-300' }} overflow-hidden bg-gray-100 hover:border-primary-400 transition"
+                                    title="Image {{ $index + 1 }}"
+                                    aria-label="Visualiser l'image {{ $index + 1 }}"
+                                    onclick="document.getElementById('main-image').src = '{{ asset('storage/' . $imagePath) }}';"
+                                >
+                                    <img src="{{ asset('storage/' . $imagePath) }}" alt="{{ $produit->nom }} - Image {{ $index + 1 }}" class="w-full h-full object-cover" />
+                                </button>
+                            @endforeach
+                        @elseif($produit->image)
                             <button
                                 class="flex-shrink-0 w-16 h-16 rounded-lg border-2 border-primary-500 overflow-hidden bg-gray-100"
                                 title="Image principale"
