@@ -56,11 +56,11 @@
                     <!-- Image du produit -->
                     <div class="relative h-48 bg-gray-100 overflow-hidden">
                         @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
-                            <img src="{{ asset('storage/' . $produit->images[0]) }}"
+                            <img src="{{ asset('storage/produits/' . $produit->images[0]) }}"
                                  alt="{{ $produit->nom }}"
                                  class="w-full h-full object-cover hover:scale-105 transition">
                         @elseif($produit->image)
-                            <img src="{{ asset('storage/' . $produit->image) }}"
+                            <img src="{{ asset('storage/produits/' . $produit->image) }}"
                                  alt="{{ $produit->nom }}"
                                  class="w-full h-full object-cover hover:scale-105 transition">
                         @else
@@ -136,19 +136,16 @@
                                class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold text-center">
                                 ✏️ Éditer
                             </a>
-                            <button onclick="confirmDelete({{ $produit->id }})"
-                                    class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold">
-                                🗑️ Supprimer
-                            </button>
+                            <form method="POST" action="{{ route('vendeur.produits.destroy', $produit->id) }}" class="flex flex-1" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est définitive.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold">
+                                    🗑️ Supprimer
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
-
-                <!-- Formulaire suppression caché -->
-                <form id="delete-form-{{ $produit->id }}" method="POST" action="{{ route('vendeur.produits.destroy', $produit->id) }}" style="display:none;">
-                    @csrf
-                    @method('DELETE')
-                </form>
             @endforeach
         </div>
 
@@ -170,12 +167,4 @@
         </div>
     @endif
 </div>
-
-<script>
-function confirmDelete(productId) {
-    if(confirm('Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est définitive.')) {
-        document.getElementById('delete-form-' + productId).submit();
-    }
-}
-</script>
 @endsection

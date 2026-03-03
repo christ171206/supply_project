@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class VendeurProduitController extends Controller
 {
@@ -387,25 +388,51 @@ class VendeurProduitController extends Controller
      */
     public function destroy($id)
     {
-        $user = Auth::user();
-        $produit = Produit::where('user_id', $user->id)->findOrFail($id);
+        try {
+            $user = Auth::user();
+            \Log::info('Suppression produit - Début', ['user_id' => $user->id, 'produit_id' => $id]);
 
-        // Supprimer les images multiples
-        if ($produit->images && is_array($produit->images)) {
-            foreach ($produit->images as $image) {
-                if (Storage::disk('public')->exists($image)) {
-                    Storage::disk('public')->delete($image);
+            $produit = Produit::where('user_id', $user->id)->findOrFail($id);
+            \Log::info('Produit trouvé', ['nom' => $produit->nom]);
+
+            // Supprimer les images multiples
+            if ($produit->images && is_array($produit->images)) {
+                foreach ($produit->images as $image) {
+                    // Ajouter le préfixe "produits/" s'il n'existe pas
+                    $imagePath = str_starts_with($image, 'produits/') ? $image : 'produits/' . $image;
+                    \Log::info('Vérification image', ['image' => $image, 'path' => $imagePath]);
+
+                    if (Storage::disk('public')->exists($imagePath)) {
+                        Storage::disk('public')->delete($imagePath);
+                        \Log::info('Image supprimée', ['path' => $imagePath]);
+                    }
+                }
+            } else if ($produit->image) {
+                // Ajouter le préfixe "produits/" s'il n'existe pas
+                $imagePath = str_starts_with($produit->image, 'produits/') ? $produit->image : 'produits/' . $produit->image;
+                \Log::info('Vérification image legacy', ['image' => $produit->image, 'path' => $imagePath]);
+
+                if (Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                    \Log::info('Image legacy supprimée', ['path' => $imagePath]);
                 }
             }
-        } else if ($produit->image && Storage::disk('public')->exists($produit->image)) {
-            // Supprimer l'image legacy si elle existe
-            Storage::disk('public')->delete($produit->image);
+
+            $produit->delete();
+            \Log::info('Produit supprimé', ['produit_id' => $id]);
+
+            return redirect()->route('vendeur.produits.index')
+                ->with('success', 'Produit supprimé avec succès!');
+        } catch (\Exception $e) {
+            \Log::error('Erreur suppression produit', [
+                'produit_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->route('vendeur.produits.index')
+                ->with('error', 'Erreur lors de la suppression: ' . $e->getMessage());
         }
-
-        $produit->delete();
-
-        return redirect()->route('vendeur.produits.index')
-            ->with('success', 'Produit supprimé avec succès!');
     }
 
     /**

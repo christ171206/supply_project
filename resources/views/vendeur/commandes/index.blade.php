@@ -11,10 +11,10 @@
     <!-- Filtres et Recherche -->
     <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
         <form method="GET" class="flex flex-wrap gap-4">
-            <input type="text" name="search" placeholder="Rechercher par n° commande ou client..." 
+            <input type="text" name="search" placeholder="Rechercher par n° commande ou client..."
                    class="flex-1 min-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                    value="{{ request('search') }}">
-            
+
             <select name="statut" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
                 <option value="">Tous les statuts</option>
                 <option value="en_attente" {{ request('statut') == 'en_attente' ? 'selected' : '' }}>En Attente</option>
@@ -84,19 +84,10 @@
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <div class="flex flex-wrap gap-2">
-                                    <a href="{{ route('vendeur.commandes.show', $commande->id) }}" 
+                                    <a href="{{ route('vendeur.commandes.show', $commande->id) }}"
                                        class="inline-block px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold text-xs whitespace-nowrap">
                                         👁️ Détails
                                     </a>
-
-                                    @if($commande->statut !== 'livree' && $commande->statut !== 'annulee')
-                                        <form action="{{ route('vendeur.commandes.cancel', $commande->id) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr d\'annuler cette commande? Le stock sera rétabli.');">
-                                            @csrf
-                                            <button type="submit" class="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold text-xs whitespace-nowrap">
-                                                ⛔ Annuler
-                                            </button>
-                                        </form>
-                                    @endif
 
                                     @if(in_array($commande->statut, ['en_attente', 'annulee']))
                                         <form action="{{ route('vendeur.commandes.delete', $commande->id) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande? Cette action est irréversible.');">

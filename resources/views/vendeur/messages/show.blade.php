@@ -33,7 +33,7 @@
             <h3 class="text-lg font-bold text-gray-900 mb-4">📦 Produit discuté</h3>
             <div class="flex gap-4">
                 @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
-                    <img src="{{ asset('storage/' . $produit->images[0]) }}" alt="{{ $produit->nom }}" class="w-24 h-24 object-cover rounded-lg">
+                    <img src="{{ asset('storage/produits/' . $produit->images[0]) }}" alt="{{ $produit->nom }}" class="w-24 h-24 object-cover rounded-lg">
                 @elseif($produit->image)
                     <img src="{{ asset('storage/produits/' . $produit->image) }}" alt="{{ $produit->nom }}" class="w-24 h-24 object-cover rounded-lg">
                 @else

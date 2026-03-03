@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CommandeController extends Controller
 {
@@ -69,7 +70,7 @@ class CommandeController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info('Store commande - Début', [
+        Log::info('Store commande - Début', [
             'user_id' => auth()->id(),
             'payment_method' => $request->payment_method,
         ]);
@@ -104,7 +105,7 @@ class CommandeController extends Controller
         $user = auth()->user();
         $panier = $user->panier;
 
-        \Log::info('Panier info', [
+        Log::info('Panier info', [
             'panier' => $panier ? $panier->id : 'null',
             'items_count' => $panier ? $panier->items()->count() : 0,
         ]);
@@ -119,7 +120,7 @@ class CommandeController extends Controller
             // Calculer le total
             $total = $panier->items()->sum(DB::raw('quantite * prix_unitaire'));
 
-            \Log::info('Total calculé', ['total' => $total]);
+            Log::info('Total calculé', ['total' => $total]);
 
             // Construire l'adresse complète
             $quartier = \App\Models\CiQuartier::find($request->quartier_id);
@@ -138,11 +139,11 @@ class CommandeController extends Controller
                 'notes' => $request->input('notes', null),
             ]);
 
-            \Log::info('Commande créée', ['commande_id' => $commande->id]);
+            Log::info('Commande créée', ['commande_id' => $commande->id]);
 
             // Ajouter les lignes de commande
             foreach ($panier->items as $item) {
-                \Log::info('Création ligne commande', [
+                Log::info('Création ligne commande', [
                     'produit_id' => $item->produit_id,
                     'quantite' => $item->quantite,
                 ]);
@@ -158,7 +159,7 @@ class CommandeController extends Controller
                 $item->produit->decrement('stock', $item->quantite);
             }
 
-            \Log::info('Lignes commande créées');
+            Log::info('Lignes commande créées');
 
             // Créer le paiement
             $paymentCode = 'PAY-' . strtoupper(\Illuminate\Support\Str::random(12));
@@ -170,16 +171,16 @@ class CommandeController extends Controller
                 'payment_status' => $request->payment_method === 'cash' ? 'initialisee' : 'en_attente',
             ]);
 
-            \Log::info('Paiement créé', ['payment_id' => $payment->id, 'code' => $paymentCode]);
+            Log::info('Paiement créé', ['payment_id' => $payment->id, 'code' => $paymentCode]);
 
             // Vider le panier
             $panier->items()->delete();
 
-            \Log::info('Panier vidé');
+            Log::info('Panier vidé');
 
             DB::commit();
 
-            \Log::info('Commande complète - succès', ['commande_id' => $commande->id]);
+            Log::info('Commande complète - succès', ['commande_id' => $commande->id]);
 
             // Rediriger vers la page de confirmation avec possibilité de paiement
             $redirectUrl = route('commandes.show', $commande->id);
@@ -212,7 +213,7 @@ class CommandeController extends Controller
                     $method = $paymentMethods[$request->payment_method] ?? 'createPayment';
                     $response = $paymentService->$method($paymentData);
 
-                    \Log::info('Réponse API Paiement', $response);
+                    Log::info('Réponse API Paiement', $response);
 
                     // Si succès, rediriger vers la plateforme de paiement
                     if (isset($response['code']) && $response['code'] == 'SUCCESFUL') {
@@ -224,7 +225,7 @@ class CommandeController extends Controller
                             ->with('warning', 'Paiement en attente de confirmation');
                     }
                 } catch (\Exception $paymentError) {
-                    \Log::error('Erreur API Paiement: ' . $paymentError->getMessage());
+                    Log::error('Erreur API Paiement: ' . $paymentError->getMessage());
                     // Rediriger vers la commande même en cas d'erreur API
                     return redirect()->to($redirectUrl)
                         ->with('warning', 'Commande créée mais vérification paiement échouée. Veuillez réessayer.');
@@ -236,7 +237,7 @@ class CommandeController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur création commande: ' . $e->getMessage(), [
+            Log::error('Erreur création commande: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),

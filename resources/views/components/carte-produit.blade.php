@@ -2,7 +2,7 @@
     <!-- Image du produit - Optimisée -->
     <div class="relative h-72 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex items-center justify-center">
         @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
-            <img src="{{ asset('storage/' . $produit->images[0]) }}" alt="{{ $produit->nom }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <img src="{{ asset('storage/produits/' . $produit->images[0]) }}" alt="{{ $produit->nom }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
         @elseif($produit->image)
             <img src="{{ asset('storage/produits/' . $produit->image) }}" alt="{{ $produit->nom }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
         @endif

@@ -32,8 +32,8 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        \Log::info('Inscription reçue', ['role' => $request->role, 'name' => $request->name]);
-        \Log::info('Données du formulaire', [
+        Log::info('Inscription reçue', ['role' => $request->role, 'name' => $request->name]);
+        Log::info('Données du formulaire', [
             'shop_name' => $request->shop_name,
             'phone' => $request->phone,
             'address' => $request->address,
@@ -60,7 +60,7 @@ class RegisteredUserController extends Controller
             }
         }
 
-        \Log::info('Règles de validation', ['rules' => array_keys($validationRules)]);
+        Log::info('Règles de validation', ['rules' => array_keys($validationRules)]);
 
         try {
             // Valider tous les champs à la fois
@@ -71,9 +71,9 @@ class RegisteredUserController extends Controller
                 'id_document.mimes' => 'Le document doit être une image (JPEG, PNG)',
                 'id_document.max' => 'Le fichier ne doit pas dépasser 5MB',
             ]);
-            \Log::info('Validation réussie');
+            Log::info('Validation réussie');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Erreur validation', ['errors' => $e->errors()]);
+            Log::error('Erreur validation', ['errors' => $e->errors()]);
             throw $e;
         }
 
@@ -102,7 +102,7 @@ class RegisteredUserController extends Controller
 
         // Créer l'utilisateur
         $user = User::create($userData);
-        \Log::info('Utilisateur créé', ['user_id' => $user->id, 'role' => $user->role]);
+        Log::info('Utilisateur créé', ['user_id' => $user->id, 'role' => $user->role]);
 
         // Générer un code de vérification (6 chiffres)
         $verificationCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -122,7 +122,7 @@ class RegisteredUserController extends Controller
             'verification_code_debug' => config('app.env') === 'local' ? $verificationCode : null,
         ]);
 
-        \Log::info('Code de vérification envoyé', ['email' => $user->email]);
+        Log::info('Code de vérification envoyé', ['email' => $user->email]);
 
         // Rediriger vers la page de vérification du code
         return redirect()->route('verification.code.show');

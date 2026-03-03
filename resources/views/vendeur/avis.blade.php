@@ -58,25 +58,25 @@
     <!-- Graphique Répartition -->
     <div class="bg-white rounded-xl shadow-md border border-gray-100 p-8 mb-8">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Répartition des Notes</h2>
-        <div class="space-y-4">
+        <div class="space-y-5">
             @for($i = 5; $i >= 1; $i--)
-                <div class="flex items-center gap-4">
-                    <div class="w-20">
+                <div class="flex items-center gap-6">
+                    <div class="w-32 flex-shrink-0">
                         <div class="flex gap-1">
                             @for($j = 1; $j <= 5; $j++)
-                                <span class="text-lg">{{ $j <= $i ? '⭐' : '☆' }}</span>
+                                <span class="text-xl">{{ $j <= $i ? '⭐' : '☆' }}</span>
                             @endfor
                         </div>
                     </div>
-                    <div class="flex-1">
-                        <div class="h-4 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="flex-1 min-w-0">
+                        <div class="h-6 bg-gray-200 rounded-full overflow-hidden">
                             <div
                                 class="h-full rounded-full transition-all duration-500"
                                 style="width: {{ $nombreAvis > 0 ? (($avisParNote[$i] ?? 0) / $nombreAvis * 100) : 0 }}%; background: linear-gradient(90deg, rgb(251, 191, 36), rgb(34, 197, 94));"
                             ></div>
                         </div>
                     </div>
-                    <span class="w-16 text-right font-bold text-gray-900">{{ $avisParNote[$i] ?? 0 }}</span>
+                    <span class="w-12 text-right font-bold text-gray-900 flex-shrink-0">{{ $avisParNote[$i] ?? 0 }}</span>
                 </div>
             @endfor
         </div>

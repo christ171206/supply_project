@@ -183,7 +183,7 @@
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="statut" value="confirmee">
-                                <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105">
                                     ✓ CONFIRMER LA COMMANDE
                                 </button>
                                 <p class="text-xs text-gray-700 mt-2">La commande passe du statut "En Attente" à "Confirmée"</p>

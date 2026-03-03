@@ -25,7 +25,7 @@
                 <div class="bg-gray-100 flex items-center justify-center aspect-square overflow-hidden" id="main-image-container">
                     @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
                         <img
-                            src="{{ asset('storage/' . $produit->images[0]) }}"
+                            src="{{ asset('storage/produits/' . $produit->images[0]) }}"
                             alt="{{ $produit->nom }}"
                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             id="main-image"
@@ -58,9 +58,9 @@
                                     class="flex-shrink-0 w-16 h-16 rounded-lg border-2 {{ $index === 0 ? 'border-primary-500' : 'border-gray-300' }} overflow-hidden bg-gray-100 hover:border-primary-400 transition"
                                     title="Image {{ $index + 1 }}"
                                     aria-label="Visualiser l'image {{ $index + 1 }}"
-                                    onclick="document.getElementById('main-image').src = '{{ asset('storage/' . $imagePath) }}';"
+                                    onclick="document.getElementById('main-image').src = '{{ asset('storage/produits/' . $imagePath) }}';"
                                 >
-                                    <img src="{{ asset('storage/' . $imagePath) }}" alt="{{ $produit->nom }} - Image {{ $index + 1 }}" class="w-full h-full object-cover" />
+                                    <img src="{{ asset('storage/produits/' . $imagePath) }}" alt="{{ $produit->nom }} - Image {{ $index + 1 }}" class="w-full h-full object-cover" />
                                 </button>
                             @endforeach
                         @elseif($produit->image)
