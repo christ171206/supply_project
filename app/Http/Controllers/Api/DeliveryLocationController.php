@@ -7,7 +7,7 @@ use App\Models\CiCommune;
 use App\Models\CiDistrict;
 use App\Models\CiQuartier;
 use App\Models\CiRegion;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\JsonResponse; // Correction : 'use' au lieu de 'uses'
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -95,14 +95,13 @@ class DeliveryLocationController extends Controller
 
     /**
      * Search locations by name (autocomplete)
-     * Search across all location types with detailed information
      */
     public function search(Request $request): JsonResponse
     {
         try {
             $query = $request->get('q', '');
 
-            if (strlen($query) < 1) {
+            if (empty($query) || strlen($query) < 1) {
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Entrez au moins 1 caractère',
@@ -112,114 +111,66 @@ class DeliveryLocationController extends Controller
 
             $searchPattern = "%{$query}%";
 
-            // Régions
+            // 1. Régions
             $regions = CiRegion::where('name', 'LIKE', $searchPattern)
-                ->limit(10)
-                ->get(['id', 'name', 'code']);
+                ->limit(5)
+                ->get(['id', 'name', 'code'])
+                ->map(fn($r) => [
+                    'id' => $r->id,
+                    'name' => $r->name,
+                    'type' => 'region',
+                    'code' => $r->code,
+                    'display' => $r->name,
+                    'breadcrumb' => $r->name,
+                ]);
 
-            // Districts
-            $districts = CiDistrict::whereHas('region')
+            // 2. Districts
+            $districts = CiDistrict::with('region')
                 ->where('name', 'LIKE', $searchPattern)
-                ->with('region')
-                ->limit(10)
+                ->limit(5)
                 ->get()
                 ->map(fn($d) => [
                     'id' => $d->id,
                     'name' => $d->name,
                     'type' => 'district',
-                    'region_id' => $d->region_id,
                     'region' => $d->region->name ?? null,
                     'display' => $d->name . ' (' . ($d->region->name ?? '') . ')',
                     'breadcrumb' => ($d->region->name ?? '') . ' > ' . $d->name,
                 ]);
 
-            // Communes
-            $communes = CiCommune::whereHas('district')
+            // 3. Communes
+            $communes = CiCommune::with('district.region')
                 ->where('name', 'LIKE', $searchPattern)
-                ->with('district.region')
-                ->limit(10)
+                ->limit(5)
                 ->get()
                 ->map(fn($c) => [
                     'id' => $c->id,
                     'name' => $c->name,
                     'type' => 'commune',
-                    'district_id' => $c->district_id,
-                    'district' => $c->district->name ?? null,
-                    'region_id' => $c->district->region_id ?? null,
-                    'region' => $c->district->region->name ?? null,
                     'display' => $c->name . ' (' . ($c->district->name ?? '') . ')',
                     'breadcrumb' => ($c->district->region->name ?? '') . ' > ' . ($c->district->name ?? '') . ' > ' . $c->name,
                 ]);
 
-            // Quartiers
-            $quartiers = CiQuartier::whereHas('commune')
+            // 4. Quartiers - Correction de la syntaxe ici
+            $quartiers = CiQuartier::with('commune.district.region')
                 ->where('name', 'LIKE', $searchPattern)
-                ->with('commune.district.region')
-                ->limit(10)
+                ->limit(5)
                 ->get()
                 ->map(fn($q) => [
                     'id' => $q->id,
                     'name' => $q->name,
                     'type' => 'quartier',
-                    'commune_id' => $q->commune_id,
-                    'commune' => $q->commune->name ?? null,
-                    'district_id' => $q->commune->district_id ?? null,
-                    'district' => $q->commune->district->name ?? null,
-                    'region_id' => $q->commune->district->region_id ?? null,
-                    'region' => $q->commune->district->region->name ?? null,
                     'display' => $q->name . ' (' . ($q->commune->name ?? '') . ')',
                     'breadcrumb' => ($q->commune->district->region->name ?? '') . ' > ' .
-                        ($q->commune->district->name ?? '') . ' > ' .
-                        ($q->commune->name ?? '') . ' > ' . $q->name,
+                                    ($q->commune->district->name ?? '') . ' > ' .
+                                    ($q->commune->name ?? '') . ' > ' . $q->name,
                 ]);
 
             $results = [];
-
-            // Ajouter les résultats groupés
-            if ($regions->isNotEmpty()) {
-                $results[] = [
-                    'group' => 'Régions (Villes)',
-                    'items' => $regions->map(fn($r) => [
-                        'id' => $r->id,
-                        'name' => $r->name,
-                        'type' => 'region',
-                        'code' => $r->code,
-                        'display' => $r->name,
-                    ])->toArray(),
-                ];
-            }
-
-            if ($districts->isNotEmpty()) {
-                $results[] = [
-                    'group' => 'Districts',
-                    'items' => $districts->toArray(),
-                ];
-            }
-
-            if ($communes->isNotEmpty()) {
-                $results[] = [
-                    'group' => 'Communes',
-                    'items' => $communes->toArray(),
-                ];
-            }
-
-            if ($quartiers->isNotEmpty()) {
-                $results[] = [
-                    'group' => 'Quartiers',
-                    'items' => $quartiers->toArray(),
-                ];
-            }
-
-            // S'il n'y a aucun résultat
-            if (empty($results)) {
-                return response()->json([
-                    'status' => 'success',
-                    'query' => $query,
-                    'count' => 0,
-                    'data' => [],
-                    'message' => 'Aucun résultat trouvé pour "' . htmlspecialchars($query) . '"'
-                ]);
-            }
+            if ($regions->isNotEmpty()) $results[] = ['group' => 'Régions (Villes)', 'items' => $regions];
+            if ($districts->isNotEmpty()) $results[] = ['group' => 'Districts', 'items' => $districts];
+            if ($communes->isNotEmpty()) $results[] = ['group' => 'Communes', 'items' => $communes];
+            if ($quartiers->isNotEmpty()) $results[] = ['group' => 'Quartiers', 'items' => $quartiers];
 
             return response()->json([
                 'status' => 'success',
@@ -227,11 +178,12 @@ class DeliveryLocationController extends Controller
                 'count' => (count($regions) + count($districts) + count($communes) + count($quartiers)),
                 'data' => $results,
             ]);
+
         } catch (\Exception $e) {
-            Log::error('Erreur search:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            Log::error('Erreur search:', ['error' => $e->getMessage()]);
             return response()->json([
                 'status' => 'error',
-                'message' => 'Erreur lors de la recherche: ' . $e->getMessage(),
+                'message' => 'Erreur lors de la recherche',
             ], 500);
         }
     }
