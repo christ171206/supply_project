@@ -33,7 +33,7 @@ psql --version  # ou mysql --version
 ### 1️⃣ Cloner le projet
 
 ```bash
-git clone https://github.com/votre-repo/supply.git
+git clone https://github.com/christ171206/supply_project.git
 cd supply
 ```
 
