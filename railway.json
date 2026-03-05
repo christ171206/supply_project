@@ -10,8 +10,9 @@
     "healthchecks": [
       {
         "path": "/",
-        "initialDelaySeconds": 30,
-        "periodSeconds": 10
+        "initialDelaySeconds": 45,
+        "periodSeconds": 10,
+        "timeoutSeconds": 5
       }
     ]
   }
