@@ -123,4 +123,28 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->name('admin.')->group
         Route::post('client-exit', [\App\Http\Controllers\Admin\AdminModeController::class, 'exitClientMode'])->name('client-exit');
         Route::get('status', [\App\Http\Controllers\Admin\AdminModeController::class, 'getStatus'])->name('status');
     });
+
+    // Admin Profile Management
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('edit', [\App\Http\Controllers\Admin\AdminProfileController::class, 'edit'])->name('edit');
+        Route::put('update', [\App\Http\Controllers\Admin\AdminProfileController::class, 'update'])->name('update');
+    });
+
+    // Admin Security Settings
+    Route::prefix('security')->name('security.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminSecurityController::class, 'index'])->name('index');
+        Route::post('password', [\App\Http\Controllers\Admin\AdminSecurityController::class, 'updatePassword'])->name('password');
+        Route::post('2fa/enable', [\App\Http\Controllers\Admin\AdminSecurityController::class, 'enableTwoFactor'])->name('2fa.enable');
+        Route::post('2fa/disable', [\App\Http\Controllers\Admin\AdminSecurityController::class, 'disableTwoFactor'])->name('2fa.disable');
+        Route::get('sessions', [\App\Http\Controllers\Admin\AdminSecurityController::class, 'getSessions'])->name('sessions');
+        Route::post('sessions/revoke', [\App\Http\Controllers\Admin\AdminSecurityController::class, 'revokeSession'])->name('sessions.revoke');
+    });
+
+    // Admin Settings
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('index');
+        Route::post('update', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('update');
+        Route::post('export-data', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'exportData'])->name('export-data');
+        Route::get('audit-logs', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'getAuditLogs'])->name('audit-logs');
+    });
 });

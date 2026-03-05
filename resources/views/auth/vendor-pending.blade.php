@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
+<div class="bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4" style="min-height: 100vh;">
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md border border-gray-200">
         <!-- Success Icon with Animation -->
         <div class="flex justify-center mb-6">

@@ -146,8 +146,8 @@ class LocationController extends Controller
                     'label' => '🏠 ' . $quartier->name . ' (' . ($quartier->commune->name ?? '') . ')',
                     'display' => $quartier->name,
                     'breadcrumb' => ($quartier->commune->district->region->name ?? '') . ' > ' .
-                        ($quartier->commune->district->name ?? '') . ' > ' .
-                        ($quartier->commune->name ?? '') . ' > ' . $quartier->name,
+                                    ($quartier->commune->district->name ?? '') . ' > ' .
+                                    ($quartier->commune->name ?? '') . ' > ' . $quartier->name,
                 ];
             }
         }

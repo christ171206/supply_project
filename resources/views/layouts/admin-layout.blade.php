@@ -112,24 +112,136 @@
                         <button id="hamburger-btn" class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition">
                             <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                         </button>
+                        
+                        <!-- Center spacer -->
                         <div></div>
-                        <!-- User Info -->
-                        <div class="flex items-center gap-4">
+                        
+                        <!-- Right section: Notifications + Profile -->
+                        <div class="flex items-center gap-6">
+                            <!-- Notifications -->
+                            <div class="relative group">
+                                <button class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition">
+                                    <x-heroicon-o-bell class="w-5 h-5" />
+                                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                </button>
+                                
+                                <!-- Notifications Dropdown -->
+                                <div class="absolute right-0 mt-0 w-80 bg-white rounded-lg shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                    <div class="p-4 border-b border-gray-100">
+                                        <h3 class="text-sm font-bold text-gray-900">Notifications</h3>
+                                    </div>
+                                    <div class="max-h-96 overflow-y-auto">
+                                        <!-- Sample notifications -->
+                                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition">
+                                            <div class="flex items-start gap-3">
+                                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <x-heroicon-o-user class="w-4 h-4 text-blue-600" />
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-xs font-semibold text-gray-900">Nouveau vendeur en attente</p>
+                                                    <p class="text-xs text-gray-500 mt-1">Test Shop en attente de validation</p>
+                                                    <p class="text-xs text-gray-400 mt-1">Il y a 2 heures</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        
+                                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition">
+                                            <div class="flex items-start gap-3">
+                                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <x-heroicon-o-shopping-cart class="w-4 h-4 text-green-600" />
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-xs font-semibold text-gray-900">Nouvelle commande reçue</p>
+                                                    <p class="text-xs text-gray-500 mt-1">Commande #1 - 680 000 FCFA</p>
+                                                    <p class="text-xs text-gray-400 mt-1">Il y a 4 heures</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        
+                                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 transition">
+                                            <div class="flex items-start gap-3">
+                                                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <x-heroicon-o-exclamation-triangle class="w-4 h-4 text-yellow-600" />
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-xs font-semibold text-gray-900">5 produits en attente de validation</p>
+                                                    <p class="text-xs text-gray-500 mt-1">Veuillez valider les produits</p>
+                                                    <p class="text-xs text-gray-400 mt-1">Il y a 1 jour</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="p-3 border-t border-gray-100 text-center">
+                                        <a href="#" class="text-xs text-blue-600 hover:text-blue-700 font-semibold">Voir toutes les notifications</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mode Client Toggle -->
                             @if(!session('admin_client_mode'))
                                 <form method="POST" action="{{ route('admin.mode.client-enter') }}" class="inline">
                                     @csrf
-                                    <button type="submit" class="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-semibold text-sm">
-                                        <x-heroicon-o-eye class="w-4 h-4" /> Mode Client
+                                    <button type="submit" class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200 transition font-semibold flex items-center gap-1">
+                                        <x-heroicon-o-eye class="w-3 h-3" /> Mode Client
                                     </button>
                                 </form>
                             @endif
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                    {{ substr(auth()->user()->name, 0, 1) }}
-                                </div>
-                                <div class="hidden sm:block">
-                                    <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
-                                    <p class="text-xs text-gray-500">Administrateur</p>
+
+                            <!-- Profile Dropdown -->
+                            <div class="relative group">
+                                <button class="flex items-center gap-3 hover:bg-gray-100 rounded-lg px-3 py-2 transition">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+                                        {{ substr(auth()->user()->name, 0, 1) }}
+                                    </div>
+                                    <div class="hidden sm:block text-left">
+                                        <p class="text-xs font-semibold text-gray-900">{{ auth()->user()->name }}</p>
+                                        <p class="text-xs text-gray-500">Admin</p>
+                                    </div>
+                                    <x-heroicon-o-chevron-down class="w-4 h-4 text-gray-400" />
+                                </button>
+
+                                <!-- Profile Dropdown Menu -->
+                                <div class="absolute right-0 mt-0 w-48 bg-white rounded-lg shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                    <!-- Profile Info -->
+                                    <div class="px-4 py-3 border-b border-gray-100">
+                                        <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
+                                        <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
+                                    </div>
+
+                                    <!-- Menu Items -->
+                                    <div class="py-2">
+                                        <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                            <x-heroicon-o-user class="w-4 h-4" />
+                                            <span>Profil</span>
+                                        </a>
+                                        
+                                        <a href="{{ route('admin.security') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                            <x-heroicon-o-lock-closed class="w-4 h-4" />
+                                            <span>Sécurité</span>
+                                        </a>
+
+                                        <a href="{{ route('admin.settings') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                            <x-heroicon-o-cog-6-tooth class="w-4 h-4" />
+                                            <span>Paramètres</span>
+                                        </a>
+
+                                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                            <x-heroicon-o-document-text class="w-4 h-4" />
+                                            <span>Documentation</span>
+                                        </a>
+                                    </div>
+
+                                    <!-- Divider -->
+                                    <div class="border-t border-gray-100 py-2">
+                                        <form action="{{ route('logout') }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                                                <x-heroicon-o-arrow-right-on-rectangle class="w-4 h-4" />
+                                                <span>Déconnexion</span>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
