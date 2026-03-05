@@ -46,6 +46,14 @@ class CommandeController extends Controller
      */
     public function create(Request $request)
     {
+        // Les administrateurs ne peuvent pas passer de commandes (même en mode client, c'est juste pour voir)
+        if (auth()->check() && auth()->user()->is_admin) {
+            $message = session('admin_client_mode')
+                ? 'En mode visualisation client, vous ne pouvez pas passer de commande. C\'est pour voir comment fonctionne la plateforme.'
+                : 'Les administrateurs ne peuvent pas passer de commandes. Activez le mode client pour explorer la plateforme.';
+            return redirect('/admin/dashboard')->with('error', $message);
+        }
+
         // Si non authentifié, rediriger vers login avec intention de retour
         if (!auth()->check()) {
             return redirect()->route('login')->with('message', 'Veuillez vous connecter pour valider votre commande');
@@ -70,6 +78,11 @@ class CommandeController extends Controller
      */
     public function store(Request $request)
     {
+        // Les administrateurs ne peuvent pas passer de commandes
+        if (auth()->check() && auth()->user()->is_admin) {
+            return back()->with('error', 'Les administrateurs n\'ont pas le droit de passer des commandes.');
+        }
+
         Log::info('Store commande - Début', [
             'user_id' => auth()->id(),
             'payment_method' => $request->payment_method,
@@ -77,8 +90,9 @@ class CommandeController extends Controller
 
         $request->validate([
             'payment_method' => 'required|in:wave,orange_money,mtn_money,moov_money,cash',
-            'quartier_id' => 'required|exists:ci_quartiers,id',
+            'quartier_id' => 'nullable|exists:ci_quartiers,id',
             'adresse_detail' => 'required|string|min:5',
+            'pays' => 'nullable|string|max:255',
             'telephone_livraison' => [
                 'required',
                 'string',
@@ -122,9 +136,29 @@ class CommandeController extends Controller
 
             Log::info('Total calculé', ['total' => $total]);
 
-            // Construire l'adresse complète
-            $quartier = \App\Models\CiQuartier::find($request->quartier_id);
-            $adresseLivraison = $quartier->name . ', ' . $quartier->commune->name;
+            // Construire l'adresse complète (optionnelle si quartier fourni)
+            $adresseLivraison = '';
+            if ($request->quartier_id) {
+                $quartier = \App\Models\CiQuartier::find($request->quartier_id);
+                if ($quartier) {
+                    $adresseLivraison = $quartier->name . ', ' . $quartier->commune->name;
+                }
+            }
+
+            // Si pas d'adresse construite, utiliser le pays et quartier si fournis
+            if (!$adresseLivraison) {
+                $parts = [];
+                if ($request->pays) {
+                    $parts[] = $request->pays;
+                }
+                if ($request->quartier_id) {
+                    $quartier = \App\Models\CiQuartier::find($request->quartier_id);
+                    if ($quartier) {
+                        $parts[] = $quartier->name;
+                    }
+                }
+                $adresseLivraison = implode(', ', $parts) ?: 'Non spécifiée';
+            }
 
             // Créer la commande
             $commande = Commande::create([
@@ -133,6 +167,7 @@ class CommandeController extends Controller
                 'statut' => 'en_attente',
                 'payment_method' => $request->payment_method,
                 'quartier_id' => $request->quartier_id,
+                'pays' => $request->input('pays', 'Côte d\'Ivoire'),
                 'adresse_livraison' => $adresseLivraison,
                 'adresse_detail' => $request->adresse_detail,
                 'telephone_livraison' => $request->telephone_livraison,

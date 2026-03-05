@@ -5,7 +5,10 @@
     <!-- Header -->
     <div class="mb-12 flex justify-between items-center">
         <div>
-            <h1 class="text-5xl font-bold text-slate-700">📦 Gestion du Stock</h1>
+            <h1 class="text-5xl font-bold text-slate-700 flex items-center gap-3">
+                <x-heroicon-o-cube class="w-12 h-12" />
+                <span>Gestion du Stock</span>
+            </h1>
             <p class="text-slate-500 mt-2 text-lg">Gérez vos inventaires et seuils</p>
         </div>
         <a href="{{ route('vendeur.produits.create') }}" class="bg-sky-400 hover:bg-sky-500 text-white px-8 py-4 rounded-lg font-bold transition shadow-md transform hover:scale-105">
@@ -31,16 +34,16 @@
                         @php
                             $etat = 'OK';
                             $statut_classe = 'emerald';
-                            $icon = '✅';
+                            $icon = '✓';
 
                             if ($produit->stock == 0) {
                                 $etat = 'Rupture';
                                 $statut_classe = 'red';
-                                $icon = '❌';
+                                $icon = '✗';
                             } elseif ($produit->stock <= $produit->stock_minimum) {
                                 $etat = 'Faible';
                                 $statut_classe = 'amber';
-                                $icon = '⚠️';
+                                $icon = '⚠';
                             }
                         @endphp
                         <tr class="hover:bg-slate-50 transition">
@@ -55,13 +58,13 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <a href="{{ route('vendeur.produits.edit', $produit->id) }}" class="text-sky-500 hover:text-sky-700 font-bold text-sm hover:underline">✏️ Modifier</a>
+                                <a href="{{ route('vendeur.produits.edit', $produit->id) }}" class="text-sky-500 hover:text-sky-700 font-bold text-sm hover:underline flex items-center justify-center gap-1"><x-heroicon-o-pencil-square class="w-4 h-4" /><span>Modifier</span></a>
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="5" class="px-6 py-12 text-center text-slate-600">
-                                <p class="text-lg mb-2">📦 Aucun produit</p>
+                                <p class="text-lg mb-2 flex items-center justify-center gap-2"><x-heroicon-o-cube class="w-6 h-6" /><span>Aucun produit</span></p>
                                 <p class="text-sm">Vous n'avez pas encore ajouté de produit</p>
                             </td>
                         </tr>
@@ -73,8 +76,8 @@
 
     <!-- Légende -->
     <div class="mt-8 p-6 bg-sky-50 rounded-xl border border-sky-200 shadow-sm">
-        <p class="text-sm text-slate-700 font-semibold">
-            💡 <span class="font-bold">Conseil :</span> Un stock "Faible" signifie qu'il est proche du seuil minimum.
+        <p class="text-sm text-slate-700 font-semibold flex items-center gap-2">
+            <x-heroicon-o-light-bulb class="w-5 h-5 text-amber-500" /><span class="font-bold">Conseil :</span> Un stock "Faible" signifie qu'il est proche du seuil minimum.
             Un stock en "Rupture" signifie qu'il est égal à 0. Cliquez sur "Modifier" pour ajuster les quantités.
         </p>
     </div>

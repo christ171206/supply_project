@@ -50,7 +50,7 @@
 
                     <!-- Avantages Clients -->
                     <div class="mb-12">
-                        <h3 class="text-lg font-bold text-gray-900 mb-6">👥 Pour les Clients</h3>
+                        <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><x-heroicon-o-user-group class="w-5 h-5" /><span>Pour les Clients</span></h3>
                         <div class="space-y-4">
                             <div class="flex gap-3">
                                 <span class="text-2xl flex-shrink-0">💝</span>
@@ -67,7 +67,7 @@
                                 </div>
                             </div>
                             <div class="flex gap-3">
-                                <span class="text-2xl flex-shrink-0">💬</span>
+                                <span class="text-2xl flex-shrink-0"><x-heroicon-o-chat-bubble-left class="w-6 h-6" /></span>
                                 <div>
                                     <p class="font-bold text-gray-900">Support direct</p>
                                     <p class="text-sm text-gray-600">Chat avec les vendeurs</p>
@@ -81,7 +81,7 @@
                         <h3 class="text-lg font-bold text-gray-900 mb-6">🏪 Pour les Vendeurs</h3>
                         <div class="space-y-4">
                             <div class="flex gap-3">
-                                <span class="text-2xl flex-shrink-0">📊</span>
+                                <span class="text-2xl flex-shrink-0"><x-heroicon-o-chart-bar class="w-6 h-6" /></span>
                                 <div>
                                     <p class="font-bold text-gray-900">Tableau de bord complet</p>
                                     <p class="text-sm text-gray-600">Gère ton stock et tes ventes</p>
@@ -95,7 +95,7 @@
                                 </div>
                             </div>
                             <div class="flex gap-3">
-                                <span class="text-2xl flex-shrink-0">💰</span>
+                                <span class="text-2xl flex-shrink-0"><x-heroicon-o-banknotes class="w-6 h-6" /></span>
                                 <div>
                                     <p class="font-bold text-gray-900">Paiements sécurisés</p>
                                     <p class="text-sm text-gray-600">Reçois tes gains rapidement</p>
@@ -131,7 +131,7 @@
                                     required
                                     autofocus
                                     class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors bg-gray-50 text-gray-900 placeholder-gray-500 font-medium"
-                                    placeholder="Jean Dupont"
+                                    placeholder="Kouassi Jean"
                                 >
                                 @error('name')
                                     <p class="mt-2 text-sm text-danger-600">{{ $message }}</p>
@@ -205,7 +205,7 @@
                             <!-- Mot de passe -->
                             <div>
                                 <label for="password" class="block text-sm font-semibold text-gray-900 mb-2">
-                                    🔐 Mot de passe
+                                    <x-heroicon-o-lock-closed class="w-4 h-4" /><span>Mot de passe</span>
                                 </label>
                                 <div class="relative">
                                     <input
@@ -282,7 +282,7 @@
                                             onchange="toggleVendorFields()"
                                         >
                                         <span class="ml-3 flex-grow">
-                                            <span class="text-sm font-semibold text-gray-900">👥 Client</span>
+                                            <span class="text-sm font-semibold text-gray-900">Client</span>
                                             <span class="block text-xs text-gray-600">Achète des produits informatiques</span>
                                         </span>
                                     </label>
@@ -346,7 +346,7 @@
 
                                 <div>
                                     <label for="address" class="block text-sm font-semibold text-gray-900 mb-2">
-                                        📍 Adresse
+                                        <x-heroicon-o-map-pin class="w-4 h-4" /><span>Adresse</span>
                                     </label>
                                     <textarea
                                         id="address"

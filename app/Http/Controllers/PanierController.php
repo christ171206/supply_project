@@ -77,6 +77,11 @@ class PanierController extends Controller
      */
     public function ajouter(Request $request, $produitId)
     {
+        // Les administrateurs ne peuvent pas ajouter d'articles au panier
+        if (auth()->check() && auth()->user()->is_admin) {
+            return back()->with('error', 'Les administrateurs n\'ont pas le droit d\'ajouter des articles au panier. Activez le mode client pour tester la plateforme.');
+        }
+
         $request->validate([
             'quantite' => 'required|integer|min:1',
         ]);
@@ -89,8 +94,8 @@ class PanierController extends Controller
             $panier = $user->panier ?? Panier::create(['user_id' => $user->id]);
 
             $panierItem = PanierItem::where('panier_id', $panier->id)
-                                   ->where('produit_id', $produitId)
-                                   ->first();
+                ->where('produit_id', $produitId)
+                ->first();
 
             if ($panierItem) {
                 $panierItem->quantite += $quantite;
@@ -187,4 +192,3 @@ class PanierController extends Controller
         return redirect()->back()->with('success', 'Panier vidé');
     }
 }
-

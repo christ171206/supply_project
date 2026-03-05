@@ -33,7 +33,7 @@
                 <!-- Flash Messages -->
                 @if ($errors->any())
                     <div class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
-                        <p class="font-semibold">❌ Erreur</p>
+                        <p class="font-semibold">Erreur</p>
                         <ul class="text-sm mt-1">
                             @foreach ($errors->all() as $error)
                                 <li>• {{ $error }}</li>
@@ -45,7 +45,7 @@
                 @if (session('success'))
                     <div class="mb-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded flex justify-between items-center">
                         <div>
-                            <p class="font-semibold">✅ Succès</p>
+                            <p class="font-semibold">Succès</p>
                             <p class="text-sm mt-1">{{ session('success') }}</p>
                         </div>
                         <button onclick="this.parentElement.style.display='none'" class="text-green-500 hover:text-green-700">✕</button>
@@ -55,7 +55,7 @@
                 @if (session('warning'))
                     <div class="mb-4 p-4 bg-orange-50 border-l-4 border-orange-500 text-orange-700 rounded flex justify-between items-center">
                         <div>
-                            <p class="font-semibold">⚠️ Attention</p>
+                            <p class="font-semibold">Attention</p>
                             <p class="text-sm mt-1">{{ session('warning') }}</p>
                         </div>
                         <button onclick="this.parentElement.style.display='none'" class="text-orange-500 hover:text-orange-700">✕</button>
@@ -68,6 +68,7 @@
         </main>
     </div>
 
+    @include('components.confirmation-modal')
     @stack('scripts')
 </body>
 </html>

@@ -3,13 +3,13 @@
 @section('content')
 <div class="space-y-8">
     <!-- Header -->
-    <div>
-        <h1 class="text-4xl font-bold text-gray-900">Tableau de Bord</h1>
+    <div class ="ml-6">
+        <h1   class="text-4xl font-bold text-gray-900"> Tableau de Bord</h1>
         <p class="text-gray-500 mt-2">Gérez votre boutique en ligne</p>
     </div>
 
     <!-- Statistiques de Performance -->
-    <div>
+    <div class ="ml-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Statistiques de Performance</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Chiffre d'affaires total -->
@@ -154,7 +154,7 @@
                 </div>
             </a>
             <a href="{{ route('vendeur.commandes') }}" class="flex items-center gap-3 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition">
-                <div class="text-3xl">📦</div>
+                <div class="text-3xl"><x-heroicon-o-cube class="w-8 h-8" /></div>
                 <div>
                     <p class="font-bold text-gray-900">Voir Commandes</p>
                     <p class="text-sm text-gray-600">Gérer vos commandes</p>
@@ -252,7 +252,7 @@
                         <div class="flex items-start justify-between mb-3">
                             <div>
                                 <p class="font-bold text-gray-900 text-lg">{{ $avis->user->name }}</p>
-                                <p class="text-sm text-gray-600 mt-1">📦 {{ $avis->produit->nom }}</p>
+                                <p class="text-sm text-gray-600 mt-1">{{ $avis->produit->nom }}</p>
                             </div>
                             <div class="text-right">
                                 <div class="flex gap-1 justify-end mb-2">

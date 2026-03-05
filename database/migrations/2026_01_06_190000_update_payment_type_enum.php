@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -16,7 +17,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->enum('typePayement', ['mobile_money', 'carte_bancaire', 'paiement_livraison'])->change();
+            // Utiliser une chaîne régulière au lieu d'enum pour ne pas perdre de données
+            DB::statement("ALTER TABLE payments MODIFY typePayement VARCHAR(255)");
         });
     }
 };

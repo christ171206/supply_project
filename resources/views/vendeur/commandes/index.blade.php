@@ -4,7 +4,10 @@
 <div class="p-8 bg-gradient-to-br from-slate-50 to-white min-h-screen">
     <!-- En-tête -->
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-2">🛒 Commandes Reçues</h1>
+        <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+            <x-heroicon-o-shopping-cart class="w-10 h-10" />
+            <span>Commandes Reçues</span>
+        </h1>
         <p class="text-gray-600">Gestion et suivi de vos commandes clients</p>
     </div>
 
@@ -23,8 +26,9 @@
                 <option value="livree" {{ request('statut') == 'livree' ? 'selected' : '' }}>Livrée</option>
             </select>
 
-            <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold">
-                🔍 Filtrer
+            <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold flex items-center gap-2">
+                <x-heroicon-o-magnifying-glass class="w-5 h-5" />
+                <span>Filtrer</span>
             </button>
         </form>
     </div>
@@ -85,16 +89,22 @@
                             <td class="px-6 py-4 text-sm">
                                 <div class="flex flex-wrap gap-2">
                                     <a href="{{ route('vendeur.commandes.show', $commande->id) }}"
-                                       class="inline-block px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold text-xs whitespace-nowrap">
-                                        👁️ Détails
+                                       class="inline-block px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold text-xs whitespace-nowrap flex items-center gap-1">
+                                        <x-heroicon-o-eye class="w-4 h-4" />
+                                        <span>Détails</span>
                                     </a>
 
                                     @if(in_array($commande->statut, ['en_attente', 'annulee']))
-                                        <form action="{{ route('vendeur.commandes.delete', $commande->id) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande? Cette action est irréversible.');">
+                                        <form action="{{ route('vendeur.commandes.delete', $commande->id) }}" method="POST" class="inline"
+                                              data-confirm="Êtes-vous sûr de vouloir supprimer cette commande? Cette action est irréversible."
+                                              data-confirm-title="Supprimer la commande"
+                                              data-confirm-type="danger"
+                                              data-confirm-button="Supprimer">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-xs whitespace-nowrap">
-                                                🗑️ Supprimer
+                                            <button type="submit" class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-xs whitespace-nowrap flex items-center gap-1">
+                                                <x-heroicon-o-trash class="w-4 h-4" />
+                                                <span>Supprimer</span>
                                             </button>
                                         </form>
                                     @endif
@@ -108,7 +118,7 @@
     @else
         <!-- Pas de commandes -->
         <div class="bg-white rounded-xl shadow-lg p-12 text-center">
-            <p class="text-6xl mb-4">🛒</p>
+            <x-heroicon-o-shopping-cart class="w-24 h-24 mx-auto mb-4 text-gray-400" />
             <h3 class="text-2xl font-bold text-gray-900 mb-2">Aucune commande trouvée</h3>
             <p class="text-gray-600">Vous n'avez pas encore reçu de commandes</p>
         </div>

@@ -5,7 +5,7 @@
     <div class="max-w-6xl mx-auto px-4">
         <!-- Retour -->
         <a href="{{ route('client.commandes') }}" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold mb-8">
-            ← Retour aux commandes
+            <x-heroicon-o-arrow-left class="w-5 h-5" /><span>Retour aux commandes</span>
         </a>
 
         <!-- Header -->
@@ -31,11 +31,11 @@
                             @case('annulee') #991b1b @break
                             @default #111827 @endswitch;">
                         @switch($commande->statut)
-                            @case('en_attente') <x-icon name="clock" class="w-4 h-4 inline mr-1" /> En attente @break
-                            @case('confirmee') <x-icon name="check-circle" class="w-4 h-4 inline mr-1" /> Confirmée @break
-                            @case('expediee') 🚚 Expédiée @break
-                            @case('livree') ✓ Livrée @break
-                            @case('annulee') ❌ Annulée @break
+                            @case('en_attente') <x-heroicon-o-clock class="w-4 h-4 inline mr-1" /><span>En attente</span> @break
+                            @case('confirmee') <x-heroicon-o-check-circle class="w-4 h-4 inline mr-1" /><span>Confirmée</span> @break
+                            @case('expediee') <x-heroicon-o-truck class="w-4 h-4 inline mr-1" /><span>Expédiée</span> @break
+                            @case('livree') <x-heroicon-o-check-circle class="w-4 h-4 inline mr-1" /><span>Livrée</span> @break
+                            @case('annulee') <x-heroicon-o-x-circle class="w-4 h-4 inline mr-1" /><span>Annulée</span> @break
                         @endswitch
                     </span>
                 </div>
@@ -44,7 +44,7 @@
 
         <!-- Suivi de la Commande - Stepper -->
         <div class="mb-12 bg-white rounded-xl shadow-lg p-8 border border-gray-100">
-            <h2 class="text-xl font-bold text-gray-900 mb-8">📍 Suivi de votre commande</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-8 flex items-center gap-2"><x-heroicon-o-map-pin class="w-6 h-6" /><span>Suivi de votre commande</span></h2>
 
             <div class="flex items-center justify-between relative">
                 <!-- Ligne de progression -->
@@ -54,8 +54,8 @@
                     $steps = [
                         'en_attente' => ['label' => 'Validée', 'icon' => '✓', 'color' => 'yellow'],
                         'confirmee' => ['label' => 'Confirmée', 'icon' => '✓', 'color' => 'blue'],
-                        'expediee' => ['label' => 'Expédiée', 'icon' => '🚚', 'color' => 'indigo'],
-                        'livree' => ['label' => 'Livrée', 'icon' => '📦', 'color' => 'green']
+                        'expediee' => ['label' => 'Expédiée', 'icon' => '�', 'color' => 'indigo'],
+                        'livree' => ['label' => 'Livrée', 'color' => 'green']
                     ];
 
                     $statusOrder = ['en_attente', 'confirmee', 'expediee', 'livree'];
@@ -85,22 +85,22 @@
 
             <!-- Message de statut -->
             <div class="mt-8 p-4 rounded-lg {{ $commande->statut === 'livree' ? 'bg-green-50 border border-green-200' : 'bg-blue-50 border border-blue-200' }}">
-                <p class="text-sm font-semibold {{ $commande->statut === 'livree' ? 'text-green-700' : 'text-blue-700' }}">
+                <p class="text-sm font-semibold {{ $commande->statut === 'livree' ? 'text-green-700' : 'text-blue-700' }} flex items-start gap-2">
                     @switch($commande->statut)
                         @case('en_attente')
-                            ⏳ Votre commande est en cours de traitement. Elle sera confirmée très bientôt.
+                            <x-heroicon-o-clock class="w-5 h-5 flex-shrink-0 mt-0.5" /><span>Votre commande est en cours de traitement. Elle sera confirmée très bientôt.</span>
                         @break
                         @case('confirmee')
-                            ✓ Votre commande a été confirmée et sera expédiée dans les prochaines 24h.
+                            <x-heroicon-o-check-circle class="w-5 h-5 flex-shrink-0 mt-0.5" /><span>Votre commande a été confirmée et sera expédiée dans les prochaines 24h.</span>
                         @break
                         @case('expediee')
-                            🚚 Votre commande est en route! Elle devrait arriver entre 2 et 5 jours.
+                            <x-heroicon-o-truck class="w-5 h-5 flex-shrink-0 mt-0.5" /><span>Votre commande est en route! Elle devrait arriver entre 2 et 5 jours.</span>
                         @break
                         @case('livree')
-                            ✓ Commande livrée avec succès! Merci de votre achat. Avez-vous apprécié ce produit? Laissez un avis!
+                            <x-heroicon-o-check-circle class="w-5 h-5 flex-shrink-0 mt-0.5" /><span>Commande livrée avec succès! Merci de votre achat. Avez-vous apprécié ce produit? Laissez un avis!</span>
                         @break
                         @default
-                            ℹ️ Statut: {{ $commande->statut }}
+                            <x-heroicon-o-information-circle class="w-5 h-5 flex-shrink-0 mt-0.5" /><span>Statut: {{ $commande->statut }}</span>
                     @endswitch
                 </p>
             </div>
@@ -114,7 +114,7 @@
                 <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
                     <div class="flex items-center gap-3 mb-8">
                         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-lg">
-                            📅
+                            <x-heroicon-o-calendar class="w-5 h-5" />
                         </div>
                         <h3 class="text-xl font-bold text-gray-900">Informations de la Commande</h3>
                     </div>
@@ -127,18 +127,18 @@
                         <div class="p-4 bg-blue-50 rounded-lg">
                             <p class="text-xs text-gray-600 font-semibold">Mode de Paiement</p>
                             <p class="text-lg font-bold text-gray-900 mt-2">
-                                @if($commande->mode_paiement == 'mobile_money') <x-icon name="smartphone" class="w-4 h-4 inline mr-1" /> Mobile Money
-                                @elseif($commande->mode_paiement == 'carte_bancaire') 💳 Carte Bancaire
-                                @else 🚚 À la livraison @endif
+                                @if($commande->mode_paiement == 'mobile_money') <x-heroicon-o-device-phone-mobile class="w-4 h-4 inline mr-1" /><span>Mobile Money</span>
+                                @elseif($commande->mode_paiement == 'carte_bancaire') <x-heroicon-o-credit-card class="w-4 h-4 inline mr-1" /><span>Carte Bancaire</span>
+                                @else <x-heroicon-o-truck class="w-4 h-4 inline mr-1" /><span>À la livraison</span> @endif
                             </p>
                         </div>
                         <div class="p-4 bg-green-50 rounded-lg">
                             <p class="text-xs text-gray-600 font-semibold">Statut Paiement</p>
                             <p class="text-lg font-bold mt-2 flex items-center gap-2">
                                 @if($commande->paiement_confirme)
-                                    <span class="text-green-600">✓ Payé</span>
+                                    <x-heroicon-o-check-circle class="w-5 h-5 text-green-600" /><span class="text-green-600">Payé</span>
                                 @else
-                                    <span class="text-orange-600 flex items-center gap-1"><x-icon name="clock" class="w-4 h-4" /> En attente</span>
+                                    <x-heroicon-o-clock class="w-4 h-4" /><span class="text-orange-600 flex items-center gap-1">En attente</span>
                                 @endif
                             </p>
                         </div>
@@ -153,7 +153,7 @@
                 <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
                     <div class="flex items-center gap-3 mb-8">
                         <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-lg">
-                            📦
+                            <x-heroicon-o-cube class="w-5 h-5" />
                         </div>
                         <h3 class="text-xl font-bold text-gray-900">Articles Commandés</h3>
                     </div>
@@ -180,7 +180,7 @@
                                         <td class="py-4 px-4">
                                             @if($ligne->produit && $ligne->produit->vendeur)
                                                 <span class="text-sm text-gray-600 flex items-center gap-1">
-                                                    <span>🏪</span>
+                                                    <x-heroicon-o-building-storefront class="w-4 h-4" />
                                                     {{ $ligne->produit->vendeur->name }}
                                                 </span>
                                             @else
@@ -206,7 +206,7 @@
                     <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center text-lg">
-                                🏠
+                                <x-heroicon-o-home class="w-5 h-5" />
                             </div>
                             <h3 class="text-xl font-bold text-gray-900">Adresse de Livraison</h3>
                         </div>
@@ -241,7 +241,7 @@
 
                     <div class="mt-6 pt-6 border-t border-gray-200">
                         <a href="{{ route('commandes.download-pdf', $commande->id) }}" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg font-bold transition">
-                            📄 Télécharger la Facture
+                            <x-heroicon-o-document-arrow-down class="w-5 h-5" /><span>Télécharger la Facture</span>
                         </a>
                     </div>
 
@@ -254,22 +254,26 @@
 
                     @if($peutAnnuler)
                         <div class="mt-4">
-                            <form action="{{ route('client.commande.cancel', $commande->id) }}" method="POST" class="w-full">
+                            <form action="{{ route('client.commande.cancel', $commande->id) }}" method="POST" class="w-full"
+                                  data-confirm="Êtes-vous sûr de vouloir annuler cette commande?"
+                                  data-confirm-title="Annuler la commande"
+                                  data-confirm-type="warning"
+                                  data-confirm-button="Annuler">
                                 @csrf
-                                <button type="submit" class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-bold transition" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette commande?')">
-                                    ❌ Annuler la commande
+                                <button type="submit" class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-bold transition">
+                                    <x-heroicon-o-no-symbol class="w-5 h-5" /><span>Annuler la commande</span>
                                 </button>
                             </form>
-                            <p class="text-xs text-red-600 mt-2 text-center">⏰ Vous avez {{ round($minutesRestantes, 1) }} minute(s) pour annuler</p>
+                            <p class="text-xs text-red-600 mt-2 text-center flex items-center justify-center gap-1"><x-heroicon-o-clock class="w-3 h-3" /><span>Vous avez {{ round($minutesRestantes, 1) }} minute(s) pour annuler</span></p>
                         </div>
                     @endif
                 </div>
 
                 <!-- Actions -->
                 <div class="mt-6 bg-blue-50 rounded-xl border border-blue-200 p-6">
-                    <p class="text-blue-900 text-sm font-semibold">💡 Besoin d'aide?</p>
-                    <a href="{{ route('client.messages') }}" class="mt-4 block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-bold transition">
-                        💬 Contacter le vendeur
+                    <p class="text-blue-900 text-sm font-semibold flex items-center gap-2"><x-heroicon-o-light-bulb class="w-5 h-5" /><span>Besoin d'aide?</span></p>
+                    <a href="{{ route('client.messages') }}" class="mt-4 block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-bold transition flex items-center justify-center gap-2">
+                        <x-heroicon-o-chat-bubble-left class="w-5 h-5" /><span>Contacter le vendeur</span>
                     </a>
                 </div>
             </div>

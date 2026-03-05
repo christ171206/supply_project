@@ -14,6 +14,11 @@ class AvisController extends Controller
      */
     public function store(Request $request)
     {
+        // Les administrateurs ne peuvent pas laisser d'avis
+        if (Auth::user()->is_admin) {
+            return back()->with('error', 'Les administrateurs n\'ont pas le droit de laisser des avis.');
+        }
+
         // Validation
         $validated = $request->validate([
             'produit_id' => 'required|exists:produits,id',

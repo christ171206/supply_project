@@ -743,11 +743,12 @@ class VendeurProduitController extends Controller
         $user = Auth::user();
         $client = User::findOrFail($userId);
 
-        // Récupérer les messages de cette conversation
+        // Récupérer les messages de cette conversation avec les produits associés
         $messages = Message::where(function ($query) use ($user, $userId) {
             $query->where('from_user_id', $user->id)->where('to_user_id', $userId)
                 ->orWhere('from_user_id', $userId)->where('to_user_id', $user->id);
         })
+            ->with('produit')  // Charger le produit associé
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -971,5 +972,129 @@ class VendeurProduitController extends Controller
             \Log::error('Erreur basculement mode client: ' . $e->getMessage());
             return redirect('/')->with('error', 'Erreur lors du basculement en mode client.');
         }
+    }
+
+    /**
+     * Récupérer les notifications du vendeur
+     */
+    public function getNotifications()
+    {
+        $user = Auth::user();
+        $notifications = [];
+
+        // 🔴 Messages non lus
+        $unreadMessages = Message::where('to_user_id', $user->id)
+            ->where('lu', false)
+            ->with(['fromUser' => function ($q) {
+                $q->select('id', 'name', 'shop_name');
+            }, 'produit' => function ($q) {
+                $q->select('id', 'nom', 'image');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $unreadCount = Message::where('to_user_id', $user->id)->where('lu', false)->count();
+
+        if ($unreadCount > 0) {
+            $notifications[] = [
+                'type' => 'messages',
+                'count' => $unreadCount,
+                'title' => $unreadCount . ' message' . ($unreadCount > 1 ? 's' : '') . ' non lu' . ($unreadCount > 1 ? 's' : ''),
+                'icon' => 'chat-bubble-left',
+                'color' => 'blue',
+                'data' => $unreadMessages,
+                'link' => route('vendeur.messages')
+            ];
+        }
+
+        // 🛒 Commandes en attente
+        $pendingOrders = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->whereIn('statut', ['confirmée', 'en attente', 'en cours de traitement'])
+            ->with(['ligneCommandes.produit' => function ($q) use ($user) {
+                $q->where('user_id', $user->id)->select('id', 'nom', 'image');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $pendingCount = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->whereIn('statut', ['confirmée', 'en attente', 'en cours de traitement'])->count();
+
+        if ($pendingCount > 0) {
+            $notifications[] = [
+                'type' => 'orders',
+                'count' => $pendingCount,
+                'title' => $pendingCount . ' commande' . ($pendingCount > 1 ? 's' : '') . ' en attente',
+                'icon' => 'shopping-cart',
+                'color' => 'orange',
+                'data' => $pendingOrders,
+                'link' => route('vendeur.commandes')
+            ];
+        }
+
+        // ⭐ Avis clients non lus
+        $unreadReviews = Avis::whereHas('produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->where('lu', 0)
+            ->with(['user' => function ($q) {
+                $q->select('id', 'name');
+            }, 'produit' => function ($q) {
+                $q->select('id', 'nom', 'image');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        $unreadReviewsCount = Avis::whereHas('produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('lu', 0)->count();
+
+        if ($unreadReviewsCount > 0) {
+            $notifications[] = [
+                'type' => 'reviews',
+                'count' => $unreadReviewsCount,
+                'title' => $unreadReviewsCount . ' avi' . ($unreadReviewsCount > 1 ? 's' : 's') . ' client',
+                'icon' => 'star',
+                'color' => 'yellow',
+                'data' => $unreadReviews,
+                'link' => route('vendeur.avis')
+            ];
+        }
+
+        // 📦 Produits en stock critique
+        $criticalStock = Produit::where('user_id', $user->id)
+            ->whereRaw('stock <= stock_minimum')
+            ->select('id', 'nom', 'stock', 'stock_minimum', 'image')
+            ->orderBy('stock', 'asc')
+            ->limit(5)
+            ->get();
+
+        $criticalCount = Produit::where('user_id', $user->id)->whereRaw('stock <= stock_minimum')->count();
+
+        if ($criticalCount > 0) {
+            $notifications[] = [
+                'type' => 'stock',
+                'count' => $criticalCount,
+                'title' => $criticalCount . ' produit' . ($criticalCount > 1 ? 's' : '') . ' en stock critique',
+                'icon' => 'cube',
+                'color' => 'red',
+                'data' => $criticalStock,
+                'link' => route('vendeur.stock')
+            ];
+        }
+
+        $totalNotifications = $unreadCount + $pendingCount + $unreadReviewsCount + $criticalCount;
+
+        return response()->json([
+            'success' => true,
+            'total' => $totalNotifications,
+            'notifications' => $notifications,
+            'timestamp' => now()
+        ]);
     }
 }

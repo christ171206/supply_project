@@ -13,6 +13,11 @@ class ProduitController extends Controller
      */
     public function index()
     {
+        // Rediriger les administrateurs vers le dashboard admin
+        if (auth()->check() && auth()->user()->is_admin) {
+            return redirect('/admin/dashboard');
+        }
+
         // Rediriger les vendeurs vers le dashboard
         if (auth()->check() && auth()->user()->role === 'vendor') {
             return redirect()->route('vendeur.dashboard');

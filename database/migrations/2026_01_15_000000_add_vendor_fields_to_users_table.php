@@ -37,7 +37,25 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['shop_name', 'phone', 'address', 'id_document', 'vendor_status']);
+            $columnsToRemove = [];
+            if (Schema::hasColumn('users', 'shop_name')) {
+                $columnsToRemove[] = 'shop_name';
+            }
+            if (Schema::hasColumn('users', 'phone')) {
+                $columnsToRemove[] = 'phone';
+            }
+            if (Schema::hasColumn('users', 'address')) {
+                $columnsToRemove[] = 'address';
+            }
+            if (Schema::hasColumn('users', 'id_document')) {
+                $columnsToRemove[] = 'id_document';
+            }
+            if (Schema::hasColumn('users', 'vendor_status')) {
+                $columnsToRemove[] = 'vendor_status';
+            }
+            if (!empty($columnsToRemove)) {
+                $table->dropColumn($columnsToRemove);
+            }
         });
     }
 };

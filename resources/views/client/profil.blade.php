@@ -5,7 +5,8 @@
     <div class="max-w-6xl mx-auto px-4">
         <!-- Retour -->
         <a href="{{ route('client.dashboard') }}" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold mb-8">
-            ← Retour au tableau de bord
+            <x-heroicon-o-arrow-left class="w-5 h-5" />
+            <span>Retour au tableau de bord</span>
         </a>
 
         <!-- Header -->
@@ -32,7 +33,7 @@
         @if(session('success'))
             <div class="mb-8 bg-green-50 border-l-4 border-green-600 p-4 rounded-lg">
                 <div class="flex items-start gap-3">
-                    <span class="text-2xl">✓</span>
+                    <x-heroicon-o-check-circle class="w-6 h-6 text-green-600 flex-shrink-0" />
                     <div>
                         <p class="text-green-800 font-semibold">Modifications enregistrées</p>
                         <p class="text-green-700 text-sm">{{ session('success') }}</p>
@@ -48,8 +49,8 @@
                 <!-- Card: Photo de Profil -->
                 <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 mb-8 hover:shadow-xl transition">
                     <div class="flex items-center gap-3 mb-8">
-                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-lg">
-                            📸
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <x-heroicon-o-camera class="w-6 h-6 text-purple-600" />
                         </div>
                         <h2 class="text-2xl font-bold text-gray-900">Photo de Profil</h2>
                     </div>
@@ -63,8 +64,8 @@
                             @if(Auth::user()->profile_photo)
                                 <img id="photo-preview" src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Photo de profil" class="w-40 h-40 rounded-full object-cover shadow-lg border-4 border-purple-400 mb-6">
                             @else
-                                <div id="photo-preview" class="w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center text-6xl shadow-lg border-4 border-gray-300 mb-6">
-                                    👤
+                                <div id="photo-preview" class="w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center shadow-lg border-4 border-gray-300 mb-6">
+                                    <x-heroicon-o-user class="w-24 h-24 text-gray-400" />
                                 </div>
                             @endif
                         </div>
@@ -76,11 +77,15 @@
                             @error('profile_photo')
                                 <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                             @enderror
-                            <p class="text-gray-500 text-xs mt-2">📁 JPG, PNG, GIF - Max 2 MB</p>
+                            <div class="flex items-center gap-2 text-gray-500 text-xs mt-2">
+                                <x-heroicon-o-folder class="w-4 h-4" />
+                                <span>JPG, PNG, GIF - Max 2 MB</span>
+                            </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 shadow-sm" id="photo-submit-btn">
-                            💾 Mettre à jour la photo
+                        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-semibold transition duration-200 shadow-sm flex items-center justify-center gap-2" id="photo-submit-btn">
+                            <x-heroicon-o-arrow-up-tray class="w-5 h-5" />
+                            <span>Mettre à jour la photo</span>
                         </button>
                     </form>
                 </div>
@@ -88,8 +93,8 @@
                 <!-- Card: Zone de Livraison (Leaflet Map) -->
                 <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 mb-8 hover:shadow-xl transition">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-lg">
-                            📍
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <x-heroicon-o-map-pin class="w-6 h-6 text-green-600" />
                         </div>
                         <h2 class="text-2xl font-bold text-gray-900">Zone de Livraison</h2>
                     </div>
@@ -119,8 +124,8 @@
                 <!-- Card: Informations Personnelles -->
                 <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 mb-8 hover:shadow-xl transition">
                     <div class="flex items-center gap-3 mb-8">
-                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-lg">
-                            ℹ️
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <x-heroicon-o-information-circle class="w-6 h-6 text-blue-600" />
                         </div>
                         <h2 class="text-2xl font-bold text-gray-900">Informations Personnelles</h2>
                     </div>
@@ -156,9 +161,12 @@
                                     <input type="email" value="{{ Auth::user()->email }}" readonly
                                            class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
                                 </div>
-                                <span class="text-green-600 text-2xl">✓</span>
+                                <x-heroicon-o-check-circle class="w-6 h-6 text-green-600 flex-shrink-0" />
                             </div>
-                            <p class="text-gray-500 text-xs mt-2">🔒 L'email ne peut pas être modifié pour votre sécurité</p>
+                            <div class="flex items-center gap-2 text-gray-500 text-xs mt-2">
+                                <x-heroicon-o-lock-closed class="w-4 h-4" />
+                                <span>L'email ne peut pas être modifié pour votre sécurité</span>
+                            </div>
                         </div>
 
                         <!-- Téléphone -->
@@ -182,7 +190,7 @@
                         <!-- Boutons d'Action -->
                         <div class="flex gap-4 pt-6 border-t border-gray-200">
                             <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition transform hover:scale-105 shadow-md flex items-center justify-center gap-2">
-                                <span>✓</span>
+                                <x-heroicon-o-check-circle class="w-5 h-5" />
                                 <span>Enregistrer les modifications</span>
                             </button>
                             <a href="{{ route('client.dashboard') }}" class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition">
@@ -198,8 +206,8 @@
                 <!-- Card: Sécurité -->
                 <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center text-lg">
-                            🔒
+                        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <x-heroicon-o-lock-closed class="w-6 h-6 text-orange-600" />
                         </div>
                         <h3 class="text-lg font-bold text-gray-900">Sécurité</h3>
                     </div>
@@ -207,12 +215,12 @@
                     <div class="space-y-4">
                         <a href="{{ route('profile.edit') }}"
                            class="flex items-center gap-3 p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition group">
-                            <span class="text-xl">🔑</span>
+                            <x-heroicon-o-key class="w-5 h-5 text-orange-600 group-hover:scale-110 transition" />
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-900 group-hover:text-orange-600">Changer mot de passe</p>
                                 <p class="text-xs text-gray-600">Mettre à jour votre sécurité</p>
                             </div>
-                            <span class="text-gray-400 group-hover:text-orange-600">→</span>
+                            <x-heroicon-o-arrow-right class="w-5 h-5 text-gray-400 group-hover:text-orange-600 transition" />
                         </a>
                     </div>
                 </div>
@@ -243,8 +251,8 @@
                         <div class="p-3 bg-gray-50 rounded-lg">
                             <p class="text-xs text-gray-600">Rôle</p>
                             <p class="font-semibold text-gray-900 flex items-center gap-2">
-                                <span>🛒</span>
-                                Client
+                                <x-heroicon-o-shopping-cart class="w-5 h-5 text-gray-600" />
+                                <span>Client</span>
                             </p>
                         </div>
                     </div>
@@ -256,14 +264,14 @@
                 <!-- Card: Actions Dangereuses -->
                 <div class="bg-red-50 rounded-xl shadow-lg border border-red-200 p-6 hover:shadow-xl transition">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-lg">
-                            ⚠️
+                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                            <x-heroicon-o-exclamation-triangle class="w-6 h-6 text-red-600" />
                         </div>
                         <h3 class="text-lg font-bold text-red-900">Zone Dangereuse</h3>
                     </div>
 
                     <button type="button" onclick="openDeleteAccountModal()" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2">
-                        <span>🗑️</span>
+                        <x-heroicon-o-trash class="w-5 h-5" />
                         <span>Supprimer mon compte</span>
                     </button>
                     <p class="text-red-700 text-xs mt-3">
@@ -290,8 +298,10 @@
         <!-- Corps -->
         <div class="p-6">
             <div class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6">
-                <p class="text-red-900 text-sm">
-                    ⚠️ <strong>Attention!</strong> Supprimer votre compte supprimera définitivement:
+                <p class="text-red-900 text-sm flex items-start gap-2">
+                    <x-heroicon-o-exclamation-triangle class="w-5 h-5 mt-0.5 flex-shrink-0" />
+                    <span><strong>Attention!</strong> Supprimer votre compte supprimera définitivement:</span>
+                </p>
                 </p>
                 <ul class="text-red-800 text-xs mt-3 space-y-1 ml-4 list-disc">
                     <li>Vos informations personnelles</li>
@@ -368,7 +378,7 @@
         // Ajouter un marqueur existant s'il y a des coordonnées sauvegardées
         @if(Auth::user()->delivery_latitude && Auth::user()->delivery_longitude)
             marker = L.marker([{{ Auth::user()->delivery_latitude }}, {{ Auth::user()->delivery_longitude }}]).addTo(map)
-                .bindPopup('📍 Votre zone de livraison')
+                .bindPopup('<div class="flex items-center gap-2"><x-heroicon-o-map-pin class="w-4 h-4" /><span>Votre zone de livraison</span></div>')
                 .openPopup();
         @endif
 
@@ -384,7 +394,7 @@
 
             // Ajouter le nouveau marqueur
             marker = L.marker([lat, lng]).addTo(map)
-                .bindPopup('📍 Marqueur de livraison')
+                .bindPopup('<div class="flex items-center gap-2"><x-heroicon-o-map-pin class="w-4 h-4" /><span>Marqueur de livraison</span></div>')
                 .openPopup();
 
             // Mettre à jour les inputs
@@ -444,7 +454,7 @@
     document.getElementById('photo-form').addEventListener('submit', function(e) {
         // Désactiver le bouton pour éviter les doubles submissions
         document.getElementById('photo-submit-btn').disabled = true;
-        document.getElementById('photo-submit-btn').textContent = '⏳ Mise à jour...';
+        document.getElementById('photo-submit-btn').textContent = 'Mise à jour...';
 
         // Rafraîchir après 1.5 secondes (temps de traitement du serveur)
         setTimeout(function() {

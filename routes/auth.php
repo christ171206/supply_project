@@ -27,6 +27,11 @@ Route::middleware('guest')->group(function () {
     Route::post('verify-email-code/resend', [EmailVerificationCodeController::class, 'resend'])
         ->name('verification.code.resend');
 
+    // Page d'attente pour les vendeurs en attente d'approbation
+    Route::get('vendor/pending', function () {
+        return view('auth.vendor-pending');
+    })->name('vendor.pending');
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
@@ -64,6 +69,6 @@ Route::middleware('auth')->group(function () {
 
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
+    // Logout - Exclus du CSRF (action critique qui doit toujours fonctionner)
+    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });

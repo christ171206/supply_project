@@ -22,10 +22,11 @@ class OrderValidationController extends Controller
     {
         $request->validate([
             'commande_id' => 'required|exists:commandes,id',
-            'quartier_id' => 'required|exists:ci_quartiers,id',
+            'quartier_id' => 'nullable|exists:ci_quartiers,id',
             'adresse_livraison' => 'required|string|min:5|max:255',
             'telephone_livraison' => 'required|string|regex:/^[0-9]{10}$/',
             'adresse_detail' => 'nullable|string|max:255',
+            'pays' => 'nullable|string|max:255',
             'notes' => 'nullable|string|max:500',
         ]);
 
@@ -47,23 +48,30 @@ class OrderValidationController extends Controller
             ], 400);
         }
 
-        // Vérifier que le quartier existe et récupérer les données géographiques
-        $quartier = CiQuartier::find($request->quartier_id);
-        if (!$quartier) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Quartier introuvable',
-            ], 404);
-        }
+        // Vérifier que le quartier existe si fourni
+        $quartier = null;
+        $region = null;
+        $district = null;
+        $commune = null;
 
-        // Récupérer la commune, le district et la région
-        $commune = $quartier->commune;
-        $district = $commune->district;
-        $region = $district->region;
+        if ($request->quartier_id) {
+            $quartier = CiQuartier::find($request->quartier_id);
+            if (!$quartier) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Quartier introuvable',
+                ], 404);
+            }
+            // Récupérer la commune, le district et la région
+            $commune = $quartier->commune;
+            $district = $commune->district;
+            $region = $district->region;
+        }
 
         // Mettre à jour la commande
         $commande->update([
             'quartier_id' => $request->quartier_id,
+            'pays' => $request->input('pays'),
             'adresse_livraison' => $request->adresse_livraison,
             'telephone_livraison' => $request->telephone_livraison,
             'adresse_detail' => $request->input('adresse_detail'),

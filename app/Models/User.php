@@ -27,6 +27,8 @@ class User extends Authenticatable
         'phone',
         'address',
         'vendor_status',
+        'vendor_approved_at',
+        'vendor_notes',
         'id_document',
         'profile_photo',
         'delivery_latitude',
@@ -36,6 +38,10 @@ class User extends Authenticatable
         'email_verification_code',
         'email_verification_code_sent_at',
         'country',
+        'is_admin',
+        'admin_role_id',
+        'is_banned',
+        'banned_until',
     ];
 
     /**
@@ -110,5 +116,90 @@ class User extends Authenticatable
     public function securityLogs(): HasMany
     {
         return $this->hasMany(SecurityLog::class);
+    }
+
+    // Relations Admin
+    public function adminRole()
+    {
+        return $this->belongsTo(AdminRole::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(UserDocument::class);
+    }
+
+    public function bans(): HasMany
+    {
+        return $this->hasMany(UserBan::class);
+    }
+
+    public function activeBan()
+    {
+        return $this->hasOne(UserBan::class)->where('is_active', true);
+    }
+
+    public function disputes()
+    {
+        return $this->hasMany(Dispute::class);
+    }
+
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(AuditLog::class, 'admin_id');
+    }
+
+    /**
+     * Relation avec la validation vendeur
+     */
+    public function validationVendeur()
+    {
+        return $this->hasOne(VendorValidation::class);
+    }
+
+    /**
+     * Vérifier si l'utilisateur est administrateur
+     */
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin;
+    }
+
+    /**
+     * Vérifier si l'utilisateur est banni
+     */
+    public function isBanned(): bool
+    {
+        if (!$this->is_banned) {
+            return false;
+        }
+
+        if ($this->banned_until && $this->banned_until->isFuture()) {
+            return true;
+        }
+
+        return !$this->banned_until;
+    }
+
+    /**
+     * Bannir un utilisateur
+     */
+    public function ban(User $admin, string $reason, string $details = '', ?\DateTime $unbannedAt = null): UserBan
+    {
+        $ban = UserBan::create([
+            'user_id' => $this->id,
+            'reason' => $reason,
+            'details' => $details,
+            'is_active' => true,
+            'banned_at' => now(),
+            'banned_by' => $admin->id,
+        ]);
+
+        $this->update([
+            'is_banned' => true,
+            'banned_until' => $unbannedAt,
+        ]);
+
+        return $ban;
     }
 }

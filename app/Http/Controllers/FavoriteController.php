@@ -24,6 +24,11 @@ class FavoriteController extends Controller
 
     public function toggle($productId)
     {
+        // Les administrateurs ne peuvent pas ajouter aux favoris
+        if (auth()->check() && auth()->user()->is_admin) {
+            return back()->with('error', 'Les administrateurs n\'ont pas le droit d\'ajouter des favoris.');
+        }
+
         $produit = Produit::findOrFail($productId);
 
         if (auth()->check()) {
@@ -66,5 +71,3 @@ class FavoriteController extends Controller
         return response()->json(['is_favorited' => $isFavorited]);
     }
 }
-
-

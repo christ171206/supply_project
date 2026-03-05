@@ -4,7 +4,10 @@
 <div class="p-8 bg-gradient-to-br from-slate-50 to-white min-h-screen">
     <!-- En-tête -->
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-2">💬 Messages</h1>
+        <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+            <x-heroicon-o-chat-bubble-left class="w-10 h-10" />
+            <span>Messages</span>
+        </h1>
         <p class="text-gray-600">Communication avec vos clients</p>
     </div>
 
@@ -15,8 +18,9 @@
                 <option value="tous" {{ request('filtre') == 'tous' ? 'selected' : '' }}>Tous les messages</option>
                 <option value="non_lus" {{ request('filtre') == 'non_lus' ? 'selected' : '' }}>Non lus uniquement</option>
             </select>
-            <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold">
-                🔍 Filtrer
+            <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold flex items-center gap-2">
+                <x-heroicon-o-magnifying-glass class="w-5 h-5" />
+                <span>Filtrer</span>
             </button>
         </form>
     </div>
@@ -78,7 +82,10 @@
                             <!-- Produit associé -->
                             @if($conv['produit'])
                                 <div class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                    <p class="text-xs text-blue-600 font-semibold">📦 Produit:</p>
+                                    <p class="text-xs text-blue-600 font-semibold flex items-center gap-1">
+                                        <x-heroicon-o-cube class="w-4 h-4" />
+                                        <span>Produit:</span>
+                                    </p>
                                     <p class="text-sm font-bold text-gray-900 line-clamp-1">{{ $conv['produit']->nom }}</p>
                                 </div>
                             @endif
@@ -97,8 +104,9 @@
                             @endif
 
                             @if($conv['unread_count'] > 0)
-                                <span class="inline-block mt-2 px-3 py-1 bg-orange-600 text-white text-xs font-bold rounded-full">
-                                    🔔 {{ $conv['unread_count'] }} nouveau{{ $conv['unread_count'] > 1 ? 'x' : '' }}
+                                <span class="inline-block mt-2 px-3 py-1 bg-orange-600 text-white text-xs font-bold rounded-full flex items-center gap-1 w-fit">
+                                    <x-heroicon-o-bell class="w-4 h-4" />
+                                    <span>{{ $conv['unread_count'] }} nouveau{{ $conv['unread_count'] > 1 ? 'x' : '' }}</span>
                                 </span>
                             @else
                                 <span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">

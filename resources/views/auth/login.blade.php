@@ -65,7 +65,7 @@
                         <div class="flex gap-4">
                             <div class="flex-shrink-0">
                                 <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-accent-100">
-                                    <span class="text-2xl">📋</span>
+                                    <span class="text-2xl"><x-heroicon-o-clipboard class="w-6 h-6" /></span>
                                 </div>
                             </div>
                             <div>
@@ -89,7 +89,7 @@
                         <div class="flex gap-4">
                             <div class="flex-shrink-0">
                                 <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-green-100">
-                                    <span class="text-2xl">💬</span>
+                                    <span class="text-2xl"><x-heroicon-o-chat-bubble-left class="w-6 h-6" /></span>
                                 </div>
                             </div>
                             <div>
@@ -112,7 +112,7 @@
                         <!-- Messages d'erreur/succès -->
                         @if ($errors->any())
                             <div class="p-4 mb-6 bg-danger-50 border border-danger-200 rounded-xl flex gap-3">
-                                <span class="text-2xl flex-shrink-0">⚠️</span>
+                                <span class="text-2xl flex-shrink-0"><x-heroicon-o-exclamation-triangle class="w-6 h-6" /></span>
                                 <div>
                                     <p class="text-danger-900 font-semibold text-sm">Erreur de connexion</p>
                                     <p class="text-danger-700 text-sm mt-1">{{ __('auth.failed') }}</p>
@@ -156,7 +156,7 @@
                             <!-- Mot de passe -->
                             <div>
                                 <label for="password" class="block text-sm font-semibold text-gray-900 mb-2">
-                                    🔐 Mot de passe
+                                    <x-heroicon-o-lock-closed class="w-4 h-4" /><span>Mot de passe</span>
                                 </label>
                                 <div class="relative">
                                     <input

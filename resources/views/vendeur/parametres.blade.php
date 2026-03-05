@@ -151,7 +151,11 @@
                     Attention: Ces actions sont irréversibles!
                 </p>
 
-                <form method="POST" action="{{ route('vendeur.parametres.delete') }}" onsubmit="return confirm('Êtes-vous sûr? Cette action supprimera votre boutique et tous vos produits. Elle est IRRÉVERSIBLE!');">
+                <form method="POST" action="{{ route('vendeur.parametres.delete') }}"
+                      data-confirm="Êtes-vous sûr? Cette action supprimera votre boutique et tous vos produits. Elle est IRRÉVERSIBLE!"
+                      data-confirm-title="Supprimer la boutique"
+                      data-confirm-type="danger"
+                      data-confirm-button="🗑️ Supprimer">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold text-sm">

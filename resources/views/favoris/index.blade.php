@@ -46,20 +46,22 @@
             <!-- Actionner Section -->
             <div class="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-8 border border-primary-100 text-center">
                 <p class="text-gray-700 mb-6 text-lg">Prêt à commander? Consultez vos articles favoris et ajoutez-les au panier.</p>
-                <a href="{{ route('panier.index') }}" class="inline-block px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-lg hover:shadow-lg transition duration-200">
-                    🛒 Voir mon panier
+                <a href="{{ route('panier.index') }}" class="inline-block px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-lg hover:shadow-lg transition duration-200 flex items-center gap-2">
+                    <x-heroicon-o-shopping-cart class="w-5 h-5" /><span>Voir mon panier</span>
                 </a>
             </div>
         @else
             <!-- Message d'état vide -->
             <div class="text-center py-20">
-                <div class="text-7xl mb-6 animate-bounce">💔</div>
+                <div class="text-7xl mb-6 animate-bounce">
+                    <x-heroicon-o-heart class="w-16 h-16 inline text-red-500" />
+                </div>
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Aucun favori pour le moment</h2>
                 <p class="text-gray-600 mb-10 text-lg max-w-md mx-auto">
                     Explorez notre catalogue et ajoutez vos produits préférés en cliquant sur le cœur!
                 </p>
-                <a href="{{ route('produits.catalogue') }}" class="inline-block px-10 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-lg hover:shadow-xl transition duration-200 text-lg">
-                    🔍 Découvrir des produits
+                <a href="{{ route('produits.catalogue') }}" class="inline-block px-10 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-lg hover:shadow-xl transition duration-200 text-lg flex items-center gap-2">
+                    <x-heroicon-o-magnifying-glass class="w-5 h-5" /><span>Découvrir des produits</span>
                 </a>
             </div>
         @endif
@@ -78,16 +80,16 @@
 
         <!-- Section authentification -->
         <div class="text-center mt-16 bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-12 border border-primary-100">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">💡 Stocke tes favoris définitivement</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-2"><x-heroicon-o-light-bulb class="w-6 h-6" /><span>Stocke tes favoris définitivement</span></h2>
             <p class="text-gray-600 mb-8 text-lg max-w-md mx-auto">
                 Connecte-toi pour sauvegarder tous tes produits préférés et y accéder depuis n'importe quel appareil.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('login') }}" class="inline-block px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-lg hover:shadow-lg transition duration-200">
-                    🔐 Se connecter
+                <a href="{{ route('login') }}" class="inline-block px-8 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-lg hover:shadow-lg transition duration-200 flex items-center gap-2">
+                    <x-heroicon-o-lock-closed class="w-5 h-5" /><span>Se connecter</span>
                 </a>
-                <a href="{{ route('register') }}" class="inline-block px-8 py-3 border-2 border-accent-500 text-accent-600 font-bold rounded-lg hover:bg-accent-50 transition duration-200">
-                    📝 Créer un compte
+                <a href="{{ route('register') }}" class="inline-block px-8 py-3 border-2 border-accent-500 text-accent-600 font-bold rounded-lg hover:bg-accent-50 transition duration-200 flex items-center gap-2">
+                    <x-heroicon-o-pencil-square class="w-5 h-5" /><span>Créer un compte</span>
                 </a>
             </div>
         </div>
@@ -194,7 +196,7 @@
             console.error('Error loading favorites:', error);
             container.innerHTML = `
                 <div class="text-center py-16">
-                    <div class="text-6xl mb-4">⚠️</div>
+                    <div class="text-6xl mb-4"><x-heroicon-o-exclamation-triangle class="w-16 h-16" /></div>
                     <p class="text-gray-600 text-lg">Erreur lors du chargement des favoris</p>
                     <p class="text-gray-500 mt-2 text-sm">Veuillez rafraîchir la page</p>
                 </div>

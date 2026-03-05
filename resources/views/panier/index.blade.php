@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold text-gray-900 mb-8">🛒 Mon Panier</h1>
+    <h1 class="text-4xl font-bold text-gray-900 mb-8 flex items-center gap-2"><x-heroicon-o-shopping-cart class="w-8 h-8" /><span>Mon Panier</span></h1>
 
     @if(session('success'))
         <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
@@ -32,7 +32,7 @@
                                         <img src="{{ asset('storage/produits/' . $item->produit->image) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center bg-gray-300">
-                                            <span class="text-2xl">📦</span>
+                                            <x-heroicon-o-cube class="w-8 h-8 text-gray-600" />
                                         </div>
                                     @endif
                                 </div>
@@ -72,8 +72,8 @@
                                     <form action="{{ route('panier.supprimer', $item->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm">
-                                            🗑️ Supprimer
+                                        <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm flex items-center gap-1">
+                                            <x-heroicon-o-trash class="w-4 h-4" /><span>Supprimer</span>
                                         </button>
                                     </form>
                                 </div>
@@ -83,14 +83,21 @@
 
                     <!-- Actions -->
                     <div class="bg-gray-50 p-6 flex gap-4">
-                        <a href="{{ route('produits.catalogue') }}" class="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-center font-medium">
-                            ← Continuer les achats
+                        <a href="{{ route('produits.catalogue') }}" class="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-center font-medium flex items-center justify-center gap-2">
+                            <x-heroicon-o-arrow-left class="w-4 h-4" /><span>Continuer les achats</span>
                         </a>
                         <form action="{{ route('panier.vider') }}" method="POST" class="flex-1">
                             @csrf
-                            <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium" onclick="return confirm('Êtes-vous sûr de vouloir vider votre panier ?')">
-                                🗑️ Vider le panier
-                            </button>
+                            <form method="POST" action="{{ route('panier.vider') }}"
+                                  data-confirm="Êtes-vous sûr de vouloir vider votre panier ?"
+                                  data-confirm-title="Vider le panier"
+                                  data-confirm-type="warning"
+                                  data-confirm-button="Vider">
+                                @csrf
+                                <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium flex items-center justify-center gap-2">
+                                    <x-heroicon-o-trash class="w-4 h-4" /><span>Vider le panier</span>
+                                </button>
+                            </form>
                         </form>
                     </div>
                 </div>
@@ -98,7 +105,7 @@
                 <!-- Panier Vide -->
                 <div class="bg-white rounded-lg shadow-lg p-12 text-center">
                     <div class="mb-6">
-                        <span class="text-6xl">🛒</span>
+                        <div class="text-6xl flex justify-center"><x-heroicon-o-shopping-cart class="w-16 h-16" /></div>
                     </div>
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Votre panier est vide</h2>
                     <p class="text-gray-600 mb-8">Commencez vos achats en explorant notre catalogue</p>

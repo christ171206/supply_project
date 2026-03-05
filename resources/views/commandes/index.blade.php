@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold text-gray-900 mb-8">📋 Mes Commandes</h1>
+    <h1 class="text-4xl font-bold text-gray-900 mb-8 flex items-center gap-2"><x-heroicon-o-clipboard class="w-10 h-10" /><span>Mes Commandes</span></h1>
 
     @if(session('success'))
         <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">

@@ -35,11 +35,8 @@
 
     <!-- Lien déconnexion -->
     <div class="pt-6 border-t border-gray-200 text-center">
-        <form method="POST" action="{{ route('logout') }}" class="inline">
-            @csrf
-            <button type="submit" class="text-sm text-blue-600 hover:text-blue-700 font-semibold">
-                Se déconnecter
-            </button>
-        </form>
+        <a href="{{ route('logout.get') }}" class="text-sm text-blue-600 hover:text-blue-700 font-semibold">
+            Se déconnecter
+        </a>
     </div>
 </x-guest-layout>

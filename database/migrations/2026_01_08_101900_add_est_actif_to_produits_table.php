@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('produits', function (Blueprint $table) {
-            $table->boolean('est_actif')->default(true)->after('stock_minimum');
+            if (!Schema::hasColumn('produits', 'est_actif')) {
+                $table->boolean('est_actif')->default(true);
+            }
         });
     }
 

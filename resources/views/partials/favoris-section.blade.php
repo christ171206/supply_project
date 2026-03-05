@@ -66,7 +66,7 @@
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="{{ route('login') }}" class="inline-block px-10 py-4 bg-white text-primary-600 font-bold rounded-lg hover:shadow-lg transition duration-200">
-                        🔐 Se connecter
+                        <x-heroicon-o-lock-closed class=\"w-5 h-5\" /><span>Se connecter</span>
                     </a>
                     <a href="{{ route('register') }}" class="inline-block px-10 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition duration-200">
                         📝 Créer un compte

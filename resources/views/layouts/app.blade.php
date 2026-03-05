@@ -65,8 +65,8 @@
                             <h3 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Support</h3>
                             <ul class="space-y-3 text-sm">
                                 <li><a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><span>?</span> FAQ</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><span>📋</span> Conditions</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><span>🔒</span> Confidentialité</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><x-heroicon-o-document-text class="w-4 h-4" /><span>Conditions</span></a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><x-heroicon-o-lock-closed class="w-4 h-4" /><span>Confidentialité</span></a></li>
                             </ul>
                         </div>
 
@@ -74,9 +74,9 @@
                         <div>
                             <h3 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Contact</h3>
                             <ul class="space-y-3 text-sm">
-                                <li class="text-gray-400">📧 <a href="mailto:info@supply.ci" class="hover:text-primary-400 transition">info@supply.ci</a></li>
-                                <li class="text-gray-400">📞 <a href="tel:+22527200000" class="hover:text-primary-400 transition">+225 27 20 00 00 00</a></li>
-                                <li class="text-gray-400">📍 Abidjan, Côte d'Ivoire</li>
+                                <li class="text-gray-400 flex items-center gap-2"><x-heroicon-o-envelope class="w-4 h-4" /><a href="mailto:info@supply.ci" class="hover:text-primary-400 transition">info@supply.ci</a></li>
+                                <li class="text-gray-400 flex items-center gap-2"><x-heroicon-o-phone class="w-4 h-4" /><a href="tel:+22527200000" class="hover:text-primary-400 transition">+225 27 20 00 00 00</a></li>
+                                <li class="text-gray-400 flex items-center gap-2"><x-heroicon-o-map-pin class="w-4 h-4" /><span>Abidjan, Côte d'Ivoire</span></li>
                             </ul>
                         </div>
                     </div>
@@ -359,7 +359,7 @@
                     } else {
                         btn.classList.remove('text-red-500', 'animate-pulse');
                         btn.classList.add('text-gray-400');
-                        btn.innerHTML = '🤍';
+                        btn.innerHTML = '<x-heroicon-o-heart class="w-6 h-6" />';
                     }
                 });
             }
@@ -403,6 +403,9 @@
             @endauth
         </script>
         </script>
+
+        <!-- Composant Modal de Confirmation -->
+        @include('components.confirmation-modal')
 
         @yield('scripts')
     </body>

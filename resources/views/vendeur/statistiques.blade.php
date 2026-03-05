@@ -5,7 +5,7 @@
     <!-- En-tête avec sélecteur de période -->
     <div class="mb-8 flex justify-between items-center flex-wrap gap-4">
         <div>
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">📈 Statistiques</h1>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-2"><x-heroicon-o-chart-bar class="w-8 h-8" /><span>Statistiques</span></h1>
             <p class="text-gray-600">Analyse détaillée de vos performances</p>
         </div>
 
@@ -23,25 +23,25 @@
     <!-- Statistiques Principales -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow-lg border-l-4 border-green-500 p-6">
-            <p class="text-gray-600 text-sm font-semibold mb-2">💰 Chiffre d'Affaires</p>
+            <p class="text-gray-600 text-sm font-semibold mb-2 flex items-center gap-1"><x-heroicon-o-banknotes class="w-4 h-4" /><span>Chiffre d'Affaires</span></p>
             <p class="text-3xl font-bold text-green-600">{{ number_format($totalCA, 0, ',', ' ') }} CFA</p>
             <p class="text-xs text-gray-500 mt-2">Derniers {{ request('periode', 7) }} jours</p>
         </div>
 
         <div class="bg-white rounded-xl shadow-lg border-l-4 border-blue-500 p-6">
-            <p class="text-gray-600 text-sm font-semibold mb-2">🛒 Commandes</p>
+            <p class="text-gray-600 text-sm font-semibold mb-2 flex items-center gap-1"><x-heroicon-o-shopping-cart class="w-4 h-4" /><span>Commandes</span></p>
             <p class="text-3xl font-bold text-blue-600">{{ $nombreCommandes }}</p>
             <p class="text-xs text-gray-500 mt-2">Panier moyen: {{ number_format($panierMoyen, 0, ',', ' ') }} CFA</p>
         </div>
 
         <div class="bg-white rounded-xl shadow-lg border-l-4 border-yellow-500 p-6">
-            <p class="text-gray-600 text-sm font-semibold mb-2">⭐ Notation</p>
+            <p class="text-gray-600 text-sm font-semibold mb-2 flex items-center gap-1"><x-heroicon-o-star class="w-4 h-4 text-yellow-500" /><span>Notation</span></p>
             <p class="text-3xl font-bold text-yellow-600">{{ round($noteMoyenne, 1) }}/5</p>
             <p class="text-xs text-gray-500 mt-2">{{ $nombreAvis }} avis</p>
         </div>
 
         <div class="bg-white rounded-xl shadow-lg border-l-4 border-purple-500 p-6">
-            <p class="text-gray-600 text-sm font-semibold mb-2">📊 Taux de Complétion</p>
+            <p class="text-gray-600 text-sm font-semibold mb-2 flex items-center gap-1"><x-heroicon-o-chart-pie class="w-4 h-4" /><span>Taux de Complétion</span></p>
             <p class="text-3xl font-bold text-purple-600">
                 @php
                     $tauxCompletion = $nombreCommandes > 0 ? round(($commandeslivrees / $nombreCommandes) * 100) : 0;
@@ -56,7 +56,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Top 5 Produits -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">🏆 Top 5 Produits</h3>
+            <h3 class=\"text-lg font-bold text-gray-900 mb-4 flex items-center gap-2\"><x-heroicon-o-star class=\"w-5 h-5 text-yellow-500\" /><span>Top 5 Produits</span></h3>
             <div class="space-y-3">
                 @forelse($topProduits as $idx => $produit)
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
@@ -74,7 +74,7 @@
 
         <!-- Statut Commandes -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">📊 Statut Commandes</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-chart-bar class="w-5 h-5" /><span>Statut Commandes</span></h3>
             <div class="space-y-3">
                 <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                     <div>
@@ -115,7 +115,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Évolution CA -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">📈 Évolution du CA</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-chart-line class="w-5 h-5" /><span>Évolution du CA</span></h3>
             <div class="h-64">
                 <canvas id="chartCA"></canvas>
             </div>
@@ -123,7 +123,7 @@
 
         <!-- Statut Commandes - Donut Chart -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">🎯 Distribution des Commandes</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-rocket-launch class="w-5 h-5" /><span>Distribution des Commandes</span></h3>
             <div class="h-64 flex justify-center">
                 <canvas id="chartStatutCommandes"></canvas>
             </div>

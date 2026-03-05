@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Mail\EmailVerificationCodeMail;
+use App\Mail\NewVendorRegistrationNotification;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -104,6 +105,15 @@ class RegisteredUserController extends Controller
         $user = User::create($userData);
         Log::info('Utilisateur créé', ['user_id' => $user->id, 'role' => $user->role]);
 
+        // Si c'est un vendeur, notifier l'admin
+        if ($request->role === 'vendor') {
+            $admins = User::where('is_admin', true)->get();
+            foreach ($admins as $admin) {
+                Mail::to($admin->email)->send(new NewVendorRegistrationNotification($user));
+            }
+            Log::info('Notification vendeur envoyée aux admins', ['vendor_id' => $user->id]);
+        }
+
         // Générer un code de vérification (6 chiffres)
         $verificationCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
@@ -124,7 +134,12 @@ class RegisteredUserController extends Controller
 
         Log::info('Code de vérification envoyé', ['email' => $user->email]);
 
-        // Rediriger vers la page de vérification du code
+        // Redirection spéciale pour les vendeurs en attente d'approbation
+        if ($request->role === 'vendor') {
+            return redirect()->route('vendor.pending');
+        }
+
+        // Rediriger vers la page de vérification du code pour les clients
         return redirect()->route('verification.code.show');
     }
 }

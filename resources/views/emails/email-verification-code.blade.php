@@ -40,7 +40,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎉 Bienvenue sur Supply!</h1>
+            <h1>Bienvenue sur Supply!</h1>
         </div>
         
         <div class="content">

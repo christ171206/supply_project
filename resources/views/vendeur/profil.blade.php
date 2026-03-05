@@ -5,19 +5,27 @@
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="mb-12">
-            <h1 class="text-5xl font-bold text-gray-900">⚙️ Profil Vendeur</h1>
-            <p class="text-gray-600 mt-3 text-lg">Gérez vos informations personnelles et professionnelles</p>
+            <div class="flex items-center gap-4">
+                <x-heroicon-o-cog-6-tooth class="w-12 h-12 text-gray-900" />
+                <div>
+                    <h1 class="text-5xl font-bold text-gray-900">Profil Vendeur</h1>
+                    <p class="text-gray-600 mt-3 text-lg">Gérez vos informations personnelles et professionnelles</p>
+                </div>
+            </div>
         </div>
 
         <!-- Messages -->
         @if ($errors->any())
             <div class="mb-8 p-4 bg-red-50 border border-red-300 rounded-xl flex gap-3">
-                <span class="text-2xl flex-shrink-0">⚠️</span>
+                <x-heroicon-o-exclamation-triangle class="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
                     <p class="text-red-900 font-bold mb-2">Erreurs détectées</p>
                     <ul class="text-red-700 text-sm space-y-1">
                         @foreach ($errors->all() as $error)
-                            <li>❌ {{ $error }}</li>
+                            <li class="flex items-start gap-2">
+                                <x-heroicon-o-x-circle class="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                <span>{{ $error }}</span>
+                            </li>
                         @endforeach
                     </ul>
                 </div>
@@ -26,7 +34,7 @@
 
         @if (session('success'))
             <div class="mb-8 p-4 bg-green-50 border border-green-300 rounded-xl flex gap-3">
-                <span class="text-2xl flex-shrink-0">✅</span>
+                <x-heroicon-o-check-circle class="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
                 <div>
                     <p class="text-green-900 font-bold">{{ session('success') }}</p>
                 </div>
@@ -36,8 +44,8 @@
         <!-- Section Photo de Profil -->
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-10 mb-8">
             <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-xl">
-                    📸
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <x-heroicon-o-camera class="w-6 h-6 text-purple-600" />
                 </div>
                 Photo de Profil
             </h2>
@@ -51,8 +59,8 @@
                     @if(Auth::user()->profile_photo)
                         <img id="vendor-photo-preview" src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="Photo de profil" class="w-48 h-48 rounded-2xl object-cover shadow-2xl border-4 border-purple-300 transition-transform hover:scale-105">
                     @else
-                        <div class="w-48 h-48 rounded-2xl bg-gradient-to-br from-purple-200 to-blue-200 flex items-center justify-center text-6xl shadow-xl border-4 border-purple-300">
-                            👤
+                        <div class="w-48 h-48 rounded-2xl bg-gradient-to-br from-purple-200 to-blue-200 flex items-center justify-center shadow-xl border-4 border-purple-300">
+                            <x-heroicon-o-user class="w-32 h-32 text-purple-600" />
                         </div>
                     @endif
                 </div>
@@ -61,7 +69,9 @@
                 <div class="border-2 border-dashed border-purple-300 rounded-2xl p-8 text-center hover:border-purple-500 hover:bg-purple-50 transition cursor-pointer" id="dropZone">
                     <input type="file" id="vendor-profile-photo" name="profile_photo" accept="image/*" class="hidden" onchange="previewVendorPhoto(event)">
 
-                    <p class="text-4xl mb-3">🖼️</p>
+                    <div class="flex justify-center mb-3">
+                        <x-heroicon-o-photo class="w-16 h-16 text-purple-400" />
+                    </div>
                     <p class="text-gray-900 font-bold text-lg">Glissez votre photo ici ou cliquez</p>
                     <p class="text-gray-500 text-sm mt-2">JPG, PNG, GIF • Max 2 MB</p>
                 </div>
@@ -70,8 +80,9 @@
                     <p class="text-red-600 text-sm text-center mt-2">{{ $message }}</p>
                 @enderror
 
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-4 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl text-lg">
-                    💾 Enregistrer la photo
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-4 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl text-lg flex items-center justify-center gap-2">
+                    <x-heroicon-o-arrow-up-tray class="w-5 h-5" />
+                    <span>Enregistrer la photo</span>
                 </button>
             </form>
         </div>
@@ -79,8 +90,8 @@
         <!-- Section Informations Personnelles -->
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-10 mb-8">
             <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-xl">
-                    👤
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <x-heroicon-o-user class="w-6 h-6 text-blue-600" />
                 </div>
                 Informations Personnelles
             </h2>
@@ -123,8 +134,9 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl">
-                    ✓ Mettre à jour
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                    <x-heroicon-o-check-circle class="w-5 h-5" />
+                    <span>Mettre à jour</span>
                 </button>
             </form>
         </div>
@@ -132,8 +144,8 @@
         <!-- Section Informations Boutique -->
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-10 mb-8">
             <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-xl">
-                    🏪
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <x-heroicon-o-building-storefront class="w-6 h-6 text-green-600" />
                 </div>
                 Informations Boutique
             </h2>
@@ -207,8 +219,9 @@
                     @enderror
                 </div>
 
-                <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl">
-                    ✓ Mettre à jour la boutique
+                <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                    <x-heroicon-o-check-circle class="w-5 h-5" />
+                    <span>Mettre à jour la boutique</span>
                 </button>
             </form>
         </div>
@@ -216,8 +229,8 @@
         <!-- Section Sécurité -->
         <div class="bg-gradient-to-r from-red-50 to-orange-50 rounded-2xl shadow-xl border border-red-200 p-10 mb-8">
             <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-xl">
-                    🔐
+                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                    <x-heroicon-o-lock-closed class="w-6 h-6 text-red-600" />
                 </div>
                 Sécurité & Confidentialité
             </h2>
@@ -225,7 +238,8 @@
             <div class="space-y-4">
                 <p class="text-gray-700">Gérez la sécurité de votre compte et changez votre mot de passe.</p>
                 <a href="{{ route('profile.edit') }}" class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-xl font-bold transition duration-200 shadow-lg hover:shadow-xl">
-                    🔑 Changer mon mot de passe
+                    <x-heroicon-o-key class="w-5 h-5" />
+                    <span>Changer mon mot de passe</span>
                 </a>
             </div>
         </div>
@@ -233,7 +247,7 @@
         <!-- Conseil -->
         <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border-2 border-blue-300 p-8">
             <div class="flex gap-4">
-                <span class="text-4xl flex-shrink-0">💡</span>
+                <x-heroicon-o-light-bulb class="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
                 <div>
                     <p class="text-blue-900 font-bold text-lg mb-2">Conseil Important</p>
                     <p class="text-blue-800">Maintenez vos informations à jour pour que vos clients puissent vous trouver facilement et vous contacter. Une boutique bien complétée inspire confiance et obtient plus de commandes!</p>

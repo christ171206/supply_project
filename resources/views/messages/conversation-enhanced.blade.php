@@ -51,7 +51,7 @@
                 @empty
                     <div class="flex items-center justify-center h-full text-center text-gray-500">
                         <div>
-                            <p class="text-6xl mb-4">💬</p>
+                            <p class="text-6xl mb-4"><x-heroicon-o-chat-bubble-left class="w-16 h-16" /></p>
                             <p class="font-semibold text-lg">Aucun message</p>
                             <p class="text-sm mt-2">Commencez la conversation ci-dessous</p>
                         </div>
@@ -166,7 +166,7 @@
 
     socket.on('user-typing', function(data) {
         if (data.userId === otherUserId && data.isTyping) {
-            typingIndicator.textContent = '💬 En train d\'écrire...';
+            typingIndicator.textContent = 'En train d\'écrire...';
             typingIndicator.classList.add('animate-pulse');
         } else if (data.userId === otherUserId && !data.isTyping) {
             typingIndicator.textContent = '';

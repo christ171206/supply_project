@@ -11,6 +11,7 @@ class Categorie extends Model
         'slug',
         'description',
         'image',
+        'is_active',
     ];
 
     public function produits()

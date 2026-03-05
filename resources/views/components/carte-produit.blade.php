@@ -47,7 +47,7 @@
             class="absolute bottom-3 right-3 p-2.5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transform scale-0 group-hover:scale-100 transition-all duration-300 hover:bg-primary-50 text-2xl hover:shadow-xl active:scale-95"
             title="Ajouter aux favoris"
         >
-            🤍
+            <x-heroicon-o-heart class="w-6 h-6" />
         </button>
     </div>
 
@@ -93,7 +93,7 @@
                    class="flex-1 px-4 py-3 bg-gray-100 text-gray-900 font-semibold rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-all duration-150 text-center text-sm border border-gray-300 hover:border-gray-400"
                    title="Voir les détails du produit"
                    aria-label="Afficher tous les détails du produit {{ $produit->nom }}">
-                    👁️ Détails
+                    <x-heroicon-o-eye class="w-5 h-5" /> Détails
                 </a>
                 @if($produit->stock > 0)
                     <button
@@ -103,7 +103,7 @@
                         aria-label="Ajouter {{ $produit->nom }} au panier ({{ $produit->stock }} en stock)"
                         title="Ajouter {{ $produit->nom }} au panier"
                     >
-                        🛒 Ajouter
+                        <x-heroicon-o-shopping-cart class=\"w-4 h-4\" /><span>Ajouter</span>
                     </button>
                 @else
                     <button disabled class="flex-1 px-4 py-3 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed text-sm opacity-60" aria-disabled="true" title="Ce produit est actuellement indisponible">

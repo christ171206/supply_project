@@ -122,6 +122,9 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
     Route::get('/dashboard', [VendeurProduitController::class, 'dashboard'])->name('dashboard');
     Route::get('/apercu', [VendeurProduitController::class, 'apercu'])->name('apercu');
 
+    // API Notifications
+    Route::get('/api/notifications', [VendeurProduitController::class, 'getNotifications'])->name('notifications');
+
     // Stock Management
     Route::get('/stock', [VendeurProduitController::class, 'stock'])->name('stock');
 
@@ -163,3 +166,4 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
 });
 
 require __DIR__ . '/auth.php';
+require __DIR__ . '/admin.php';

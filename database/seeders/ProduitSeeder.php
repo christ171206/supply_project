@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Categorie;
 use App\Models\Produit;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class ProduitSeeder extends Seeder
@@ -13,11 +14,24 @@ class ProduitSeeder extends Seeder
      */
     public function run(): void
     {
+        // Récupérer l'utilisateur vendeur de test
+        $vendeurTest = User::where('email', 'testshop@supply.ci')->first();
+        
+        // Si le vendeur test n'existe pas, le créer
+        if (!$vendeurTest) {
+            $vendeurTest = User::create([
+                'name' => 'Test Shop',
+                'email' => 'testshop@supply.ci',
+                'password' => bcrypt('testshop123'),
+                'role' => 'vendor',
+                'email_verified_at' => now(),
+            ]);
+        }
         // Créer les catégories enrichies (18 catégories)
         $categories = [
             // Informatique
-            ['nom' => 'Ordinateurs Portables', 'slug' => 'ordinateurs-portables', 'description' => 'Laptops performants pour le travail et loisirs', 'image' => 'Ordinateur portable.jpg'],
-            ['nom' => 'Ordinateurs de Bureau', 'slug' => 'ordinateurs-bureau', 'description' => 'Unités centrales et tours gaming', 'image' => 'Ordinateur portable.jpg'],
+            ['nom' => 'Ordinateurs Portables', 'slug' => 'ordinateurs-portables', 'description' => 'Laptops performants pour le travail et loisirs', 'image' => 'Ordinateurs Portables.jpg'],
+            ['nom' => 'Ordinateurs de Bureau', 'slug' => 'ordinateurs-bureau', 'description' => 'Unités centrales et tours gaming', 'image' => 'Ordinateurs de Bureau.jpg'],
             ['nom' => 'Écrans & Moniteurs', 'slug' => 'ecrans-moniteurs', 'description' => 'Moniteurs haute résolution et gaming', 'image' => 'Ecran.jpg'],
 
             // Périphériques
@@ -27,25 +41,25 @@ class ProduitSeeder extends Seeder
             ['nom' => 'Webcams & Microphones', 'slug' => 'webcams-microphones', 'description' => 'Caméras, microphones pour visioconférence et streaming', 'image' => 'Webcams.jpg'],
 
             // Stockage & Mémoire
-            ['nom' => 'SSD & HDD', 'slug' => 'ssd-hdd', 'description' => 'Disques durs et SSD haute vitesse', 'image' => 'storage.jpg'],
-            ['nom' => 'Clés USB & Cartes Mémoire', 'slug' => 'cles-usb-cartes', 'description' => 'Clés USB rapides et cartes microSD', 'image' => 'usb.jpg'],
+            ['nom' => 'SSD & HDD', 'slug' => 'ssd-hdd', 'description' => 'Disques durs et SSD haute vitesse', 'image' => 'SSD & HDD.jpg'],
+            ['nom' => 'Clés USB & Cartes Mémoire', 'slug' => 'cles-usb-cartes', 'description' => 'Clés USB rapides et cartes microSD', 'image' => 'Clés USB & Cartes Mémoire.jpg'],
 
             // Accessoires
-            ['nom' => 'Tapis & Supports', 'slug' => 'tapis-supports', 'description' => 'Tapis souris, supports écran et laptop', 'image' => 'mousepad.jpg'],
-            ['nom' => 'Câbles & Connecteurs', 'slug' => 'cables-connecteurs', 'description' => 'Câbles USB, HDMI, de données', 'image' => 'cables.jpg'],
-            ['nom' => 'Hubs & Docking', 'slug' => 'hubs-docking', 'description' => 'Hubs USB et stations d\'accueil', 'image' => 'hub.jpg'],
+            ['nom' => 'Tapis & Supports', 'slug' => 'tapis-supports', 'description' => 'Tapis souris, supports écran et laptop', 'image' => 'Tapis & Supports.jpeg'],
+            ['nom' => 'Câbles & Connecteurs', 'slug' => 'cables-connecteurs', 'description' => 'Câbles USB, HDMI, de données', 'image' => 'Câbles & Connecteurs.jpg'],
+            ['nom' => 'Hubs & Docking', 'slug' => 'hubs-docking', 'description' => 'Hubs USB et stations d\'accueil', 'image' => 'Hubs & Docking.jpg'],
 
             // Réseau & Connectivité
-            ['nom' => 'Routeurs & Modems', 'slug' => 'routeurs-modems', 'description' => 'Équipements réseau haute vitesse', 'image' => 'router.jpg'],
-            ['nom' => 'Adaptateurs Réseau', 'slug' => 'adaptateurs-reseau', 'description' => 'Cartes réseau et adaptateurs Wifi', 'image' => 'adapter.jpg'],
+            ['nom' => 'Routeurs & Modems', 'slug' => 'routeurs-modems', 'description' => 'Équipements réseau haute vitesse', 'image' => 'Routeurs & Modems.jpg'],
+            ['nom' => 'Adaptateurs Réseau', 'slug' => 'adaptateurs-reseau', 'description' => 'Cartes réseau et adaptateurs Wifi', 'image' => 'Adaptateurs Réseau.jpeg'],
 
             // Composants
-            ['nom' => 'Processeurs', 'slug' => 'processeurs', 'description' => 'CPUs Intel et AMD dernière génération', 'image' => 'cpu.jpg'],
-            ['nom' => 'Cartes Graphiques', 'slug' => 'cartes-graphiques', 'description' => 'GPUs NVIDIA RTX et AMD radeon', 'image' => 'gpu.jpg'],
-            ['nom' => 'Mémoire RAM', 'slug' => 'memoire-ram', 'description' => 'RAM DDR4 et DDR5', 'image' => 'ram.jpg'],
+            ['nom' => 'Processeurs', 'slug' => 'processeurs', 'description' => 'CPUs Intel et AMD dernière génération', 'image' => 'Processeurs.jpg'],
+            ['nom' => 'Cartes Graphiques', 'slug' => 'cartes-graphiques', 'description' => 'GPUs NVIDIA RTX et AMD radeon', 'image' => 'Cartes Graphiques.jpg'],
+            ['nom' => 'Mémoire RAM', 'slug' => 'memoire-ram', 'description' => 'RAM DDR4 et DDR5', 'image' => 'Mémoire RAM.jpg'],
 
             // Alimentation & Refroidissement
-            ['nom' => 'Alimentations & Refroidissement', 'slug' => 'alimentations-refroidissement', 'description' => 'Blocs d\'alimentation, refroidisseurs, ventilateurs', 'image' => 'psu.jpg'],
+            ['nom' => 'Alimentations & Refroidissement', 'slug' => 'alimentations-refroidissement', 'description' => 'Blocs d\'alimentation, refroidisseurs, ventilateurs', 'image' => 'Alimentations & Refroidissement.jpg'],
         ];
 
         foreach ($categories as $cat) {
@@ -174,6 +188,7 @@ class ProduitSeeder extends Seeder
         ];
 
         foreach ($produits as $produit) {
+            $produit['user_id'] = $vendeurTest->id;
             Produit::create($produit);
         }
     }

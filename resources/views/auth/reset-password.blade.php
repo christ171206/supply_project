@@ -36,7 +36,7 @@
             <!-- Nouveau Mot de Passe -->
             <div class="mb-6">
                 <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
-                    🔐 Nouveau Mot de Passe
+                    <x-heroicon-o-lock-closed class=\"w-5 h-5\" /><span>Nouveau Mot de Passe</span>
                 </label>
                 <input
                     type="password"

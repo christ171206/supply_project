@@ -3,7 +3,7 @@
     <!-- Header with Period Selector -->
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h2 class="text-3xl font-bold text-gray-900">📊 Statistiques Commerciales</h2>
+            <h2 class="text-3xl font-bold text-gray-900 flex items-center gap-2"><x-heroicon-o-chart-bar class="w-8 h-8" /><span>Statistiques Commerciales</span></h2>
             <p class="text-gray-600 mt-2">Suivez vos ventes et performances</p>
         </div>
         <div class="flex gap-2">
@@ -25,11 +25,11 @@
         <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200 hover:shadow-lg transition">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-blue-700 text-sm font-semibold mb-2">💰 Ventes Totales</p>
+                    <p class="text-blue-700 text-sm font-semibold mb-2 flex items-center gap-1"><x-heroicon-o-banknotes class="w-4 h-4" /><span>Ventes Totales</span></p>
                     <p class="text-3xl font-bold text-blue-900" x-text="formatCurrency(indicators.totalVentes)"></p>
                     <p class="text-blue-600 text-xs mt-2">Période sélectionnée</p>
                 </div>
-                <div class="text-4xl opacity-20">💰</div>
+                <div class="text-4xl opacity-20"><x-heroicon-o-banknotes class="w-10 h-10" /></div>
             </div>
         </div>
 
@@ -37,11 +37,11 @@
         <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200 hover:shadow-lg transition">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-green-700 text-sm font-semibold mb-2">📦 Commandes</p>
+                    <p class="text-green-700 text-sm font-semibold mb-2 flex items-center gap-1"><x-heroicon-o-cube class="w-4 h-4" /><span>Commandes</span></p>
                     <p class="text-3xl font-bold text-green-900" x-text="indicators.totalCommandes"></p>
                     <p class="text-green-600 text-xs mt-2">Ordres reçues</p>
                 </div>
-                <div class="text-4xl opacity-20">📦</div>
+                <div class="text-4xl opacity-20"><x-heroicon-o-cube class="w-10 h-10" /></div>
             </div>
         </div>
 
@@ -49,7 +49,7 @@
         <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 hover:shadow-lg transition">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-purple-700 text-sm font-semibold mb-2">📈 Panier Moyen</p>
+                    <p class="text-purple-700 text-sm font-semibold mb-2 flex items-center gap-1"><x-heroicon-o-chart-line class="w-4 h-4" /><span>Panier Moyen</span></p>
                     <p class="text-3xl font-bold text-purple-900" x-text="formatCurrency(indicators.averageOrderValue)"></p>
                     <p class="text-purple-600 text-xs mt-2">Par commande</p>
                 </div>
@@ -75,7 +75,7 @@
         <!-- Sales Chart -->
         <div class="lg:col-span-2 bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition">
             <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>📊</span>
+                <span><x-heroicon-o-chart-bar class="w-5 h-5" /></span>
                 Tendance des Ventes
             </h3>
             <div id="salesChart" style="height: 320px;"></div>
@@ -106,7 +106,7 @@
         <!-- Stock Status -->
         <div class="lg:col-span-2 bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition">
             <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>📦</span>
+                <span><x-heroicon-o-cube class="w-5 h-5" /></span>
                 État du Stock
             </h3>
             <div id="inventoryChart" style="height: 320px;"></div>
@@ -115,15 +115,15 @@
         <!-- Summary -->
         <div class="space-y-3">
             <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                <p class="text-green-700 text-sm font-semibold">✅ Stock Bon</p>
+                <p class="text-green-700 text-sm font-semibold flex items-center gap-1"><x-heroicon-o-check-circle class="w-4 h-4" /><span>Stock Bon</span></p>
                 <p class="text-2xl font-bold text-green-900" x-text="inventoryStatus['Bon'] || 0"></p>
             </div>
             <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-4 border border-yellow-200">
-                <p class="text-yellow-700 text-sm font-semibold">⚠️ Stock Bas</p>
+                <p class="text-yellow-700 text-sm font-semibold flex items-center gap-1"><x-heroicon-o-exclamation-triangle class="w-4 h-4" /><span>Stock Bas</span></p>
                 <p class="text-2xl font-bold text-yellow-900" x-text="(inventoryStatus['Bas'] || 0) + (inventoryStatus['Critique'] || 0)"></p>
             </div>
             <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
-                <p class="text-red-700 text-sm font-semibold">❌ Rupture</p>
+                <p class="text-red-700 text-sm font-semibold flex items-center gap-1"><x-heroicon-o-x-circle class="w-4 h-4" /><span>Rupture</span></p>
                 <p class="text-2xl font-bold text-red-900" x-text="inventoryStatus['Rupture'] || 0"></p>
             </div>
         </div>
@@ -134,7 +134,7 @@
         <!-- Rating Distribution -->
         <div class="lg:col-span-2 bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition">
             <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>⭐</span>
+                <span><x-heroicon-o-star class="w-5 h-5" /></span>
                 Évaluations Clients
             </h3>
             <div id="ratingChart" style="height: 320px;"></div>
@@ -142,13 +142,13 @@
 
         <!-- Satisfaction Score -->
         <div class="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl p-6 border border-cyan-200 hover:shadow-lg transition">
-            <p class="text-cyan-700 text-sm font-semibold mb-4">⭐ Satisfaction Client</p>
+            <p class="text-cyan-700 text-sm font-semibold mb-4 flex items-center gap-1"><x-heroicon-o-star class="w-4 h-4" /><span>Satisfaction Client</span></p>
 
             <div class="mb-6">
                 <div class="text-4xl font-black text-cyan-900 mb-2" x-text="customerMetrics.averageRating + '/5'"></div>
                 <div class="flex gap-1">
                     <template x-each="[1,2,3,4,5]">
-                        <span :class="__.index + 1 <= Math.round(customerMetrics.averageRating) ? 'text-yellow-400' : 'text-gray-300'">⭐</span>
+                        <span :class="__.index + 1 <= Math.round(customerMetrics.averageRating) ? 'text-yellow-400' : 'text-gray-300'"><x-heroicon-o-star class="w-5 h-5" /></span>
                     </template>
                 </div>
             </div>

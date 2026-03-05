@@ -44,11 +44,12 @@ class MessageController extends Controller
         $currentUser = Auth::user();
         $otherUser = User::findOrFail($userId);
 
-        // Récupérer les messages de cette conversation
+        // Récupérer les messages de cette conversation avec les produits
         $messages = Message::where(function ($query) use ($currentUser, $userId) {
             $query->where('from_user_id', $currentUser->id)->where('to_user_id', $userId)
                 ->orWhere('from_user_id', $userId)->where('to_user_id', $currentUser->id);
         })
+            ->with('produit')
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -70,6 +71,17 @@ class MessageController extends Controller
      */
     public function store(Request $request)
     {
+        // Les administrateurs ne peuvent pas envoyer de messages directs
+        if (Auth::user()->is_admin) {
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Les administrateurs n\'ont pas le droit d\'envoyer des messages directs.'
+                ], 403);
+            }
+            return back()->with('error', 'Les administrateurs n\'ont pas le droit d\'envoyer des messages directs.');
+        }
+
         try {
             // Validation basique
             $request->validate([
@@ -120,6 +132,7 @@ class MessageController extends Controller
             $message = Message::create([
                 'from_user_id' => Auth::id(),
                 'to_user_id' => $destinataireId,
+                'produit_id' => $request->input('produit_id'),
                 'contenu' => $contenu,
                 'lu' => false,
             ]);

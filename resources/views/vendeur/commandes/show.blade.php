@@ -18,7 +18,7 @@
     <!-- En-tête avec retour -->
     <div class="flex items-center gap-4 mb-8">
         <a href="{{ route('vendeur.commandes') }}" class="text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-2">
-            ← Retour aux commandes
+            <x-heroicon-o-arrow-left class="w-5 h-5" /><span>Retour aux commandes</span>
         </a>
     </div>
 
@@ -33,7 +33,7 @@
         <div class="lg:col-span-2 space-y-8">
             <!-- Articles commandés -->
             <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-6">📦 Articles Commandés</h2>
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-heroicon-o-cube class="w-6 h-6" /><span>Articles Commandés</span></h2>
 
                 @if($commande->ligneCommandes->count() > 0)
                     <div class="space-y-4">
@@ -85,7 +85,7 @@
 
             <!-- Paiement -->
             <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-6">💳 Informations de Paiement</h2>
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-heroicon-o-credit-card class="w-6 h-6" /><span>Informations de Paiement</span></h2>
 
                 @if($commande->payment)
                     <div class="space-y-4">
@@ -97,9 +97,9 @@
                             <p class="text-gray-700">Statut Paiement</p>
                             <p class="font-bold">
                                 @if($commande->payment->statut == 'complete')
-                                    <span class="text-green-600">✓ Complété</span>
+                                    <span class="text-green-600 flex items-center gap-1"><x-heroicon-o-check-circle class="w-4 h-4" /><span>Complété</span></span>
                                 @else
-                                    <span class="text-orange-600">⏳ En attente</span>
+                                    <span class="text-orange-600 flex items-center gap-1"><x-heroicon-o-clock class="w-4 h-4" /><span>En attente</span></span>
                                 @endif
                             </p>
                         </div>
@@ -118,7 +118,7 @@
         <div class="space-y-6">
             <!-- Résumé commande -->
             <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-6">📊 Résumé</h2>
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-heroicon-o-chart-bar class="w-6 h-6" /><span>Résumé</span></h2>
 
                 <div class="space-y-4">
                     <div class="flex justify-between pb-4 border-b-2 border-gray-200">
@@ -137,7 +137,7 @@
 
             <!-- Statut et Actions -->
             <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-6">⚙️ Statut</h2>
+                <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-heroicon-o-cog-6-tooth class="w-6 h-6" /><span>Statut</span></h2>
 
                 @php
                     $colors = [
@@ -147,10 +147,10 @@
                         'livree' => 'bg-green-100 text-green-700'
                     ];
                     $labels = [
-                        'en_attente' => '⏳ En Attente',
-                        'confirmee' => '✓ Confirmée',
-                        'expediee' => '📦 Expédiée',
-                        'livree' => '✓ Livrée'
+                        'en_attente' => 'En Attente',
+                        'confirmee' => 'Confirmée',
+                        'expediee' => 'Expédiée',
+                        'livree' => 'Livrée'
                     ];
                 @endphp
 
@@ -176,15 +176,15 @@
 
                 <!-- Boutons d'action pour changer le statut -->
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
-                    <p class="text-sm font-bold text-gray-900 mb-4">🎯 Actions Disponibles</p>
+                    <p class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-rocket-launch class="w-5 h-5" /><span>Actions Disponibles</span></p>
                     <div class="space-y-3">
                         @if($commande->statut == 'en_attente')
                             <form method="POST" action="{{ route('vendeur.commandes.update-status', $commande->id) }}" style="display: block;">
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="statut" value="confirmee">
-                                <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105">
-                                    ✓ CONFIRMER LA COMMANDE
+                                <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2">
+                                    <x-heroicon-o-check-circle class="w-5 h-5" /><span>CONFIRMER LA COMMANDE</span>
                                 </button>
                                 <p class="text-xs text-gray-700 mt-2">La commande passe du statut "En Attente" à "Confirmée"</p>
                             </form>
@@ -195,8 +195,8 @@
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="statut" value="expediee">
-                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105">
-                                📦 EXPÉDIER LA COMMANDE
+                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2">
+                                <x-heroicon-o-cube class="w-5 h-5" /><span>EXPÉDIER LA COMMANDE</span>
                             </button>
                             <p class="text-xs text-gray-700 mt-2">La commande passe du statut "Confirmée" à "Expédiée"</p>
                         </form>
@@ -207,8 +207,8 @@
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="statut" value="livree">
-                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105">
-                                ✓ MARQUER COMME LIVRÉE
+                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition font-bold text-base shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2">
+                                <x-heroicon-o-check-circle class="w-5 h-5" /><span>MARQUER COMME LIVRÉE</span>
                             </button>
                             <p class="text-xs text-gray-700 mt-2">La commande passe du statut "Expédiée" à "Livrée"</p>
                         </form>
@@ -218,10 +218,14 @@
                     <!-- Boutons d'annulation et suppression -->
                     @if($commande->statut !== 'livree' && $commande->statut !== 'annulee')
                         <div class="border-t-2 border-gray-200 pt-4 mt-4">
-                            <form method="POST" action="{{ route('vendeur.commandes.cancel', $commande->id) }}" onsubmit="return confirm('Êtes-vous sûr d\'annuler cette commande? Le stock sera rétabli.');">
+                            <form method="POST" action="{{ route('vendeur.commandes.cancel', $commande->id) }}"
+                                  data-confirm="Êtes-vous sûr d'annuler cette commande? Le stock sera rétabli."
+                                  data-confirm-title="Annuler la commande"
+                                  data-confirm-type="warning"
+                                  data-confirm-button="Annuler">
                                 @csrf
                                 <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition font-bold text-base shadow-lg hover:shadow-xl">
-                                    ⛔ Annuler la Commande
+                                    <x-heroicon-o-no-symbol class="w-5 h-5 inline mr-2" /><span>Annuler la Commande</span>
                                 </button>
                             </form>
                         </div>
@@ -229,11 +233,15 @@
 
                     @if(in_array($commande->statut, ['en_attente', 'annulee']))
                         <div class="border-t-2 border-gray-200 pt-4 mt-4">
-                            <form method="POST" action="{{ route('vendeur.commandes.delete', $commande->id) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande? Cette action est irréversible.');">
+                            <form method="POST" action="{{ route('vendeur.commandes.delete', $commande->id) }}"
+                                  data-confirm="Êtes-vous sûr de vouloir supprimer cette commande? Cette action est irréversible."
+                                  data-confirm-title="Supprimer la commande"
+                                  data-confirm-type="danger"
+                                  data-confirm-button="Supprimer">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition font-bold text-base shadow-lg hover:shadow-xl">
-                                    🗑️ Supprimer la Commande
+                                    <x-heroicon-o-trash class="w-5 h-5 inline mr-2" /><span>Supprimer la Commande</span>
                                 </button>
                             </form>
                         </div>

@@ -10,27 +10,27 @@
 
     <!-- Menu Items -->
     <nav class="mt-6 px-4 space-y-2">
-        <!-- 📊 Aperçu -->
+        <!-- Aperçu -->
         <a href="{{ route('vendeur.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all
                   {{ request()->routeIs('vendeur.index', 'vendeur.apercu')
                      ? 'bg-primary-600 text-white shadow-sm'
                      : 'text-gray-700 hover:bg-gray-100' }}">
-            <span class="text-xl">📊</span>
+            <x-heroicon-o-cube class="w-5 h-5" />
             <span class="font-medium">Aperçu</span>
         </a>
 
-        <!-- 📦 Mes produits -->
+        <!-- Mes produits -->
         <a href="{{ route('vendeur.produits.index') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all
                   {{ request()->routeIs('vendeur.produits.*')
                      ? 'bg-primary-600 text-white shadow-sm'
                      : 'text-gray-700 hover:bg-gray-100' }}">
-            <span class="text-xl">📦</span>
+            <span class="text-xl"><x-heroicon-o-cube class="w-5 h-5" /></span>
             <span class="font-medium">Mes produits</span>
         </a>
 
-        <!-- 🛒 Gestion du stock -->
+        <!-- Gestion du stock -->
         <a href="{{ route('vendeur.stock.alertes') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all
                   {{ request()->routeIs('vendeur.stock.*')
@@ -76,13 +76,13 @@
             <span class="font-medium">Historique</span>
         </a>
 
-        <!-- 💬 Messages -->
+        <!-- Messages -->
         <a href="{{ route('vendeur.messages') }}"
            class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all
                   {{ request()->routeIs('vendeur.messages')
                      ? 'bg-primary-600 text-white shadow-sm'
                      : 'text-gray-700 hover:bg-gray-100' }}">
-            <span class="text-xl">💬</span>
+            <span class="text-xl"><x-heroicon-o-chat-bubble-left class="w-5 h-5" /></span>
             <span class="font-medium">Messages</span>
             @php
                 $messagesUnread = auth()->user()->messagesRecus()->where('lu', false)->count();
@@ -116,10 +116,14 @@
         </a>
 
         <!-- 🚪 Déconnexion -->
-        <form action="{{ route('logout') }}" method="POST" class="mt-4">
+        <form method="POST" action="{{ route('logout') }}"
+              class="mt-4 w-full"
+              data-confirm="Êtes-vous sûr de vouloir vous déconnecter ?"
+              data-confirm-title="Déconnexion"
+              data-confirm-type="warning"
+              data-confirm-button="Déconnexion">
             @csrf
-            <button type="submit"
-                    class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-danger-50 transition-all hover:text-danger-700">
+            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-danger-50 transition-all hover:text-danger-700">
                 <span class="text-xl">🚪</span>
                 <span class="font-medium">Déconnexion</span>
             </button>

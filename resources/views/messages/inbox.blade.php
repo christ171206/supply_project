@@ -6,8 +6,8 @@
         <!-- Header -->
         <div class="mb-8">
             <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-3xl shadow-lg">
-                    💬
+                <div class="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center shadow-lg">
+                    <x-heroicon-o-chat-bubble-left class="w-8 h-8 text-white" />
                 </div>
                 <div>
                     <h1 class="text-4xl font-bold text-gray-900">Mes Messages</h1>
@@ -20,7 +20,7 @@
         @if(session('success'))
             <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow">
                 <div class="flex items-start gap-3">
-                    <span class="text-2xl">✓</span>
+                    <x-heroicon-o-check-circle class="w-6 h-6 text-green-600 flex-shrink-0" />
                     <p class="text-green-800 font-semibold">{{ session('success') }}</p>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                             </a>
                         @empty
                             <div class="text-center py-12 text-gray-500">
-                                <p class="text-4xl mb-2">📭</p>
+                                <x-heroicon-o-inbox class="w-12 h-12 mb-2 mx-auto text-gray-400" />
                                 <p class="text-sm font-medium">Aucune conversation</p>
                                 <p class="text-xs mt-2">Commencez à discuter avec les vendeurs</p>
                             </div>
@@ -98,8 +98,9 @@
                                         <p class="text-sm text-gray-600">{{ $otherUser->shop_name ?? 'Client' }}</p>
                                     </div>
                                 </div>
-                                <a href="{{ route('client.messages') }}" class="text-gray-600 hover:text-gray-900 transition font-semibold">
-                                    ← Retour
+                                <a href="{{ route('client.messages') }}" class="text-gray-600 hover:text-gray-900 transition font-semibold flex items-center gap-2">
+                                    <x-heroicon-o-arrow-left class="w-5 h-5" />
+                                    <span>Retour</span>
                                 </a>
                             </div>
                         </div>
@@ -125,7 +126,7 @@
                             @empty
                                 <div class="flex items-center justify-center h-full text-center text-gray-500">
                                     <div>
-                                        <p class="text-5xl mb-3">💬</p>
+                                        <x-heroicon-o-chat-bubble-left class="w-16 h-16 mb-3 mx-auto text-gray-400" />
                                         <p class="font-semibold text-gray-900">Aucun message</p>
                                         <p class="text-sm text-gray-600 mt-2">Commencez la conversation ci-dessous</p>
                                     </div>
@@ -157,7 +158,7 @@
                 @else
                     <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 p-12 text-center h-[600px] flex items-center justify-center">
                         <div>
-                            <p class="text-6xl mb-3">💬</p>
+                            <x-heroicon-o-chat-bubble-left class="w-20 h-20 mb-3 mx-auto text-gray-400" />
                             <h3 class="text-2xl font-bold text-gray-900 mb-2">Sélectionnez une conversation</h3>
                             <p class="text-gray-600">Choisissez une conversation à gauche pour commencer à discuter</p>
                         </div>

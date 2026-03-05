@@ -33,25 +33,48 @@
             <div id="messages-container" class="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
                 @forelse($messages as $msg)
                     <div class="flex {{ $msg->from_user_id === Auth::id() ? 'justify-end' : 'justify-start' }}" data-message-id="{{ $msg->id }}">
-                        <div class="max-w-xs lg:max-w-md {{ $msg->from_user_id === Auth::id() ? 'bg-primary-600 text-white rounded-3xl rounded-tr-none' : 'bg-gray-100 text-gray-900 rounded-3xl rounded-tl-none' }} px-5 py-3 shadow-md">
-                            <p class="text-sm leading-relaxed">{{ $msg->contenu }}</p>
-                            <div class="flex items-center gap-2 mt-2 {{ $msg->from_user_id === Auth::id() ? 'justify-end' : 'justify-start' }}">
-                                <p class="text-xs {{ $msg->from_user_id === Auth::id() ? 'text-primary-100' : 'text-gray-500' }}">
-                                    {{ $msg->created_at->format('H:i') }}
-                                </p>
-                                <!-- Coches de confirmation de lecture (gris → bleu) -->
-                                @if($msg->from_user_id === Auth::id())
-                                    <span class="text-xs {{ $msg->lu ? 'text-primary-300' : 'text-primary-400' }} font-semibold" title="{{ $msg->lu ? 'Lu' : 'Non lu' }}">
-                                        {{ $msg->lu ? '✓✓' : '✓' }}
-                                    </span>
-                                @endif
+                        <div class="block space-y-2">
+                            <!-- Produit associé (si existe) -->
+                            @if($msg->produit)
+                                <div class="max-w-xs lg:max-w-md bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-lg p-3">
+                                    <div class="flex gap-3">
+                                        @if($msg->produit->images && is_array($msg->produit->images) && count($msg->produit->images) > 0)
+                                            <img src="{{ asset('storage/' . $msg->produit->images[0]) }}" alt="{{ $msg->produit->nom }}" class="w-16 h-16 object-cover rounded">
+                                        @elseif($msg->produit->image)
+                                            <img src="{{ asset('storage/produits/' . $msg->produit->image) }}" alt="{{ $msg->produit->nom }}" class="w-16 h-16 object-cover rounded">
+                                        @else
+                                            <div class="w-16 h-16 bg-gray-300 rounded flex items-center justify-center"><x-heroicon-o-cube class="w-8 h-8" /></div>
+                                        @endif
+                                        <div class="flex-1">
+                                            <p class="text-xs text-blue-600 font-semibold flex items-center gap-1"><x-heroicon-o-cube class="w-4 h-4" /><span>PRODUIT</span></p>
+                                            <p class="text-sm font-bold text-gray-900 line-clamp-1">{{ $msg->produit->nom }}</p>
+                                            <p class="text-xs text-blue-700 font-semibold">{{ number_format($msg->produit->prix, 0, ',', ' ') }} FCFA</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Message text -->
+                            <div class="max-w-xs lg:max-w-md {{ $msg->from_user_id === Auth::id() ? 'bg-primary-600 text-white rounded-3xl rounded-tr-none' : 'bg-gray-100 text-gray-900 rounded-3xl rounded-tl-none' }} px-5 py-3 shadow-md">
+                                <p class="text-sm leading-relaxed">{{ $msg->contenu }}</p>
+                                <div class="flex items-center gap-2 mt-2 {{ $msg->from_user_id === Auth::id() ? 'justify-end' : 'justify-start' }}">
+                                    <p class="text-xs {{ $msg->from_user_id === Auth::id() ? 'text-primary-100' : 'text-gray-500' }}">
+                                        {{ $msg->created_at->format('H:i') }}
+                                    </p>
+                                    <!-- Coches de confirmation de lecture (gris → bleu) -->
+                                    @if($msg->from_user_id === Auth::id())
+                                        <span class="text-xs {{ $msg->lu ? 'text-primary-300' : 'text-primary-400' }} font-semibold" title="{{ $msg->lu ? 'Lu' : 'Non lu' }}">
+                                            {{ $msg->lu ? '✓✓' : '✓' }}
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
                 @empty
                     <div class="flex items-center justify-center h-full text-center text-gray-500">
                         <div>
-                            <p class="text-6xl mb-4">💬</p>
+                            <p class="text-6xl mb-4"><x-heroicon-o-chat-bubble-left class="w-16 h-16" /></p>
                             <p class="font-semibold text-lg">Aucun message</p>
                             <p class="text-sm mt-2">Commencez la conversation ci-dessous</p>
                         </div>
@@ -169,7 +192,7 @@
 
     socket.on('user-typing', function(data) {
         if (data.userId === otherUserId && data.isTyping) {
-            typingIndicator.textContent = '💬 En train d\'écrire...';
+            typingIndicator.textContent = 'En train d\'écrire...';
             typingIndicator.classList.add('animate-pulse');
         } else if (data.userId === otherUserId && !data.isTyping) {
             typingIndicator.textContent = '';
@@ -198,7 +221,7 @@
 
         // Désactiver le bouton d'envoi
         sendBtn.disabled = true;
-        sendBtn.textContent = '⏳ Envoi...';
+        sendBtn.textContent = 'Envoi...';
 
         // Envoyer le message via AJAX
         fetch('{{ route('messages.reply', $otherUser->id) }}', {
@@ -259,7 +282,7 @@
             // Afficher erreur
             const alert = document.getElementById('alert');
             alert.className = 'mt-3 p-3 bg-red-100 text-red-700 rounded-lg';
-            alert.textContent = '❌ Erreur lors de l\'envoi du message';
+            alert.textContent = 'Erreur lors de l\'envoi du message';
             alert.classList.remove('hidden');
             setTimeout(() => alert.classList.add('hidden'), 3000);
         });

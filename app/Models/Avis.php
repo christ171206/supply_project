@@ -11,6 +11,11 @@ class Avis extends Model
         'produit_id',
         'note',
         'commentaire',
+        'lu',
+    ];
+
+    protected $casts = [
+        'lu' => 'boolean',
     ];
 
     public function user()

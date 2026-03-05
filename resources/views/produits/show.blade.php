@@ -73,7 +73,7 @@
                             </button>
                         @else
                             <div class="flex-shrink-0 w-16 h-16 rounded-lg border-2 border-gray-300 bg-gray-100 flex items-center justify-center text-sm text-gray-400">
-                                📦
+                            <div class="w-16 h-16 bg-gray-300 rounded flex items-center justify-center"><x-heroicon-o-cube class="w-8 h-8" /></div>
                             </div>
                         @endif
                     </div>
@@ -171,9 +171,9 @@
                 <button
                     type="button"
                     onclick="openContactModal({{ $produit->vendeur->id ?? 0 }}, '{{ addslashes($produit->vendeur->shop_name ?? $produit->vendeur->name ?? 'Vendeur') }}', {{ $produit->id }}, '{{ addslashes($produit->nom) }}')"
-                    class="w-full py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-primary-500/50 transition-all duration-200"
+                    class="w-full py-3 px-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-primary-500/50 transition-all duration-200 flex items-center justify-center gap-2"
                 >
-                    💬 Contacter le Vendeur
+                    <x-heroicon-o-chat-bubble-left class="w-5 h-5" /><span>Contacter le Vendeur</span>
                 </button>
 
                 <!-- Bouton WhatsApp -->
@@ -227,7 +227,7 @@
                             </div>
                             <div class="flex gap-0.5">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <span class="text-sm">{{ $i <= $av->note ? '⭐' : '☆' }}</span>
+                                    <span class="text-sm">{{ $i <= $av->note ? '' : '' }}</span>
                                 @endfor
                             </div>
                         </div>
@@ -235,10 +235,14 @@
                         @auth
                             @if(auth()->id() === $av->user_id)
                                 <div class="mt-3 pt-3 border-t border-gray-200">
-                                    <form action="{{ route('avis.destroy', $av->id) }}" method="POST" class="inline">
+                                    <form action="{{ route('avis.destroy', $av->id) }}" method="POST" class="inline"
+                                          data-confirm="Êtes-vous sûr de vouloir supprimer cet avis ?"
+                                          data-confirm-title="Supprimer l'avis"
+                                          data-confirm-type="danger"
+                                          data-confirm-button="Supprimer">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" onclick="return confirm('Êtes-vous sûr?')" class="text-xs text-danger-600 hover:text-danger-700">
+                                        <button type="submit" class="text-xs text-danger-600 hover:text-danger-700">
                                             Supprimer
                                         </button>
                                     </form>
@@ -255,7 +259,7 @@
             @endif
         @else
             <div class="card text-center p-8">
-                <p class="text-4xl mb-2">💬</p>
+                <p class="text-4xl mb-2"><x-heroicon-o-chat-bubble-left class="w-10 h-10" /></p>
                 <p class="text-gray-600">Aucun avis pour le moment</p>
             </div>
         @endif
@@ -295,13 +299,13 @@
 
                         labels.forEach((label, index) => {
                             label.addEventListener('mouseenter', () => {
-                                stars.forEach((s, i) => s.textContent = i <= index ? '⭐' : '☆');
+                                stars.forEach((s, i) => s.textContent = i <= index ? '' : '');
                             });
                             label.addEventListener('click', () => { inputs[index].checked = true; });
                         });
                         document.getElementById('rating-stars').addEventListener('mouseleave', () => {
                             const selected = Array.from(inputs).findIndex(i => i.checked);
-                            stars.forEach((s, i) => s.textContent = i <= selected ? '⭐' : '☆');
+                            stars.forEach((s, i) => s.textContent = i <= selected ? '' : '');
                         });
                     });
                 </script>
@@ -370,10 +374,10 @@
 
                     <!-- Aperçu du Produit -->
                     <div id="productPreview" class="hidden mb-6 p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg">
-                        <p class="text-xs font-semibold text-blue-600 mb-2">📦 PRODUIT</p>
+                        <p class="text-xs font-semibold text-blue-600 mb-2 flex items-center gap-1"><x-heroicon-o-cube class="w-4 h-4" /><span>PRODUIT</span></p>
                         <div class="flex gap-3">
                             <div id="productImage" class="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden flex items-center justify-center">
-                                <span class="text-2xl">📦</span>
+                                <span class="text-2xl"><x-heroicon-o-cube class="w-6 h-6" /></span>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p id="productNamePreview" class="font-semibold text-gray-900 text-sm truncate"></p>
@@ -466,7 +470,7 @@
                 document.getElementById('modalVendorName').textContent = vendorName;
                 document.getElementById('modalVendorId').value = vendorId;
                 document.getElementById('modalProduitId').value = productId;
-                document.getElementById('sujet').value = '📦 Demande sur: ' + productName;
+                document.getElementById('sujet').value = 'Demande sur: ' + productName;
                 document.getElementById('message').focus();
                 document.body.style.overflow = 'hidden';
 
@@ -488,8 +492,8 @@
                         .then(data => {
                             if (data.success) {
                                 const produit = data.data;
-                                productPricePreview.textContent = `💰 ${new Intl.NumberFormat('fr-FR').format(produit.prix)} F CFA`;
-                                productStockPreview.textContent = `📊 Stock: ${produit.stock}`;
+                                productPricePreview.textContent = `${new Intl.NumberFormat('fr-FR').format(produit.prix)} F CFA`;
+                                productStockPreview.textContent = `Stock: ${produit.stock}`;
 
                                 // Afficher l'image du produit si disponible
                                 if (produit.image) {
@@ -500,7 +504,7 @@
                         .catch(error => {
                             console.log('Erreur récupération produit:', error);
                             // Si erreur, afficher juste le nom et prix par défaut
-                            productPricePreview.textContent = '💰 Prix non disponible';
+                            productPricePreview.textContent = 'Prix non disponible';
                         });
                 }
             @else

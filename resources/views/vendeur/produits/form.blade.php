@@ -124,7 +124,7 @@
                                    class="sr-only peer">
                             <div class="w-16 h-8 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-7 after:w-7 after:transition-all peer-checked:bg-green-500"></div>
                             <span class="ml-3 text-sm font-semibold text-gray-900 toggle-label">
-                                {{ old('est_actif', $produit->est_actif ?? true) ? '✅ Actif' : '⊘ Inactif' }}
+                                {{ old('est_actif', $produit->est_actif ?? true) ? 'Actif' : '⌀ Inactif' }}
                             </span>
                         </label>
                     </div>
@@ -254,6 +254,30 @@
 
             // Afficher les aperçus
             showPreviews(selectedFiles.files);
+            
+            // Mettre à jour le texte du dropZone sans perdre les event listeners
+            updateDropZoneText(selectedFiles.files.length);
+        }
+
+        function updateDropZoneText(currentCount) {
+            const label = dropZone.querySelector('p:first-child');
+            const sublabel = dropZone.querySelector('p:last-child');
+            
+            if (currentCount > 0) {
+                if (label) {
+                    label.innerHTML = `${currentCount} image(s) sélectionnée(s) (${currentCount}/${MAX_IMAGES})`;
+                }
+                if (sublabel) {
+                    sublabel.innerHTML = `Glissez d'autres images pour les ajouter`;
+                }
+            } else {
+                if (label) {
+                    label.innerHTML = `🖼️`;
+                }
+                if (sublabel) {
+                    sublabel.innerHTML = `JPG, PNG • Max 5MB chacune`;
+                }
+            }
         }
 
         function showPreviews(files) {
@@ -276,16 +300,6 @@
 
                 reader.readAsDataURL(file);
             });
-
-            // Mettre à jour le compteur
-            const currentCount = files.length;
-            const imageCount = dropZone.querySelector('p:first-child');
-            if (currentCount > 0) {
-                dropZone.innerHTML = `
-                    <p class="text-lg text-green-600 font-semibold">✅ ${currentCount} image(s) sélectionnée(s) (${currentCount}/${MAX_IMAGES})</p>
-                    <p class="text-xs text-gray-500 mt-2">Glissez d'autres images pour les ajouter</p>
-                `;
-            }
         }
 
         // ====== TOGGLE SWITCH ======
@@ -294,7 +308,7 @@
 
         if (toggleSwitch) {
             toggleSwitch.addEventListener('change', () => {
-                toggleLabel.textContent = toggleSwitch.checked ? '✅ Actif' : '⊘ Inactif';
+                toggleLabel.textContent = toggleSwitch.checked ? 'Actif' : '⌀ Inactif';
             });
         }
     </script>

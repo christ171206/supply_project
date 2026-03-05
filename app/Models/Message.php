@@ -10,6 +10,7 @@ class Message extends Model
         'from_user_id',
         'to_user_id',
         'commande_id',
+        'produit_id',
         'contenu',
         'lu',
     ];
@@ -31,5 +32,10 @@ class Message extends Model
     public function commande()
     {
         return $this->belongsTo(Commande::class);
+    }
+
+    public function produit()
+    {
+        return $this->belongsTo(Produit::class);
     }
 }

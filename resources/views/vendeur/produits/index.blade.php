@@ -5,7 +5,10 @@
     <!-- En-tête avec bouton création -->
     <div class="flex justify-between items-center mb-8">
         <div>
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">📦 Mes Produits</h1>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                <x-heroicon-o-cube class="w-10 h-10" />
+                <span>Mes Produits</span>
+            </h1>
             <p class="text-gray-600">Gestion de votre catalogue de produits</p>
         </div>
         <a href="{{ route('vendeur.produits.create') }}" class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition font-semibold flex items-center gap-2">
@@ -42,8 +45,9 @@
                 @endforeach
             </select>
 
-            <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold">
-                🔍 Filtrer
+            <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-semibold flex items-center gap-2">
+                <x-heroicon-o-magnifying-glass class="w-5 h-5" />
+                <span>Filtrer</span>
             </button>
         </form>
     </div>
@@ -65,7 +69,7 @@
                                  class="w-full h-full object-cover hover:scale-105 transition">
                         @else
                             <div class="w-full h-full flex items-center justify-center text-4xl text-gray-300">
-                                📦
+                                <x-heroicon-o-cube class="w-16 h-16 text-gray-300" />
                             </div>
                         @endif
 
@@ -86,11 +90,12 @@
                         <div class="absolute top-3 left-3">
                             @if($produit->stock == 0)
                                 <span class="inline-block bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                                    ❌ Rupture
+                                    Rupture
                                 </span>
                             @elseif($produit->stock <= $produit->stock_minimum)
-                                <span class="inline-block bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                                    ⚠️ Stock Faible
+                                <span class="inline-block bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                                    <x-heroicon-o-exclamation-triangle class="w-4 h-4" />
+                                    <span>Stock Faible</span>
                                 </span>
                             @else
                                 <span class="inline-block bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold">
@@ -103,8 +108,9 @@
                     <!-- Contenu -->
                     <div class="p-4">
                         <!-- Catégorie -->
-                        <p class="text-xs text-primary-600 font-semibold mb-1">
-                            🏷️ {{ $produit->categorie->nom ?? 'N/A' }}
+                        <p class="text-xs text-primary-600 font-semibold mb-1 flex items-center gap-1">
+                            <x-heroicon-o-tag class="w-4 h-4" />
+                            <span>{{ $produit->categorie->nom ?? 'N/A' }}</span>
                         </p>
 
                         <!-- Nom & Description -->
@@ -116,13 +122,19 @@
                         <!-- Prix & Stock -->
                         <div class="grid grid-cols-2 gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
                             <div>
-                                <p class="text-xs text-gray-600">💰 Prix</p>
+                                <p class="text-xs text-gray-600 flex items-center gap-1">
+                                    <x-heroicon-o-banknotes class="w-4 h-4" />
+                                    <span>Prix</span>
+                                </p>
                                 <p class="text-lg font-bold text-green-600">
                                     {{ number_format($produit->prix, 0, ',', ' ') }} CFA
                                 </p>
                             </div>
                             <div>
-                                <p class="text-xs text-gray-600">📊 Stock</p>
+                                <p class="text-xs text-gray-600 flex items-center gap-1">
+                                    <x-heroicon-o-chart-bar class="w-4 h-4" />
+                                    <span>Stock</span>
+                                </p>
                                 <p class="text-lg font-bold text-blue-600">
                                     {{ $produit->stock }}
                                 </p>
@@ -133,14 +145,20 @@
                         <!-- Actions -->
                         <div class="flex gap-2">
                             <a href="{{ route('vendeur.produits.edit', $produit->id) }}"
-                               class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold text-center">
-                                ✏️ Éditer
+                               class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-semibold text-center flex items-center justify-center gap-2">
+                                <x-heroicon-o-pencil-square class="w-4 h-4" />
+                                <span>Éditer</span>
                             </a>
-                            <form method="POST" action="{{ route('vendeur.produits.destroy', $produit->id) }}" class="flex flex-1" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est définitive.');">
+                            <form method="POST" action="{{ route('vendeur.produits.destroy', $produit->id) }}" class="flex flex-1"
+                                  data-confirm="Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est définitive."
+                                  data-confirm-title="Supprimer le produit"
+                                  data-confirm-type="danger"
+                                  data-confirm-button="Supprimer">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold">
-                                    🗑️ Supprimer
+                                <button type="submit" class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-semibold flex items-center justify-center gap-2">
+                                    <x-heroicon-o-trash class="w-4 h-4" />
+                                    <span>Supprimer</span>
                                 </button>
                             </form>
                         </div>

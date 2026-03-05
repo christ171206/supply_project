@@ -251,7 +251,7 @@
         <!-- Informations Client et Livraison -->
         <div class="info-section">
             <div class="info-block">
-                <h3>📦 Informations Client</h3>
+                <h3>Informations Client</h3>
                 <p><strong>{{ auth()->user()->name }}</strong></p>
                 <p>{{ auth()->user()->email }}</p>
                 <p>{{ auth()->user()->phone ?? 'Non renseigné' }}</p>

@@ -17,7 +17,11 @@ class Commande extends Model
         'adresse_detail',
         'telephone_livraison',
         'quartier_id',
+        'pays',
         'notes',
+        'delivery_zone_id',
+        'delivery_status',
+        'expected_delivery_date',
     ];
 
     protected $casts = [
@@ -47,5 +51,20 @@ class Commande extends Model
     public function quartier()
     {
         return $this->belongsTo(Quartier::class);
+    }
+
+    public function deliveryZone()
+    {
+        return $this->belongsTo(DeliveryZone::class);
+    }
+
+    public function deliveryTracking()
+    {
+        return $this->hasMany(DeliveryTracking::class);
+    }
+
+    public function dispute()
+    {
+        return $this->hasOne(Dispute::class);
     }
 }

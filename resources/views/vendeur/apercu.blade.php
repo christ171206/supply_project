@@ -4,7 +4,7 @@
 <div class="p-8 bg-gradient-to-br from-slate-50 to-white min-h-screen">
     <!-- En-tête -->
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 mb-2">👁️ Aperçu Boutique</h1>
+        <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-2"><x-heroicon-o-eye class="w-8 h-8" /><span>Aperçu Boutique</span></h1>
         <p class="text-gray-600">Vue d'ensemble de votre boutique et performances</p>
     </div>
 
@@ -13,8 +13,8 @@
         <!-- Ventes Totales -->
         <div class="bg-white rounded-xl shadow-lg border-l-4 border-green-500 p-6 hover:shadow-xl transition">
             <div class="flex items-center justify-between mb-2">
-                <p class="text-gray-600 text-sm font-semibold">💰 Ventes Totales</p>
-                <span class="text-2xl">📊</span>
+                <p class="text-gray-600 text-sm font-semibold flex items-center gap-1"><x-heroicon-o-banknotes class="w-4 h-4" /><span>Ventes Totales</span></p>
+                <x-heroicon-o-chart-bar class="w-6 h-6 text-gray-400" />
             </div>
             <p class="text-3xl font-bold text-green-600">{{ number_format($totalVentes, 0, ',', ' ') }} CFA</p>
             <p class="text-xs text-gray-500 mt-2">Chiffre d'affaires total</p>
@@ -23,8 +23,8 @@
         <!-- Commandes -->
         <div class="bg-white rounded-xl shadow-lg border-l-4 border-blue-500 p-6 hover:shadow-xl transition">
             <div class="flex items-center justify-between mb-2">
-                <p class="text-gray-600 text-sm font-semibold">🛒 Commandes</p>
-                <span class="text-2xl">📦</span>
+                <p class="text-gray-600 text-sm font-semibold flex items-center gap-1"><x-heroicon-o-shopping-cart class="w-4 h-4" /><span>Commandes</span></p>
+                <x-heroicon-o-cube class="w-6 h-6 text-gray-400" />
             </div>
             <p class="text-3xl font-bold text-blue-600">{{ $nombreCommandes }}</p>
             <p class="text-xs text-gray-500 mt-2">Panier moyen: {{ number_format($panierMoyen, 0, ',', ' ') }} CFA</p>
@@ -33,8 +33,8 @@
         <!-- Produits -->
         <div class="bg-white rounded-xl shadow-lg border-l-4 border-purple-500 p-6 hover:shadow-xl transition">
             <div class="flex items-center justify-between mb-2">
-                <p class="text-gray-600 text-sm font-semibold">📦 Produits</p>
-                <span class="text-2xl">🏷️</span>
+                <p class="text-gray-600 text-sm font-semibold flex items-center gap-1"><x-heroicon-o-cube class="w-4 h-4" /><span>Produits</span></p>
+                <x-heroicon-o-tag class="w-6 h-6 text-gray-400" />
             </div>
             <p class="text-3xl font-bold text-purple-600">{{ $nombreProduits }}</p>
             <p class="text-xs text-gray-500 mt-2">Produits en ligne</p>
@@ -43,8 +43,8 @@
         <!-- Notation -->
         <div class="bg-white rounded-xl shadow-lg border-l-4 border-yellow-500 p-6 hover:shadow-xl transition">
             <div class="flex items-center justify-between mb-2">
-                <p class="text-gray-600 text-sm font-semibold">⭐ Notation</p>
-                <span class="text-2xl">🌟</span>
+                <p class="text-gray-600 text-sm font-semibold flex items-center gap-1"><x-heroicon-o-star class="w-4 h-4 text-yellow-500" /><span>Notation</span></p>
+                <x-heroicon-o-star class="w-6 h-6 text-yellow-400" />
             </div>
             <p class="text-3xl font-bold text-yellow-600">{{ round($noteMoyenne, 1) }}/5</p>
             <p class="text-xs text-gray-500 mt-2">{{ $nombreAvis }} avis clients</p>
@@ -55,7 +55,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Taux de Complétude Profil -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">📝 Complétude du Profil</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-document-text class="w-5 h-5" /><span>Complétude du Profil</span></h3>
             <div class="space-y-4">
                 <div>
                     <div class="flex justify-between items-center mb-2">
@@ -72,41 +72,41 @@
                         <p class="text-sm text-gray-600 mb-3">Éléments à compléter:</p>
                         <div class="space-y-2 text-sm">
                             @if(!auth()->user()->shop_name)
-                                <p class="text-orange-600">❌ Nom de la boutique</p>
+                                <p class="text-orange-600 flex items-center gap-1"><x-heroicon-o-x-circle class="w-4 h-4" /><span>Nom de la boutique</span></p>
                             @else
-                                <p class="text-green-600">✓ Nom de la boutique</p>
+                                <p class="text-green-600 flex items-center gap-1"><x-heroicon-o-check-circle class="w-4 h-4" /><span>Nom de la boutique</span></p>
                             @endif
                             
                             @if(!auth()->user()->description)
-                                <p class="text-orange-600">❌ Description boutique</p>
+                                <p class="text-orange-600 flex items-center gap-1"><x-heroicon-o-x-circle class="w-4 h-4" /><span>Description boutique</span></p>
                             @else
-                                <p class="text-green-600">✓ Description boutique</p>
+                                <p class="text-green-600 flex items-center gap-1"><x-heroicon-o-check-circle class="w-4 h-4" /><span>Description boutique</span></p>
                             @endif
                             
                             @if(!auth()->user()->phone)
-                                <p class="text-orange-600">❌ Téléphone</p>
+                                <p class="text-orange-600 flex items-center gap-1"><x-heroicon-o-x-circle class="w-4 h-4" /><span>Téléphone</span></p>
                             @else
-                                <p class="text-green-600">✓ Téléphone</p>
+                                <p class="text-green-600 flex items-center gap-1"><x-heroicon-o-check-circle class="w-4 h-4" /><span>Téléphone</span></p>
                             @endif
                             
                             @if(!auth()->user()->address)
-                                <p class="text-orange-600">❌ Adresse</p>
+                                <p class="text-orange-600 flex items-center gap-1"><x-heroicon-o-x-circle class="w-4 h-4" /><span>Adresse</span></p>
                             @else
-                                <p class="text-green-600">✓ Adresse</p>
+                                <p class="text-green-600 flex items-center gap-1"><x-heroicon-o-check-circle class="w-4 h-4" /><span>Adresse</span></p>
                             @endif
                             
                             @if(!auth()->user()->profile_photo)
-                                <p class="text-orange-600">❌ Photo de profil</p>
+                                <p class="text-orange-600 flex items-center gap-1"><x-heroicon-o-x-circle class="w-4 h-4" /><span>Photo de profil</span></p>
                             @else
-                                <p class="text-green-600">✓ Photo de profil</p>
+                                <p class="text-green-600 flex items-center gap-1"><x-heroicon-o-check-circle class="w-4 h-4" /><span>Photo de profil</span></p>
                             @endif
                         </div>
                         
-                        <a href="{{ route('vendeur.profil') }}" class="mt-4 inline-block bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition font-semibold text-sm">
-                            Compléter le profil →
+                        <a href="{{ route('vendeur.profil') }}" class="mt-4 inline-block bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition font-semibold text-sm flex items-center gap-2">
+                            <span>Compléter le profil</span><x-heroicon-o-arrow-right class="w-4 h-4" />
                         </a>
                     @else
-                        <p class="text-green-600 font-semibold text-center">✓ Profil complété à 100%!</p>
+                        <p class="text-green-600 font-semibold text-center flex items-center justify-center gap-2"><x-heroicon-o-check-circle class="w-5 h-5" /><span>Profil completé à 100%!</span></p>
                     @endif
                 </div>
             </div>
@@ -114,7 +114,7 @@
 
         <!-- Statut des Commandes -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">📊 Statut des Commandes</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-chart-bar class="w-5 h-5" /><span>Statut des Commandes</span></h3>
             <div class="space-y-4">
                 <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                     <div>
@@ -149,8 +149,8 @@
                 </div>
 
                 <div class="pt-4 border-t border-gray-200">
-                    <a href="{{ route('vendeur.commandes') }}" class="block text-center bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition font-semibold text-sm">
-                        Voir toutes les commandes →
+                    <a href="{{ route('vendeur.commandes') }}" class="block text-center bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition font-semibold text-sm flex items-center justify-center gap-2">
+                        <span>Voir toutes les commandes</span><x-heroicon-o-arrow-right class="w-4 h-4" />
                     </a>
                 </div>
             </div>
@@ -161,7 +161,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 mb-8">
         <!-- Graphique Statut Commandes -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">🎯 Distribution des Commandes</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-rocket-launch class="w-5 h-5" /><span>Distribution des Commandes</span></h3>
             <div class="h-72 flex justify-center">
                 <canvas id="chartStatutApercu"></canvas>
             </div>
@@ -169,7 +169,7 @@
 
         <!-- Graphique Top Produits -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">🏆 Top 5 Produits (Ventes)</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-star class="w-5 h-5 text-yellow-500" /><span>Top 5 Produits (Ventes)</span></h3>
             <div class="h-72">
                 <canvas id="chartTopProduitsApercu"></canvas>
             </div>
@@ -180,7 +180,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Top 5 Produits -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">📊 Détail Top 5 Produits</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-chart-bar class="w-5 h-5" /><span>Détail Top 5 Produits</span></h3>
             <div class="space-y-3">
                 @forelse($topProduits as $idx => $produit)
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
@@ -198,7 +198,7 @@
 
         <!-- Avis Récents -->
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">⭐ Avis Récents</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-star class="w-5 h-5 text-yellow-500" /><span>Avis Récents</span></h3>
             <div class="space-y-3">
                 @forelse($avisRecents as $avis)
                     <div class="p-3 bg-gray-50 rounded-lg">
@@ -207,9 +207,9 @@
                             <div class="flex items-center gap-1">
                                 @for($i = 1; $i <= 5; $i++)
                                     @if($i <= $avis->note)
-                                        <span class="text-yellow-400">⭐</span>
+                                        <x-heroicon-o-star class="w-4 h-4 text-yellow-400 fill-yellow-400" />
                                     @else
-                                        <span class="text-gray-300">☆</span>
+                                        <x-heroicon-o-star class="w-4 h-4 text-gray-300" />
                                     @endif
                                 @endfor
                             </div>
