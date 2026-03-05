@@ -1,42 +1,39 @@
 [nixpacks]
-# Utiliser nixpacks pour détecter et configurer
+providers = ["php", "nodejs-npm"]
 
 [build.env]
-# Variables de build
 LOG_CHANNEL = "stdout"
 APP_ENV = "production"
 APP_DEBUG = "false"
 
 [install.apt]
-# Paquets système supplémentaires
 packages = ["libmysqlclient-dev", "libpng-dev", "libjpeg-dev", "libfreetype6-dev"]
 
-[phases]
-# Phase de setup du système
-setup = ["apt-get update"]
+[phases.setup]
+cmds = ["apt-get update && apt-get install -y libmysqlclient-dev"]
 
-# Phase d'installation des dépendances
-installer = [
-  "composer install --optimize-autoloader --no-dev --no-interaction --ignore-platform-reqs 2>&1",
+[phases.installer]
+cmds = [
+  "composer install --optimize-autoloader --no-dev --no-interaction --ignore-platform-reqs",
   "npm ci --prefer-offline --no-audit"
 ]
 
-# Phase de build
-build = [
+[phases.build]
+cmds = [
   "npm run build",
   "mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache",
-  "chmod -R a+rw storage bootstrap/cache",
-  "php artisan config:cache 2>/dev/null || true",
-  "php artisan route:cache 2>/dev/null || true",
-  "php artisan view:cache 2>/dev/null || true"
+  "chmod -R 777 storage bootstrap/cache",
+  "php artisan config:cache || true",
+  "php artisan route:cache || true",
+  "php artisan view:cache || true"
 ]
 
-# Phase de release (avant le lancement)
-release = [
-  "php artisan migrate --force 2>&1 || true",
-  "php artisan db:seed --force 2>&1 || true"
+[phases.release]
+cmds = [
+  "php artisan migrate --force || true",
+  "php artisan db:seed --force || true"
 ]
 
-# Commande de démarrage
-start = "vendor/bin/heroku-php-apache2 public/"
+[start]
+cmd = "vendor/bin/heroku-php-apache2 public/"
 
