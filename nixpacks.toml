@@ -22,16 +22,16 @@ cmds = [
 cmds = [
   "npm run build",
   "mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache",
-  "chmod -R 777 storage bootstrap/cache",
-  "php artisan config:cache || true",
-  "php artisan route:cache || true",
-  "php artisan view:cache || true"
+  "chmod -R 777 storage bootstrap/cache"
 ]
 
 [phases.release]
 cmds = [
   "php artisan migrate --force || true",
-  "php artisan db:seed --force || true"
+  "php artisan db:seed --force || true",
+  "php artisan config:cache || true",
+  "php artisan route:cache || true",
+  "php artisan view:cache || true"
 ]
 
 [start]
