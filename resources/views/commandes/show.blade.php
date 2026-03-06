@@ -91,12 +91,20 @@
                         <div class="flex justify-between p-4 bg-gray-50 rounded-lg">
                             <span class="text-gray-700 font-semibold">Statut du paiement:</span>
                             <span class="font-bold
-                                @if(strtolower($payment->payment_status) === 'confirmée' || strtolower($payment->payment_status) === 'confirmed') text-green-600
-                                @elseif(strtolower($payment->payment_status) === 'en_attente' || strtolower($payment->payment_status) === 'pending') text-yellow-600
-                                @else text-red-600
+                                @if($payment->payment_status === 'confirmee') text-green-600
+                                @elseif($payment->payment_status === 'en_attente') text-yellow-600
+                                @elseif($payment->payment_status === 'echouee') text-red-600
+                                @else text-gray-600
                                 @endif
                             ">
-                                {{ ucfirst(str_replace('_', ' ', $payment->payment_status)) }}
+                                {{ match($payment->payment_status) {
+                                    'initialisee' => 'Initialisée',
+                                    'en_attente' => 'En attente',
+                                    'confirmee' => 'Confirmée',
+                                    'echouee' => 'Échouée',
+                                    'annulee' => 'Annulée',
+                                    default => ucfirst(str_replace('_', ' ', $payment->payment_status))
+                                } }}
                             </span>
                         </div>
                         <div class="flex justify-between p-4 bg-gray-50 rounded-lg">

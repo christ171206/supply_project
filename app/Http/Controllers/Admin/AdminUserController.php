@@ -89,7 +89,7 @@ class AdminUserController extends Controller
             ->count();
 
         if ($pendingDocs === 0) {
-            $document->user->update(['vendor_status' => 'verified']);
+            $document->user->update(['vendor_status' => 'approved']);
         }
 
         return redirect()->back()->with('success', 'Document approuvé avec succès.');

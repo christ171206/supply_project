@@ -21,11 +21,11 @@ class AdminReportController extends Controller
         $endDate = $request->input('end_date', now()->endOfMonth());
 
         $totalRevenue = Commande::whereBetween('created_at', [$startDate, $endDate])
-            ->where('statut', 'delivered')
+            ->where('statut', 'livree')
             ->sum('total');
 
         $orderCount = Commande::whereBetween('created_at', [$startDate, $endDate])
-            ->where('statut', 'delivered')
+            ->where('statut', 'livree')
             ->count();
 
         $averageOrderValue = $orderCount > 0 ? $totalRevenue / $orderCount : 0;
@@ -33,7 +33,7 @@ class AdminReportController extends Controller
         // Revenu par jour
         $dailyRevenue = Commande::selectRaw('DATE(created_at) as date, COUNT(*) as orders, SUM(total) as revenue')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->where('statut', 'delivered')
+            ->where('statut', 'livree')
             ->groupBy('date')
             ->get();
 
@@ -45,7 +45,7 @@ class AdminReportController extends Controller
             ->join('ligne_commandes', 'produits.id', '=', 'ligne_commandes.produit_id')
             ->join('commandes', 'ligne_commandes.commande_id', '=', 'commandes.id')
             ->whereBetween('commandes.created_at', [$startDate, $endDate])
-            ->where('commandes.statut', 'delivered')
+            ->where('commandes.statut', 'livree')
             ->groupBy('users.id', 'users.name', 'users.shop_name')
             ->orderByDesc('revenue')
             ->get();
@@ -69,8 +69,8 @@ class AdminReportController extends Controller
         $vendors = User::where('role', 'vendor')
             ->select('users.id', 'users.name', 'users.shop_name')
             ->selectRaw('COUNT(DISTINCT commandes.id) as total_orders')
-            ->selectRaw('SUM(CASE WHEN commandes.statut = "delivered" THEN 1 ELSE 0 END) as delivered_orders')
-            ->selectRaw('SUM(CASE WHEN commandes.statut = "cancelled" THEN 1 ELSE 0 END) as cancelled_orders')
+            ->selectRaw('SUM(CASE WHEN commandes.statut = "livree" THEN 1 ELSE 0 END) as delivered_orders')
+            ->selectRaw('SUM(CASE WHEN commandes.statut = "annulee" THEN 1 ELSE 0 END) as cancelled_orders')
             ->selectRaw('SUM(commandes.total) as total_revenue')
             ->selectRaw('AVG(DATEDIFF(CURDATE(), commandes.created_at)) as avg_delivery_time')
             ->leftJoin('produits', 'users.id', '=', 'produits.user_id')
@@ -235,7 +235,7 @@ class AdminReportController extends Controller
 
             $data = Commande::selectRaw('DATE(created_at) as date, COUNT(*) as orders, SUM(total) as revenue')
                 ->whereBetween('created_at', [$startDate, $endDate])
-                ->where('statut', 'delivered')
+                ->where('statut', 'livree')
                 ->groupBy('date')
                 ->get();
 
