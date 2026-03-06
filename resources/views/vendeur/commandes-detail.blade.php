@@ -169,7 +169,7 @@
                 </div>
             @else
                 <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-                    <p class="text-yellow-700 font-medium flex items-center gap-2"><x-icon name="alert-circle" class="w-4 h-4" /> Aucune information de paiement</p>
+                    <p class="text-yellow-700 font-medium flex items-center gap-2"><x-heroicon-o-exclamation-triangle class="w-4 h-4" /> Aucune information de paiement</p>
                 </div>
             @endif
 

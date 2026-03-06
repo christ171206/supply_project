@@ -185,9 +185,9 @@
                     </a>
                     <button type="submit" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl transition shadow-lg hover:shadow-xl">
                         @if(isset($produit))
-                            <x-icon name="save" class="w-4 h-4 inline mr-1" /> Mettre à jour
+                            <x-heroicon-o-check-circle class="w-4 h-4 inline mr-1" /> Mettre à jour
                         @else
-                            <x-icon name="check-circle" class="w-4 h-4 inline mr-1" /> Ajouter le produit
+                            <x-heroicon-o-check-circle class="w-4 h-4 inline mr-1" /> Ajouter le produit
                         @endif
                     </button>
                 </div>

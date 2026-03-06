@@ -12,7 +12,7 @@
             <p class="text-slate-500 mt-2 text-lg">Gérez vos inventaires et seuils</p>
         </div>
         <a href="{{ route('vendeur.produits.create') }}" class="bg-sky-400 hover:bg-sky-500 text-white px-8 py-4 rounded-lg font-bold transition shadow-md transform hover:scale-105">
-            <x-icon name="plus-circle" class="w-5 h-5 mr-2 inline" /> Ajouter Produit
+            <x-heroicon-o-light-bulb class="w-5 h-5 mr-2 inline" /> Ajouter Produit
         </a>
     </div>
 
