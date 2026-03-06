@@ -126,10 +126,9 @@ class RegisteredUserController extends Controller
         // Envoyer l'email avec le code
         Mail::send(new EmailVerificationCodeMail($user, $verificationCode));
 
-        // Sauvegarder l'email et le code en session pour la vérification
+        // Sauvegarder l'email en session pour la vérification
         session([
             'registration_email' => $user->email,
-            'verification_code_debug' => config('app.env') === 'local' ? $verificationCode : null,
         ]);
 
         Log::info('Code de vérification envoyé', ['email' => $user->email]);
