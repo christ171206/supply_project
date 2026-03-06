@@ -151,53 +151,6 @@
     </div>
 </body>
 </html>
-                                name="code"
-                                id="code"
-                                inputmode="numeric"
-                                maxlength="6"
-                                placeholder="000000"
-                                class="w-full px-5 py-4 text-center text-4xl font-bold tracking-widest border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none transition bg-gray-50 hover:bg-white"
-                                required
-                                autofocus
-                            />
-                            @error('code')
-                                <p class="text-red-600 text-sm mt-2 flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18.101 12.93a1 1 0 00-1.414 0L10 20.485l-6.687-6.686a1 1 0 00-1.414 1.414l7.394 7.394a1 1 0 001.414 0l8.394-8.393a1 1 0 000-1.414z" clip-rule="evenodd"/></path></svg>
-                                    {{ $message }}
-                                </p>
-                            @enderror
-                        </div>
-
-                        <button
-                            type="submit"
-                            class="w-full bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-700 hover:to-accent-700 text-white font-bold py-4 px-6 rounded-lg transition duration-300 transform hover:scale-105 active:scale-95 text-lg shadow-lg"
-                        >
-                            Vérifier le code
-                        </button>
-                    </form>
-
-                    <!-- Options supplémentaires -->
-                    <div class="mt-8 space-y-4 border-t border-gray-200 pt-8">
-                        <!-- Renvoyer le code -->
-                        <div>
-                            <p class="text-sm text-gray-600 text-center mb-3">Vous n'avez pas reçu le code ?</p>
-                            <form action="{{ route('verification.code.resend') }}" method="POST">
-                                @csrf
-                                <button
-                                    type="submit"
-                                    class="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-lg border border-gray-300 transition duration-200 hover:border-gray-400"
-                                >
-                                    Renvoyer le code
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Recommencer -->
-                        <div>
-                            <a href="{{ route('register') }}" class="block text-center text-primary-600 hover:text-primary-700 font-semibold py-3 px-4 rounded-lg hover:bg-primary-50 transition duration-200">
-                                Recommencer l'inscription
-                            </a>
-                        </div>
                     </div>
 
                     <!-- Infos importantes -->

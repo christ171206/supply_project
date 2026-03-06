@@ -10,7 +10,7 @@
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Dernière Activité</h3>
             @php
                 /** @var \App\Models\SecurityLog|null $lastActivity */
-                $lastActivity = Auth::user()->securityLogs()->latest()->first();
+                $lastActivity = auth()->user()->securityLogs()->latest()->first();
             @endphp
             @if($lastActivity)
                 <div class="space-y-2">
@@ -44,7 +44,7 @@
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">⚠️ Activités Suspectes</h3>
             @php
-                $suspiciousActivity = Auth::user()->securityLogs()
+                $suspiciousActivity = auth()->user()->securityLogs()
                     ->where('status', 'failed')
                     ->latest()
                     ->limit(3)
@@ -84,7 +84,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse(Auth::user()->securityLogs()->latest()->limit(10)->get() as $log)
+                    @forelse(auth()->user()->securityLogs()->latest()->limit(10)->get() as $log)
                         <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
                             <td class="px-6 py-4">
                                 {!! $log->getEventLabel() !!}

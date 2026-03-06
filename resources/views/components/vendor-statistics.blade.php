@@ -199,7 +199,7 @@ function vendorStats() {
 
         async loadSalesData() {
             try {
-                const response = await fetch(`{{ route('vendeur:statistics.sales') }}?days=${this.period}`);
+                const response = await fetch(`{{ route('vendeur.statistics.sales') }}?days=${this.period}`);
                 const data = await response.json();
                 if (data.success) {
                     this.chartData = data.data;
@@ -214,7 +214,7 @@ function vendorStats() {
 
         async loadInventoryStatus() {
             try {
-                const response = await fetch(`{{ route('vendeur:statistics.inventory') }}`);
+                const response = await fetch(`{{ route('vendeur.statistics.inventory') }}`);
                 const data = await response.json();
                 if (data.success) {
                     this.inventoryStatus = data.data;
@@ -227,7 +227,7 @@ function vendorStats() {
 
         async loadCustomerMetrics() {
             try {
-                const response = await fetch(`{{ route('vendeur:statistics.customers') }}`);
+                const response = await fetch(`{{ route('vendeur.statistics.customers') }}`);
                 const data = await response.json();
                 if (data.success) {
                     this.customerMetrics = data.data;
