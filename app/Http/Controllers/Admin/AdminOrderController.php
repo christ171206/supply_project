@@ -64,7 +64,7 @@ class AdminOrderController extends Controller
     public function updateStatus(Request $request, Commande $commande)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,ready,shipped,delivered,cancelled',
+            'status' => 'required|in:en_attente,confirmee,expediee,livree,annulee',
         ]);
 
         $commande->update(['statut' => $request->input('status')]);

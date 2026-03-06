@@ -34,8 +34,15 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-gray-600 font-medium">STATUT COMMANDE</p>
-                            <span class="px-3 py-1 mt-2 @if($commande->statut === 'en_attente') bg-yellow-100 text-yellow-800 @elseif($commande->statut === 'en_cours') bg-blue-100 text-blue-800 @elseif($commande->statut === 'prete') bg-purple-100 text-purple-800 @else bg-red-100 text-red-800 @endif rounded-full text-xs font-semibold inline-block">
-                                {{ ucfirst(str_replace('_', ' ', $commande->statut)) }}
+                            <span class="px-3 py-1 mt-2 @if($commande->statut === 'en_attente') bg-yellow-100 text-yellow-800 @elseif($commande->statut === 'confirmee') bg-blue-100 text-blue-800 @elseif($commande->statut === 'expediee') bg-purple-100 text-purple-800 @elseif($commande->statut === 'livree') bg-green-100 text-green-800 @else bg-red-100 text-red-800 @endif rounded-full text-xs font-semibold inline-block">
+                                {{ match($commande->statut) {
+                                    'en_attente' => 'En attente',
+                                    'confirmee' => 'Confirmée',
+                                    'expediee' => 'Expédiée',
+                                    'livree' => 'Livrée',
+                                    'annulee' => 'Annulée',
+                                    default => ucfirst(str_replace('_', ' ', $commande->statut))
+                                } }}
                             </span>
                         </div>
                         <div>
@@ -165,11 +172,12 @@
                 
                 <form method="POST" action="{{ route('admin.orders.update-status', $commande->id) }}" class="space-y-3">
                     @csrf
-                    <select name="statut" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                         <option value="en_attente" @selected($commande->statut === 'en_attente')>⏳ En attente</option>
-                        <option value="en_cours" @selected($commande->statut === 'en_cours')>🔄 En cours</option>
-                        <option value="prete" @selected($commande->statut === 'prete')>✅ Prête</option>
-                        <option value="cancelled" @selected($commande->statut === 'cancelled')>❌ Annulée</option>
+                        <option value="confirmee" @selected($commande->statut === 'confirmee')>✅ Confirmée</option>
+                        <option value="expediee" @selected($commande->statut === 'expediee')>🚚 Expédiée</option>
+                        <option value="livree" @selected($commande->statut === 'livree')>✔️ Livrée</option>
+                        <option value="annulee" @selected($commande->statut === 'annulee')>❌ Annulée</option>
                     </select>
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
                         Mettre à jour
@@ -183,7 +191,7 @@
                 
                 <form method="POST" action="{{ route('admin.orders.update-delivery-status', $commande->id) }}" class="space-y-3">
                     @csrf
-                    <select name="delivery_status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                         <option value="pending" @selected($commande->delivery_status === 'pending')>⏳ En attente</option>
                         <option value="picked_up" @selected($commande->delivery_status === 'picked_up')>📦 Enlevée</option>
                         <option value="in_transit" @selected($commande->delivery_status === 'in_transit')>🚚 En transit</option>

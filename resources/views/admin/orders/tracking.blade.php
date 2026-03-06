@@ -38,11 +38,13 @@
                         <div class="mt-2">
                             @if($commande->statut === 'en_attente')
                                 <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">⏳ En attente</span>
-                            @elseif($commande->statut === 'en_cours')
-                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">🔄 En cours</span>
-                            @elseif($commande->statut === 'prete')
-                                <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">✅ Prête</span>
-                            @elseif($commande->statut === 'cancelled')
+                            @elseif($commande->statut === 'confirmee')
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">✅ Confirmée</span>
+                            @elseif($commande->statut === 'expediee')
+                                <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">🚚 Expédiée</span>
+                            @elseif($commande->statut === 'livree')
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">✔️ Livrée</span>
+                            @elseif($commande->statut === 'annulee')
                                 <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">❌ Annulée</span>
                             @else
                                 <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">{{ $commande->statut }}</span>

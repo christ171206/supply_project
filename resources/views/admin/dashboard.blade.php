@@ -246,14 +246,21 @@
                             <td class="px-6 py-4 font-bold text-green-600">{{ number_format($order->total ?? 0, 0, ',', ' ') }} FCFA</td>
                             <td class="px-6 py-4">
                                 <span class="px-3 py-1 rounded-full text-xs font-bold 
-                                    @if($order->statut === 'pending') bg-yellow-100 text-yellow-800
-                                    @elseif($order->statut === 'confirmed') bg-blue-100 text-blue-800
-                                    @elseif($order->statut === 'shipped') bg-indigo-100 text-indigo-800
-                                    @elseif($order->statut === 'delivered') bg-green-100 text-green-800
+                                    @if($order->statut === 'en_attente') bg-yellow-100 text-yellow-800
+                                    @elseif($order->statut === 'confirmee') bg-blue-100 text-blue-800
+                                    @elseif($order->statut === 'expediee') bg-indigo-100 text-indigo-800
+                                    @elseif($order->statut === 'livree') bg-green-100 text-green-800
                                     @else bg-red-100 text-red-800
                                     @endif
                                 ">
-                                    {{ ucfirst(str_replace('_', ' ', $order->statut)) }}
+                                    {{ match($order->statut) {
+                                        'en_attente' => 'En attente',
+                                        'confirmee' => 'Confirmée',
+                                        'expediee' => 'Expédiée',
+                                        'livree' => 'Livrée',
+                                        'annulee' => 'Annulée',
+                                        default => ucfirst(str_replace('_', ' ', $order->statut))
+                                    } }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-center">
@@ -343,7 +350,7 @@
         data: {
             labels: ['Attente', 'Confirmées', 'Expédiées', 'Livrées', 'Annulées'],
             datasets: [{
-                data: [@json($ordersByStatus['pending'] ?? 0), @json($ordersByStatus['confirmed'] ?? 0), @json($ordersByStatus['shipped'] ?? 0), @json($ordersByStatus['delivered'] ?? 0), @json($ordersByStatus['cancelled'] ?? 0)],
+                data: [@json($ordersByStatus['en_attente'] ?? 0), @json($ordersByStatus['confirmee'] ?? 0), @json($ordersByStatus['expediee'] ?? 0), @json($ordersByStatus['livree'] ?? 0), @json($ordersByStatus['annulee'] ?? 0)],
                 backgroundColor: ['#fbbf24', '#60a5fa', '#818cf8', '#34d399', '#f87171'],
                 borderColor: '#fff',
                 borderWidth: 3

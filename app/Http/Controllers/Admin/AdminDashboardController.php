@@ -45,11 +45,11 @@ class AdminDashboardController extends Controller
         $revenueGrowth = $lastMonthRevenue > 0 ? round((($thisMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100, 1) : 0;
 
         // Order statuses
-        $ordersAwaitingConfirmation = Commande::where('statut', 'pending')->count();
-        $ordersConfirmed = Commande::where('statut', 'confirmed')->orWhere('statut', 'processing')->count();
-        $ordersShipped = Commande::where('statut', 'shipped')->count();
-        $ordersDelivered = Commande::where('statut', 'delivered')->count();
-        $cancelledOrders = Commande::where('statut', 'cancelled')->orWhere('statut', 'rejected')->count();
+        $ordersAwaitingConfirmation = Commande::where('statut', 'en_attente')->count();
+        $ordersConfirmed = Commande::where('statut', 'confirmee')->count();
+        $ordersShipped = Commande::where('statut', 'expediee')->count();
+        $ordersDelivered = Commande::where('statut', 'livree')->count();
+        $cancelledOrders = Commande::where('statut', 'annulee')->count();
 
         // Other stats
         $pendingDisputes = Dispute::where('status', 'open')->count();
@@ -105,11 +105,11 @@ class AdminDashboardController extends Controller
 
         // Order status distribution
         $ordersByStatus = [
-            'pending' => $ordersAwaitingConfirmation,
-            'confirmed' => $ordersConfirmed,
-            'shipped' => $ordersShipped,
-            'delivered' => $ordersDelivered,
-            'cancelled' => $cancelledOrders,
+            'en_attente' => $ordersAwaitingConfirmation,
+            'confirmee' => $ordersConfirmed,
+            'expediee' => $ordersShipped,
+            'livree' => $ordersDelivered,
+            'annulee' => $cancelledOrders,
         ];
 
         // Revenue 7 days
