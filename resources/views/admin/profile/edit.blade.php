@@ -119,7 +119,7 @@
     <!-- Additional Info -->
     <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p class="text-sm text-blue-900">
-            <strong>Note :</strong> Votre adresse email est liée à votre compte de connexion. Pour modifier votre email ou votre mot de passe, veuillez accéder à la section <a href="{{ route('admin.security') }}" class="text-blue-600 hover:text-blue-700 font-semibold">Sécurité</a>.
+            <strong>Note :</strong> Votre adresse email est liée à votre compte de connexion. Pour modifier votre email ou votre mot de passe, veuillez accéder à la section <a href="{{ route('admin.security.index') }}" class="text-blue-600 hover:text-blue-700 font-semibold">Sécurité</a>.
         </p>
     </div>
 </div>

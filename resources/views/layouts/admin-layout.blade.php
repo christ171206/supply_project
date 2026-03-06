@@ -216,12 +216,12 @@
                                             <span>Profil</span>
                                         </a>
                                         
-                                        <a href="{{ route('admin.security') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <a href="{{ route('admin.security.index') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                                             <x-heroicon-o-lock-closed class="w-4 h-4" />
                                             <span>Sécurité</span>
                                         </a>
 
-                                        <a href="{{ route('admin.settings') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                                             <x-heroicon-o-cog-6-tooth class="w-4 h-4" />
                                             <span>Paramètres</span>
                                         </a>

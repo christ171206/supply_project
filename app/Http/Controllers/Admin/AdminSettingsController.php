@@ -59,7 +59,7 @@ class AdminSettingsController extends Controller
                 ->log('Settings updated');
         }
 
-        return redirect()->route('admin.settings')
+        return redirect()->route('admin.settings.index')
             ->with('success', 'Paramètres mis à jour avec succès');
     }
 
