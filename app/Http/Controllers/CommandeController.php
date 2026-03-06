@@ -419,8 +419,8 @@ class CommandeController extends Controller
         $lignes = $commande->ligneCommandes()->with('produit')->get();
         $payment = $commande->payment;
 
-        // Si le paiement n'est pas confirmé, on attend ou on affiche un message d'attente
-        if ($payment && $payment->payment_status === 'EN_ATTENTE') {
+        // If payment is not confirmed, show pending message
+        if ($payment && $payment->payment_status === 'en_attente') {
             return view('commandes.payment-pending', compact('commande', 'lignes', 'payment'));
         }
 

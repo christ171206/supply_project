@@ -367,17 +367,17 @@ class PaymentCinemaController extends Controller
             // Mettre à jour le statut du paiement
             if ($status === 'completed' || $status === 'SUCCESS') {
                 $payment->update([
-                    'payment_status' => 'CONFIRMÉE',
+                    'payment_status' => 'confirmee',
                     'payment_confirmed_at' => now(),
                 ]);
 
                 // Mettre à jour le statut de la commande
-                $payment->commande->update(['statut' => 'confirmée']);
+                $payment->commande->update(['statut' => 'confirmee']);
 
                 Log::info('Paiement confirmé', ['payment_id' => $payment->id, 'commande_id' => $payment->commande_id]);
             } else {
-                $payment->update(['payment_status' => 'ÉCHOUÉE']);
-                $payment->commande->update(['statut' => 'paiement_échoué']);
+                $payment->update(['payment_status' => 'echouee']);
+                $payment->commande->update(['statut' => 'annulee']);
 
                 Log::warning('Paiement échoué', ['payment_id' => $payment->id, 'status' => $status]);
             }
