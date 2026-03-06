@@ -217,6 +217,9 @@ class CommandeController extends Controller
 
             Log::info('Commande complète - succès', ['commande_id' => $commande->id]);
 
+            // Déclencher l'événement pour notifier les vendeurs
+            \App\Events\OrderCreated::dispatch($commande);
+
             // Rediriger vers la page de confirmation avec possibilité de paiement
             $redirectUrl = route('commandes.show', $commande->id);
 
