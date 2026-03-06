@@ -32,15 +32,15 @@
             <!-- Messages Container -->
             <div id="messages-container" class="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
                 @forelse($messages as $msg)
-                    <div class="flex {{ $msg->from_user_id === Auth::id() ? 'justify-end' : 'justify-start' }}" data-message-id="{{ $msg->id }}">
-                        <div class="max-w-xs lg:max-w-md {{ $msg->from_user_id === Auth::id() ? 'bg-primary-600 text-white rounded-3xl rounded-tr-none' : 'bg-gray-100 text-gray-900 rounded-3xl rounded-tl-none' }} px-5 py-3 shadow-md">
+                    <div class="flex {{ $msg->from_user_id === auth()->id() ? 'justify-end' : 'justify-start' }}" data-message-id="{{ $msg->id }}">
+                        <div class="max-w-xs lg:max-w-md {{ $msg->from_user_id === auth()->id() ? 'bg-primary-600 text-white rounded-3xl rounded-tr-none' : 'bg-gray-100 text-gray-900 rounded-3xl rounded-tl-none' }} px-5 py-3 shadow-md">
                             <p class="text-sm leading-relaxed">{{ $msg->contenu }}</p>
-                            <div class="flex items-center gap-2 mt-2 {{ $msg->from_user_id === Auth::id() ? 'justify-end' : 'justify-start' }}">
-                                <p class="text-xs {{ $msg->from_user_id === Auth::id() ? 'text-primary-100' : 'text-gray-500' }}">
+                            <div class="flex items-center gap-2 mt-2 {{ $msg->from_user_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
+                                <p class="text-xs {{ $msg->from_user_id === auth()->id() ? 'text-primary-100' : 'text-gray-500' }}">
                                     {{ $msg->created_at->format('H:i') }}
                                 </p>
                                 <!-- Coches de confirmation de lecture (gris → bleu) -->
-                                @if($msg->from_user_id === Auth::id())
+                                @if($msg->from_user_id === auth()->id())
                                     <span class="text-xs {{ $msg->lu ? 'text-primary-300' : 'text-primary-400' }} font-semibold" title="{{ $msg->lu ? 'Lu' : 'Non lu' }}">
                                         {{ $msg->lu ? '✓✓' : '✓' }}
                                     </span>
@@ -92,13 +92,13 @@
     // Configuration Socket.io
     const socket = io('{{ env('SOCKET_IO_URL', 'http://localhost:3000') }}', {
         auth: {
-            userId: {{ Auth::id() }},
+            userId: {{ auth()->id() }},
             token: '{{ csrf_token() }}'
         }
     });
 
     // Éléments DOM
-    const currentUserId = {{ Auth::id() }};
+    const currentUserId = {{ auth()->id() }};
     const otherUserId = {{ $otherUser->id }};
     const messagesContainer = document.getElementById('messages-container');
     const messageForm = document.getElementById('message-form');

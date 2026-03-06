@@ -36,7 +36,7 @@
                     <div class="space-y-2 max-h-[600px] overflow-y-auto">
                         @forelse($conversations as $message)
                             @php
-                                $otherUser = $message->from_user_id === Auth::id() ? $message->toUser : $message->fromUser;
+                                $otherUser = $message->from_user_id === auth()->id() ? $message->toUser : $message->fromUser;
                             @endphp
 
                             <a href="{{ route('messages.show', $otherUser->id) }}"
@@ -70,11 +70,11 @@
                 @if($otherUser)
                     @php
                         $messages = \App\Models\Message::where(function ($query) use ($otherUser) {
-                            $query->where('from_user_id', Auth::id())
+                            $query->where('from_user_id', auth()->id())
                                   ->where('to_user_id', $otherUser->id)
                                   ->orWhere(function ($q) use ($otherUser) {
                                       $q->where('from_user_id', $otherUser->id)
-                                        ->where('to_user_id', Auth::id());
+                                        ->where('to_user_id', auth()->id());
                                   });
                         })->orderBy('created_at', 'asc')->get();
 
@@ -108,14 +108,14 @@
                         <!-- Messages Container -->
                         <div id="messages-container" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
                             @forelse($messages as $msg)
-                                <div class="flex {{ $msg->from_user_id === Auth::id() ? 'justify-end' : 'justify-start' }}">
-                                    <div class="max-w-xs lg:max-w-md {{ $msg->from_user_id === Auth::id() ? 'bg-primary-600 text-white rounded-3xl rounded-tr-none' : 'bg-white text-gray-900 border border-gray-200 rounded-3xl rounded-tl-none' }} px-5 py-3 shadow-md">
+                                <div class="flex {{ $msg->from_user_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
+                                    <div class="max-w-xs lg:max-w-md {{ $msg->from_user_id === auth()->id() ? 'bg-primary-600 text-white rounded-3xl rounded-tr-none' : 'bg-white text-gray-900 border border-gray-200 rounded-3xl rounded-tl-none' }} px-5 py-3 shadow-md">
                                         <p class="text-sm leading-relaxed">{{ $msg->contenu }}</p>
-                                        <div class="flex items-center gap-2 mt-2 {{ $msg->from_user_id === Auth::id() ? 'justify-end' : 'justify-start' }}">
-                                            <p class="text-xs {{ $msg->from_user_id === Auth::id() ? 'text-primary-100' : 'text-gray-500' }}">
+                                        <div class="flex items-center gap-2 mt-2 {{ $msg->from_user_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
+                                            <p class="text-xs {{ $msg->from_user_id === auth()->id() ? 'text-primary-100' : 'text-gray-500' }}">
                                                 {{ $msg->created_at->format('H:i') }}
                                             </p>
-                                            @if($msg->from_user_id === Auth::id())
+                                            @if($msg->from_user_id === auth()->id())
                                                 <span class="text-xs {{ $msg->lu ? 'text-primary-300' : 'text-primary-400' }} font-semibold">
                                                     {{ $msg->lu ? '✓✓' : '✓' }}
                                                 </span>
