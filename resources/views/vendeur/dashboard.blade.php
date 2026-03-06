@@ -20,7 +20,7 @@
                         <p class="text-3xl font-bold text-green-600 mt-3">{{ number_format($totalVentes, 0, ',', ' ') }}</p>
                         <p class="text-gray-500 text-xs mt-1">FCFA</p>
                     </div>
-                    <div class="opacity-20"><x-icon name="dollar-sign" class="w-12 h-12 text-green-600" /></div>
+                    <div class="opacity-20"><x-heroicon-o-banknotes class="w-12 h-12 text-green-600" /></div>
                 </div>
             </div>
 
@@ -32,7 +32,7 @@
                         <p class="text-3xl font-bold text-blue-600 mt-3">{{ $nombreCommandes }}</p>
                         <p class="text-gray-500 text-xs mt-1">Total reçues</p>
                     </div>
-                    <div class="opacity-20"><x-icon name="package" class="w-12 h-12 text-blue-600" /></div>
+                    <div class="opacity-20"><x-heroicon-o-cube class="w-12 h-12 text-blue-600" /></div>
                 </div>
             </div>
 
@@ -44,7 +44,7 @@
                         <p class="text-3xl font-bold text-purple-600 mt-3">{{ $nombreCommandes > 0 ? number_format($totalVentes / $nombreCommandes, 0, ',', ' ') : '0' }}</p>
                         <p class="text-gray-500 text-xs mt-1">FCFA</p>
                     </div>
-                    <div class="opacity-20"><x-icon name="shopping-cart" class="w-12 h-12 text-purple-600" /></div>
+                    <div class="opacity-20"><x-heroicon-o-shopping-cart class="w-12 h-12 text-purple-600" /></div>
                 </div>
             </div>
 
@@ -56,7 +56,7 @@
                         <p class="text-3xl font-bold text-cyan-600 mt-3">{{ $tauxCompletion }}%</p>
                         <p class="text-gray-500 text-xs mt-1">Commandes livrées</p>
                     </div>
-                    <div class="opacity-20"><x-icon name="check-circle" class="w-12 h-12 text-cyan-600" /></div>
+                    <div class="opacity-20"><x-heroicon-o-check-circle class="w-12 h-12 text-cyan-600" /></div>
                 </div>
             </div>
         </div>
@@ -69,7 +69,7 @@
             <!-- En attente -->
             <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200">
                 <div class="flex items-center justify-between mb-3">
-                    <x-icon name="clock" class="w-8 h-8 text-yellow-600" />
+                    <x-heroicon-o-clock class="w-8 h-8 text-yellow-600" />
                     <span class="text-xs font-bold text-yellow-700 uppercase">En attente</span>
                 </div>
                 <p class="text-4xl font-bold text-yellow-600">{{ $commandesEnAttente }}</p>
@@ -79,7 +79,7 @@
             <!-- Confirmées -->
             <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
                 <div class="flex items-center justify-between mb-3">
-                    <x-icon name="check-circle" class="w-8 h-8 text-blue-600" />
+                    <x-heroicon-o-check-circle class="w-8 h-8 text-blue-600" />
                     <span class="text-xs font-bold text-blue-700 uppercase">Confirmées</span>
                 </div>
                 <p class="text-4xl font-bold text-blue-600">{{ $commandesConfirmees }}</p>
@@ -89,7 +89,7 @@
             <!-- Expédiées -->
             <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-6 border border-indigo-200">
                 <div class="flex items-center justify-between mb-3">
-                    <x-icon name="package" class="w-8 h-8 text-indigo-600" />
+                    <x-heroicon-o-cube class="w-8 h-8 text-indigo-600" />
                     <span class="text-xs font-bold text-indigo-700 uppercase">Expédiées</span>
                 </div>
                 <p class="text-4xl font-bold text-indigo-600">{{ $commandesExpediees }}</p>
@@ -99,7 +99,7 @@
             <!-- Livrées -->
             <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
                 <div class="flex items-center justify-between mb-3">
-                    <x-icon name="award" class="w-8 h-8 text-green-600" />
+                    <x-heroicon-o-star class="w-8 h-8 text-green-600" />
                     <span class="text-xs font-bold text-green-700 uppercase">Livrées</span>
                 </div>
                 <p class="text-4xl font-bold text-green-600">{{ $commandeslivrees }}</p>
@@ -112,7 +112,7 @@
     @if($produitsStockFaible->count() > 0)
         <div class="bg-red-50 border-l-4 border-red-600 rounded-lg p-6">
             <div class="flex items-start gap-4">
-                <x-icon name="alert-circle" class="w-8 h-8 text-red-600 flex-shrink-0 mt-1" />
+                <x-heroicon-o-exclamation-triangle class="w-8 h-8 text-red-600 flex-shrink-0 mt-1" />
                 <div class="flex-1">
                     <h3 class="font-bold text-red-900 mb-4">Alerte : Stock Critique Détecté!</h3>
                     <p class="text-red-800 mb-4">{{ $produitsStockFaible->count() }} produit(s) nécessitent un réapprovisionnement immédiat</p>
@@ -125,7 +125,7 @@
                                     <p class="text-sm text-gray-600">Stock: {{ $produit->stock }} / Min: {{ $produit->stock_minimum }}</p>
                                 </div>
                                 <a href="{{ route('vendeur.produits.edit', $produit->id) }}" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition text-sm">
-                                    <x-icon name="zap" class="w-4 h-4" /> Modifier
+                                    <x-heroicon-o-pencil-square class="w-4 h-4" /> Modifier
                                 </a>
                             </div>
                         @endforeach
@@ -137,17 +137,17 @@
 
     <!-- Actions Rapides -->
     <div>
-        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><x-icon name="zap" class="w-6 h-6 text-yellow-500" /> Actions Rapides</h2>
+        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-star class="w-6 h-6 text-yellow-500" /> Actions Rapides</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a href="{{ route('vendeur.produits.create') }}" class="flex items-center gap-3 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition">
-                <x-icon name="plus-circle" class="w-8 h-8 text-blue-600 flex-shrink-0" />
+                <x-heroicon-o-light-bulb class="w-8 h-8 text-blue-600 flex-shrink-0" />
                 <div>
                     <p class="font-bold text-gray-900">Ajouter Produit</p>
                     <p class="text-sm text-gray-600">Créer un nouveau produit</p>
                 </div>
             </a>
             <a href="{{ route('vendeur.produits.index') }}" class="flex items-center gap-3 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition">
-                <x-icon name="edit-2" class="w-8 h-8 text-green-600 flex-shrink-0" />
+                <x-heroicon-o-pencil-square class="w-8 h-8 text-green-600 flex-shrink-0" />
                 <div>
                     <p class="font-bold text-gray-900">Gérer Produits</p>
                     <p class="text-sm text-gray-600">Modifier vos produits</p>
