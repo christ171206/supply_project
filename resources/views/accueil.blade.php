@@ -27,7 +27,7 @@
                                     <p class="text-gray-600 text-sm font-semibold">Mes Produits</p>
                                     <p class="text-3xl font-bold text-gray-900 mt-2">{{ $produits_vendeur ?? 0 }}</p>
                                 </div>
-                                <x-icon name="commerce/shopping-bag" class="w-12 h-12 text-primary-500 opacity-50" />
+                                <x-heroicon-o-shopping-bag class="w-12 h-12 text-primary-500 opacity-50" />
                             </div>
                         </div>
 
@@ -37,7 +37,7 @@
                                     <p class="text-gray-600 text-sm font-semibold">Stock Total</p>
                                     <p class="text-3xl font-bold text-gray-900 mt-2">{{ $stock_total ?? 0 }}</p>
                                 </div>
-                                <x-icon name="electronics/hard-drive" class="w-12 h-12 text-accent-500 opacity-50" />
+                                <x-heroicon-o-cube class="w-12 h-12 text-accent-500 opacity-50" />
                             </div>
                         </div>
 
@@ -47,7 +47,7 @@
                                     <p class="text-gray-600 text-sm font-semibold">Commandes</p>
                                     <p class="text-3xl font-bold text-gray-900 mt-2">{{ $commandes_total ?? 0 }}</p>
                                 </div>
-                                <x-icon name="commerce/checkout" class="w-12 h-12 text-secondary-500 opacity-50" />
+                                <x-heroicon-o-document-text class="w-12 h-12 text-secondary-500 opacity-50" />
                             </div>
                         </div>
 
@@ -57,7 +57,7 @@
                                     <p class="text-gray-600 text-sm font-semibold">Revenu</p>
                                     <p class="text-3xl font-bold text-gray-900 mt-2">0 €</p>
                                 </div>
-                                <x-icon name="dollar-sign" class="w-12 h-12 text-green-500 opacity-50" />
+                                <x-heroicon-o-banknotes class="w-12 h-12 text-green-500 opacity-50" />
                             </div>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                 <a href="{{ route('vendeur.produits.index') }}" class="group relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
-                        <x-icon name="commerce/shopping-bag" class="w-8 h-8 mb-4" />
+                        <x-heroicon-o-shopping-bag class="w-8 h-8 mb-4" />
                         <h3 class="text-2xl font-bold mb-2">Gérer les Produits</h3>
                         <p class="text-primary-100">Ajouter, modifier, supprimer vos produits</p>
                     </div>
@@ -80,7 +80,7 @@
                 <a href="{{ route('vendeur.commandes') }}" class="group relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-accent-500 to-accent-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
-                        <x-icon name="commerce/checkout" class="w-8 h-8 mb-4" />
+                        <x-heroicon-o-document-text class="w-8 h-8 mb-4" />
                         <h3 class="text-2xl font-bold mb-2">Commandes</h3>
                         <p class="text-accent-100">Voir et gérer vos commandes en attente</p>
                     </div>
@@ -89,7 +89,7 @@
                 <a href="{{ route('vendeur.stock') }}" class="group relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-secondary-500 to-secondary-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative z-10">
-                        <x-icon name="electronics/hard-drive" class="w-8 h-8 mb-4" />
+                        <x-heroicon-o-cube class="w-8 h-8 mb-4" />
                         <h3 class="text-2xl font-bold mb-2">Gestion Stock</h3>
                         <p class="text-secondary-100">Surveiller et gérer votre inventaire</p>
                     </div>
@@ -109,7 +109,7 @@
                     </div>
                 @else
                     <div class="text-center py-12">
-                        <x-icon name="commerce/shopping-bag" class="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <x-heroicon-o-shopping-bag class="w-16 h-16 text-gray-300 mx-auto mb-4" />
                         <p class="text-gray-600 text-lg">Vous n'avez pas encore de produits</p>
                         <a href="{{ route('vendeur.produits.create') }}" class="btn-primary inline-block mt-4">
                             Ajouter votre premier produit
