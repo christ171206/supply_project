@@ -66,8 +66,12 @@
                 <a href="{{ route('panier.index') }}" class="relative px-4 py-2 text-gray-800 hover:text-primary-600 font-medium transition duration-150 flex items-center gap-2">
                     <x-heroicon-o-shopping-cart class="w-5 h-5" />
                     <span>Panier</span>
-                    <span id="cart-badge" class="absolute -top-2 -right-1 bg-danger-600 text-white text-xs rounded-full w-5 h-5 items-center justify-center font-bold shadow-sm @if(!auth()->check() || !auth()->user()->panier || auth()->user()->panier->items->count() === 0) modal-hidden @else modal-shown @endif">
-                        {{ auth()->check() && auth()->user()->panier ? auth()->user()->panier->items->count() : '0' }}
+                    @php
+                        $cartCount = auth()->check() && auth()->user()->panier ? auth()->user()->panier->items->count() : 0;
+                        $showBadge = $cartCount > 0;
+                    @endphp
+                    <span id="cart-badge" class="absolute -top-2 -right-1 bg-danger-600 text-white text-xs rounded-full w-5 h-5 items-center justify-center font-bold shadow-sm {{ !$showBadge ? 'modal-hidden' : 'modal-shown' }}">
+                        {{ $cartCount }}
                     </span>
                 </a>
 
