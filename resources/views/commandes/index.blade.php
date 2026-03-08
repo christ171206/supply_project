@@ -29,12 +29,21 @@
                             <p class="text-2xl font-bold text-gray-900">{{ number_format($commande->total, 0, ',', ' ') }} CFA</p>
                             <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold mt-2
                                 @if($commande->statut === 'en_attente') bg-yellow-100 text-yellow-800
-                                @elseif($commande->statut === 'payée') bg-green-100 text-green-800
-                                @elseif($commande->statut === 'annulée') bg-red-100 text-red-800
-                                @else bg-blue-100 text-blue-800
+                                @elseif($commande->statut === 'confirmee') bg-blue-100 text-blue-800
+                                @elseif($commande->statut === 'expediee') bg-purple-100 text-purple-800
+                                @elseif($commande->statut === 'livree') bg-green-100 text-green-800
+                                @elseif($commande->statut === 'annulee') bg-red-100 text-red-800
+                                @else bg-gray-100 text-gray-800
                                 @endif
                             ">
-                                {{ ucfirst(str_replace('_', ' ', $commande->statut)) }}
+                                {{ match($commande->statut) {
+                                    'en_attente' => 'En attente',
+                                    'confirmee' => 'Confirmée',
+                                    'expediee' => 'Expédiée',
+                                    'livree' => 'Livrée',
+                                    'annulee' => 'Annulée',
+                                    default => ucfirst(str_replace('_', ' ', $commande->statut))
+                                } }}
                             </span>
                         </div>
                     </div>

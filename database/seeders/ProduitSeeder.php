@@ -16,7 +16,7 @@ class ProduitSeeder extends Seeder
     {
         // Récupérer l'utilisateur vendeur de test
         $vendeurTest = User::where('email', 'testshop@supply.ci')->first();
-        
+
         // Si le vendeur test n'existe pas, le créer
         if (!$vendeurTest) {
             $vendeurTest = User::create([

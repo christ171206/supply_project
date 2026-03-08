@@ -10,6 +10,9 @@ use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminVendorController;
 use App\Http\Controllers\Admin\AdminAuditController;
 use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminAvisController;
+use App\Http\Controllers\Admin\AdminMessageController;
+use App\Http\Controllers\Admin\AdminBannedWordController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:web', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -78,13 +81,49 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->name('admin.')->group
         Route::post('{user}/reactivate', [AdminVendorController::class, 'reactivate'])->name('reactivate');
     });
 
-    // Gestion des catégories (Supervision uniquement - Lecture seule)
+    // Gestion des catégories (CRUD complet)
     Route::prefix('categories')->name('categories.')->group(function () {
         Route::get('/', [AdminCategoryController::class, 'index'])->name('index');
+        Route::get('create', [AdminCategoryController::class, 'create'])->name('create');
+        Route::post('/', [AdminCategoryController::class, 'store'])->name('store');
         Route::get('{category}', [AdminCategoryController::class, 'show'])->name('show');
-        // RETRAIT: create, store, edit, update, destroy (Gestion = Responsabilité des Propriétaires)
+        Route::get('{category}/edit', [AdminCategoryController::class, 'edit'])->name('edit');
+        Route::put('{category}', [AdminCategoryController::class, 'update'])->name('update');
+        Route::delete('{category}', [AdminCategoryController::class, 'destroy'])->name('destroy');
         Route::post('{category}/toggle', [AdminCategoryController::class, 'toggle'])->name('toggle');
-        // RETRAIT: bulk operations
+    });
+
+    // Modération des avis
+    Route::prefix('avis')->name('avis.')->group(function () {
+        Route::get('/', [AdminAvisController::class, 'index'])->name('index');
+        Route::get('{avis}', [AdminAvisController::class, 'show'])->name('show');
+        Route::post('{avis}/delete', [AdminAvisController::class, 'delete'])->name('delete');
+        Route::post('{avis}/restore', [AdminAvisController::class, 'restore'])->name('restore');
+        Route::get('inappropriate/list', [AdminAvisController::class, 'inappropriate'])->name('inappropriate');
+    });
+
+    // Gestion des messages signalés
+    Route::prefix('messages')->name('messages.')->group(function () {
+        Route::get('/flagged/list', [AdminMessageController::class, 'flagged'])->name('flagged');
+        Route::get('/', [AdminMessageController::class, 'index'])->name('index');
+        Route::get('{message}', [AdminMessageController::class, 'show'])->name('show');
+        Route::post('{message}/flag', [AdminMessageController::class, 'flag'])->name('flag');
+        Route::post('{message}/delete', [AdminMessageController::class, 'delete'])->name('delete');
+        Route::post('{message}/restore', [AdminMessageController::class, 'restore'])->name('restore');
+        Route::post('{message}/dismiss-flag', [AdminMessageController::class, 'dismissFlag'])->name('dismiss-flag');
+    });
+
+    // Gestion des mots bannissants
+    Route::prefix('banned-words')->name('banned-words.')->group(function () {
+        Route::get('/', [AdminBannedWordController::class, 'index'])->name('index');
+        Route::get('create', [AdminBannedWordController::class, 'create'])->name('create');
+        Route::post('/', [AdminBannedWordController::class, 'store'])->name('store');
+        Route::get('{word}/edit', [AdminBannedWordController::class, 'edit'])->name('edit');
+        Route::put('{word}', [AdminBannedWordController::class, 'update'])->name('update');
+        Route::delete('{word}', [AdminBannedWordController::class, 'destroy'])->name('destroy');
+        Route::post('{word}/toggle', [AdminBannedWordController::class, 'toggle'])->name('toggle');
+        Route::post('import', [AdminBannedWordController::class, 'import'])->name('import');
+        Route::get('export', [AdminBannedWordController::class, 'export'])->name('export');
     });
 
     // Audit logs

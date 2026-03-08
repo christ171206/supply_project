@@ -322,7 +322,7 @@
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                     <span><strong>Méthode:</strong> {{ ucfirst(str_replace('_', ' ', $commande->payment_method)) }}</span>
                     <span>
-                        @if($payment->statut === 'confirmé')
+                        @if($payment->statut === 'confirme')
                             <span class="status-badge status-paid">✓ Payé</span>
                         @else
                             <span class="status-badge status-pending">En Attente</span>

@@ -6,10 +6,12 @@ use App\Models\User;
 use App\Models\Commande;
 use App\Models\Produit;
 use App\Models\Dispute;
+use App\Models\Notification;
 use App\Models\SystemConfiguration;
 use Carbon\Carbon;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class AdminDashboardController extends Controller
 {
@@ -157,6 +159,16 @@ class AdminDashboardController extends Controller
         // Satisfaction rate
         $satisfactionRate = $totalOrders > 0 ? round((($totalOrders - $pendingDisputes) / $totalOrders) * 100, 1) : 100;
 
+        // Notifications pour l'admin connecté
+        $adminNotifications = Notification::where('user_id', Auth::id())
+            ->where('lu', false)
+            ->orderBy('created_at', 'DESC')
+            ->limit(10)
+            ->get();
+        $unreadNotificationsCount = Notification::where('user_id', Auth::id())
+            ->where('lu', false)
+            ->count();
+
         return view('admin.dashboard', [
             'totalUsers' => $totalUsers,
             'totalVendors' => $totalVendors,
@@ -195,6 +207,8 @@ class AdminDashboardController extends Controller
             'newClientsThisMonth' => $newClientsThisMonth,
             'conversionRate' => $conversionRate,
             'satisfactionRate' => $satisfactionRate,
+            'adminNotifications' => $adminNotifications,
+            'unreadNotificationsCount' => $unreadNotificationsCount,
         ]);
     }
 }

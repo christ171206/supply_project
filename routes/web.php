@@ -13,6 +13,7 @@ use App\Http\Controllers\ValidationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\VendorStatisticsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NotificationController;
 
 // Routes publiques
 Route::get('/', [ProduitController::class, 'index'])->name('accueil');
@@ -115,6 +116,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/messages/{userId}/reply', [MessageController::class, 'reply'])->name('messages.reply');
     Route::delete('/messages/{messageId}', [MessageController::class, 'destroy'])->name('messages.destroy');
     Route::get('/messages/unread/count', [MessageController::class, 'unreadCount'])->name('messages.unread-count');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'delete'])->name('notifications.delete');
+    Route::post('/notifications/delete-all-read', [NotificationController::class, 'deleteAllRead'])->name('notifications.delete-all-read');
 });
 
 // Routes Vendeur

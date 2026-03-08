@@ -29,12 +29,21 @@
                     </div>
                     <span class="inline-block px-6 py-3 rounded-full text-lg font-bold bg-white
                         @if($commande->statut === 'en_attente') text-yellow-700
-                        @elseif($commande->statut === 'payée') text-green-700
-                        @elseif($commande->statut === 'annulée') text-red-700
+                        @elseif($commande->statut === 'confirmee') text-blue-700
+                        @elseif($commande->statut === 'expediee') text-purple-700
+                        @elseif($commande->statut === 'livree') text-green-700
+                        @elseif($commande->statut === 'annulee') text-red-700
                         @else text-blue-700
                         @endif
                     ">
-                        {{ ucfirst(str_replace('_', ' ', $commande->statut)) }}
+                        {{ match($commande->statut) {
+                            'en_attente' => 'En attente',
+                            'confirmee' => 'Confirmée',
+                            'expediee' => 'Expédiée',
+                            'livree' => 'Livrée',
+                            'annulee' => 'Annulée',
+                            default => ucfirst(str_replace('_', ' ', $commande->statut))
+                        } }}
                     </span>
                 </div>
             </div>

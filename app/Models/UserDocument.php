@@ -10,7 +10,9 @@ class UserDocument extends Model
     protected $fillable = [
         'user_id',
         'document_type',
+        'document_side',
         'document_path',
+        'document_number',
         'status',
         'rejection_reason',
         'verified_by',

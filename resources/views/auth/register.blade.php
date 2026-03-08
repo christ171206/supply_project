@@ -360,28 +360,7 @@
                                     @enderror
                                 </div>
 
-                                <div>
-                                    <label for="id_document" class="block text-sm font-semibold text-gray-900 mb-2">
-                                        🪪 Justificatif d'identité
-                                    </label>
-                                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-primary-400 hover:bg-primary-50 transition" onclick="document.getElementById('id_document').click()">
-                                        <input
-                                            type="file"
-                                            id="id_document"
-                                            name="id_document"
-                                            accept=".pdf,.jpg,.jpeg,.png"
-                                            class="hidden"
-                                            onchange="updateFileName(this)"
-                                        >
-                                        <p id="fileName" class="text-sm text-gray-600 font-medium">
-                                            📤 Cliquez pour télécharger
-                                        </p>
-                                    </div>
-                                    <p class="mt-1.5 text-xs text-gray-500">✓ Formats acceptés: PDF, JPG, PNG (max 2 Mo)</p>
-                                    @error('id_document')
-                                        <p class="mt-2 text-sm text-danger-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
+
                             </div>
 
                             <!-- Conditions -->

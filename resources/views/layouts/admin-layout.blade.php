@@ -122,59 +122,74 @@
                             <div class="relative group">
                                 <button class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition">
                                     <x-heroicon-o-bell class="w-5 h-5" />
-                                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                    @if(isset($unreadNotificationsCount) && $unreadNotificationsCount > 0)
+                                        <span class="absolute top-1 right-1 px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-max">{{ $unreadNotificationsCount }}</span>
+                                    @endif
                                 </button>
                                 
                                 <!-- Notifications Dropdown -->
-                                <div class="absolute right-0 mt-0 w-80 bg-white rounded-lg shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                    <div class="p-4 border-b border-gray-100">
+                                <div class="absolute right-0 mt-0 w-96 bg-white rounded-lg shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                    <div class="p-4 border-b border-gray-100 flex items-center justify-between">
                                         <h3 class="text-sm font-bold text-gray-900">Notifications</h3>
+                                        @if(isset($unreadNotificationsCount) && $unreadNotificationsCount > 0)
+                                            <span class="text-xs text-gray-500">{{ $unreadNotificationsCount }} non lue{{ $unreadNotificationsCount > 1 ? 's' : '' }}</span>
+                                        @endif
                                     </div>
                                     <div class="max-h-96 overflow-y-auto">
-                                        <!-- Sample notifications -->
-                                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition">
-                                            <div class="flex items-start gap-3">
-                                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                                    <x-heroicon-o-user class="w-4 h-4 text-blue-600" />
+                                        @if(isset($adminNotifications) && $adminNotifications->count() > 0)
+                                            @foreach($adminNotifications as $notification)
+                                                <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition flex items-start justify-between group/item">
+                                                    <div class="flex-1 flex items-start gap-3">
+                                                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-lg
+                                                            @if($notification->type === 'new_vendor_registration') bg-orange-100
+                                                            @elseif($notification->type === 'vendor_documents_submitted') bg-purple-100
+                                                            @else bg-blue-100
+                                                            @endif">
+                                                            @if($notification->type === 'new_vendor_registration')
+                                                                🏪
+                                                            @elseif($notification->type === 'vendor_documents_submitted')
+                                                                📄
+                                                            @else
+                                                                🔔
+                                                            @endif
+                                                        </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="text-xs font-semibold text-gray-900">{{ $notification->titre }}</p>
+                                                            <p class="text-xs text-gray-500 mt-1">{{ Str::limit($notification->message, 60) }}</p>
+                                                            <p class="text-xs text-gray-400 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition ml-2 flex-shrink-0">
+                                                        <form action="{{ route('notifications.mark-as-read', $notification->id) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="p-1 text-gray-400 hover:text-green-600 transition" title="Marquer comme lu">
+                                                                <x-heroicon-o-check-circle class="w-4 h-4" />
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('notifications.delete', $notification->id) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="p-1 text-gray-400 hover:text-red-600 transition" title="Supprimer">
+                                                                <x-heroicon-o-trash class="w-4 h-4" />
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                                 </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-xs font-semibold text-gray-900">Nouveau vendeur en attente</p>
-                                                    <p class="text-xs text-gray-500 mt-1">Test Shop en attente de validation</p>
-                                                    <p class="text-xs text-gray-400 mt-1">Il y a 2 heures</p>
-                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="px-4 py-8 text-center">
+                                                <x-heroicon-o-bell-slash class="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                                                <p class="text-sm text-gray-500">Aucune notification</p>
                                             </div>
-                                        </a>
-                                        
-                                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition">
-                                            <div class="flex items-start gap-3">
-                                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                                    <x-heroicon-o-shopping-cart class="w-4 h-4 text-green-600" />
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-xs font-semibold text-gray-900">Nouvelle commande reçue</p>
-                                                    <p class="text-xs text-gray-500 mt-1">Commande #1 - 680 000 FCFA</p>
-                                                    <p class="text-xs text-gray-400 mt-1">Il y a 4 heures</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        
-                                        <a href="#" class="block px-4 py-3 hover:bg-gray-50 transition">
-                                            <div class="flex items-start gap-3">
-                                                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                                    <x-heroicon-o-exclamation-triangle class="w-4 h-4 text-yellow-600" />
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-xs font-semibold text-gray-900">5 produits en attente de validation</p>
-                                                    <p class="text-xs text-gray-500 mt-1">Veuillez valider les produits</p>
-                                                    <p class="text-xs text-gray-400 mt-1">Il y a 1 jour</p>
-                                                </div>
-                                            </div>
-                                        </a>
+                                        @endif
                                     </div>
                                     
-                                    <div class="p-3 border-t border-gray-100 text-center">
-                                        <a href="#" class="text-xs text-blue-600 hover:text-blue-700 font-semibold">Voir toutes les notifications</a>
-                                    </div>
+                                    @if(isset($adminNotifications) && $adminNotifications->count() > 0)
+                                        <div class="p-3 border-t border-gray-100 text-center">
+                                            <a href="{{ route('notifications.index') }}" class="text-xs text-blue-600 hover:text-blue-700 font-semibold">Voir toutes les notifications</a>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 

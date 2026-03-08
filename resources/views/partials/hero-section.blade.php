@@ -13,7 +13,7 @@
                 Bienvenue à <span class="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">Supply</span>
             </h1>
             <p class="text-2xl text-gray-900 max-w-3xl mx-auto font-bold drop-shadow-md">Accédez aux meilleurs produits informatiques</p>
-            <p class="text-lg text-gray-800 max-w-2xl mx-auto font-semibold drop-shadow">Livraison rapide à Abidjan et partout en Côte d'Ivoire • Prix compétitifs en FCFA • Service client réactif</p>
+            <p class="text-lg text-gray-800 max-w-2xl mx-auto font-regular drop-shadow">Livraison rapide à Abidjan et partout en Côte d'Ivoire • Prix compétitifs en FCFA • Service client réactif</p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center pt-8">
                 <a href="{{ route('produits.catalogue') }}" class="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg font-bold hover:from-primary-700 hover:to-primary-800 transition-all duration-150 shadow-xl hover:shadow-2xl hover:scale-110 active:scale-95 inline-flex items-center justify-center gap-2 text-lg border-2 border-primary-800">

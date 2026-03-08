@@ -77,7 +77,8 @@ class EmailVerificationCodeController extends Controller
 
         // Redirection basée sur le rôle
         if ($user->role === 'vendor') {
-            return redirect()->route('vendeur.dashboard');
+            // Rediriger vers la page de soumission des documents d'identité
+            return redirect()->route('vendor.documents.submit');
         }
 
         return redirect()->route('accueil');

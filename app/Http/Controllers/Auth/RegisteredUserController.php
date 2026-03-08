@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\EmailVerificationCodeMail;
 use App\Mail\NewVendorRegistrationNotification;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -55,10 +56,7 @@ class RegisteredUserController extends Controller
             $validationRules['shop_name'] = ['required', 'string', 'max:255'];
             $validationRules['phone'] = ['required', 'string', 'max:20'];
             $validationRules['address'] = ['required', 'string', 'max:500'];
-            // id_document est complètement optionnel, pas de validation si absent
-            if ($request->hasFile('id_document')) {
-                $validationRules['id_document'] = ['file', 'mimes:jpeg,png,jpg', 'max:5120'];
-            }
+            // Les documents seront collectés APRÈS vérification de l'email
         }
 
         Log::info('Règles de validation', ['rules' => array_keys($validationRules)]);
@@ -69,8 +67,6 @@ class RegisteredUserController extends Controller
                 'shop_name.required' => 'Le nom de la boutique est obligatoire',
                 'phone.required' => 'Le téléphone est obligatoire',
                 'address.required' => 'L\'adresse est obligatoire',
-                'id_document.mimes' => 'Le document doit être une image (JPEG, PNG)',
-                'id_document.max' => 'Le fichier ne doit pas dépasser 5MB',
             ]);
             Log::info('Validation réussie');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -92,13 +88,7 @@ class RegisteredUserController extends Controller
             $userData['shop_name'] = $request->shop_name;
             $userData['phone'] = $request->phone;
             $userData['address'] = $request->address;
-            $userData['vendor_status'] = 'pending'; // En attente de vérification
-
-            // Sauvegarder le document d'identité si fourni
-            if ($request->hasFile('id_document')) {
-                $path = $request->file('id_document')->store('vendors/id-documents', 'public');
-                $userData['id_document'] = $path;
-            }
+            $userData['vendor_status'] = 'pending'; // En attente de vérification des documents d'identité
         }
 
         // Créer l'utilisateur
@@ -109,9 +99,22 @@ class RegisteredUserController extends Controller
         if ($request->role === 'vendor') {
             $admins = User::where('is_admin', true)->get();
             foreach ($admins as $admin) {
-                Mail::to($admin->email)->send(new NewVendorRegistrationNotification($user));
+                // Créer une notification dans le dashboard
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'type' => 'new_vendor_registration',
+                    'titre' => '🏪 Nouvelle demande vendeur',
+                    'message' => $user->shop_name . ' (' . $user->email . ') a demandé à devenir vendeur. À vérifier.',
+                    'lu' => false,
+                ]);
             }
-            Log::info('Notification vendeur envoyée aux admins', ['vendor_id' => $user->id]);
+            
+            // Envoyer l'email au premier admin (éviter les limites Mailtrap en dev)
+            $firstAdmin = $admins->first();
+            if ($firstAdmin) {
+                Mail::to($firstAdmin->email)->queue(new NewVendorRegistrationNotification($user));
+                Log::info('Email de notification vendeur envoyé', ['vendor_id' => $user->id, 'admin_id' => $firstAdmin->id]);
+            }
         }
 
         // Générer un code de vérification (6 chiffres)
@@ -123,8 +126,8 @@ class RegisteredUserController extends Controller
             'email_verification_code_sent_at' => now(),
         ]);
 
-        // Envoyer l'email avec le code
-        Mail::send(new EmailVerificationCodeMail($user, $verificationCode));
+        // Envoyer l'email avec le code (en queue aussi)
+        Mail::to($user->email)->queue(new EmailVerificationCodeMail($user, $verificationCode));
 
         // Sauvegarder l'email en session pour la vérification
         session([
@@ -133,12 +136,7 @@ class RegisteredUserController extends Controller
 
         Log::info('Code de vérification envoyé', ['email' => $user->email]);
 
-        // Redirection spéciale pour les vendeurs en attente d'approbation
-        if ($request->role === 'vendor') {
-            return redirect()->route('vendor.pending');
-        }
-
-        // Rediriger vers la page de vérification du code pour les clients
+        // Tous les utilisateurs (clients et vendeurs) vont d'abord vérifier leur email
         return redirect()->route('verification.code.show');
     }
 }

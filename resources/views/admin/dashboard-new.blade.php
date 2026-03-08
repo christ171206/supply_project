@@ -244,12 +244,18 @@
                                 <td class="py-4 px-4 text-gray-700">{{ $dispute->vendeur->name ?? 'N/A' }}</td>
                                 <td class="py-4 px-4">
                                     <span class="px-3 py-1 rounded-full text-xs font-bold
-                                        @if($dispute->statut === 'ouvert') bg-red-100 text-red-800
-                                        @elseif($dispute->statut === 'en_cours') bg-yellow-100 text-yellow-800
-                                        @elseif($dispute->statut === 'resolu') bg-green-100 text-green-800
-                                        @elseif($dispute->statut === 'ferme') bg-gray-100 text-gray-800
+                                        @if($dispute->status === 'open') bg-red-100 text-red-800
+                                        @elseif($dispute->status === 'in_progress') bg-yellow-100 text-yellow-800
+                                        @elseif($dispute->status === 'resolved') bg-green-100 text-green-800
+                                        @elseif($dispute->status === 'closed') bg-gray-100 text-gray-800
                                         @else bg-blue-100 text-blue-800 @endif">
-                                        {{ ucfirst(str_replace('_', ' ', $dispute->statut)) }}
+                                        {{ match($dispute->status ?? 'open') {
+                                            'open' => '🔴 Ouvert',
+                                            'in_progress' => '🟡 En cours',
+                                            'resolved' => '🟢 Résolu',
+                                            'closed' => '⚪ Fermé',
+                                            default => ucfirst(str_replace('_', ' ', $dispute->status))
+                                        } }}
                                     </span>
                                 </td>
                                 <td class="py-4 px-4 text-center">

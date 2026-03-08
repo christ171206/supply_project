@@ -64,7 +64,7 @@ class AdminDisputeController extends Controller
     public function updateStatus(Request $request, Dispute $dispute)
     {
         $request->validate([
-            'status' => 'required|in:open,under_review,resolved,closed',
+            'status' => 'required|in:open,in_progress,resolved,closed',
             'notes' => 'nullable|string',
         ]);
 

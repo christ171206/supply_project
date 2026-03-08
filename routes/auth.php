@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Vendeur\VendorDocumentController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -71,4 +72,14 @@ Route::middleware('auth')->group(function () {
 
     // Logout - Exclus du CSRF (action critique qui doit toujours fonctionner)
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+    // Routes pour la soumission des documents d'identité des vendeurs
+    Route::get('vendor/documents/submit', [VendorDocumentController::class, 'submit'])
+        ->name('vendor.documents.submit');
+
+    Route::post('vendor/documents', [VendorDocumentController::class, 'store'])
+        ->name('vendor.documents.store');
+
+    Route::get('vendor/documents/confirmation', [VendorDocumentController::class, 'confirmation'])
+        ->name('vendor.documents.confirmation');
 });
