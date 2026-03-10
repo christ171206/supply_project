@@ -1,186 +1,208 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    {{-- Message de succès --}}
-    @if(session('success'))
-        <div class="mb-6 p-4 bg-[#f7f7f5] border-l-4 border-[#0a0a0a] rounded-lg">
-            <div class="flex items-center">
-                <span class="text-3xl mr-3">✓</span>
-                <div>
-                    <h3 class="font-bold text-lg text-[#0a0a0a]">Commande créée avec succès !</h3>
-                    <p class="text-[#666660]">{{ session('success') }}</p>
+<div class="min-h-screen bg-[#f7f7f5]">
+<div class="max-w-4xl mx-auto px-4 py-10">
+
+    {{-- ══════════════════════════════
+         HEADER
+    ══════════════════════════════ --}}
+    <div class="bg-[#0a0a0a] rounded-xl px-8 pt-10 pb-8 mb-6">
+        <div class="text-[10px] font-medium tracking-[0.15em] uppercase text-white/40 mb-3">Supply</div>
+
+        <div class="flex items-start justify-between">
+            <div>
+                <h1 class="font-serif text-[32px] tracking-tight text-white leading-none mb-2">
+                    Commande confirmée
+                </h1>
+                <div class="flex items-center gap-3 mt-3">
+                    <span class="font-mono text-[13px] text-white/50">#{{ $commande->id }}</span>
+                    <span class="w-1 h-1 rounded-full bg-white/20"></span>
+                    <span class="font-mono text-[13px] text-white/50">{{ $commande->created_at->format('d/m/Y · H:i') }}</span>
                 </div>
             </div>
+
+            {{-- Badge statut --}}
+            @php
+                $badge = match($commande->statut) {
+                    'en_attente' => ['bg-[#fdf6ec] text-[#b45309]', 'bg-[#f59e0b]', 'En attente'],
+                    'confirmee'  => ['bg-[#f0fdf4] text-[#15803d]', 'bg-[#22c55e]', 'Confirmée'],
+                    'expediee'   => ['bg-[#f5f3ff] text-[#7c3aed]', 'bg-[#a78bfa]', 'Expédiée'],
+                    'livree'     => ['bg-[#f0fdf4] text-[#15803d]', 'bg-[#22c55e]', 'Livrée'],
+                    'annulee'    => ['bg-[#fef2f2] text-[#dc2626]', 'bg-[#f87171]', 'Annulée'],
+                    default      => ['bg-[#f7f7f5] text-[#666660]',  'bg-[#a0a09a]', ucfirst(str_replace('_',' ',$commande->statut))],
+                };
+            @endphp
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium px-3 py-1.5 rounded-md {{ $badge[0] }}">
+                <span class="w-1.5 h-1.5 rounded-full {{ $badge[1] }}"></span>
+                {{ $badge[2] }}
+            </span>
         </div>
-    @endif
 
-    <a href="{{ route('commandes.index') }}" class="text-[#0a0a0a] hover:text-[#2a2a28] mb-6 inline-block font-medium">← Retour aux commandes</a>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Détails de la Commande -->
-        <div class="lg:col-span-2">
-            <!-- En-tête -->
-            <div class="bg-white border border-[#e0e0dc] rounded-lg p-8 mb-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h1 class="text-4xl font-bold mb-2 text-[#0a0a0a]">✓ Commande confirmée</h1>
-                        <p class="text-[#666660]">Commande #{{ $commande->id }} — {{ $commande->created_at->format('d/m/Y à H:i') }}</p>
-                    </div>
-                    <span class="inline-block px-6 py-3 rounded-full text-lg font-bold bg-[#0a0a0a] text-white
-                        @if($commande->statut === 'en_attente') bg-[#f7f7f5] text-[#0a0a0a]
-                        @elseif($commande->statut === 'confirmee') bg-[#0a0a0a] text-white
-                        @elseif($commande->statut === 'expediee') bg-[#2a2a28] text-white
-                        @elseif($commande->statut === 'livree') bg-[#0a0a0a] text-white
-                        @elseif($commande->statut === 'annulee') bg-[#dc2626] text-white
-                        @else bg-[#a0a09a] text-white
-                        @endif
-                    ">
-                        {{ match($commande->statut) {
-                            'en_attente' => 'En attente',
-                            'confirmee' => 'Confirmée',
-                            'expediee' => 'Expédiée',
-                            'livree' => 'Livrée',
-                            'annulee' => 'Annulée',
-                            default => ucfirst(str_replace('_', ' ', $commande->statut))
-                        } }}
-                    </span>
-                </div>
+        {{-- Flash success --}}
+        @if(session('success'))
+            <div class="mt-5 pt-5 border-t border-white/10 flex items-center gap-2">
+                <svg class="w-3.5 h-3.5 text-[#22c55e] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span class="text-[12px] text-white/60 font-light">{{ session('success') }}</span>
             </div>
+        @endif
+    </div>
 
-            <!-- Produits -->
-            <div class="bg-white border border-[#e0e0dc] rounded-lg p-8 mb-6">
-                <h2 class="text-2xl font-bold text-[#0a0a0a] mb-6 flex items-center">
-                    <span class="text-3xl mr-3">📦</span>
-                    Produits Commandés
-                </h2>
-                <div class="space-y-4">
-                    @forelse($lignes as $ligne)
-                        <div class="flex justify-between items-center p-4 bg-[#f7f7f5] rounded-lg hover:bg-[#efefed] transition">
-                            <div>
-                                <p class="font-bold text-[#0a0a0a] text-lg">{{ $ligne->produit->nom }}</p>
-                                <p class="text-[#666660] text-sm">Vendeur: <span class="font-semibold">{{ $ligne->produit->user->name ?? 'N/A' }}</span></p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[#666660] mb-1">Quantité: <span class="font-bold text-lg">{{ $ligne->quantite }}</span></p>
-                                <p class="text-lg font-bold text-[#0a0a0a]">{{ number_format($ligne->quantite * $ligne->prix_unitaire, 0, '', ' ') }} F CFA</p>
+    {{-- Retour --}}
+    <a href="{{ route('commandes.index') }}"
+       class="inline-flex items-center gap-1.5 text-[12px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors mb-6">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Mes commandes
+    </a>
+
+    <div class="grid grid-cols-[1fr_280px] gap-5 items-start">
+
+        {{-- ══ COLONNE PRINCIPALE ══ --}}
+        <div class="space-y-4">
+
+            {{-- Produits commandés --}}
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-[#efefed]">
+                    <span class="text-[13px] font-medium text-[#0a0a0a]">Produits commandés</span>
+                </div>
+                @forelse($lignes as $ligne)
+                    <div class="flex items-center justify-between px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[13px] font-medium text-[#0a0a0a] truncate">{{ $ligne->produit->nom }}</div>
+                            <div class="text-[11px] text-[#a0a09a] font-light mt-0.5">
+                                Vendeur : {{ $ligne->produit->user->name ?? '—' }}
                             </div>
                         </div>
-                    @empty
-                        <p class="text-[#666660] text-center py-4">Aucun produit dans cette commande</p>
-                    @endforelse
+                        <div class="text-right flex-shrink-0 ml-4">
+                            <div class="font-mono text-[12px] text-[#a0a09a]">{{ $ligne->quantite }} × {{ number_format($ligne->prix_unitaire, 0, ',', ' ') }}</div>
+                            <div class="font-mono text-[14px] font-medium text-[#0a0a0a] mt-0.5">
+                                {{ number_format($ligne->quantite * $ligne->prix_unitaire, 0, ',', ' ') }} FCFA
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="px-5 py-10 text-center text-[13px] text-[#a0a09a] font-light">Aucun produit</div>
+                @endforelse
+            </div>
+
+            {{-- Adresse de livraison --}}
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-[#efefed]">
+                    <span class="text-[13px] font-medium text-[#0a0a0a]">Adresse de livraison</span>
+                </div>
+                <div class="px-5 py-4 space-y-1.5">
+                    <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $commande->adresse_livraison }}</div>
+                    @if($commande->adresse_detail)
+                        <div class="text-[12px] text-[#666660] font-light">{{ $commande->adresse_detail }}</div>
+                    @endif
+                    <div class="flex items-center gap-1.5 pt-1">
+                        <svg class="w-3 h-3 text-[#a0a09a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.4 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.34 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.4a16 16 0 0 0 6.29 6.29l.76-.77a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        <span class="font-mono text-[11px] text-[#a0a09a]">{{ $commande->telephone_livraison }}</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Adresse de Livraison -->
-            <div class="bg-white border border-[#e0e0dc] rounded-lg p-8 mb-6">
-                <h3 class="text-xl font-bold text-[#0a0a0a] mb-4 flex items-center">
-                    <span class="text-2xl mr-3">📍</span>
-                    Adresse de Livraison
-                </h3>
-                <div class="bg-[#f7f7f5] p-4 rounded-lg">
-                    <p class="text-[#2a2a28] font-semibold text-lg">{{ $commande->adresse_livraison }}</p>
-                    <p class="text-[#666660] mt-2">{{ $commande->adresse_detail }}</p>
-                    <p class="text-[#a0a09a] mt-3">📞 {{ $commande->telephone_livraison }}</p>
-                </div>
-            </div>
-
-            <!-- Paiement Info -->
+            {{-- Paiement --}}
             @if($payment)
-                <div class="bg-white border border-[#e0e0dc] rounded-lg p-8">
-                    <h2 class="text-2xl font-bold text-[#0a0a0a] mb-6 flex items-center">
-                        <span class="text-3xl mr-3">💳</span>
-                        Informations de Paiement
-                    </h2>
-                    <div class="space-y-4">
-                        <div class="flex justify-between p-4 bg-[#f7f7f5] rounded-lg">
-                            <span class="text-[#2a2a28] font-semibold">Référence de paiement:</span>
-                            <span class="font-mono font-bold text-[#0a0a0a]">{{ $payment->payment_code }}</span>
-                        </div>
-                        <div class="flex justify-between p-4 bg-[#f7f7f5] rounded-lg">
-                            <span class="text-[#2a2a28] font-semibold">Statut du paiement:</span>
-                            <span class="font-bold
-                                @if($payment->payment_status === 'confirmee') text-[#0a0a0a]
-                                @elseif($payment->payment_status === 'en_attente') text-[#a0a09a]
-                                @elseif($payment->payment_status === 'echouee') text-[#dc2626]
-                                @else text-[#666660]
-                                @endif
-                            ">
-                                {{ match($payment->payment_status) {
-                                    'initialisee' => 'Initialisée',
-                                    'en_attente' => 'En attente',
-                                    'confirmee' => 'Confirmée',
-                                    'echouee' => 'Échouée',
-                                    'annulee' => 'Annulée',
-                                    default => ucfirst(str_replace('_', ' ', $payment->payment_status))
-                                } }}
-                            </span>
-                        </div>
-                        <div class="flex justify-between p-4 bg-[#f7f7f5] rounded-lg">
-                            <span class="text-[#2a2a28] font-semibold">Type de paiement:</span>
-                            <span class="font-bold text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $payment->typePayement)) }}</span>
-                        </div>
-                        <div class="flex justify-between p-4 bg-[#f7f7f5] rounded-lg">
-                            <span class="text-[#2a2a28] font-semibold">Montant:</span>
-                            <span class="font-bold text-lg text-[#0a0a0a]">{{ number_format($payment->montant, 0, '', ' ') }} F CFA</span>
-                        </div>
-                    </div>
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-[#efefed]">
+                    <span class="text-[13px] font-medium text-[#0a0a0a]">Informations de paiement</span>
                 </div>
+                @php
+                    $pRows = [
+                        ['label' => 'Référence',       'value' => $payment->payment_code,                                           'mono' => true],
+                        ['label' => 'Type',             'value' => ucfirst(str_replace('_', ' ', $payment->typePayement)),           'mono' => false],
+                        ['label' => 'Statut paiement', 'value' => match($payment->payment_status) {
+                            'initialisee' => 'Initialisée',
+                            'en_attente'  => 'En attente',
+                            'confirmee'   => 'Confirmée',
+                            'echouee'     => 'Échouée',
+                            'annulee'     => 'Annulée',
+                            default       => ucfirst(str_replace('_', ' ', $payment->payment_status))
+                        }, 'mono' => false],
+                        ['label' => 'Montant',          'value' => number_format($payment->montant, 0, ',', ' ') . ' FCFA',          'mono' => true],
+                    ];
+                @endphp
+                @foreach($pRows as $row)
+                    <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#efefed] last:border-b-0">
+                        <span class="text-[12px] text-[#a0a09a] font-light">{{ $row['label'] }}</span>
+                        <span class="{{ $row['mono'] ? 'font-mono text-[12px]' : 'text-[13px]' }} font-medium text-[#0a0a0a]">
+                            {{ $row['value'] }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
             @endif
+
         </div>
 
-        <!-- Résumé et Actions -->
-        <div class="lg:col-span-1">
-            <div class="bg-white border border-[#e0e0dc] rounded-lg p-6 sticky top-24">
-                <h2 class="text-2xl font-bold text-[#0a0a0a] mb-6">📊 Résumé</h2>
+        {{-- ══ SIDEBAR STICKY ══ --}}
+        <div class="sticky top-6 space-y-4">
 
-                <div class="space-y-3 mb-6 pb-6 border-b border-[#e0e0dc]">
-                    <div class="flex justify-between text-[#666660]">
-                        <span>Montant:</span>
-                        <span class="font-bold text-lg text-[#0a0a0a]">
-                            {{ number_format($commande->total, 0, '', ' ') }} F CFA
+            {{-- Résumé --}}
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-[#efefed]">
+                    <span class="text-[13px] font-medium text-[#0a0a0a]">Résumé</span>
+                </div>
+
+                <div class="px-5 py-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[12px] text-[#666660] font-light">Méthode</span>
+                        <span class="text-[12px] font-medium text-[#0a0a0a]">
+                            {{ ucfirst(str_replace('_', ' ', $commande->payment_method)) }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[12px] text-[#666660] font-light">Statut</span>
+                        <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded {{ $badge[0] }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $badge[1] }}"></span>
+                            {{ $badge[2] }}
                         </span>
                     </div>
                 </div>
 
-                <!-- Informations Commande -->
-                <div class="space-y-6 mb-8">
-                    <div class="bg-[#f7f7f5] p-4 rounded-lg">
-                        <p class="text-[#a0a09a] text-sm font-medium mb-1">Méthode de paiement</p>
-                        <p class="text-[#0a0a0a] font-bold text-lg">{{ ucfirst(str_replace('_', ' ', $commande->payment_method)) }}</p>
-                    </div>
-                    <div class="bg-[#f7f7f5] p-4 rounded-lg">
-                        <p class="text-[#a0a09a] text-sm font-medium mb-1">État de la commande</p>
-                        <p class="text-[#0a0a0a] font-bold text-lg">{{ ucfirst(str_replace('_', ' ', $commande->statut)) }}</p>
+                <div class="mx-4 mb-4 bg-[#0a0a0a] rounded-lg px-4 py-4">
+                    <div class="text-[10px] font-medium tracking-[0.08em] uppercase text-white/50 mb-1">Total TTC</div>
+                    <div class="font-mono text-[20px] font-medium text-white leading-none">
+                        {{ number_format($commande->total, 0, ',', ' ') }}
+                        <span class="text-[11px] text-white/40 font-sans font-light">FCFA</span>
                     </div>
                 </div>
 
-                <!-- Actions -->
-                <div class="space-y-3">
-                    <a href="{{ route('commandes.download-pdf', $commande->id) }}" class="w-full block px-4 py-3 bg-[#0a0a0a] text-white rounded-lg hover:bg-[#2a2a28] transition font-bold text-center shadow-sm">
-                        📄 Télécharger la Facture
-                    </a>
-                    <a href="{{ route('produits.catalogue') }}" class="w-full block px-4 py-3 bg-[#f7f7f5] text-[#0a0a0a] border border-[#e0e0dc] rounded-lg hover:bg-[#efefed] transition font-bold text-center">
-                        🛍️ Continuer les achats
-                    </a>
-                    <a href="{{ route('commandes.index') }}" class="w-full block px-4 py-3 bg-[#f7f7f5] text-[#0a0a0a] border border-[#e0e0dc] rounded-lg hover:bg-[#efefed] transition font-bold text-center">
-                        📋 Mes Commandes
-                    </a>
-                </div>
-
-                <!-- Info Important -->
-                <div class="mt-8 p-4 bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg">
-                    <p class="text-sm text-[#2a2a28]">
-                        <span class="font-bold">✓ Confirmation :</span> Votre commande a été créée avec succès.
-                        @if($commande->payment_method !== 'cash')
-                            Veuillez confirmer votre paiement via {{ ucfirst(str_replace('_', ' ', $commande->payment_method)) }}.
-                        @else
-                            Vous paierez à la livraison.
-                        @endif
-                    </p>
-                </div>
+                {{-- Note paiement --}}
+                @if($commande->payment_method !== 'cash')
+                    <div class="mx-4 mb-4 px-3 py-2.5 bg-[#fdf6ec] border border-[#fde68a] rounded-lg">
+                        <p class="text-[11px] text-[#b45309] font-light leading-relaxed">
+                            Confirmez votre paiement via {{ ucfirst(str_replace('_', ' ', $commande->payment_method)) }}.
+                        </p>
+                    </div>
+                @else
+                    <div class="mx-4 mb-4 px-3 py-2.5 bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg">
+                        <p class="text-[11px] text-[#15803d] font-light leading-relaxed">Paiement à la livraison.</p>
+                    </div>
+                @endif
             </div>
+
+            {{-- Actions --}}
+            <div class="space-y-2">
+                <a href="{{ route('commandes.download-pdf', $commande->id) }}"
+                   class="flex items-center justify-center gap-2 w-full bg-[#0a0a0a] text-white text-[12px] font-medium py-3 rounded-lg hover:opacity-85 transition-opacity">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Télécharger la facture
+                </a>
+                <a href="{{ route('produits.catalogue') }}"
+                   class="flex items-center justify-center gap-2 w-full border border-[#e0e0dc] text-[#0a0a0a] text-[12px] font-medium py-3 rounded-lg hover:border-[#2a2a28] transition-all">
+                    Continuer les achats
+                </a>
+                <a href="{{ route('commandes.index') }}"
+                   class="flex items-center justify-center gap-2 w-full border border-[#e0e0dc] text-[#666660] text-[12px] font-light py-3 rounded-lg hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                    Voir mes commandes
+                </a>
+            </div>
+
         </div>
+
     </div>
+</div>
 </div>
 @endsection

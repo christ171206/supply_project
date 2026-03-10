@@ -64,5 +64,4 @@ class SendVendorOrderNotification implements ShouldQueue
             // Ne pas relancer l'exception - laisser la commande être créée
         }
     }
-    }
 }

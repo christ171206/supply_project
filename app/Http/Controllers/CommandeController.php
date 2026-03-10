@@ -34,7 +34,7 @@ class CommandeController extends Controller
             abort(403);
         }
 
-        $lignes = $commande->ligneCommandes()->with('produit.user')->get();
+        $lignes = $commande->ligneCommandes()->with('produit.vendeur')->get();
         $payment = $commande->payment;
 
         return view('commandes.show', compact('commande', 'lignes', 'payment'));
@@ -223,8 +223,13 @@ class CommandeController extends Controller
 
             Log::info('Commande complète - succès', ['commande_id' => $commande->id]);
 
-            // Déclencher l'événement pour notifier les vendeurs
-            \App\Events\OrderCreated::dispatch($commande);
+            // Déclencher l'événement pour notifier les vendeurs (dans un try-catch pour ne pas bloquer la redirection)
+            try {
+                \App\Events\OrderCreated::dispatch($commande);
+            } catch (\Exception $eventError) {
+                Log::error('Erreur dispatch OrderCreated: ' . $eventError->getMessage());
+                // Continuer même si l'event dispatch échoue - la commande est créée
+            }
 
             // Rediriger vers la page de confirmation avec possibilité de paiement
             $redirectUrl = route('commandes.show', $commande->id);

@@ -3,398 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facture #{{ $commande->id }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Facture #{{ str_pad($commande->id, 6, '0', STR_PAD_LEFT) }} — Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Geist', -apple-system, sans-serif;
+            font-weight: 300;
             color: #0a0a0a;
             line-height: 1.6;
             background: #f7f7f5;
         }
-        .print-only {
-            display: none;
-        }
-        .screen-only {
-            display: block;
-        }
-        @media print {
-            .print-only {
-                display: block;
-            }
-            .screen-only {
-                display: none;
-            }
-            body {
-                background: white;
-            }
-        }
-        .print-toolbar {
+
+        /* ── Toolbar (screen only) ── */
+        .toolbar {
             position: sticky;
             top: 0;
-            background: white;
-            padding: 16px 20px;
+            background: #ffffff;
             border-bottom: 1px solid #e0e0dc;
+            padding: 12px 20px;
             display: flex;
-            gap: 12px;
             align-items: center;
+            gap: 8px;
             z-index: 100;
         }
-        .print-toolbar button {
-            padding: 10px 20px;
-            border: 1px solid #0a0a0a;
-            background: transparent;
-            color: #0a0a0a;
-            border-radius: 4px;
-            cursor: pointer;
+        .toolbar-label {
+            font-size: 11px;
             font-weight: 500;
-            font-size: 13px;
-            transition: all 0.2s;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #a0a09a;
+            margin-right: 8px;
         }
-        .print-toolbar button:hover {
+        .toolbar button {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'Geist', sans-serif;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-primary {
             background: #0a0a0a;
             color: #fff;
+            border: 1px solid #0a0a0a;
         }
-        .print-toolbar .close-btn {
-            margin-left: auto;
+        .btn-primary:hover { opacity: 0.85; }
+        .btn-ghost {
+            background: transparent;
+            color: #666660;
+            border: 1px solid #e0e0dc;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px;
-            background: white;
+        .btn-ghost:hover { border-color: #2a2a28; color: #0a0a0a; }
+        .toolbar .spacer { flex: 1; }
+
+        /* ── Page ── */
+        .page {
+            max-width: 820px;
+            margin: 32px auto;
+            background: #ffffff;
+            border: 1px solid #e0e0dc;
+            border-radius: 12px;
+            overflow: hidden;
         }
-        .header {
+
+        /* ── Header ── */
+        .page-header {
+            background: #0a0a0a;
+            padding: 32px 40px 28px;
+        }
+        .page-header-top {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 40px;
-            border-bottom: 1px solid #e0e0dc;
-            padding-bottom: 24px;
         }
-        .header-left h1 {
+        .invoice-brand {
             font-family: 'Instrument Serif', serif;
-            font-size: 32px;
-            color: #0a0a0a;
-            margin-bottom: 8px;
+            font-size: 28px;
+            color: #ffffff;
             letter-spacing: -0.5px;
+            line-height: 1;
         }
-        .header-left p {
-            font-size: 13px;
-            color: #666660;
+        .invoice-brand-sub {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            margin-top: 6px;
         }
-        .header-right {
+        .invoice-meta {
             text-align: right;
         }
-        .header-right .invoice-number {
-            font-size: 13px;
-            color: #666660;
-            margin-bottom: 8px;
+        .invoice-number {
+            font-family: 'Geist Mono', monospace;
+            font-size: 15px;
+            font-weight: 500;
+            color: #ffffff;
         }
-        .header-right .invoice-date {
-            font-size: 12px;
-            color: #a0a09a;
-        }
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 40px;
-        }
-        .info-block {
-            width: 45%;
-        }
-        .info-block h3 {
+        .invoice-date {
+            font-family: 'Geist Mono', monospace;
             font-size: 11px;
-            color: #0a0a0a;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
+        }
+
+        /* ── Body ── */
+        .page-body { padding: 36px 40px; }
+
+        /* ── Info blocks ── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 36px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #efefed;
+        }
+        .info-block-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            margin-bottom: 12px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
+            color: #a0a09a;
+            margin-bottom: 10px;
         }
         .info-block p {
             font-size: 13px;
-            margin-bottom: 6px;
-            line-height: 1.8;
-            color: #0a0a0a;
+            color: #2a2a28;
+            line-height: 1.7;
         }
-        .info-block strong {
-            font-weight: 600;
-        }
-        .table {
-            width: 100%;
-            margin-bottom: 30px;
-            border-collapse: collapse;
-        }
-        .table thead {
-            background-color: #f7f7f5;
-            border-bottom: 1px solid #e0e0dc;
-        }
-        .table th {
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 12px;
-            color: #0a0a0a;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .table td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0dc;
-            font-size: 13px;
-            color: #0a0a0a;
-        }
-        .table tbody tr:hover {
-            background-color: #f7f7f5;
-        }
-        .text-right {
-            text-align: right;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .product-name {
-            font-weight: 600;
-            color: #0a0a0a;
-        }
-        .product-desc {
-            color: #a0a09a;
-            font-size: 12px;
-        }
-        .quantity {
-            font-family: 'Geist Mono', monospace;
+        .info-block p strong {
             font-weight: 500;
-        }
-        .price {
-            font-family: 'Geist Mono', monospace;
-            font-weight: 600;
             color: #0a0a0a;
         }
-        .totals-section {
-            width: 50%;
+
+        /* ── Table ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 28px;
+        }
+        thead tr {
+            background: #f7f7f5;
+            border-bottom: 1px solid #e0e0dc;
+        }
+        th {
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #a0a09a;
+        }
+        th.r { text-align: right; }
+        th.c { text-align: center; }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #efefed;
+            font-size: 13px;
+            color: #2a2a28;
+            vertical-align: top;
+        }
+        tr:last-child td { border-bottom: none; }
+        td.r { text-align: right; }
+        td.c { text-align: center; }
+        .td-name {
+            font-weight: 500;
+            color: #0a0a0a;
+        }
+        .td-desc {
+            font-size: 11px;
+            color: #a0a09a;
+            margin-top: 2px;
+            font-weight: 300;
+        }
+        .td-mono {
+            font-family: 'Geist Mono', monospace;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        /* ── Totaux ── */
+        .totals {
+            width: 260px;
             margin-left: auto;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
         .total-row {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #e0e0dc;
-            font-size: 13px;
-            color: #0a0a0a;
+            align-items: baseline;
+            padding: 9px 0;
+            border-bottom: 1px solid #efefed;
+            font-size: 12px;
+            color: #666660;
         }
         .total-row span:last-child {
             font-family: 'Geist Mono', monospace;
-            font-weight: 500;
+            font-size: 12px;
+            color: #0a0a0a;
         }
         .total-row.final {
-            border-bottom: 1px solid #0a0a0a;
-            padding: 16px 0;
-            font-size: 14px;
-            font-weight: 700;
+            border-top: 1px solid #0a0a0a;
+            border-bottom: none;
+            padding-top: 12px;
+            font-size: 13px;
+            font-weight: 500;
             color: #0a0a0a;
         }
         .total-row.final span:last-child {
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 500;
         }
-        .payment-info {
-            background-color: #f7f7f5;
-            border-left: 1px solid #e0e0dc;
-            padding: 16px;
-            margin-top: 30px;
-            font-size: 13px;
+
+        /* ── Paiement ── */
+        .payment-block {
+            border: 1px solid #e0e0dc;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 36px;
         }
-        .payment-info h3 {
-            color: #0a0a0a;
-            margin-bottom: 10px;
-            font-size: 12px;
-            font-weight: 600;
+        .payment-header {
+            background: #f7f7f5;
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: #a0a09a;
+            border-bottom: 1px solid #e0e0dc;
         }
-        .payment-info div {
-            margin-bottom: 6px;
-            color: #0a0a0a;
-        }
-        .payment-info strong {
-            font-weight: 600;
-        }
-        .payment-details {
+        .payment-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px solid #efefed;
+            font-size: 12px;
         }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0dc;
-            color: #a0a09a;
-            font-size: 11px;
+        .payment-row:last-child { border-bottom: none; }
+        .payment-row span:first-child { color: #a0a09a; }
+        .payment-row span:last-child {
+            font-weight: 500;
+            color: #0a0a0a;
         }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 3px;
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 4px;
             font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-weight: 500;
+            font-family: 'Geist Mono', monospace;
         }
-        .status-pending {
-            background-color: #fefce8;
-            color: #92400e;
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
         }
-        .status-paid {
-            background-color: #f0fdf4;
-            color: #15803d;
+        .badge-ok   { background: #f0fdf4; color: #15803d; }
+        .badge-ok   .badge-dot { background: #22c55e; }
+        .badge-warn { background: #fdf6ec; color: #b45309; }
+        .badge-warn .badge-dot { background: #f59e0b; }
+
+        /* ── Footer ── */
+        .page-footer {
+            border-top: 1px solid #efefed;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-footer span {
+            font-size: 10px;
+            color: #a0a09a;
+            font-weight: 300;
+        }
+        .page-footer .footer-brand {
+            font-family: 'Geist Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            color: #666660;
+            letter-spacing: 0.06em;
+        }
+
+        /* ── Print ── */
+        @media print {
+            body { background: #fff; }
+            .toolbar { display: none; }
+            .page {
+                margin: 0;
+                border: none;
+                border-radius: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Barre d'outils pour l'impression -->
-    <div class="screen-only print-toolbar">
-        <button class="print-btn" onclick="window.print()">
-            Imprimer / Télécharger
-        </button>
-        <button onclick="downloadAsHTML()">
-            Télécharger HTML
-        </button>
-        <button class="close-btn" onclick="window.history.back()">
-            Fermer
-        </button>
+
+    {{-- Toolbar (screen only) --}}
+    <div class="toolbar">
+        <span class="toolbar-label">Facture</span>
+        <button class="btn-primary" onclick="window.print()">Imprimer / PDF</button>
+        <button class="btn-ghost" onclick="downloadHTML()">Télécharger HTML</button>
+        <div class="spacer"></div>
+        <button class="btn-ghost" onclick="window.history.back()">Fermer ×</button>
     </div>
 
-    <div class="container">
-        <!-- En-tête -->
-        <div class="header">
-            <div class="header-left">
-                <h1>FACTURE</h1>
-                <p>#{{ str_pad($commande->id, 6, '0', STR_PAD_LEFT) }}</p>
-            </div>
-            <div class="header-right">
-                <div class="invoice-number">
-                    <strong>Date:</strong> {{ $commande->created_at->format('d/m/Y') }}
+    <div class="page">
+
+        {{-- Header noir --}}
+        <div class="page-header">
+            <div class="page-header-top">
+                <div>
+                    <div class="invoice-brand">Facture</div>
+                    <div class="invoice-brand-sub">Supply · Marketplace</div>
                 </div>
-                <div class="invoice-date">
-                    <strong>Heure:</strong> {{ $commande->created_at->format('H:i') }}
+                <div class="invoice-meta">
+                    <div class="invoice-number">#{{ str_pad($commande->id, 6, '0', STR_PAD_LEFT) }}</div>
+                    <div class="invoice-date">{{ $commande->created_at->format('d/m/Y · H:i') }}</div>
                 </div>
             </div>
         </div>
 
-        <!-- Informations Client et Livraison -->
-        <div class="info-section">
-            <div class="info-block">
-                <h3>Client</h3>
-                <p><strong>{{ auth()->user()->name }}</strong></p>
-                <p>{{ auth()->user()->email }}</p>
-                <p>{{ auth()->user()->phone ?? 'Non renseigné' }}</p>
-            </div>
-            <div class="info-block">
-                <h3>Adresse de Livraison</h3>
-                <p>{{ $commande->adresse_livraison }}</p>
-            </div>
-        </div>
+        <div class="page-body">
 
-        <!-- Table des produits -->
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Produit</th>
-                    <th class="text-center">Quantité</th>
-                    <th class="text-right">Prix Unitaire</th>
-                    <th class="text-right">Sous-Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($lignes as $ligne)
-                    <tr>
-                        <td>
-                            <div class="product-name">{{ $ligne->produit->nom }}</div>
-                            @if($ligne->produit->description)
-                                <div class="product-desc">{{ Str::limit($ligne->produit->description, 50) }}</div>
-                            @endif
-                        </td>
-                        <td class="text-center quantity">{{ $ligne->quantite }}</td>
-                        <td class="text-right price">{{ number_format($ligne->prix_unitaire, 0, '', ' ') }} F</td>
-                        <td class="text-right price">{{ number_format($ligne->quantite * $ligne->prix_unitaire, 0, '', ' ') }} F</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="text-center">Aucun produit</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        <!-- Totaux -->
-        <div class="totals-section">
-            <div class="total-row">
-                <span>Sous-total</span>
-                <span>{{ number_format($sousTotal, 0, '', ' ') }} F</span>
-            </div>
-            <div class="total-row">
-                <span>Frais de livraison</span>
-                <span>
-                    @if($frais == 0)
-                        Gratuit
-                    @else
-                        {{ number_format($frais, 0, '', ' ') }} F
+            {{-- Client + Livraison --}}
+            <div class="info-grid">
+                <div>
+                    <div class="info-block-label">Client</div>
+                    <p><strong>{{ auth()->user()->name }}</strong></p>
+                    <p>{{ auth()->user()->email }}</p>
+                    <p>{{ auth()->user()->phone ?? '—' }}</p>
+                </div>
+                <div>
+                    <div class="info-block-label">Adresse de livraison</div>
+                    <p>{{ $commande->adresse_livraison }}</p>
+                    @if($commande->adresse_detail)
+                        <p style="color:#a0a09a; margin-top:4px; font-size:12px;">{{ $commande->adresse_detail }}</p>
                     @endif
-                </span>
+                    @if($commande->telephone_livraison)
+                        <p style="font-family:'Geist Mono',monospace; font-size:11px; color:#a0a09a; margin-top:4px;">{{ $commande->telephone_livraison }}</p>
+                    @endif
+                </div>
             </div>
-            <div class="total-row final">
-                <span>TOTAL TTC</span>
-                <span>{{ number_format($total, 0, '', ' ') }} F</span>
-            </div>
-        </div>
 
-        <!-- Informations de paiement -->
-        @if($payment)
-            <div class="payment-info">
-                <h3>Paiement</h3>
-                <div class="payment-details">
-                    <span><strong>Méthode:</strong> {{ ucfirst(str_replace('_', ' ', $commande->payment_method)) }}</span>
+            {{-- Table produits --}}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th class="c">Qté</th>
+                        <th class="r">Prix unitaire</th>
+                        <th class="r">Sous-total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($lignes as $ligne)
+                        <tr>
+                            <td>
+                                <div class="td-name">{{ $ligne->produit->nom }}</div>
+                                @if($ligne->produit->description)
+                                    <div class="td-desc">{{ Str::limit($ligne->produit->description, 55) }}</div>
+                                @endif
+                            </td>
+                            <td class="c td-mono">{{ $ligne->quantite }}</td>
+                            <td class="r td-mono">{{ number_format($ligne->prix_unitaire, 0, ',', ' ') }} FCFA</td>
+                            <td class="r td-mono">{{ number_format($ligne->quantite * $ligne->prix_unitaire, 0, ',', ' ') }} FCFA</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" style="text-align:center; color:#a0a09a; font-weight:300;">Aucun produit</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            {{-- Totaux --}}
+            <div class="totals">
+                <div class="total-row">
+                    <span>Sous-total</span>
+                    <span>{{ number_format($sousTotal, 0, ',', ' ') }} FCFA</span>
+                </div>
+                <div class="total-row">
+                    <span>Livraison</span>
+                    <span>{{ $frais == 0 ? 'Gratuite' : number_format($frais, 0, ',', ' ') . ' FCFA' }}</span>
+                </div>
+                <div class="total-row final">
+                    <span>Total TTC</span>
+                    <span>{{ number_format($total, 0, ',', ' ') }} FCFA</span>
+                </div>
+            </div>
+
+            {{-- Paiement --}}
+            @if($payment)
+            <div class="payment-block">
+                <div class="payment-header">Paiement</div>
+                <div class="payment-row">
+                    <span>Méthode</span>
+                    <span>{{ ucfirst(str_replace('_', ' ', $commande->payment_method)) }}</span>
+                </div>
+                <div class="payment-row">
+                    <span>Statut</span>
                     <span>
                         @if($payment->statut === 'confirme')
-                            <span class="status-badge status-paid">Payé</span>
+                            <span class="badge badge-ok">
+                                <span class="badge-dot"></span>Payé
+                            </span>
                         @else
-                            <span class="status-badge status-pending">En Attente</span>
+                            <span class="badge badge-warn">
+                                <span class="badge-dot"></span>En attente
+                            </span>
                         @endif
                     </span>
                 </div>
                 @if($payment->reference)
-                    <div><strong>Référence:</strong> {{ $payment->reference }}</div>
+                    <div class="payment-row">
+                        <span>Référence</span>
+                        <span style="font-family:'Geist Mono',monospace; font-size:12px;">{{ $payment->reference }}</span>
+                    </div>
                 @endif
                 @if($payment->date_paiement)
-                    <div><strong>Date de paiement:</strong> {{ $payment->date_paiement->format('d/m/Y H:i') }}</div>
+                    <div class="payment-row">
+                        <span>Date paiement</span>
+                        <span style="font-family:'Geist Mono',monospace; font-size:12px;">{{ $payment->date_paiement->format('d/m/Y · H:i') }}</span>
+                    </div>
                 @endif
             </div>
-        @endif
+            @endif
 
-        <!-- Pied de page -->
-        <div class="footer">
-            <p>
-                Merci pour votre achat | Facture générée le {{ now()->format('d/m/Y H:i') }} | Gestion E-commerce Supply
-            </p>
+        </div>{{-- /page-body --}}
+
+        {{-- Footer --}}
+        <div class="page-footer">
+            <span class="footer-brand">SUPPLY</span>
+            <span>Facture générée le {{ now()->format('d/m/Y à H:i') }}</span>
+            <span>© 2026 Supply. Tous droits réservés.</span>
         </div>
-    </div>
+
+    </div>{{-- /page --}}
 
     <script>
-        function downloadAsHTML() {
-            const element = document.querySelector('.container');
-            const html = element.innerHTML;
-            const blob = new Blob([html], { type: 'text/html' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'facture_{{ str_pad($commande->id, 6, '0', STR_PAD_LEFT) }}.html';
-            link.click();
-        }
+    function downloadHTML() {
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Facture #{{ str_pad($commande->id, 6, '0', STR_PAD_LEFT) }}</title></head><body>${document.querySelector('.page').outerHTML}</body></html>`;
+        const blob = new Blob([html], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'facture_{{ str_pad($commande->id, 6, '0', STR_PAD_LEFT) }}.html';
+        a.click();
+    }
     </script>
 </body>
 </html>

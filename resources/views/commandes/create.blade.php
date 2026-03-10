@@ -1,1027 +1,625 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Conteneur pour les notifications Toast -->
+
+{{-- Toast container --}}
 <div id="notification-container" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
-<div class="min-h-screen bg-white">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header avec progression -->
-        <div class="mb-8">
-            <h1 class="text-4xl font-bold text-[#0a0a0a] mb-2">
-                🛍️ Finaliser votre Commande
-            </h1>
-            <p class="text-[#666660]">Complétez les étapes ci-dessous pour confirmer votre achat</p>
+<div class="min-h-screen bg-[#f7f7f5]">
+<div class="max-w-5xl mx-auto px-4 py-10">
 
-            <!-- Indicateurs de progression -->
-            <div class="flex items-center gap-2 mt-6 max-w-2xl">
-                <div class="flex-1 h-1 bg-[#0a0a0a] rounded-full"></div>
-                <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center text-sm font-bold">1</div>
-                <div class="flex-1 h-1 bg-[#0a0a0a] rounded-full"></div>
-                <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center text-sm font-bold">2</div>
-                <div class="flex-1 h-1 bg-[#0a0a0a] rounded-full"></div>
-                <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center text-sm font-bold">3</div>
-                <div class="flex-1 h-1 bg-[#e0e0dc] rounded-full"></div>
-            </div>
-            <div class="flex justify-between mt-2 text-xs text-[#666660]">
-                <span>Livraison</span>
-                <span>Paiement</span>
-                <span>Confirmation</span>
-            </div>
-        </div>
+    {{-- ══════════════════════════════
+         HEADER
+    ══════════════════════════════ --}}
+    <div class="mb-8">
+        <div class="text-[10px] font-medium tracking-[0.15em] uppercase text-[#a0a09a] mb-2">Supply</div>
+        <h1 class="font-serif text-[32px] tracking-tight text-[#0a0a0a] leading-none mb-5">Finaliser la commande</h1>
 
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-        <!-- Formulaire principal -->
-        <div class="lg:col-span-2 space-y-6">
-            <form action="{{ route('commandes.store') }}" method="POST" id="payment-form">
-                @csrf
-
-                <!-- Section Livraison -->
-                <div class="bg-white rounded-lg border border-[#e0e0dc] shadow-sm p-8">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center font-bold">
-                            📍
+        {{-- Stepper --}}
+        <div class="flex items-center gap-0 max-w-xs">
+            @php $steps = ['Livraison','Paiement','Confirmation']; @endphp
+            @foreach($steps as $i => $step)
+                <div class="flex items-center gap-0">
+                    <div class="flex flex-col items-center">
+                        <div class="w-7 h-7 rounded-sm flex items-center justify-center text-[11px] font-mono font-medium
+                            {{ $i < 2 ? 'bg-[#0a0a0a] text-white' : 'bg-[#efefed] text-[#a0a09a]' }}">
+                            {{ $i + 1 }}
                         </div>
-                        <h2 class="text-2xl font-bold text-[#0a0a0a]">Adresse de Livraison</h2>
-                    </div>
-
-                    <!-- Pays (nouveau) -->
-                    <div class="mb-6">
-                        <label for="pays" class="block text-xs font-bold text-\[#2a2a28\] mb-2 uppercase tracking-wide">
-                            🌍 Pays
-                        </label>
-                        <input
-                            type="text"
-                            id="pays"
-                            name="pays"
-                            value="{{ old('pays', 'Côte d\'Ivoire') }}"
-                            placeholder="Ex: Côte d'Ivoire, France, Sénégal..."
-                            class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base"
-                        />
-                        @error('pays')
-                            <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
-                        @enderror
-                        <p class="text-xs text-\[#a0a09a\] mt-1">Entrez le nom du pays</p>
-                    </div>
-
-                    <!-- Tabs pour Recherche vs Manuel -->
-                    <div class="flex gap-2 mb-6 bg-\[#f7f7f5\] p-1 rounded-lg">
-                        <button type="button" class="location-tab active flex-1 px-4 py-2 rounded-md font-semibold transition-all bg-white text-\[#0a0a0a\] border-2 border-\[#0a0a0a\]/30" data-tab="search">
-                            🔍 Recherche Rapide
-                        </button>
-                        <button type="button" class="location-tab flex-1 px-4 py-2 rounded-md font-semibold transition-all text-\[#666660\] border-2 border-transparent" data-tab="manual">
-                            📍 Sélection Manuelle
-                        </button>
-                    </div>
-
-                    <!-- Recherche rapide -->
-                    <div id="search-tab" class="location-section mb-8 pb-8 border-b-2 border-gray-100">
-                        <div class="relative" style="z-index: 100;">
-                            <input
-                                type="text"
-                                id="location-search"
-                                placeholder="Tapez pour chercher (Abidjan, Yopougon, Cocody...)"
-                                class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base"
-                                autocomplete="off"
-                            />
-                            <div class="absolute right-4 top-3 text-gray-400 text-lg pointer-events-none">🔎</div>
-                            <div id="search-results" class="absolute top-full left-0 right-0 bg-white border border-\[#e0e0dc\] rounded-lg mt-1 hidden max-h-72 overflow-y-auto shadow-xl"></div>
-                        </div>
-                        <p class="text-xs text-\[#a0a09a\] mt-2">✨ Meilleur moyen: tapez une ville, un quartier ou un district</p>
-                    </div>
-
-                    <!-- Sélecteurs en cascade améliorés -->
-                    <div id="manual-tab" class="location-section mb-8 hidden">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Région -->
-                            <div class="flex flex-col">
-                                <label for="region" class="block text-xs font-semibold text-\[#666660\] mb-2 uppercase tracking-wide">
-                                    Région / Ville
-                                </label>
-                                <select
-                                    id="region"
-                                    name="region_id"
-                                    class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base bg-white cursor-pointer hover:border-\[#0a0a0a\]/20"
-                                >
-                                    <option value="">⏳ Chargement...</option>
-                                </select>
-                            </div>
-
-                            <!-- District -->
-                            <div class="flex flex-col">
-                                <label for="district" class="block text-xs font-semibold text-\[#666660\] mb-2 uppercase tracking-wide">
-                                    District
-                                </label>
-                                <select
-                                    id="district"
-                                    name="district_id"
-                                    class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base bg-white cursor-pointer hover:border-\[#0a0a0a\]/20 disabled:bg-\[#f7f7f5\] disabled:cursor-not-allowed disabled:text-\[#a0a09a\]"
-                                    disabled
-                                >
-                                    <option value="">-- Sélectionner --</option>
-                                </select>
-                            </div>
-
-                            <!-- Commune -->
-                            <div class="flex flex-col">
-                                <label for="commune" class="block text-xs font-semibold text-\[#666660\] mb-2 uppercase tracking-wide">
-                                    Commune
-                                </label>
-                                <select
-                                    id="commune"
-                                    name="commune_id"
-                                    class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base bg-white cursor-pointer hover:border-\[#0a0a0a\]/20 disabled:bg-\[#f7f7f5\] disabled:cursor-not-allowed disabled:text-\[#a0a09a\]"
-                                    disabled
-                                >
-                                    <option value="">-- Sélectionner --</option>
-                                </select>
-                            </div>
-
-                            <!-- Quartier -->
-                            <div class="flex flex-col">
-                                <label for="quartier" class="block text-xs font-semibold text-\[#666660\] mb-2 uppercase tracking-wide">
-                                    Quartier
-                                </label>
-                                <select
-                                    id="quartier"
-                                    name="quartier_manual"
-                                    class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base bg-white cursor-pointer hover:border-\[#0a0a0a\]/20 disabled:bg-\[#f7f7f5\] disabled:cursor-not-allowed disabled:text-\[#a0a09a\]"
-                                    disabled
-                                >
-                                    <option value="">-- Sélectionner --</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Adresse détaillée -->
-                    <div class="mb-6">
-                        <label for="adresse_detail" class="block text-xs font-bold text-\[#2a2a28\] mb-2 uppercase tracking-wide">
-                            Adresse Détaillée
-                        </label>
-                        <textarea
-                            id="adresse_detail"
-                            name="adresse_detail"
-                            rows="3"
-                            class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base resize-none"
-                            placeholder="Ex: 123 rue Principale, Immeuble A, Appartement 5, près de la pharmacie..."
-                            required>{{ old('adresse_detail') }}</textarea>
-                        @error('adresse_detail')
-                            <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
-                        @enderror
-                        <p class="text-xs text-\[#a0a09a\] mt-1">Soyez le plus précis possible pour faciliter la livraison</p>
-                    </div>
-
-                    <!-- Téléphone de livraison -->
-                    <div>
-                        <label for="telephone_livraison" class="block text-xs font-bold text-\[#2a2a28\] mb-2 uppercase tracking-wide">
-                            📱 Téléphone de Livraison
-                        </label>
-                        <input
-                            type="tel"
-                            id="telephone_livraison"
-                            name="telephone_livraison"
-                            class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base"
-                            placeholder="+225 01 23 45 67 89"
-                            inputmode="numeric"
-                            required>
-                        @error('telephone_livraison')
-                            <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
-                        @enderror
-                        <p class="text-xs text-\[#a0a09a\] mt-1">Format: 10 chiffres (ex: 0123456789)</p>
-                    </div>
-                </div>
-
-                <!-- Section Paiement -->
-                <div class="bg-white rounded-lg shadow-sm transition-shadow p-8">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center font-bold">
-                            💳
-                        </div>
-                        <h2 class="text-2xl font-bold text-\[#0a0a0a\]">Méthode de Paiement</h2>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- Wave -->
-                        <label class="payment-option cursor-pointer">
-                            <input type="radio" name="payment_method" value="wave" class="hidden" required>
-                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-emerald-400 hover:bg-emerald-50 transition-all duration-200 group">
-                                <div class="flex items-center gap-4">
-                                    <img src="{{ asset('images/payments/wave.png') }}" alt="Wave" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
-                                    <div>
-                                        <p class="font-bold text-\[#0a0a0a\] text-sm">Wave</p>
-                                        <p class="text-xs text-\[#666660\]">Paiement sécurisé</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-
-                        <!-- Orange Money -->
-                        <label class="payment-option cursor-pointer">
-                            <input type="radio" name="payment_method" value="orange_money" class="hidden" required>
-                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-all duration-200 group">
-                                <div class="flex items-center gap-4">
-                                    <img src="{{ asset('images/payments/orange money.png') }}" alt="Orange Money" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
-                                    <div>
-                                        <p class="font-bold text-\[#0a0a0a\] text-sm">Orange Money</p>
-                                        <p class="text-xs text-\[#666660\]">Porte-monnaie Orange</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-
-                        <!-- MTN Money -->
-                        <label class="payment-option cursor-pointer">
-                            <input type="radio" name="payment_method" value="mtn_money" class="hidden" required>
-                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-yellow-400 hover:bg-yellow-50 transition-all duration-200 group">
-                                <div class="flex items-center gap-4">
-                                    <img src="{{ asset('images/payments/mtn money.png') }}" alt="MTN Money" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
-                                    <div>
-                                        <p class="font-bold text-\[#0a0a0a\] text-sm">MTN Money</p>
-                                        <p class="text-xs text-\[#666660\]">Service MTN</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-
-                        <!-- Moov Money -->
-                        <label class="payment-option cursor-pointer">
-                            <input type="radio" name="payment_method" value="moov_money" class="hidden" required>
-                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 group">
-                                <div class="flex items-center gap-4">
-                                    <img src="{{ asset('images/payments/moov money.png') }}" alt="Moov Money" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
-                                    <div>
-                                        <p class="font-bold text-\[#0a0a0a\] text-sm">Moov Money</p>
-                                        <p class="text-xs text-\[#666660\]">Service Moov</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-
-                        <!-- À la Livraison -->
-                        <label class="payment-option cursor-pointer sm:col-span-2">
-                            <input type="radio" name="payment_method" value="cash" class="hidden" required>
-                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-green-400 hover:bg-green-50 transition-all duration-200 group">
-                                <div class="flex items-center gap-4">
-                                    <img src="{{ asset('images/payments/a la livraison.jfif') }}" alt="À la Livraison" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
-                                    <div>
-                                        <p class="font-bold text-\[#0a0a0a\] text-sm">À la Livraison</p>
-                                        <p class="text-xs text-\[#666660\]">Paiement en espèces à la réception</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Champ téléphone dynamique -->
-                    <div id="phone-payment-section" class="mt-6 p-4 bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg hidden">
-                        <label for="phone_payment" class="block text-sm font-semibold text-\[#2a2a28\] mb-2">
-                            📱 Numéro de Téléphone (paiement mobile)
-                        </label>
-                        <input
-                            type="tel"
-                            name="phone_payment"
-                            id="phone_payment"
-                            placeholder="+225 01 23 45 67 89"
-                            class="w-full px-4 py-2 border-2 border-\[#0a0a0a\]/30 rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all"
-                        />
-                    </div>
-
-                    @error('payment_method')
-                        <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Section Conditions -->
-                <div class="bg-white rounded-lg shadow-sm transition-shadow p-8">
-                    <label class="flex items-start gap-3 cursor-pointer group">
-                        <input
-                            type="checkbox"
-                            name="accept_conditions"
-                            required
-                            class="mt-1.5 w-5 h-5 rounded border border-\[#e0e0dc\] cursor-pointer accent-\[#0a0a0a\] flex-shrink-0"
-                        />
-                        <span class="text-sm text-\[#2a2a28\] group-hover:text-\[#0a0a0a\] leading-relaxed">
-                            J'accepte les <a href="#" class="text-\[#0a0a0a\] hover:underline font-semibold">conditions d'utilisation</a>
-                            et la <a href="#" class="text-\[#0a0a0a\] hover:underline font-semibold">politique de confidentialité</a>
+                        <span class="text-[9px] font-medium tracking-[0.06em] uppercase mt-1.5
+                            {{ $i < 2 ? 'text-[#0a0a0a]' : 'text-[#a0a09a]' }}">
+                            {{ $step }}
                         </span>
-                    </label>
-                    @error('accept_conditions')
-                        <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
+                    </div>
+                    @if(!$loop->last)
+                        <div class="w-10 h-px {{ $i < 1 ? 'bg-[#0a0a0a]' : 'bg-[#e0e0dc]' }} mx-2 mb-4"></div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- ══════════════════════════════
+         GRID
+    ══════════════════════════════ --}}
+    <div class="grid grid-cols-[1fr_300px] gap-6 items-start">
+
+        {{-- FORMULAIRE --}}
+        <form action="{{ route('commandes.store') }}" method="POST" id="payment-form" class="space-y-4">
+        @csrf
+
+        {{-- ── Section Livraison ── --}}
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            <div class="flex items-center gap-3 px-5 py-4 border-b border-[#efefed]">
+                <div class="w-5 h-5 bg-[#0a0a0a] rounded-sm flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                </div>
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Adresse de livraison</span>
+            </div>
+
+            <div class="p-5 space-y-5">
+
+                {{-- Pays --}}
+                <div>
+                    <label for="pays" class="block text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-2">Pays</label>
+                    <input type="text" id="pays" name="pays"
+                           value="{{ old('pays', 'Côte d\'Ivoire') }}"
+                           placeholder="Ex: Côte d'Ivoire, France…"
+                           class="w-full px-3.5 py-3 text-[13px] text-[#0a0a0a] bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg placeholder-[#a0a09a] focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-colors">
+                    @error('pays')
+                        <p class="text-[11px] text-[#dc2626] mt-1.5">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <!-- Champs cachés pour la recherche rapide -->
-                <input type="hidden" id="hidden-quartier-id" name="quartier_id" value="">
-                <input type="hidden" id="hidden-adresse-livraison" name="adresse_livraison" value="">
-
-                <!-- Boutons d'action -->
-                <div class="flex flex-col sm:flex-row gap-3 pt-4">
-                    <a href="{{ route('panier.index') }}" class="px-6 py-4 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition font-bold text-center shadow-sm flex items-center justify-center gap-2">
-                        ← Retour au Panier
-                    </a>
-                    <button type="submit" class="px-6 py-4 bg-[#0a0a0a] hover:bg-[#2a2a28] text-white rounded-lg transition font-bold shadow-sm flex items-center justify-center gap-2 flex-1" id="submit-btn">
-                        ✓ Confirmer la Commande
+                {{-- Tabs recherche / manuel --}}
+                <div class="flex gap-px bg-[#e0e0dc] border border-[#e0e0dc] rounded-lg overflow-hidden">
+                    <button type="button" data-tab="search"
+                            class="location-tab active flex-1 px-4 py-2.5 text-[12px] font-medium bg-[#0a0a0a] text-white transition-colors">
+                        Recherche rapide
+                    </button>
+                    <button type="button" data-tab="manual"
+                            class="location-tab flex-1 px-4 py-2.5 text-[12px] font-medium bg-white text-[#666660] hover:text-[#0a0a0a] transition-colors">
+                        Sélection manuelle
                     </button>
                 </div>
-            </form>
-        </div>
 
-        <!-- Résumé Récapitulatif (Sticky) -->
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow-sm transition-shadow p-6 sticky top-24">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="text-2xl">📦</div>
-                    <h3 class="text-2xl font-bold text-\[#0a0a0a\]">Résumé</h3>
+                {{-- Recherche rapide --}}
+                <div id="search-tab" class="location-section" style="position:relative; z-index:100;">
+                    <div class="relative">
+                        <input type="text" id="location-search"
+                               placeholder="Tapez une ville, un quartier… (ex: Cocody, Yopougon)"
+                               autocomplete="off"
+                               class="w-full px-3.5 py-3 pr-10 text-[13px] text-[#0a0a0a] bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg placeholder-[#a0a09a] focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-colors">
+                        <svg class="absolute right-3.5 top-3.5 w-3.5 h-3.5 text-[#a0a09a] pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <div id="search-results"
+                             class="absolute top-full left-0 right-0 mt-1 bg-white border border-[#e0e0dc] rounded-lg hidden max-h-64 overflow-y-auto"
+                             style="box-shadow: 0 8px 24px rgba(0,0,0,0.08);"></div>
+                    </div>
+                    <p class="text-[10px] text-[#a0a09a] font-light mt-1.5">Meilleur moyen : tapez directement le nom du quartier</p>
                 </div>
 
-                <!-- Produits -->
-                <div class="space-y-4 mb-6 pb-6 border-b-2 border-gray-200 max-h-96 overflow-y-auto">
-                    @forelse($items as $item)
-                        <div class="flex justify-between items-start text-sm hover:bg-\[#f7f7f5\] p-3 rounded-lg transition">
-                            <div class="flex-1">
-                                <p class="font-bold text-\[#0a0a0a\]">{{ $item->produit->nom }}</p>
-                                <p class="text-\[#666660\] text-xs mt-1">Quantité: <span class="font-semibold">{{ $item->quantite }}</span></p>
-                                <p class="text-\[#0a0a0a\] text-xs mt-1">@ {{ number_format($item->prix_unitaire, 0, '', ' ') }} F CFA</p>
+                {{-- Sélection manuelle --}}
+                <div id="manual-tab" class="location-section hidden">
+                    <div class="grid grid-cols-2 gap-3">
+                        @foreach([
+                            ['id' => 'region',   'name' => 'region_id',       'label' => 'Région'],
+                            ['id' => 'district', 'name' => 'district_id',     'label' => 'District',  'disabled' => true],
+                            ['id' => 'commune',  'name' => 'commune_id',      'label' => 'Commune',   'disabled' => true],
+                            ['id' => 'quartier', 'name' => 'quartier_manual', 'label' => 'Quartier',  'disabled' => true],
+                        ] as $sel)
+                        <div>
+                            <label for="{{ $sel['id'] }}" class="block text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-2">
+                                {{ $sel['label'] }}
+                            </label>
+                            <select id="{{ $sel['id'] }}" name="{{ $sel['name'] }}"
+                                    {{ isset($sel['disabled']) ? 'disabled' : '' }}
+                                    class="w-full px-3.5 py-3 text-[13px] text-[#0a0a0a] bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-colors disabled:text-[#a0a09a] disabled:cursor-not-allowed cursor-pointer">
+                                <option value="">— Sélectionner —</option>
+                            </select>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Adresse détaillée --}}
+                <div>
+                    <label for="adresse_detail" class="block text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-2">Adresse détaillée</label>
+                    <textarea id="adresse_detail" name="adresse_detail" rows="3" required
+                              placeholder="N° de rue, immeuble, point de repère…"
+                              class="w-full px-3.5 py-3 text-[13px] text-[#0a0a0a] bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg placeholder-[#a0a09a] focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-colors resize-none">{{ old('adresse_detail') }}</textarea>
+                    @error('adresse_detail')
+                        <p class="text-[11px] text-[#dc2626] mt-1.5">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Téléphone livraison --}}
+                <div>
+                    <label for="telephone_livraison" class="block text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-2">Téléphone de livraison</label>
+                    <input type="tel" id="telephone_livraison" name="telephone_livraison" required
+                           placeholder="+225 01 23 45 67 89"
+                           inputmode="numeric"
+                           class="w-full px-3.5 py-3 text-[13px] text-[#0a0a0a] bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg placeholder-[#a0a09a] focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-colors">
+                    @error('telephone_livraison')
+                        <p class="text-[11px] text-[#dc2626] mt-1.5">{{ $message }}</p>
+                    @enderror
+                </div>
+
+            </div>
+        </div>
+
+        {{-- ── Section Paiement ── --}}
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            <div class="flex items-center gap-3 px-5 py-4 border-b border-[#efefed]">
+                <div class="w-5 h-5 bg-[#0a0a0a] rounded-sm flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </div>
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Méthode de paiement</span>
+            </div>
+
+            <div class="p-5">
+                <div class="grid grid-cols-2 gap-px bg-[#e0e0dc] border border-[#e0e0dc] rounded-lg overflow-hidden">
+                    @php
+                        $methods = [
+                            ['value' => 'wave',        'label' => 'Wave',          'sub' => 'Paiement sécurisé',          'img' => 'wave.png'],
+                            ['value' => 'orange_money', 'label' => 'Orange Money', 'sub' => 'Porte-monnaie Orange',        'img' => 'orange money.png'],
+                            ['value' => 'mtn_money',   'label' => 'MTN Money',     'sub' => 'Service MTN',                 'img' => 'mtn money.png'],
+                            ['value' => 'moov_money',  'label' => 'Moov Money',    'sub' => 'Service Moov',                'img' => 'moov money.png'],
+                        ];
+                    @endphp
+
+                    @foreach($methods as $m)
+                    <label class="payment-option cursor-pointer">
+                        <input type="radio" name="payment_method" value="{{ $m['value'] }}" class="hidden" required>
+                        <div class="flex items-center gap-3 px-4 py-4 bg-white hover:bg-[#f7f7f5] transition-colors">
+                            <img src="{{ asset('images/payments/' . $m['img']) }}"
+                                 alt="{{ $m['label'] }}"
+                                 class="w-9 h-9 object-cover rounded-md flex-shrink-0">
+                            <div>
+                                <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $m['label'] }}</div>
+                                <div class="text-[11px] text-[#a0a09a] font-light">{{ $m['sub'] }}</div>
                             </div>
-                            <p class="font-bold text-\[#0a0a0a\] ml-2">{{ number_format($item->quantite * $item->prix_unitaire, 0, '', ' ') }} F</p>
+                        </div>
+                    </label>
+                    @endforeach
+
+                    {{-- À la livraison — pleine largeur --}}
+                    <label class="payment-option cursor-pointer col-span-2">
+                        <input type="radio" name="payment_method" value="cash" class="hidden" required>
+                        <div class="flex items-center gap-3 px-4 py-4 bg-white hover:bg-[#f7f7f5] transition-colors border-t border-[#e0e0dc]">
+                            <img src="{{ asset('images/payments/a la livraison.jfif') }}"
+                                 alt="À la livraison"
+                                 class="w-9 h-9 object-cover rounded-md flex-shrink-0">
+                            <div>
+                                <div class="text-[13px] font-medium text-[#0a0a0a]">À la livraison</div>
+                                <div class="text-[11px] text-[#a0a09a] font-light">Paiement en espèces à la réception</div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                @error('payment_method')
+                    <p class="text-[11px] text-[#dc2626] mt-2">{{ $message }}</p>
+                @enderror
+
+                {{-- Téléphone paiement mobile --}}
+                <div id="phone-payment-section" class="hidden mt-4">
+                    <label for="phone_payment" class="block text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-2">
+                        Numéro de téléphone (paiement mobile)
+                    </label>
+                    <input type="tel" id="phone_payment" name="phone_payment"
+                           placeholder="+225 01 23 45 67 89"
+                           class="w-full px-3.5 py-3 text-[13px] text-[#0a0a0a] bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg placeholder-[#a0a09a] focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-colors">
+                </div>
+            </div>
+        </div>
+
+        {{-- ── Conditions ── --}}
+        <div class="bg-white border border-[#e0e0dc] rounded-xl px-5 py-4">
+            <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" name="accept_conditions" required
+                       class="mt-0.5 w-4 h-4 border border-[#e0e0dc] rounded cursor-pointer accent-[#0a0a0a] flex-shrink-0">
+                <span class="text-[13px] text-[#2a2a28] font-light leading-relaxed">
+                    J'accepte les <a href="#" class="text-[#0a0a0a] border-b border-[#e0e0dc] pb-px hover:border-[#0a0a0a] transition-colors">conditions d'utilisation</a>
+                    et la <a href="#" class="text-[#0a0a0a] border-b border-[#e0e0dc] pb-px hover:border-[#0a0a0a] transition-colors">politique de confidentialité</a>
+                </span>
+            </label>
+            @error('accept_conditions')
+                <p class="text-[11px] text-[#dc2626] mt-2">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- Champs cachés --}}
+        <input type="hidden" id="hidden-quartier-id" name="quartier_id" value="">
+        <input type="hidden" id="hidden-adresse-livraison" name="adresse_livraison" value="">
+
+        {{-- Boutons --}}
+        <div class="flex gap-3">
+            <a href="{{ route('panier.index') }}"
+               class="flex items-center gap-2 px-4 py-3 border border-[#e0e0dc] rounded-lg text-[13px] font-medium text-[#666660] hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Panier
+            </a>
+            <button type="submit" id="submit-btn"
+                    class="flex-1 flex items-center justify-center gap-2 bg-[#0a0a0a] text-white text-[13px] font-medium py-3 rounded-lg hover:opacity-85 transition-opacity">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Confirmer la commande
+            </button>
+        </div>
+
+        </form>
+
+        {{-- RÉSUMÉ (sticky) --}}
+        <div class="sticky top-6">
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+
+                <div class="px-5 py-4 border-b border-[#efefed]">
+                    <span class="text-[13px] font-medium text-[#0a0a0a]">Résumé</span>
+                </div>
+
+                {{-- Articles --}}
+                <div class="divide-y divide-[#efefed] max-h-72 overflow-y-auto">
+                    @forelse($items as $item)
+                        <div class="px-4 py-3.5 hover:bg-[#f7f7f5] transition-colors">
+                            <div class="text-[13px] font-medium text-[#0a0a0a] leading-snug mb-0.5">{{ $item->produit->nom }}</div>
+                            <div class="flex items-center justify-between mt-1">
+                                <span class="text-[11px] text-[#a0a09a] font-light font-mono">{{ $item->quantite }} × {{ number_format($item->prix_unitaire, 0, ',', ' ') }}</span>
+                                <span class="text-[12px] font-mono font-medium text-[#0a0a0a]">{{ number_format($item->quantite * $item->prix_unitaire, 0, ',', ' ') }} F</span>
+                            </div>
                         </div>
                     @empty
-                        <p class="text-center text-\[#a0a09a\] py-4">Aucun article</p>
+                        <div class="px-4 py-8 text-center text-[13px] text-[#a0a09a] font-light">Aucun article</div>
                     @endforelse
                 </div>
 
-                <!-- Frais de livraison -->
-                <div class="space-y-3 mb-6 p-4 bg-[#f7f7f5] rounded-lg">
-                    <div class="flex justify-between text-\[#2a2a28\]">
-                        <span class="font-semibold">Sous-total</span>
-                        <span class="font-bold text-\[#0a0a0a\]">{{ number_format($total, 0, '', ' ') }} F CFA</span>
+                {{-- Calculs --}}
+                <div class="px-5 py-4 border-t border-[#efefed] space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[12px] text-[#666660] font-light">Sous-total</span>
+                        <span class="font-mono text-[12px] text-[#0a0a0a]">{{ number_format($total, 0, ',', ' ') }} FCFA</span>
                     </div>
-                    <div class="flex justify-between text-\[#2a2a28\]">
-                        <span class="font-semibold flex items-center gap-2">
-                            🚚 Livraison
+                    <div class="flex items-center justify-between">
+                        <span class="text-[12px] text-[#666660] font-light">Livraison</span>
+                        <span class="font-mono text-[12px] text-[#0a0a0a]" id="shipping-cost">
+                            @if($total > 100) Gratuite @else 2 500 FCFA @endif
                         </span>
-                        <span class="font-bold text-\[#0a0a0a\]" id="shipping-cost">
+                    </div>
+                </div>
+
+                {{-- Total --}}
+                <div class="mx-4 mb-4 bg-[#0a0a0a] rounded-lg px-4 py-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-medium tracking-[0.08em] uppercase text-white/60">Total TTC</span>
+                        <span class="font-mono text-[18px] font-medium text-white" id="total-amount">
                             @if($total > 100)
-                                Gratuit ✓
+                                {{ number_format($total, 0, ',', ' ') }}
                             @else
-                                2 500 F CFA
+                                {{ number_format($total + 2500, 0, ',', ' ') }}
                             @endif
+                            <span class="text-[11px] text-white/50 font-sans font-light ml-0.5">FCFA</span>
                         </span>
                     </div>
                 </div>
 
-                <!-- Total final -->
-                <div class="flex justify-between items-center px-4 py-4 bg-[#0a0a0a] rounded-xl text-white">
-                    <span class="font-bold text-lg">Total TTC</span>
-                    <span class="text-3xl font-bold" id="total-amount">
-                        @if($total > 100)
-                            {{ number_format($total, 0, '', ' ') }}
-                        @else
-                            {{ number_format($total + 2500, 0, '', ' ') }}
-                        @endif
-                        <span class="text-lg ml-1">F CFA</span>
-                    </span>
-                </div>
-
-                <!-- Infos client -->
-                <div class="mt-6 pt-6 border-t-2 border-gray-200 text-sm">
-                    <p class="text-\[#666660\] mb-2 font-semibold">Vos informations:</p>
-                    <div class="space-y-2">
-                        <p class="text-\[#2a2a28\]"><strong>👤 Nom:</strong> <br/><span class="text-\[#0a0a0a\]">{{ auth()->user()->name }}</span></p>
-                        <p class="text-\[#2a2a28\]"><strong>📧 Email:</strong> <br/><span class="text-\[#0a0a0a\]">{{ auth()->user()->email }}</span></p>
+                {{-- Infos client --}}
+                <div class="px-5 pb-4 pt-1 border-t border-[#efefed] space-y-2">
+                    <div class="text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-2">Votre compte</div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 bg-[#0a0a0a] rounded-sm flex items-center justify-center text-white text-[10px] font-medium flex-shrink-0">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <div class="text-[12px] font-medium text-[#0a0a0a]">{{ auth()->user()->name }}</div>
+                            <div class="text-[11px] text-[#a0a09a] font-light">{{ auth()->user()->email }}</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Badge sécurité -->
-                <div class="mt-6 p-3 bg-green-50 border border-green-200 rounded-lg text-center">
-                    <p class="text-xs text-green-700 font-semibold">🔒 Paiement Sécurisé & Chiffré</p>
+                {{-- Sécurité --}}
+                <div class="mx-4 mb-4 flex items-center gap-2 px-3 py-2.5 border border-[#e0e0dc] rounded-lg">
+                    <svg class="w-3.5 h-3.5 text-[#a0a09a] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span class="text-[11px] text-[#666660] font-light">Paiement sécurisé et chiffré</span>
                 </div>
+
             </div>
         </div>
-    </div>
+
+    </div>{{-- /grid --}}
+</div>
 </div>
 
-<!-- Styles CSS personnalisés -->
 <style>
-    input[type="radio"] {
-        accent-color: #2563eb;
-    }
+/* Payment option selected state */
+.payment-option input[type="radio"]:checked + div {
+    background-color: #f7f7f5;
+    outline: 1.5px solid #0a0a0a;
+    outline-offset: -1.5px;
+}
 
-    .payment-option input[type="radio"]:checked + div {
-        @apply border-\[#0a0a0a\] bg-\[#f7f7f5\] shadow-md;
-    }
+/* Input autofill reset */
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #f7f7f5 inset;
+    -webkit-text-fill-color: #0a0a0a;
+}
 
-    .payment-option input[type="radio"]:checked + div p:first-child {
-        @apply text-\[#0a0a0a\] font-bold;
-    }
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #f7f7f5; }
+::-webkit-scrollbar-thumb { background: #e0e0dc; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #a0a09a; }
 
-    /* Animation au focus */
-    input:focus-visible,
-    select:focus-visible,
-    textarea:focus-visible {
-        outline: none;
-    }
+/* Toast */
+.toast-notification {
+    pointer-events: auto;
+    animation: toastIn 0.25s ease forwards;
+}
+.toast-notification.hide {
+    animation: toastOut 0.25s ease forwards;
+}
+@keyframes toastIn  { from { opacity:0; transform:translateX(24px); } to { opacity:1; transform:translateX(0); } }
+@keyframes toastOut { from { opacity:1; transform:translateX(0); }    to { opacity:0; transform:translateX(24px); } }
 
-    /* Smooth transitions */
-    * {
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
+.toast-success { background:#0a0a0a; color:#fff; }
+.toast-error   { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+.toast-info    { background:#f7f7f5; color:#2a2a28; border:1px solid #e0e0dc; }
+.toast-warning { background:#fdf6ec; color:#b45309; border:1px solid #fde68a; }
 
-    /* Scrollbar personnalisée -->
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #f1f5f9;
-        border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-    }
-
-    /* Toast Notifications */
-    .toast-notification {
-        animation: slideInRight 0.3s ease-in-out forwards;
-        pointer-events: auto;
-    }
-
-    .toast-notification.hide {
-        animation: slideOutRight 0.3s ease-in-out forwards;
-    }
-
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(400px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    @keyframes slideOutRight {
-        from {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateX(400px);
-        }
-    }
-
-    .toast-success {
-        @apply bg-green-500 text-white;
-    }
-
-    .toast-error {
-        @apply bg-\[#dc2626\] text-white;
-    }
-
-    .toast-info {
-        @apply bg-\[#0a0a0a\] text-white;
-    }
-
-    .toast-warning {
-        @apply bg-yellow-500 text-white;
-    }
-
-    /* ========== Payment Method Selection ========== */
-    .payment-option input[type="radio"]:checked + div {
-        @apply border-\[#0a0a0a\] border-4 bg-\[#f7f7f5\] shadow-lg;
-    }
-
-    .payment-option input[type="radio"]:checked + div p:first-child {
-        @apply text-\[#0a0a0a\] font-bold;
-    }
-
+.toast-notification {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 280px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
 </style>
 
-<!-- Scripts JavaScript améliorés -->
 <script>
-    console.log('✅ Script de paiement chargé');
-    const API_BASE = '{{ url("/api") }}';
-    let searchTimeout;
+const API_BASE = '{{ url("/api") }}';
+let searchTimeout;
 
-    // ==================== Initialisation ====================
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('🚀 DOMContentLoaded déclenché - Initialisation du formulaire');
-        loadRegions();
-        setupEventListeners();
-        setupFormValidation();
-        console.log('✓ Initialisation complète');
+document.addEventListener('DOMContentLoaded', () => {
+    loadRegions();
+    setupEventListeners();
+    setupFormValidation();
+});
+
+function setupEventListeners() {
+    // Tabs
+    document.querySelectorAll('.location-tab').forEach(tab => {
+        tab.addEventListener('click', e => {
+            e.preventDefault();
+            const tabName = tab.dataset.tab;
+
+            document.querySelectorAll('.location-tab').forEach(t => {
+                const isActive = t.dataset.tab === tabName;
+                t.classList.toggle('bg-[#0a0a0a]', isActive);
+                t.classList.toggle('text-white', isActive);
+                t.classList.toggle('bg-white', !isActive);
+                t.classList.toggle('text-[#666660]', !isActive);
+            });
+
+            document.querySelectorAll('.location-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+
+            if (tabName === 'manual') {
+                document.getElementById('location-search').value = '';
+                document.getElementById('search-results').classList.add('hidden');
+            }
+        });
     });
 
-    // ==================== Gestion des événements ====================
-    function setupEventListeners() {
-        // ===== Gestion des Tabs =====
-        document.querySelectorAll('.location-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                e.preventDefault();
-                const tabName = tab.dataset.tab;
+    document.getElementById('region').addEventListener('change', loadDistricts);
+    document.getElementById('district').addEventListener('change', loadCommunes);
+    document.getElementById('commune').addEventListener('change', loadQuartiers);
+    document.getElementById('quartier').addEventListener('change', e => {
+        if (e.target.value) document.getElementById('hidden-quartier-id').value = e.target.value;
+    });
 
-                // Désactiver tous les tabs
-                document.querySelectorAll('.location-tab').forEach(t => {
-                    t.classList.remove('active', 'bg-white', 'text-\[#0a0a0a\]', 'border-\[#0a0a0a\]/30');
-                    t.classList.add('text-\[#666660\]', 'border-transparent');
-                });
-
-                // Cacher toutes les sections
-                document.querySelectorAll('.location-section').forEach(section => {
-                    section.classList.add('hidden');
-                });
-
-                // Activer le tab cliqué
-                tab.classList.add('active', 'bg-white', 'text-\[#0a0a0a\]', 'border-\[#0a0a0a\]/30');
-                tab.classList.remove('text-\[#666660\]', 'border-transparent');
-
-                // Afficher la section correspondante
-                document.getElementById(`${tabName}-tab`).classList.remove('hidden');
-
-                // Effacer la recherche si on passe au manuel
-                if (tabName === 'manual') {
-                    document.getElementById('location-search').value = '';
-                    document.getElementById('search-results').classList.add('hidden');
-                }
-            });
+    document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+        radio.addEventListener('change', e => {
+            showNotification(`${e.target.value.replace(/_/g, ' ')} sélectionné`, 'info');
+            togglePhoneSection();
         });
+    });
 
-        // Régions
-        document.getElementById('region').addEventListener('change', loadDistricts);
+    document.getElementById('location-search').addEventListener('input', handleLocationSearch);
+    document.addEventListener('click', e => {
+        if (!e.target.closest('#location-search') && !e.target.closest('#search-results'))
+            document.getElementById('search-results').classList.add('hidden');
+    });
+}
 
-        // Districts
-        document.getElementById('district').addEventListener('change', loadCommunes);
-
-        // Communes
-        document.getElementById('commune').addEventListener('change', loadQuartiers);
-
-        // Quartiers - Remplir le champ caché avec le quartier sélectionné
-        document.getElementById('quartier').addEventListener('change', (e) => {
-            const quartierValue = e.target.value;
-            const quartierText = e.target.options[e.target.selectedIndex]?.text;
-            if (quartierValue) {
-                document.getElementById('hidden-quartier-id').value = quartierValue;
-                console.log('✓ Quartier manuel sélectionné:', quartierValue, '-', quartierText);
-            }
+async function loadRegions() {
+    try {
+        const r = await fetch(`${API_BASE}/delivery-locations/regions`);
+        const data = await r.json();
+        const select = document.getElementById('region');
+        select.innerHTML = '<option value="">— Sélectionner une région —</option>';
+        (data.data ?? []).forEach(region => {
+            const o = document.createElement('option');
+            o.value = region.id; o.textContent = region.name;
+            select.appendChild(o);
         });
+    } catch(e) { showNotification('Erreur chargement régions', 'error'); }
+}
 
-        // Paiements - Sélection visuelle et gestion du téléphone
-        document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                console.log('💳 Moyen de paiement sélectionné:', e.target.value);
-
-                // Mise à jour visuelle
-                document.querySelectorAll('.payment-option').forEach(option => {
-                    const input = option.querySelector('input[name="payment_method"]');
-                    if (input?.checked) {
-                        option.querySelector('div').classList.add('ring-2', 'ring-\[#0a0a0a\]');
-                        showNotification(`✓ ${e.target.value.replace(/_/g, ' ').toUpperCase()} sélectionné`, 'success');
-                    } else {
-                        option.querySelector('div').classList.remove('ring-2', 'ring-\[#0a0a0a\]');
-                    }
-                });
-
-                togglePhoneSection();
-            });
-        });
-
-        // Recherche
-        document.getElementById('location-search').addEventListener('input', handleLocationSearch);
-
-        // Fermer les résultats de recherche au clic
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('#location-search') && !e.target.closest('#search-results')) {
-                document.getElementById('search-results').classList.add('hidden');
-            }
-        });
+async function loadDistricts() {
+    const regionId = document.getElementById('region').value;
+    const districtSelect = document.getElementById('district');
+    const communeSelect  = document.getElementById('commune');
+    const quartierSelect = document.getElementById('quartier');
+    if (!regionId) {
+        [districtSelect, communeSelect, quartierSelect].forEach(s => { s.disabled = true; s.innerHTML = '<option value="">— Sélectionner —</option>'; });
+        return;
     }
+    try {
+        const r = await fetch(`${API_BASE}/delivery-locations/regions/${regionId}/districts`);
+        const data = await r.json();
+        districtSelect.innerHTML = '<option value="">— Sélectionner un district —</option>';
+        districtSelect.disabled = false;
+        (data.data ?? []).forEach(d => { const o = document.createElement('option'); o.value = d.id; o.textContent = d.name; districtSelect.appendChild(o); });
+        communeSelect.innerHTML = '<option value="">— Sélectionner —</option>'; communeSelect.disabled = true;
+        quartierSelect.innerHTML = '<option value="">— Sélectionner —</option>'; quartierSelect.disabled = true;
+    } catch(e) { showNotification('Erreur chargement districts', 'error'); }
+}
 
-    // ==================== Chargement des régions ====================
-    async function loadRegions() {
-        try {
-            const response = await fetch(`${API_BASE}/delivery-locations/regions`);
-            const data = await response.json();
-
-            const select = document.getElementById('region');
-            select.innerHTML = '<option value="">-- Sélectionner une région --</option>';
-
-            if (data.data && Array.isArray(data.data)) {
-                data.data.forEach(region => {
-                    const option = document.createElement('option');
-                    option.value = region.id;
-                    option.textContent = region.name;
-                    select.appendChild(option);
-                });
-            }
-        } catch (err) {
-            console.error('Erreur lors du chargement des régions:', err);
-            showNotification('Erreur lors du chargement', 'error');
-        }
+async function loadCommunes() {
+    const districtId = document.getElementById('district').value;
+    const communeSelect  = document.getElementById('commune');
+    const quartierSelect = document.getElementById('quartier');
+    if (!districtId) {
+        [communeSelect, quartierSelect].forEach(s => { s.disabled = true; s.innerHTML = '<option value="">— Sélectionner —</option>'; });
+        return;
     }
+    try {
+        const r = await fetch(`${API_BASE}/delivery-locations/districts/${districtId}/communes`);
+        const data = await r.json();
+        communeSelect.innerHTML = '<option value="">— Sélectionner une commune —</option>';
+        communeSelect.disabled = false;
+        (data.data ?? []).forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.name; communeSelect.appendChild(o); });
+        quartierSelect.innerHTML = '<option value="">— Sélectionner —</option>'; quartierSelect.disabled = true;
+    } catch(e) { showNotification('Erreur chargement communes', 'error'); }
+}
 
-    // ==================== Chargement des districts ====================
-    async function loadDistricts() {
-        const regionId = document.getElementById('region').value;
-        const districtSelect = document.getElementById('district');
-        const communeSelect = document.getElementById('commune');
-        const quartierSelect = document.getElementById('quartier');
+async function loadQuartiers() {
+    const communeId = document.getElementById('commune').value;
+    const quartierSelect = document.getElementById('quartier');
+    if (!communeId) { quartierSelect.disabled = true; quartierSelect.innerHTML = '<option value="">— Sélectionner —</option>'; return; }
+    try {
+        const r = await fetch(`${API_BASE}/delivery-locations/communes/${communeId}/quartiers`);
+        const data = await r.json();
+        quartierSelect.innerHTML = '<option value="">— Sélectionner un quartier —</option>';
+        quartierSelect.disabled = false;
+        (data.data ?? []).forEach(q => { const o = document.createElement('option'); o.value = q.id; o.textContent = q.name; quartierSelect.appendChild(o); });
+    } catch(e) { showNotification('Erreur chargement quartiers', 'error'); }
+}
 
-        if (!regionId) {
-            districtSelect.disabled = true;
-            communeSelect.disabled = true;
-            quartierSelect.disabled = true;
-            districtSelect.innerHTML = '<option value="">-- Sélectionner --</option>';
-            communeSelect.innerHTML = '<option value="">-- Sélectionner --</option>';
-            quartierSelect.innerHTML = '<option value="">-- Sélectionner --</option>';
-            return;
-        }
+function handleLocationSearch() {
+    const query = document.getElementById('location-search').value.trim();
+    const resultsDiv = document.getElementById('search-results');
+    clearTimeout(searchTimeout);
+    if (query.length < 1) { resultsDiv.classList.add('hidden'); return; }
 
-        try {
-            const response = await fetch(`${API_BASE}/delivery-locations/regions/${regionId}/districts`);
-            const data = await response.json();
-
-            districtSelect.innerHTML = '<option value="">-- Sélectionner un district --</option>';
-            districtSelect.disabled = false;
-
-            if (data.data && Array.isArray(data.data)) {
-                data.data.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district.id;
-                    option.textContent = district.name;
-                    districtSelect.appendChild(option);
-                });
-            }
-
-            // Reset communes et quartiers
-            communeSelect.innerHTML = '<option value="">-- Sélectionner une commune --</option>';
-            communeSelect.disabled = true;
-            quartierSelect.innerHTML = '<option value="">-- Sélectionner un quartier --</option>';
-            quartierSelect.disabled = true;
-        } catch (err) {
-            console.error('Erreur lors du chargement des districts:', err);
-            showNotification('Erreur lors du chargement des districts', 'error');
-        }
-    }
-
-    // ==================== Chargement des communes ====================
-    async function loadCommunes() {
-        const districtId = document.getElementById('district').value;
-        const communeSelect = document.getElementById('commune');
-        const quartierSelect = document.getElementById('quartier');
-
-        if (!districtId) {
-            communeSelect.disabled = true;
-            quartierSelect.disabled = true;
-            communeSelect.innerHTML = '<option value="">-- Sélectionner --</option>';
-            quartierSelect.innerHTML = '<option value="">-- Sélectionner --</option>';
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_BASE}/delivery-locations/districts/${districtId}/communes`);
-            const data = await response.json();
-
-            communeSelect.innerHTML = '<option value="">-- Sélectionner une commune --</option>';
-            communeSelect.disabled = false;
-
-            if (data.data && Array.isArray(data.data)) {
-                data.data.forEach(commune => {
-                    const option = document.createElement('option');
-                    option.value = commune.id;
-                    option.textContent = commune.name;
-                    communeSelect.appendChild(option);
-                });
-            }
-
-            // Reset quartiers
-            quartierSelect.innerHTML = '<option value="">-- Sélectionner un quartier --</option>';
-            quartierSelect.disabled = true;
-        } catch (err) {
-            console.error('Erreur lors du chargement des communes:', err);
-            showNotification('Erreur lors du chargement des communes', 'error');
-        }
-    }
-
-    // ==================== Chargement des quartiers ====================
-    async function loadQuartiers() {
-        const communeId = document.getElementById('commune').value;
-        const quartierSelect = document.getElementById('quartier');
-
-        if (!communeId) {
-            quartierSelect.disabled = true;
-            quartierSelect.innerHTML = '<option value="">-- Sélectionner --</option>';
-            return;
-        }
-
-        try {
-            const response = await fetch(`${API_BASE}/delivery-locations/communes/${communeId}/quartiers`);
-            const data = await response.json();
-
-            quartierSelect.innerHTML = '<option value="">-- Sélectionner un quartier --</option>';
-            quartierSelect.disabled = false;
-
-            if (data.data && Array.isArray(data.data)) {
-                data.data.forEach(quartier => {
-                    const option = document.createElement('option');
-                    option.value = quartier.id;
-                    option.textContent = quartier.name;
-                    quartierSelect.appendChild(option);
-                });
-            }
-        } catch (err) {
-            console.error('Erreur lors du chargement des quartiers:', err);
-            showNotification('Erreur lors du chargement des quartiers', 'error');
-        }
-    }
-
-    // ==================== Gestion de la recherche ====================
-    function handleLocationSearch() {
-        const input = document.getElementById('location-search');
-        const query = input.value.trim();
-        const resultsDiv = document.getElementById('search-results');
-
-        clearTimeout(searchTimeout);
-
-        if (query.length < 1) {
-            resultsDiv.classList.add('hidden');
-            return;
-        }
-
-        searchTimeout = setTimeout(() => {
-            fetch(`${API_BASE}/delivery-locations/search?q=${encodeURIComponent(query)}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (!data.data || data.data.length === 0) {
-                        resultsDiv.innerHTML = '<div class="px-4 py-4 text-center text-\[#a0a09a\] text-sm">✗ Aucun résultat trouvé</div>';
-                    } else {
-                        // Réorganiser les résultats pour mettre les Quartiers en premier
-                        let reorganizedData = [];
-                        let otherGroups = [];
-
-                        data.data.forEach(group => {
-                            if (group.group === 'Quartiers' || group.group.includes('Quartier')) {
-                                reorganizedData.unshift(group); // Ajouter au début
-                            } else {
-                                otherGroups.push(group);
-                            }
+    searchTimeout = setTimeout(() => {
+        fetch(`${API_BASE}/delivery-locations/search?q=${encodeURIComponent(query)}`)
+            .then(r => r.json())
+            .then(data => {
+                if (!data.data?.length) {
+                    resultsDiv.innerHTML = `<div class="px-4 py-5 text-center text-[12px] text-[#a0a09a] font-light">Aucun résultat</div>`;
+                } else {
+                    let groups = [], others = [];
+                    data.data.forEach(g => g.group.includes('Quartier') ? groups.unshift(g) : others.push(g));
+                    groups = [...groups, ...others];
+                    let html = '';
+                    groups.forEach(group => {
+                        html += `<div class="px-4 py-2 bg-[#f7f7f5] text-[9px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] border-b border-[#efefed] sticky top-0">${group.group}</div>`;
+                        group.items.forEach(item => {
+                            const isQ = item.type === 'quartier';
+                            html += `<button type="button" class="search-result-item w-full text-left px-4 py-3 hover:bg-[#f7f7f5] border-b border-[#efefed] last:border-b-0 transition-colors"
+                                data-type="${item.type}" data-id="${item.id}" data-name="${item.name}">
+                                <div class="text-[13px] ${isQ ? 'font-medium text-[#0a0a0a]' : 'font-light text-[#2a2a28]'}">${item.display || item.name}</div>
+                                ${item.breadcrumb ? `<div class="text-[11px] text-[#a0a09a] font-light mt-0.5">${item.breadcrumb}</div>` : ''}
+                            </button>`;
                         });
-
-                        reorganizedData = [...reorganizedData, ...otherGroups];
-
-                        let html = '';
-                        reorganizedData.forEach(group => {
-                            html += `<div class="px-4 py-3 bg-\[#f7f7f5\] text-xs font-bold text-\[#666660\] sticky top-0 border-b border-gray-200">📌 ${group.group}</div>`;
-                            group.items.forEach(item => {
-                                const displayText = item.display || item.name;
-                                const breadcrumb = item.breadcrumb ? ` <div class="text-\[#a0a09a\] text-xs mt-0.5">${item.breadcrumb}</div>` : '';
-                                const isQuartier = item.type === 'quartier' ? 'font-bold text-\[#0a0a0a\]' : '';
-                                html += `<button type="button" class="search-result-item w-full text-left px-4 py-3 hover:bg-\[#f7f7f5\] border-b border-gray-100 transition duration-150 flex justify-between items-start ${isQuartier}" data-type="${item.type}" data-id="${item.id}" data-name="${item.name}">
-                                    <div class="flex-1">
-                                        <div class="font-semibold text-\[#0a0a0a\] text-sm ${isQuartier}">${displayText} ${item.type === 'quartier' ? '✓' : ''}</div>
-                                        ${breadcrumb}
-                                    </div>
-                                    <span class="text-gray-400 ml-2">→</span>
-                                </button>`;
-                            });
-                        });
-                        resultsDiv.innerHTML = html;
-                        setupSearchResultsListeners();
-                    }
-                    resultsDiv.classList.remove('hidden');
-                })
-                .catch(err => {
-                    console.error('Erreur:', err);
-                    resultsDiv.innerHTML = '<div class="px-4 py-4 text-center text-\[#dc2626\] text-sm">⚠️ Erreur lors de la recherche</div>';
-                    resultsDiv.classList.remove('hidden');
-                });
-        }, 250);
-    }
-
-    // ==================== Configuration des écouteurs de résultats ====================
-    function setupSearchResultsListeners() {
-        document.querySelectorAll('.search-result-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                const type = item.dataset.type;
-                const id = item.dataset.id;
-                const name = item.dataset.name;
-
-                // Remplir le champ de recherche
-                document.getElementById('location-search').value = name;
-                document.getElementById('search-results').classList.add('hidden');
-
-                // Remplir et déclencher les changements appropriés
-                if (type === 'region') {
-                    document.getElementById('region').value = id;
-                    document.getElementById('region').dispatchEvent(new Event('change'));
-                    showNotification(`ℹ️ Région sélectionnée. Veuillez continuer pour choisir un quartier.`, 'info');
-                } else if (type === 'district') {
-                    // Besoin de trouver la région d'abord
-                    document.getElementById('district').value = id;
-                    document.getElementById('district').dispatchEvent(new Event('change'));
-                    showNotification(`ℹ️ District sélectionné. Veuillez continuer pour choisir un quartier.`, 'info');
-                } else if (type === 'commune') {
-                    document.getElementById('commune').value = id;
-                    document.getElementById('commune').dispatchEvent(new Event('change'));
-                    showNotification(`ℹ️ Commune sélectionnée. Veuillez continuer pour choisir un quartier.`, 'info');
-                } else if (type === 'quartier') {
-                    document.getElementById('quartier').value = id;
-                    document.getElementById('hidden-quartier-id').value = id;
-                    document.getElementById('hidden-adresse-livraison').value = name;
-
-                    // Pré-remplir l'adresse détaillée avec le quartier sélectionné
-                    const adresseDetailField = document.getElementById('adresse_detail');
-                    if (!adresseDetailField.value) {
-                        adresseDetailField.value = `Quartier: ${name}`;
-                        showNotification(`✓ Quartier "${name}" sélectionné!`, 'success');
-                    }
-
-                    // Scroll vers le champ de l'adresse détaillée
-                    setTimeout(() => {
-                        adresseDetailField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        adresseDetailField.focus();
-                    }, 100);
+                    });
+                    resultsDiv.innerHTML = html;
+                    setupSearchResultsListeners();
                 }
+                resultsDiv.classList.remove('hidden');
+            })
+            .catch(() => {
+                resultsDiv.innerHTML = `<div class="px-4 py-5 text-center text-[12px] text-[#dc2626]">Erreur lors de la recherche</div>`;
+                resultsDiv.classList.remove('hidden');
             });
+    }, 250);
+}
+
+function setupSearchResultsListeners() {
+    document.querySelectorAll('.search-result-item').forEach(item => {
+        item.addEventListener('click', e => {
+            e.preventDefault();
+            const { type, id, name } = item.dataset;
+            document.getElementById('location-search').value = name;
+            document.getElementById('search-results').classList.add('hidden');
+
+            if (type === 'quartier') {
+                document.getElementById('hidden-quartier-id').value = id;
+                document.getElementById('hidden-adresse-livraison').value = name;
+                const adresse = document.getElementById('adresse_detail');
+                if (!adresse.value) adresse.value = `Quartier: ${name}`;
+                showNotification(`Quartier "${name}" sélectionné`, 'success');
+                setTimeout(() => { adresse.scrollIntoView({ behavior:'smooth', block:'center' }); adresse.focus(); }, 100);
+            } else {
+                showNotification(`Continuez pour préciser le quartier`, 'info');
+            }
         });
-    }
+    });
+}
 
-    // ==================== Toggle section téléphone ====================
-    function togglePhoneSection() {
-        const phoneSection = document.getElementById('phone-payment-section');
-        const phoneName = document.getElementById('phone_payment');
-        const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+function togglePhoneSection() {
+    const section = document.getElementById('phone-payment-section');
+    const phone   = document.getElementById('phone_payment');
+    const method  = document.querySelector('input[name="payment_method"]:checked')?.value;
+    const show = method && method !== 'cash';
+    section.classList.toggle('hidden', !show);
+    phone.required = show;
+    if (!show) phone.value = '';
+}
 
-        if (selectedMethod !== 'cash') {
-            phoneSection.classList.remove('hidden');
-            phoneName.required = true;
-        } else {
-            phoneSection.classList.add('hidden');
-            phoneName.required = false;
-            phoneName.value = '';
-        }
-    }
+function setupFormValidation() {
+    const form = document.getElementById('payment-form');
+    if (!form) return;
 
-    // ==================== Validation du formulaire avant soumission ====================
-    function setupFormValidation() {
-        const form = document.getElementById('payment-form');
-        if (!form) {
-            console.error('❌ Formulaire #payment-form introuvable!');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const quartierIdFinal = document.getElementById('quartier').value || document.getElementById('hidden-quartier-id').value;
+        const adresseDetail   = document.getElementById('adresse_detail').value.trim();
+        const telephone       = document.getElementById('telephone_livraison').value.trim();
+        const paymentMethod   = document.querySelector('input[name="payment_method"]:checked');
+        const phonePayment    = document.getElementById('phone_payment').value.trim();
+        const phoneRequired   = !document.getElementById('phone-payment-section').classList.contains('hidden');
+        const conditions      = document.querySelector('input[name="accept_conditions"]:checked');
+
+        const errors = [];
+        if (!adresseDetail || adresseDetail.length < 5) errors.push('Adresse détaillée invalide (min. 5 caractères)');
+        if (telephone.replace(/\D/g, '').length < 10)  errors.push('Téléphone invalide (min. 10 chiffres)');
+        if (!paymentMethod)                             errors.push('Sélectionnez un moyen de paiement');
+        if (phoneRequired && !phonePayment)             errors.push('Numéro de téléphone requis pour ce paiement');
+        if (!conditions)                                errors.push('Acceptez les conditions pour continuer');
+
+        if (errors.length) {
+            errors.forEach(err => showNotification(err, 'error'));
             return;
         }
-        console.log('✓ Formulaire trouvé, attachement écouteur submit');
 
-        try {
-            form.addEventListener('submit', (e) => {
-                try {
-                    e.preventDefault();
-                    console.log('📋 Validation du formulaire en cours...');
+        if (quartierIdFinal) document.getElementById('hidden-quartier-id').value = quartierIdFinal;
 
-                    // Récupérer tous les champs
-                    const quartierIdManual = document.getElementById('quartier').value;
-                    const quartierIdHidden = document.getElementById('hidden-quartier-id').value;
-                    const quartierIdFinal = quartierIdManual || quartierIdHidden;
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.innerHTML = 'Traitement en cours…';
+        showNotification('Commande en cours d\'envoi…', 'info');
 
-                    const adresseDetail = document.getElementById('adresse_detail').value.trim();
-                    const telephone = document.getElementById('telephone_livraison').value.trim();
-                    const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
-                    const phonePayment = document.getElementById('phone_payment').value.trim();
-                    const phonePaymentRequired = !document.getElementById('phone-payment-section').classList.contains('hidden');
-                    const acceptConditions = document.querySelector('input[name="accept_conditions"]:checked');
-
-                    console.log('🔍 Récupération des quartiers:');
-                    console.log('  - Select #quartier:', quartierIdManual || '(vide)');
-                    console.log('  - Hidden #hidden-quartier-id:', quartierIdHidden || '(vide)');
-                    console.log('  - Quartier ID final:', quartierIdFinal || '(vide)');
-                    console.log('Quartier ID:', quartierIdFinal);
-                    console.log('Adresse détaillée:', adresseDetail);
-                    console.log('Téléphone:', telephone);
-                    console.log('Paiement:', paymentMethod?.value);
-                    console.log('Téléphone paiement requis:', phonePaymentRequired, 'Valeur:', phonePayment);
-                    console.log('Conditions acceptées:', acceptConditions?.checked);
-
-                    // Vérifications
-                    let hasError = false;
-                    const errors = [];
-
-                    // Quartier ID est optionnel (voir contrôleur)
-                    // if (!quartierIdFinal) {
-                    //     errors.push('Veuillez sélectionner un quartier');
-                    //     hasError = true;
-                    // }
-
-                    if (!adresseDetail || adresseDetail.length < 5) {
-                        errors.push('Adresse détaillée invalide (min. 5 caractères)');
-                        hasError = true;
-                    }
-
-                    // Valider le téléphone - extraire seulement les chiffres
-                    const phoneDigitsOnly = telephone.replace(/\D/g, '');
-                    if (!telephone || phoneDigitsOnly.length < 10) {
-                        errors.push('Téléphone invalide (min. 10 chiffres)');
-                        hasError = true;
-                    }
-
-                    if (!paymentMethod) {
-                        errors.push('Veuillez sélectionner un moyen de paiement');
-                        hasError = true;
-                    }
-
-                    if (phonePaymentRequired && !phonePayment) {
-                        errors.push('Numéro pour paiement mobile requis');
-                        hasError = true;
-                    }
-
-                    if (!acceptConditions?.checked) {
-                        errors.push('Vous devez accepter les conditions');
-                        hasError = true;
-                    }
-
-                    // Afficher les erreurs
-                    if (hasError) {
-                        console.error('❌ Erreurs de validation:', errors);
-                        errors.forEach(error => {
-                            showNotification(`❌ ${error}`, 'error');
-                        });
-                        return false;
-                    }
-
-                    // Si tout est valide, remplir le champ hidden et soumettre
-                    console.log('✓ Tous les champs valides');
-                    console.log('✓ Remplissage du quartier_id:', quartierIdFinal || '(optionnel)');
-                    
-                    // Remplir les champs cachés même s'ils sont vides (quartier_id est nullable)
-                    if (quartierIdFinal) {
-                        document.getElementById('hidden-quartier-id').value = quartierIdFinal;
-                    }
-                    
-                    showNotification('✓ Commande validée, envoi en cours...', 'success');
-
-                    // Désactiver le bouton pour éviter les doubles clics
-                    const submitBtn = document.getElementById('submit-btn');
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '⏳ Traitement en cours...';
-
-                    // Attendre un peu avant de soumettre
-                    setTimeout(() => {
-                        try {
-                            console.log('📤 ===== DÉBUT DE LA SOUMISSION =====');
-                            console.log('📤 Form action:', form.action);
-                            console.log('📤 Form method:', form.method);
-                            console.log('📤 Token CSRF présent:', !!document.querySelector('input[name="_token"]'));
-
-                            // Créer FormData pour vérifier les données
-                            const formData = new FormData(form);
-                            console.log('📋 DONNÉES ENVOYÉES:');
-                            for (let [key, value] of formData.entries()) {
-                                console.log(`  ${key}: ${value}`);
-                            }
-
-                            console.log('📤 Appel de form.submit()...');
-                            showNotification('✓ Redirection vers votre commande...', 'success');
-                            form.submit();
-                            console.log('✓ form.submit() a été appelée');
-                        } catch (submitError) {
-                            console.error('❌ ERREUR:', submitError.message);
-                            console.error('Stack:', submitError.stack);
-                            showNotification(`❌ Erreur: ${submitError.message}`, 'error');
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '✓ Confirmer la Commande';
-                        }
-                    }, 1000);
-                } catch (validationError) {
-                    console.error('❌ Erreur dans la validation:', validationError);
-                    showNotification(`❌ Erreur validation: ${validationError.message}`, 'error');
-                }
-            });
-        } catch (setupError) {
-            console.error('❌ Erreur lors de la configuration:', setupError);
-        }
-    }
-    // ==================== Notifications Toast Visibles ====================
-    function showNotification(message, type = 'info') {
-        const container = document.getElementById('notification-container');
-        const toast = document.createElement('div');
-        toast.className = `toast-notification toast-${type} p-4 rounded-lg shadow-lg max-w-sm text-sm font-semibold`;
-        toast.textContent = message;
-
-        container.appendChild(toast);
-
-        // Auto-remove après 4 secondes
         setTimeout(() => {
-            toast.classList.add('hide');
-            setTimeout(() => toast.remove(), 300);
-        }, 4000);
-    }
+            try { form.submit(); }
+            catch(err) {
+                showNotification(`Erreur: ${err.message}`, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Confirmer la commande';
+            }
+        }, 800);
+    });
+}
+
+function showNotification(message, type = 'info') {
+    const container = document.getElementById('notification-container');
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
 </script>
+
 @endsection

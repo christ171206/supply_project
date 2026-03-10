@@ -81,6 +81,20 @@
                 Créer un compte
             </a>
         @else
+            {{-- Messagerie --}}
+            <a href="{{ route('client.messages') }}"
+               class="relative w-9 h-9 flex items-center justify-center rounded-lg text-[#666660] hover:bg-[#f7f7f5] hover:text-[#0a0a0a] transition-all duration-150 mr-2">
+                <svg class="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                @if(auth()->user()->messagesRecus()->where('lu', false)->count() > 0)
+                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-[#dc2626] text-white text-[9px] font-bold rounded-full flex items-center justify-center border border-white">
+                        {{ auth()->user()->messagesRecus()->where('lu', false)->count() }}
+                    </span>
+                @endif
+            </a>
+
+            {{-- Profil --}}
             <div class="ml-1 relative group">
                 <button class="w-8 h-8 bg-[#0a0a0a] text-white text-[12px] font-medium rounded-full flex items-center justify-center tracking-tight hover:opacity-85 transition-opacity">
                     {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
