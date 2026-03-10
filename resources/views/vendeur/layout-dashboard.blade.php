@@ -1,470 +1,328 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Espace Vendeur — Supply')</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-[#f7f7f5] antialiased" style="font-family:'Geist',sans-serif;">
 
-        <title>@yield('title', 'Espace Vendeur - Supply')</title>
+<div class="flex min-h-screen">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    {{-- ══════════════════════════════
+         SIDEBAR — fond noir
+    ══════════════════════════════ --}}
+    <aside class="w-[220px] bg-[#0a0a0a] flex flex-col sticky top-0 h-screen flex-shrink-0">
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-            <!-- Header Vendeur -->
-            <header class="sticky top-0 z-50 bg-white shadow-lg border-b-2 border-primary-200">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between items-center h-20">
-                        <!-- Logo -->
-                        <a href="{{ route('vendeur.dashboard') }}" class="text-2xl font-bold text-primary-600">
-                            <x-heroicon-o-cube class="w-6 h-6" /> Supply
-                        </a>
-
-                        <!-- Centre: Breadcrumb -->
-                        <div class="hidden md:flex items-center gap-2 text-sm">
-                            <x-heroicon-o-home class="w-6 h-6 text-gray-600" />
-                            <span class="font-bold text-gray-900">{{ auth()->user()->shop_name ?? auth()->user()->name }}</span>
-                        </div>
-
-                        <!-- Droite: Actions -->
-                        <div class="flex items-center gap-4">
-                            <!-- Notifications -->
-                            <button class="relative p-2 text-gray-600 hover:text-primary-600 transition" onclick="toggleNotifications()">
-                                <x-heroicon-o-bell class="w-6 h-6" />
-                                <span id="notifications-badge" class="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">0</span>
-                            </button>
-
-                            <!-- Profil Dropdown -->
-                            <div class="relative group">
-                                <button class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full flex items-center justify-center text-white font-bold">
-                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                    </div>
-                                    <span class="hidden md:block text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</span>
-                                </button>
-
-                                <!-- Menu Dropdown -->
-                                <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                    <a href="{{ route('vendeur.profil') }}" class="block px-4 py-3 text-gray-900 hover:bg-gray-100 rounded-t-lg font-medium flex items-center gap-2"><x-heroicon-o-user class="w-5 h-5" /> Mon Profil</a>
-                                    <a href="{{ route('accueil') }}" class="block px-4 py-3 text-gray-900 hover:bg-gray-100 font-medium flex items-center gap-2"><x-heroicon-o-shopping-bag class="w-5 h-5" /> Mode Client</a>
-                                    <form action="{{ route('logout') }}" method="POST" style="display: inline;" class="w-full"
-                                          data-confirm="Êtes-vous sûr de vouloir vous déconnecter ?"
-                                          data-confirm-title="Déconnexion"
-                                          data-confirm-type="warning"
-                                          data-confirm-button="Déconnexion">
-                                        @csrf
-                                        <button type="submit" class="block w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 rounded-b-lg font-medium flex items-center gap-2"><x-heroicon-o-arrow-right-on-rectangle class="w-5 h-5" /> Déconnexion</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        {{-- Logo --}}
+        <div class="px-5 pt-6 pb-5 border-b border-white/10">
+            <a href="{{ route('vendeur.dashboard') }}" class="flex items-center gap-2.5">
+                <div class="w-7 h-7 bg-white rounded-md flex items-center justify-center flex-shrink-0">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5" class="w-3.5 h-3.5">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
                 </div>
-            </header>
-
-            <!-- Main Content -->
-            <div class="flex">
-                <!-- Sidebar -->
-                <aside class="w-64 bg-white shadow-lg min-h-[calc(100vh-80px)] border-r-2 border-gray-100 sticky top-20">
-                    <nav class="p-6 space-y-2">
-                        <!-- Section Princ -->
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest px-4 mb-3">Principal</p>
-
-                        <a href="{{ route('vendeur.dashboard') }}" class="block px-4 py-3 rounded-lg font-medium transition duration-200 {{ request()->routeIs('vendeur.dashboard') ? 'bg-primary-100 text-primary-600 border-l-4 border-primary-600' : 'text-gray-700 hover:bg-gray-100' }} flex items-center gap-2">
-                            <x-heroicon-o-chart-bar class="w-5 h-5" /> Tableau de Bord
-                        </a>
-                        <a href="{{ route('vendeur.apercu') }}" class="block px-4 py-3 rounded-lg font-medium transition duration-200 {{ request()->routeIs('vendeur.apercu') ? 'bg-primary-100 text-primary-600 border-l-4 border-primary-600' : 'text-gray-700 hover:bg-gray-100' }} flex items-center gap-2">
-                            <x-heroicon-o-eye class="w-5 h-5" /> Aperçu Boutique
-                        </a>
-
-                        <hr class="my-4 border-gray-200">
-
-                        <!-- Section Gestion -->
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest px-4 mb-3">Gestion</p>
-
-                        <a href="{{ route('vendeur.produits.index') }}" class="block px-4 py-3 rounded-lg font-medium transition duration-200 {{ request()->routeIs('vendeur.produits.*') ? 'bg-primary-100 text-primary-600 border-l-4 border-primary-600' : 'text-gray-700 hover:bg-gray-100' }} flex items-center gap-2">
-                            <x-heroicon-o-cube class="w-5 h-5" /> Mes Produits
-                        </a>
-                        <a href="{{ route('vendeur.stock') }}" class="block px-4 py-3 rounded-lg font-medium transition duration-200 {{ request()->routeIs('vendeur.stock') ? 'bg-primary-100 text-primary-600 border-l-4 border-primary-600' : 'text-gray-700 hover:bg-gray-100' }} flex items-center gap-2">
-                            <x-heroicon-o-document-text class="w-5 h-5" /> Gestion Stock
-                        </a>
-                        <a href="{{ route('vendeur.commandes') }}" class="block px-4 py-3 rounded-lg font-medium transition duration-200 {{ request()->routeIs('vendeur.commandes*') ? 'bg-primary-100 text-primary-600 border-l-4 border-primary-600' : 'text-gray-700 hover:bg-gray-100' }} flex items-center gap-2">
-                            <x-heroicon-o-shopping-cart class="w-5 h-5" /> Commandes
-                        </a>
-
-                        <hr class="my-4 border-gray-200">
-
-                        <!-- Section Client -->
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest px-4 mb-3">Client</p>
-
-                        <a href="{{ route('vendeur.avis') }}" class="block px-4 py-3 rounded-lg font-medium transition duration-200 {{ request()->routeIs('vendeur.avis') ? 'bg-primary-100 text-primary-600 border-l-4 border-primary-600' : 'text-gray-700 hover:bg-gray-100' }} flex items-center gap-2">
-                            <x-heroicon-o-star class="w-5 h-5" /> Avis Clients
-                        </a>
-                        <a href="{{ route('vendeur.messages') }}" class="block px-4 py-3 rounded-lg font-medium transition duration-200 {{ request()->routeIs('vendeur.messages') ? 'bg-primary-100 text-primary-600 border-l-4 border-primary-600' : 'text-gray-700 hover:bg-gray-100' }} flex items-center gap-2">
-                            <x-heroicon-o-chat-bubble-left class="w-5 h-5" /> Messages
-                        </a>
-
-                        <hr class="my-4 border-gray-200">
-
-                        <!-- Section Compte -->
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest px-4 mb-3">Compte</p>
-
-                        <a href="{{ route('vendeur.statistiques') }}" class="block px-4 py-3 rounded-lg font-medium transition duration-200 {{ request()->routeIs('vendeur.statistiques') ? 'bg-primary-100 text-primary-600 border-l-4 border-primary-600' : 'text-gray-700 hover:bg-gray-100' }} flex items-center gap-2">
-                            <x-heroicon-o-arrow-trending-up class="w-5 h-5" /> Statistiques
-                        </a>
-                        <a href="{{ route('vendeur.parametres') }}" class="block px-4 py-3 rounded-lg font-medium transition duration-200 {{ request()->routeIs('vendeur.parametres') ? 'bg-primary-100 text-primary-600 border-l-4 border-primary-600' : 'text-gray-700 hover:bg-gray-100' }} flex items-center gap-2">
-                            <x-heroicon-o-cog-6-tooth class="w-5 h-5" /> Paramètres
-                        </a>
-
-                        <hr class="my-4 border-gray-200">
-
-                        <!-- Retour Boutique -->
-                        <a href="{{ route('accueil') }}" class="block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-200 flex items-center gap-2">
-                            <x-heroicon-o-arrow-left class="w-5 h-5" /> Retour Boutique
-                        </a>
-                    </nav>
-                </aside>
-
-                <!-- Content Area -->
-                <main class="flex-1">
-                    @yield('content')
-                </main>
-            </div>
-
-            <!-- Footer -->
-            <footer class="bg-gradient-to-r from-gray-900 to-gray-800 text-gray-300 mt-16 border-t-4 border-primary-500">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                        <div>
-                            <p class="font-bold text-white mb-3">Supply</p>
-                            <p class="text-sm">Plateforme de vente en ligne pour revendeurs informatiques</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-white mb-3">Contact</p>
-                            <p class="text-sm flex items-center gap-2"><x-heroicon-o-envelope class="w-4 h-4" /> support@supply.fr</p>
-                            <p class="text-sm flex items-center gap-2"><x-heroicon-o-phone class="w-4 h-4" /> 01 23 45 67 89</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-white mb-3">Liens</p>
-                            <p class="text-sm"><a href="#" class="hover:text-white transition">Centre d'aide</a></p>
-                            <p class="text-sm"><a href="#" class="hover:text-white transition">Politique de confidentialité</a></p>
-                        </div>
-                    </div>
-                    <div class="text-center border-t border-gray-700 pt-8">
-                        <p class="text-sm">&copy; 2026 Supply - Espace Vendeur. Tous droits réservés.</p>
-                    </div>
-                </div>
-            </footer>
+                <span class="text-[14px] font-medium text-white">Supply</span>
+            </a>
         </div>
 
-        <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-        <script>
-            // Configuration WebSocket pour les notifications en temps réel
-            const socketUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-                ? 'http://127.0.0.1:3000'
-                : `http://${window.location.hostname}:3000`;
+        {{-- Shop name --}}
+        <div class="px-5 py-4 border-b border-white/10">
+            <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-white/30 mb-1">Boutique</div>
+            <div class="text-[12px] font-medium text-white/80 truncate">{{ auth()->user()->shop_name ?? auth()->user()->name }}</div>
+        </div>
 
-            let socket = null;
-            let socketConnected = false;
+        {{-- Nav --}}
+        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
 
-            // Initialiser la connexion WebSocket avec gestion d'erreur
-            function initializeSocket() {
-                try {
-                    socket = io(socketUrl, {
-                        reconnection: true,
-                        reconnectionDelay: 1000,
-                        reconnectionDelayMax: 5000,
-                        reconnectionAttempts: 5,
-                        transports: ['websocket', 'polling']
-                    });
+            {{-- Principal --}}
+            <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/25 px-3 pt-1 pb-2">Principal</div>
 
-                    // Connexion de l'utilisateur au WebSocket
-                    socket.on('connect', function() {
-                        console.log('✅ Connecté au serveur WebSocket');
-                        socketConnected = true;
-                        socket.emit('user-connect', {
-                            userId: currentUserId,
-                            name: currentUserName
-                        });
-                    });
+            <a href="{{ route('vendeur.dashboard') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.dashboard') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                Tableau de Bord
+            </a>
 
-                    // Écouter les notifications de messages en temps réel
-                    socket.on('message-notification', function(data) {
-                        console.log('🔔 Notification de message reçue:', data);
-                        updateNotificationsBadge();
-                        
-                        // Afficher une notification visuelle
-                        showNotificationToast(data);
-                        
-                        // Rafraîchir le contenu du panel si ouvert
-                        if (notificationsPanel && notificationsPanel.style.display === 'block') {
-                            toggleNotifications(); // Fermer
-                            // Attendre un peu avant de réouvrir pour rafraîchir les données
-                            setTimeout(() => {
-                                toggleNotifications(); // Rouvrir avec données fraîches
-                            }, 300);
-                        }
-                    });
+            <a href="{{ route('vendeur.apercu') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.apercu') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+                Aperçu Boutique
+            </a>
 
-                    // Écouter la déconnexion
-                    socket.on('disconnect', function() {
-                        console.log('❌ Déconnecté du serveur WebSocket');
-                        socketConnected = false;
-                    });
+            {{-- Gestion --}}
+            <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/25 px-3 pt-4 pb-2">Gestion</div>
 
-                    // Gérer les erreurs WebSocket
-                    socket.on('error', function(error) {
-                        console.error('Erreur WebSocket:', error);
-                        socketConnected = false;
-                    });
-                } catch (error) {
-                    console.error('Erreur lors de l\'initialisation Socket.io:', error);
-                    socketConnected = false;
-                }
-            }
+            <a href="{{ route('vendeur.produits.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.produits.*') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                </svg>
+                Mes Produits
+            </a>
 
-            let notificationsPanel = null;
-            const currentUserId = {{ auth()->user()->id }};
-            const currentUserName = "{{ auth()->user()->name }}";
+            <a href="{{ route('vendeur.stock') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.stock') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Gestion Stock
+            </a>
 
-            function toggleNotifications() {
-                const button = event.target.closest('button');
-                
-                // Créer ou récupérer le panneau de notifications
-                if (!notificationsPanel) {
-                    notificationsPanel = document.createElement('div');
-                    notificationsPanel.id = 'notifications-panel';
-                    document.body.appendChild(notificationsPanel);
-                }
+            <a href="{{ route('vendeur.commandes') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.commandes*') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/>
+                </svg>
+                Commandes
+            </a>
 
-                // Toggle d'affichage
-                if (notificationsPanel.style.display === 'block') {
-                    notificationsPanel.style.display = 'none';
-                    return;
-                }
+            {{-- Client --}}
+            <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/25 px-3 pt-4 pb-2">Client</div>
 
-                // Charger les notifications
-                const url = "{{ route('vendeur.notifications') }}";
-                
-                notificationsPanel.innerHTML = '<div class="bg-white rounded-lg shadow-lg p-4"><div class="flex justify-center"><span class="text-gray-500">Chargement...</span></div></div>';
-                notificationsPanel.style.display = 'block';
-                
-                // Positionner le panneau
-                const rect = button.getBoundingClientRect();
-                notificationsPanel.style.position = 'fixed';
-                notificationsPanel.style.top = (rect.bottom + 10) + 'px';
-                notificationsPanel.style.right = '20px';
-                notificationsPanel.style.width = '400px';
-                notificationsPanel.style.maxHeight = '500px';
-                notificationsPanel.style.overflowY = 'auto';
-                notificationsPanel.style.zIndex = '1000';
+            <a href="{{ route('vendeur.avis') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.avis') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                Avis Clients
+            </a>
 
-                // Charger les données
+            <a href="{{ route('vendeur.messages') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.messages') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Messages
+                <span id="notif-badge" class="ml-auto hidden w-4 h-4 bg-white text-[#0a0a0a] text-[9px] font-mono font-medium rounded-sm flex items-center justify-center">0</span>
+            </a>
 
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        renderNotifications(data);
-                    })
-                    .catch(error => {
-                        console.error('Erreur:', error);
-                        notificationsPanel.innerHTML = '<div class="bg-white rounded-lg shadow-lg p-4"><div class="text-center text-red-500">Erreur lors du chargement</div></div>';
-                    });
-            }
+            {{-- Compte --}}
+            <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/25 px-3 pt-4 pb-2">Compte</div>
 
-            // Mapper les icones Heroicons
-            function getIconSVG(iconName) {
-                const icons = {
-                    'chat-bubble-left': '<svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z\" /></svg>',
-                    'shopping-cart': '<svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z\" /></svg>',
-                    'star': '<svg class=\"w-6 h-6\" fill=\"currentColor\" viewBox=\"0 0 24 24\"><path d=\"M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z\" /></svg>',
-                    'cube': '<svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20.325 3.507a2.001 2.001 0 00-2.38.72l-.896 1.345-.748 1.545m7.624 7.138a2.001 2.001 0 001.414-3.675l-1.08-.54m-5.906 7.045c.435-.435.536-1.112.211-1.664m2.26 5.015a2 2 0 10-3.464 2m6.514-1.285a15.075 15.075 0 002.29-4.571m-12.66 4.926A7.456 7.456 0 004.458 9m.007-.175a7.456 7.456 0 00 13.528 5.039M4 20h16\" /></svg>',
-                    'bell': '<svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9\" /></svg>'
-                };
-                return icons[iconName] || icons['cube'];
-            }
+            <a href="{{ route('vendeur.statistiques') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.statistiques') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                Statistiques
+            </a>
 
-            function renderNotifications(data) {
-                if (!data.notifications || data.notifications.length === 0) {
-                    notificationsPanel.innerHTML = `
-                        <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-                            <svg class="w-16 h-16 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <p class="text-gray-500 font-medium">Aucune notification</p>
-                            <p class="text-sm text-gray-400">Vous êtes à jour!</p>
-                        </div>
-                    `;
-                    return;
-                }
+            <a href="{{ route('vendeur.parametres') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.parametres') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                Paramètres
+            </a>
 
-                let html = '<div class="bg-white rounded-lg shadow-lg overflow-hidden">';
-                html += '<div class="bg-gradient-to-r from-primary-500 to-primary-600 text-white p-4">';
-                    html += '<h3 class="font-bold text-lg flex items-center gap-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg> Notifications</h3>';
-                html += '<p class="text-sm text-primary-100">Vous avez ' + data.total + ' notification' + (data.total > 1 ? 's' : '') + '</p>';
-                html += '</div>';
+        </nav>
 
-                html += '<div class="divide-y">';
+        {{-- Bottom : retour boutique + user --}}
+        <div class="border-t border-white/10 px-3 py-3 space-y-0.5">
+            <a href="{{ route('accueil') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium text-white/50 hover:text-white hover:bg-white/10 transition-all">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M19 12H5M12 5l-7 7 7 7"/>
+                </svg>
+                Retour Boutique
+            </a>
 
-                data.notifications.forEach(notification => {
-                    html += '<div class="p-4 hover:bg-gray-50 cursor-pointer transition">';
-                    html += '<div class="flex items-start justify-between mb-2">';
-                    html += '<div class="flex items-center gap-2">';
-                    html += '<div class=\"text-primary-600\">' + getIconSVG(notification.icon) + '</div>';
-                    html += '<div>';
-                    html += '<p class="font-bold text-gray-900">' + notification.title + '</p>';
-                    html += '<span class="inline-block mt-1 px-2 py-1 text-xs font-semibold rounded-full ';
-                    
-                    // Couleur basée sur le type
-                    switch(notification.color) {
-                        case 'blue':
-                            html += 'bg-blue-100 text-blue-800';
-                            break;
-                        case 'orange':
-                            html += 'bg-orange-100 text-orange-800';
-                            break;
-                        case 'yellow':
-                            html += 'bg-yellow-100 text-yellow-800';
-                            break;
-                        case 'red':
-                            html += 'bg-red-100 text-red-800';
-                            break;
-                        default:
-                            html += 'bg-gray-100 text-gray-800';
-                    }
-                    
-                    html += '">' + notification.type.toUpperCase() + '</span>';
-                    html += '</div>';
-                    html += '</div>';
-                    html += '</div>';
+            {{-- User row --}}
+            <div class="flex items-center gap-3 px-3 py-3 mt-1 border-t border-white/10">
+                <div class="w-7 h-7 bg-white/15 rounded-md flex items-center justify-center text-white text-[11px] font-medium flex-shrink-0">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[12px] font-medium text-white truncate">{{ auth()->user()->name }}</div>
+                    <div class="text-[10px] text-white/40 font-light">Vendeur</div>
+                </div>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" title="Déconnexion"
+                        class="w-6 h-6 flex items-center justify-center text-white/30 hover:text-white/70 transition-colors">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
 
-                    // Afficher les détails
-                    if (notification.data && notification.data.length > 0) {
-                        html += '<div class="text-sm text-gray-600 space-y-1">';
-                        notification.data.slice(0, 3).forEach(item => {
-                            let itemName = item.nom || item.name || 'Élément';
-                            html += '<div class="flex items-center gap-2 text-xs">';
-                            html += '<span>•</span>';
-                            html += '<span class="truncate">' + itemName + '</span>';
-                            html += '</div>';
-                        });
-                        if (notification.data.length > 3) {
-                            html += '<div class="text-xs text-gray-400 mt-1">... et ' + (notification.data.length - 3) + ' autre' + (notification.data.length - 3 > 1 ? 's' : '') + '</div>';
-                        }
-                        html += '</div>';
-                    }
+    </aside>
 
-                    html += '<div class="mt-3">';
-                    html += '<a href="' + notification.link + '" class="inline-block text-xs font-semibold text-primary-600 hover:text-primary-700 hover:underline">Voir détails →</a>';
-                    html += '</div>';
-                    html += '</div>';
-                });
+    {{-- ══════════════════════════════
+         MAIN
+    ══════════════════════════════ --}}
+    <div class="flex-1 flex flex-col min-w-0">
 
-                html += '</div>';
-                html += '</div>';
+        {{-- Topbar --}}
+        <header class="h-[52px] bg-white border-b border-[#e0e0dc] flex items-center justify-between px-6 sticky top-0 z-40 flex-shrink-0">
+            <div class="text-[12px] text-[#a0a09a] font-light">
+                @yield('breadcrumb', 'Espace Vendeur')
+            </div>
+            <div class="flex items-center gap-3">
+                {{-- Notif bell --}}
+                <button id="notif-btn" onclick="toggleNotifications(event)"
+                    class="relative w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660] hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    <span id="notif-count" class="absolute -top-1 -right-1 hidden w-4 h-4 bg-[#0a0a0a] text-white text-[9px] font-mono rounded-sm items-center justify-center">0</span>
+                </button>
 
-                notificationsPanel.innerHTML = html;
-            }
-
-            // Fermer le panneau quand on clique ailleurs
-            document.addEventListener('click', function(event) {
-                const button = document.querySelector('[onclick="toggleNotifications()"]');
-                if (notificationsPanel && event.target !== button && !notificationsPanel.contains(event.target)) {
-                    notificationsPanel.style.display = 'none';
-                }
-            });
-
-            // Charger les notifications au démarrage de la page
-            document.addEventListener('DOMContentLoaded', function() {
-                // Initialiser WebSocket
-                initializeSocket();
-                
-                updateNotificationsBadge();
-                
-                // Mettre à jour les notifications toutes les 30 secondes
-                setInterval(updateNotificationsBadge, 30000);
-            });
-
-            function updateNotificationsBadge() {
-                const url = "{{ route('vendeur.notifications') }}";
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        const badge = document.getElementById('notifications-badge');
-                        if (badge) {
-                            badge.textContent = data.total;
-                            if (data.total === 0) {
-                                badge.style.display = 'none';
-                            } else {
-                                badge.style.display = 'flex';
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.log('Erreur mise à jour notifications:', error);
-                        // Afficher un nombre par défaut en cas d'erreur
-                        const badge = document.getElementById('notifications-badge');
-                        if (badge) {
-                            badge.textContent = '?';
-                        }
-                    });
-            }
-
-            // Afficher une notification toast (petit message en haut à droite)
-            function showNotificationToast(data) {
-                const toast = document.createElement('div');
-                toast.className = 'fixed top-20 right-4 bg-white rounded-lg shadow-2xl p-4 max-w-sm border-l-4 border-primary-500 animate-pulse z-50';
-                
-                let message = 'Nouveau message reçu';
-                if (data.from_user_id) {
-                    message = 'Vous avez un nouveau message';
-                }
-                if (data.preview) {
-                    message += '<br><span class="text-xs text-gray-600 mt-1 block">"' + data.preview + '..."</span>';
-                }
-                
-                toast.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl"><x-heroicon-o-chat-bubble-left class="w-5 h-5" /></span>
-                        <div>
-                            <p class="font-bold text-gray-900">Nouveau message!</p>
-                            <p class="text-sm text-gray-600 mt-1">${message}</p>
-                            <a href="{{ route('vendeur.messages') }}" class="inline-block mt-2 text-xs font-semibold text-primary-600 hover:text-primary-700">Voir →</a>
-                        </div>
-                        <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">✕</button>
+                {{-- Profil --}}
+                <a href="{{ route('vendeur.profil') }}"
+                   class="flex items-center gap-2 border border-[#e0e0dc] rounded-lg px-2.5 py-1.5 hover:border-[#2a2a28] transition-all">
+                    <div class="w-5 h-5 bg-[#0a0a0a] rounded-sm flex items-center justify-center text-white text-[10px] font-medium">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
-                `;
-                
-                document.body.appendChild(toast);
-                
-                // Supprimer après 5 secondes
-                setTimeout(() => {
-                    toast.style.animation = 'fade-out 0.3s ease-out forwards';
-                    setTimeout(() => toast.remove(), 300);
-                }, 5000);
+                    <span class="text-[12px] font-medium text-[#0a0a0a]">{{ auth()->user()->name }}</span>
+                </a>
+            </div>
+        </header>
+
+        {{-- Page content --}}
+        <main class="flex-1">
+            @yield('content')
+        </main>
+
+    </div>
+
+</div>
+
+{{-- ══════════════════════════════
+     PANEL NOTIFICATIONS
+══════════════════════════════ --}}
+<div id="notif-panel" class="hidden fixed top-[60px] right-4 w-[340px] bg-white border border-[#e0e0dc] rounded-xl overflow-hidden z-50 shadow-lg">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-[#efefed]">
+        <span class="text-[13px] font-medium text-[#0a0a0a]">Notifications</span>
+        <button onclick="document.getElementById('notif-panel').classList.add('hidden')"
+            class="w-6 h-6 flex items-center justify-center text-[#a0a09a] hover:text-[#0a0a0a] transition-colors text-lg leading-none">×</button>
+    </div>
+    <div id="notif-content" class="max-h-[400px] overflow-y-auto">
+        <div class="px-4 py-8 text-center text-[13px] text-[#a0a09a] font-light">Chargement…</div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+const currentUserId   = {{ auth()->user()->id }};
+const currentUserName = "{{ addslashes(auth()->user()->name) }}";
+const notifUrl        = "{{ route('vendeur.notifications') }}";
+
+// ── Socket.io ──
+let socket = null;
+try {
+    const socketUrl = ['localhost','127.0.0.1'].includes(location.hostname)
+        ? 'http://127.0.0.1:3000'
+        : `http://${location.hostname}:3000`;
+
+    socket = io(socketUrl, { reconnectionAttempts: 5, transports: ['websocket','polling'] });
+    socket.on('connect', () => socket.emit('user-connect', { userId: currentUserId, name: currentUserName }));
+    socket.on('message-notification', data => { updateBadge(); showToast(data); });
+} catch(e) {}
+
+// ── Badge ──
+function updateBadge() {
+    fetch(notifUrl)
+        .then(r => r.json())
+        .then(data => {
+            const count = data.total ?? 0;
+            ['notif-count','notif-badge'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.textContent = count;
+                el.classList.toggle('hidden', count === 0);
+                if (!el.classList.contains('hidden')) el.classList.add('flex');
+            });
+        })
+        .catch(() => {});
+}
+
+// ── Panel ──
+function toggleNotifications(event) {
+    event?.stopPropagation();
+    const panel = document.getElementById('notif-panel');
+    if (!panel.classList.contains('hidden')) { panel.classList.add('hidden'); return; }
+    panel.classList.remove('hidden');
+    loadNotifications();
+}
+document.addEventListener('click', e => {
+    const panel = document.getElementById('notif-panel');
+    const btn   = document.getElementById('notif-btn');
+    if (!panel?.contains(e.target) && e.target !== btn) panel?.classList.add('hidden');
+});
+
+function loadNotifications() {
+    const content = document.getElementById('notif-content');
+    fetch(notifUrl)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.notifications?.length) {
+                content.innerHTML = `<div class="px-4 py-10 text-center">
+                    <svg class="w-8 h-8 text-[#e0e0dc] mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    <p class="text-[13px] text-[#a0a09a] font-light">Aucune notification</p>
+                </div>`;
+                return;
             }
-        </script>
+            content.innerHTML = data.notifications.map(n => `
+                <div class="px-4 py-3.5 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[13px] font-medium text-[#0a0a0a]">${n.title}</span>
+                        <span class="text-[10px] font-mono bg-[#fdf6ec] text-[#b45309] px-1.5 py-0.5 rounded">${n.type?.toUpperCase() ?? ''}</span>
+                    </div>
+                    ${n.data?.slice(0,3).map(i => `<div class="text-[11px] text-[#a0a09a] font-light truncate">— ${i.nom ?? i.name ?? ''}</div>`).join('') ?? ''}
+                    <a href="${n.link}" class="inline-block mt-2 text-[11px] text-[#a0a09a] border-b border-[#e0e0dc] pb-px hover:text-[#0a0a0a] hover:border-[#0a0a0a] transition-all">Voir →</a>
+                </div>
+            `).join('');
+        })
+        .catch(() => { document.getElementById('notif-content').innerHTML = '<div class="px-4 py-6 text-center text-[13px] text-[#a0a09a]">Erreur de chargement</div>'; });
+}
 
-        <!-- Animation CSS pour les toasts -->
-        <style>
-            @keyframes fade-out {
-                from {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-                to {
-                    opacity: 0;
-                    transform: translateX(100px);
-                }
-            }
-        </style>
+// ── Toast ──
+function showToast(data) {
+    const t = document.createElement('div');
+    t.className = 'fixed top-[64px] right-4 w-[300px] bg-white border border-[#e0e0dc] rounded-xl overflow-hidden z-50';
+    t.innerHTML = `
+        <div class="flex items-start gap-3 px-4 py-3.5">
+            <div class="w-7 h-7 bg-[#0a0a0a] rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="text-[12px] font-medium text-[#0a0a0a]">Nouveau message</div>
+                <div class="text-[11px] text-[#a0a09a] font-light mt-0.5 truncate">${data.preview ?? ''}</div>
+                <a href="{{ route('vendeur.messages') }}" class="inline-block mt-1.5 text-[11px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors">Voir →</a>
+            </div>
+            <button onclick="this.closest('div.fixed').remove()" class="text-[#a0a09a] hover:text-[#0a0a0a] transition-colors text-lg leading-none flex-shrink-0">×</button>
+        </div>`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 5000);
+}
 
-        <!-- Alpine.js for interactivity -->
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+document.addEventListener('DOMContentLoaded', () => {
+    updateBadge();
+    setInterval(updateBadge, 30000);
+});
+</script>
 
-        @yield('scripts')
-    </body>
+@yield('scripts')
+</body>
 </html>

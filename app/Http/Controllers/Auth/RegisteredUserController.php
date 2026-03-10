@@ -95,7 +95,20 @@ class RegisteredUserController extends Controller
         $user = User::create($userData);
         Log::info('Utilisateur créé', ['user_id' => $user->id, 'role' => $user->role]);
 
-        // Si c'est un vendeur, notifier l'admin
+        // Générer un code de vérification (6 chiffres)
+        $verificationCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Sauvegarder le code de vérification
+        $user->update([
+            'email_verification_code' => $verificationCode,
+            'email_verification_code_sent_at' => now(),
+        ]);
+
+        // Envoyer l'email avec le code (en queue tout de suite)
+        Mail::to($user->email)->queue(new EmailVerificationCodeMail($user, $verificationCode));
+
+        // Si c'est un vendeur, créer une notification dans le dashboard pour l'admin
+        // L'email n'est pas envoyé pour éviter de surcharger MailTrap en développement
         if ($request->role === 'vendor') {
             $admins = User::where('is_admin', true)->get();
             foreach ($admins as $admin) {
@@ -108,26 +121,8 @@ class RegisteredUserController extends Controller
                     'lu' => false,
                 ]);
             }
-            
-            // Envoyer l'email au premier admin (éviter les limites Mailtrap en dev)
-            $firstAdmin = $admins->first();
-            if ($firstAdmin) {
-                Mail::to($firstAdmin->email)->queue(new NewVendorRegistrationNotification($user));
-                Log::info('Email de notification vendeur envoyé', ['vendor_id' => $user->id, 'admin_id' => $firstAdmin->id]);
-            }
+            Log::info('Notification vendeur créée', ['vendor_id' => $user->id]);
         }
-
-        // Générer un code de vérification (6 chiffres)
-        $verificationCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-
-        // Sauvegarder le code de vérification
-        $user->update([
-            'email_verification_code' => $verificationCode,
-            'email_verification_code_sent_at' => now(),
-        ]);
-
-        // Envoyer l'email avec le code (en queue aussi)
-        Mail::to($user->email)->queue(new EmailVerificationCodeMail($user, $verificationCode));
 
         // Sauvegarder l'email en session pour la vérification
         session([

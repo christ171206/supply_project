@@ -1,296 +1,189 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Se connecter - Supply</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head>
-<body class="bg-gradient-to-br from-primary-50 via-white to-accent-50">
-    <div class="min-h-screen flex items-center justify-center px-4 py-12">
-        <div class="w-full max-w-6xl">
-            <!-- Retour à l'accueil -->
-            <a href="{{ route('accueil') }}" class="inline-flex items-center gap-3 text-gray-700 hover:text-primary-600 font-semibold mb-8 transition py-2 px-3 rounded-lg hover:bg-gray-100 text-base md:text-lg">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
+@extends('layouts.guest')
+
+@section('content')
+<div class="flex items-center justify-center min-h-screen bg-white px-4 py-16">
+    <div class="w-full max-w-md">
+
+        {{-- Header --}}
+        <div class="mb-12">
+            <a href="{{ route('accueil') }}" class="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] hover:text-[#0a0a0a] transition-colors mb-8">
                 ← Retour à l'accueil
             </a>
+            <div class="mb-6">
+                <h1 class="font-serif text-[32px] tracking-tight text-[#0a0a0a] mb-2">
+                    Se connecter
+                </h1>
+                <p class="text-[14px] text-[#666660] font-light">
+                    Accédez à votre compte Supply
+                </p>
+            </div>
+        </div>
 
-            <!-- Logo mobile -->
-            <div class="mb-8 lg:hidden">
-                <a href="{{ route('accueil') }}" class="inline-flex items-center gap-2">
-                    <div class="bg-primary-600 p-2 rounded-lg">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </div>
-                    <span class="text-2xl font-bold text-gray-900">Supply</span>
+        {{-- Erreurs --}}
+        @if ($errors->any())
+            <div class="mb-6 px-4 py-3 bg-[#fef2f2] border border-[#fecaca] rounded-lg text-[13px] text-[#dc2626]">
+                <div class="font-medium mb-2">Erreur de connexion</div>
+                @foreach ($errors->all() as $error)
+                    <div class="text-[12px] font-light">• {{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
+
+        @if (session('status'))
+            <div class="mb-6 px-4 py-3 bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg text-[13px] text-[#15803d]">
+                {{ session('status') }}
+            </div>
+        @endif
+
+        {{-- Formulaire --}}
+        <form method="POST" action="{{ route('login') }}" class="mb-8">
+            @csrf
+
+            <div class="mb-5">
+                <label for="email" class="block text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">
+                    Email
+                </label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value="{{ old('email') }}"
+                    placeholder="votre@email.com"
+                    required
+                    autofocus
+                    class="w-full px-3 py-2.5 border border-[#e0e0dc] rounded-lg text-[13px] text-[#0a0a0a] placeholder:text-[#a0a09a] outline-none focus:border-[#0a0a0a] hover:border-[#a0a09a] transition-colors bg-white"
+                />
+                @error('email')
+                    <div class="mt-1 text-[11px] text-[#dc2626] font-light">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-6">
+                <label for="password" class="block text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">
+                    Mot de passe
+                </label>
+                <div class="relative">
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        placeholder="••••••••"
+                        required
+                        class="w-full px-3 py-2.5 border border-[#e0e0dc] rounded-lg text-[13px] text-[#0a0a0a] placeholder:text-[#a0a09a] outline-none focus:border-[#0a0a0a] hover:border-[#a0a09a] transition-colors bg-white pr-10"
+                    />
+                    <button
+                        type="button"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-[#a0a09a] hover:text-[#0a0a0a] transition-colors"
+                        onclick="const input = document.getElementById('password'); input.type = input.type === 'password' ? 'text' : 'password';"
+                    >
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
+                @error('password')
+                    <div class="mt-1 text-[11px] text-[#dc2626] font-light">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Remember & Forgot --}}
+            <div class="flex items-center justify-between mb-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="remember" class="w-4 h-4 accent-[#0a0a0a] cursor-pointer" />
+                    <span class="text-[12px] text-[#666660] font-light">Se souvenir de moi</span>
+                </label>
+                <a href="{{ route('password.request') }}" class="text-[12px] text-[#a0a09a] hover:text-[#0a0a0a] border-b border-[#e0e0dc] pb-px transition-all">
+                    Mot de passe oublié ?
                 </a>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            <button
+                type="submit"
+                class="w-full py-3 bg-[#0a0a0a] text-white text-[13px] font-medium rounded-lg hover:opacity-85 transition-opacity"
+            >
+                Se connecter
+            </button>
+        </form>
 
-                <!-- Section gauche - Bénéfices -->
-                <div class="hidden lg:block">
-                    <div class="mb-8">
-                        <a href="{{ route('accueil') }}" class="inline-flex items-center gap-2">
-                            <div class="bg-primary-600 p-2 rounded-lg">
-                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                            </div>
-                            <span class="text-2xl font-bold text-gray-900">Supply</span>
-                        </a>
+        {{-- Pas encore de compte --}}
+        <div class="px-4 py-3 bg-[#f7f7f5] border border-[#efefed] rounded-lg text-center mb-8">
+            <p class="text-[12px] text-[#666660] font-light">
+                Pas encore de compte ?
+                <a href="{{ route('register') }}" class="text-[#0a0a0a] font-medium hover:underline">
+                    Créer un compte
+                </a>
+            </p>
+        </div>
+
+        {{-- Comptes de test --}}
+        <div class="border-t border-[#efefed] pt-8">
+            <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-4 flex items-center gap-2">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4M12 16h.01"/>
+                </svg>
+                Comptes de test — Cliquez pour remplir
+            </div>
+
+            <div class="space-y-2">
+                {{-- Client Test --}}
+                <button
+                    type="button"
+                    onclick="
+                        document.getElementById('email').value = 'client@test.com';
+                        document.getElementById('password').value = 'password';
+                        document.getElementById('email').focus();
+                    "
+                    class="w-full p-3 border border-[#e0e0dc] rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition-all text-left group"
+                >
+                    <div class="text-[12px] font-medium text-[#0a0a0a]">👤 Client Test</div>
+                    <div class="text-[11px] text-[#a0a09a] font-mono mt-1">
+                        <span class="block">client@test.com</span>
+                        <span class="block text-[10px] text-[#666660] font-light">password</span>
                     </div>
+                </button>
 
-                    <h2 class="text-4xl font-bold text-gray-900 mb-6 leading-tight">
-                        Accédez à vos favoris et commandes
-                    </h2>
-                    <p class="text-xl text-gray-700 mb-12 leading-relaxed font-medium">
-                        Connecte-toi pour bénéficier d'une meilleure expérience d'achat et gérer tes commandes.
-                    </p>
-
-                    <!-- Avantages -->
-                    <div class="space-y-6">
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0">
-                                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-primary-100">
-                                    <span class="text-2xl">❤️</span>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900 mb-1">Vos favoris sauvegardés</h3>
-                                <p class="text-gray-600">Retrouvez tous vos articles préférés en un clic.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0">
-                                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-accent-100">
-                                    <span class="text-2xl"><x-heroicon-o-clipboard class="w-6 h-6" /></span>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900 mb-1">Historique de commandes</h3>
-                                <p class="text-gray-600">Suivi simple de vos achats et de vos livraisons.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0">
-                                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-secondary-100">
-                                    <span class="text-2xl">🚀</span>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900 mb-1">Checkout rapide</h3>
-                                <p class="text-gray-600">Enregistre tes informations pour commander plus vite.</p>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0">
-                                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-green-100">
-                                    <span class="text-2xl"><x-heroicon-o-chat-bubble-left class="w-6 h-6" /></span>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-gray-900 mb-1">Chat avec vendeurs</h3>
-                                <p class="text-gray-600">Communique directement avec nos vendeurs.</p>
-                            </div>
-                        </div>
+                {{-- Vendeur Test --}}
+                <button
+                    type="button"
+                    onclick="
+                        document.getElementById('email').value = 'testshop@supply.ci';
+                        document.getElementById('password').value = 'testshop123';
+                        document.getElementById('email').focus();
+                    "
+                    class="w-full p-3 border border-[#e0e0dc] rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition-all text-left group"
+                >
+                    <div class="text-[12px] font-medium text-[#0a0a0a]">🏪 Vendeur Test</div>
+                    <div class="text-[11px] text-[#a0a09a] font-mono mt-1">
+                        <span class="block">testshop@supply.ci</span>
+                        <span class="block text-[10px] text-[#666660] font-light">testshop123</span>
                     </div>
-                </div>
+                </button>
 
-                <!-- Section droite - Formulaire -->
-                <div>
-                    <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-                        <!-- Header -->
-                        <div class="mb-8">
-                            <h1 class="text-3xl font-bold text-gray-900 mb-2">Se connecter</h1>
-                            <p class="text-gray-700 font-medium">Accédez à votre compte Supply</p>
-                        </div>
-
-                        <!-- Messages d'erreur/succès -->
-                        @if ($errors->any())
-                            <div class="p-4 mb-6 bg-danger-50 border border-danger-200 rounded-xl flex gap-3">
-                                <span class="text-2xl flex-shrink-0"><x-heroicon-o-exclamation-triangle class="w-6 h-6" /></span>
-                                <div>
-                                    <p class="text-danger-900 font-semibold text-sm">Erreur de connexion</p>
-                                    <p class="text-danger-700 text-sm mt-1">{{ __('auth.failed') }}</p>
-                                </div>
-                            </div>
-                        @endif
-
-                        @if (session('status'))
-                            <div class="p-4 mb-6 bg-green-50 border border-green-200 rounded-xl flex gap-3">
-                                <span class="text-2xl flex-shrink-0">✓</span>
-                                <div>
-                                    <p class="text-green-800 text-sm">{{ session('status') }}</p>
-                                </div>
-                            </div>
-                        @endif
-
-                        <!-- Formulaire de connexion -->
-                        <form method="POST" action="{{ route('login') }}" class="space-y-5">
-                            @csrf
-
-                            <!-- Email -->
-                            <div>
-                                <label for="email" class="block text-sm font-semibold text-gray-900 mb-2">
-                                    📧 Adresse email
-                                </label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value="{{ old('email') }}"
-                                    required
-                                    autofocus
-                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors bg-gray-50 text-gray-900 placeholder-gray-500 font-medium"
-                                    placeholder="votre@email.com"
-                                >
-                                @error('email')
-                                    <p class="mt-2 text-sm text-danger-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Mot de passe -->
-                            <div>
-                                <label for="password" class="block text-sm font-semibold text-gray-900 mb-2">
-                                    <x-heroicon-o-lock-closed class="w-4 h-4" /><span>Mot de passe</span>
-                                </label>
-                                <div class="relative">
-                                    <input
-                                        type="password"
-                                        id="password"
-                                        name="password"
-                                        required
-                                        class="w-full px-4 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors bg-gray-50 text-gray-900 placeholder-gray-500 font-medium"
-                                        placeholder="••••••••"
-                                    >
-                                    <button
-                                        type="button"
-                                        onclick="togglePasswordVisibility()"
-                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-primary-600 transition p-1"
-                                        title="Afficher/Masquer le mot de passe"
-                                        aria-label="Afficher/Masquer le mot de passe"
-                                    >
-                                        <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                @error('password')
-                                    <p class="mt-2 text-sm text-danger-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Se souvenir de moi & Mot de passe oublié -->
-                            <div class="flex items-center justify-between pt-2">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        id="remember"
-                                        name="remember"
-                                        class="w-4 h-4 border-2 border-gray-300 rounded accent-primary-500 cursor-pointer"
-                                    >
-                                    <span class="text-sm text-gray-700">Se souvenir de moi</span>
-                                </label>
-
-                                @if (Route::has('password.request'))
-                                    <a
-                                        href="{{ route('password.request') }}"
-                                        class="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
-                                    >
-                                        Mot de passe oublié ?
-                                    </a>
-                                @endif
-                            </div>
-
-                            <!-- Bouton connexion -->
-                            <button
-                                type="submit"
-                                class="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-primary-500/50 hover:scale-105 active:scale-95 transition-all duration-200 text-lg mt-8"
-                            >
-                                🔓 Se connecter
-                            </button>
-                        </form>
-
-                        <!-- Lien vers inscription -->
-                        <div class="pt-6 border-t border-gray-200">
-                            <p class="text-center text-gray-600">
-                                Vous n'avez pas de compte ?
-                                <a
-                                    href="{{ route('register') }}"
-                                    class="font-bold text-primary-600 hover:text-primary-700 transition-colors"
-                                >
-                                    Créer un compte
-                                </a>
-                            </p>
-                        </div>
-
-                        <!-- Lien panier guest -->
-                        <div class="pt-4">
-                            <p class="text-center text-sm text-gray-600">
-                                Tu peux aussi
-                                <a href="{{ route('panier.index') }}" class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
-                                    continuer tes achats sans te connecter
-                                </a>
-                            </p>
-                        </div>
+                {{-- Admin Test --}}
+                <button
+                    type="button"
+                    onclick="
+                        document.getElementById('email').value = 'admin@supply.ci';
+                        document.getElementById('password').value = 'admin123';
+                        document.getElementById('email').focus();
+                    "
+                    class="w-full p-3 border border-[#e0e0dc] rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition-all text-left group"
+                >
+                    <div class="text-[12px] font-medium text-[#0a0a0a]">👨‍💼 Admin Test</div>
+                    <div class="text-[11px] text-[#a0a09a] font-mono mt-1">
+                        <span class="block">admin@supply.ci</span>
+                        <span class="block text-[10px] text-[#666660] font-light">admin123</span>
                     </div>
+                </button>
+            </div>
 
-                        <!-- Comptes de test (développement) -->
-                        <div class="mt-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-300 rounded-xl">
-                            <p class="font-bold text-blue-900 mb-4 text-center">🧪 Comptes de test disponibles</p>
-                            <div class="space-y-3">
-                                <!-- Compte Vendeur -->
-                                <button type="button" onclick="fillTestAccount('testshop@supply.ci', 'testshop123')" class="w-full text-left p-3 bg-white hover:bg-blue-50 border border-blue-200 rounded-lg transition cursor-pointer hover:shadow-md">
-                                    <p class="font-bold text-blue-900 mb-1">🏪 Vendeur Test</p>
-                                    <p class="text-sm text-gray-700"><code class="bg-blue-100 px-2 py-1 rounded text-xs">testshop@supply.ci</code></p>
-                                    <p class="text-sm text-gray-700 mt-1"><code class="bg-blue-100 px-2 py-1 rounded text-xs">testshop123</code></p>
-                                    <p class="text-xs text-blue-600 mt-2">Cliquez pour remplir</p>
-                                </button>
-
-                                <!-- Compte Client -->
-                                <button type="button" onclick="fillTestAccount('client@test.com', 'password')" class="w-full text-left p-3 bg-white hover:bg-blue-50 border border-blue-200 rounded-lg transition cursor-pointer hover:shadow-md">
-                                    <p class="font-bold text-blue-900 mb-1">👤 Client Test</p>
-                                    <p class="text-sm text-gray-700"><code class="bg-blue-100 px-2 py-1 rounded text-xs">client@test.com</code></p>
-                                    <p class="text-sm text-gray-700 mt-1"><code class="bg-blue-100 px-2 py-1 rounded text-xs">password</code></p>
-                                    <p class="text-xs text-blue-600 mt-2">Cliquez pour remplir</p>
-                                </button>
-                            </div>
-                        </div>
-                </div>
-
+            <div class="mt-4 p-3 bg-[#fef3c7] border border-[#fde68a] rounded-lg text-[11px] text-[#92400e] font-light">
+                💡 <strong>Astuce:</strong> Cliquez sur un compte pour remplir automatiquement les champs
             </div>
         </div>
+
     </div>
-
-    <!-- Script pour le toggle du mot de passe -->
-    <script>
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                // Icône oeil ouvert
-                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z"></path>';
-            } else {
-                passwordInput.type = 'password';
-                // Icône oeil fermé
-                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
-            }
-        }
-
-        // Remplissage auto des comptes de test
-        function fillTestAccount(email, password) {
-            document.getElementById('email').value = email;
-            document.getElementById('password').value = password;
-            document.getElementById('password').type = 'text'; // Afficher le mot de passe
-            document.getElementById('email').focus();
-        }
-    </script>
-</body>
-</html>
+</div>
+@endsection

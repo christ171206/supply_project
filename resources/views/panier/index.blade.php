@@ -1,196 +1,248 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <h1 class="text-4xl font-bold text-gray-900 mb-8 flex items-center gap-2"><x-heroicon-o-shopping-cart class="w-8 h-8" /><span>Mon Panier</span></h1>
+<div class="max-w-[1100px] mx-auto px-8 py-10 pb-20">
 
+    {{-- ── HEADER ── --}}
+    <div class="flex items-center gap-3 mb-8">
+        <svg class="w-5 h-5 text-[#a0a09a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <h1 class="font-serif text-[28px] tracking-tight text-[#0a0a0a] leading-none">Mon Panier</h1>
+    </div>
+
+    {{-- ── FLASH MESSAGES ── --}}
     @if(session('success'))
-        <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+        <div class="flex items-center gap-2 mb-6 px-4 py-3 bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg text-[13px] text-[#15803d]">
+            <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
             {{ session('success') }}
         </div>
     @endif
-
     @if(session('error'))
-        <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+        <div class="flex items-center gap-2 mb-6 px-4 py-3 bg-[#fef2f2] border border-[#fecaca] rounded-lg text-[13px] text-[#dc2626]">
+            <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             {{ session('error') }}
         </div>
     @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Panier Items -->
-        <div class="lg:col-span-2">
+    <div class="grid grid-cols-[1fr_300px] gap-6 items-start">
+
+        {{-- ══════════════════════════════
+             ARTICLES
+        ══════════════════════════════ --}}
+        <div>
             @if($items && count($items) > 0)
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div class="divide-y">
-                        @foreach($items as $item)
-                            <div class="p-6 flex gap-4 hover:bg-gray-50 transition">
-                                <!-- Image Produit -->
-                                <div class="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                                    @if($item->produit->images && is_array($item->produit->images) && count($item->produit->images) > 0)
-                                        <img src="{{ asset('storage/produits/' . $item->produit->images[0]) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover">
-                                    @elseif($item->produit->image)
-                                        <img src="{{ asset('storage/produits/' . $item->produit->image) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover">
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center bg-gray-300">
-                                            <x-heroicon-o-cube class="w-8 h-8 text-gray-600" />
-                                        </div>
-                                    @endif
-                                </div>
 
-                                <!-- Détails Produit -->
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                                        <a href="{{ route('produits.show', $item->produit->id) }}" class="hover:text-blue-600">
-                                            {{ $item->produit->nom }}
-                                        </a>
-                                    </h3>
-                                    <p class="text-gray-600 text-sm mb-3">{{ Str::limit($item->produit->description, 100) }}</p>
-                                    <p class="text-2xl font-bold text-gray-900">{{ number_format($item->prix_unitaire, 0, '', ' ') }} F CFA</p>
-                                </div>
+                {{-- Liste --}}
+                <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden mb-4">
+                    <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#efefed]">
+                        <span class="text-[13px] font-medium text-[#0a0a0a]">Articles</span>
+                        <span class="text-[11px] font-mono text-[#a0a09a]">{{ count($items) }} article{{ count($items) > 1 ? 's' : '' }}</span>
+                    </div>
 
-                                <!-- Quantité et Actions -->
-                                <div class="flex flex-col items-end gap-4">
-                                    <form action="{{ route('panier.modifier', $item->id) }}" method="POST" class="flex items-center gap-2">
-                                        @csrf
-                                        @method('PATCH')
-                                        <label for="quantite_{{ $item->id }}" class="text-sm font-medium text-gray-700">Qté:</label>
-                                        <input type="number"
-                                               id="quantite_{{ $item->id }}"
-                                               name="quantite"
-                                               value="{{ $item->quantite }}"
-                                               min="1"
-                                               max="{{ $item->produit->stock }}"
-                                               class="w-16 px-2 py-1 border border-gray-300 rounded text-center"
-                                               onchange="this.form.submit()">
-                                    </form>
+                    @foreach($items as $item)
+                        <div class="flex gap-4 px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
 
-                                    <div class="text-right">
-                                        <p class="text-sm text-gray-600">Sous-total</p>
-                                        <p class="text-lg font-bold text-gray-900">{{ number_format($item->quantite * $item->prix_unitaire, 0, '', ' ') }} F CFA</p>
-                                    </div>
-
-                                    <form action="{{ route('panier.supprimer', $item->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm flex items-center gap-1">
-                                            <x-heroicon-o-trash class="w-4 h-4" /><span>Supprimer</span>
-                                        </button>
-                                    </form>
-                                </div>
+                            {{-- Thumb --}}
+                            <div class="w-16 h-16 rounded-lg border border-[#e0e0dc] bg-[#f7f7f5] overflow-hidden flex items-center justify-center flex-shrink-0">
+                                @if($item->produit->images && is_array($item->produit->images) && count($item->produit->images) > 0)
+                                    <img src="{{ asset('storage/produits/' . $item->produit->images[0]) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover">
+                                @elseif($item->produit->image)
+                                    <img src="{{ asset('storage/produits/' . $item->produit->image) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover">
+                                @else
+                                    <svg class="w-6 h-6 text-[#e0e0dc]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                                @endif
                             </div>
-                        @endforeach
-                    </div>
 
-                    <!-- Actions -->
-                    <div class="bg-gray-50 p-6 flex gap-4">
-                        <a href="{{ route('produits.catalogue') }}" class="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-center font-medium flex items-center justify-center gap-2">
-                            <x-heroicon-o-arrow-left class="w-4 h-4" /><span>Continuer les achats</span>
-                        </a>
-                        <form action="{{ route('panier.vider') }}" method="POST" class="flex-1">
-                            @csrf
-                            <form method="POST" action="{{ route('panier.vider') }}"
-                                  data-confirm="Êtes-vous sûr de vouloir vider votre panier ?"
-                                  data-confirm-title="Vider le panier"
-                                  data-confirm-type="warning"
-                                  data-confirm-button="Vider">
-                                @csrf
-                                <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium flex items-center justify-center gap-2">
-                                    <x-heroicon-o-trash class="w-4 h-4" /><span>Vider le panier</span>
-                                </button>
-                            </form>
-                        </form>
-                    </div>
+                            {{-- Infos --}}
+                            <div class="flex-1 min-w-0">
+                                <a href="{{ route('produits.show', $item->produit->id) }}"
+                                   class="text-[13px] font-medium text-[#0a0a0a] hover:text-[#666660] transition-colors line-clamp-1">
+                                    {{ $item->produit->nom }}
+                                </a>
+                                <div class="text-[11px] text-[#a0a09a] font-light mt-0.5 mb-3">
+                                    {{ Str::limit($item->produit->description, 60) }}
+                                </div>
+
+                                {{-- Qty control --}}
+                                <form action="{{ route('panier.modifier', $item->id) }}" method="POST" class="inline-flex items-center">
+                                    @csrf @method('PATCH')
+                                    <div class="flex items-center border border-[#e0e0dc] rounded-md overflow-hidden">
+                                        <button type="button" onclick="stepQty('qty_{{ $item->id }}', -1, this.closest('form'))"
+                                            class="w-7 h-7 flex items-center justify-center text-[#666660] hover:bg-[#f7f7f5] hover:text-[#0a0a0a] transition-colors text-sm">−</button>
+                                        <div class="w-px h-4 bg-[#e0e0dc]"></div>
+                                        <input type="number" id="qty_{{ $item->id }}" name="quantite"
+                                            value="{{ $item->quantite }}" min="1" max="{{ $item->produit->stock }}"
+                                            class="w-9 text-center text-[12px] font-mono font-medium text-[#0a0a0a] border-none outline-none bg-transparent">
+                                        <div class="w-px h-4 bg-[#e0e0dc]"></div>
+                                        <button type="button" onclick="stepQty('qty_{{ $item->id }}', 1, this.closest('form'))"
+                                            class="w-7 h-7 flex items-center justify-center text-[#666660] hover:bg-[#f7f7f5] hover:text-[#0a0a0a] transition-colors text-sm">+</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            {{-- Prix + suppr --}}
+                            <div class="flex flex-col items-end justify-between flex-shrink-0">
+                                <div class="text-right">
+                                    <div class="text-[14px] font-mono font-medium text-[#0a0a0a]">
+                                        {{ number_format($item->quantite * $item->prix_unitaire, 0, ',', ' ') }}
+                                    </div>
+                                    <div class="text-[10px] text-[#a0a09a] mt-0.5">
+                                        FCFA × {{ $item->quantite }}
+                                    </div>
+                                </div>
+                                <form action="{{ route('panier.supprimer', $item->id) }}" method="POST">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-[11px] text-[#a0a09a] hover:text-[#dc2626] transition-colors">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+                    @endforeach
                 </div>
+
+                {{-- Actions bas --}}
+                <div class="flex items-center justify-between">
+                    <a href="{{ route('produits.catalogue') }}"
+                       class="flex items-center gap-1.5 text-[12px] text-[#666660] hover:text-[#0a0a0a] transition-colors">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                        Continuer les achats
+                    </a>
+                    <form action="{{ route('panier.vider') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="text-[12px] text-[#a0a09a] hover:text-[#dc2626] transition-colors flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                            Vider le panier
+                        </button>
+                    </form>
+                </div>
+
             @else
-                <!-- Panier Vide -->
-                <div class="bg-white rounded-lg shadow-lg p-12 text-center">
-                    <div class="mb-6">
-                        <div class="text-6xl flex justify-center"><x-heroicon-o-shopping-cart class="w-16 h-16" /></div>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Votre panier est vide</h2>
-                    <p class="text-gray-600 mb-8">Commencez vos achats en explorant notre catalogue</p>
-                    <a href="{{ route('produits.catalogue') }}" class="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                {{-- ── PANIER VIDE ── --}}
+                <div class="bg-white border border-[#e0e0dc] rounded-xl px-6 py-16 text-center">
+                    <svg class="w-10 h-10 text-[#e0e0dc] mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                    <h2 class="text-[15px] font-medium text-[#0a0a0a] mb-2">Votre panier est vide</h2>
+                    <p class="text-[13px] text-[#a0a09a] font-light mb-6">Commencez vos achats en explorant notre catalogue</p>
+                    <a href="{{ route('produits.catalogue') }}"
+                       class="inline-block bg-[#0a0a0a] text-white text-[12px] font-medium px-6 py-2.5 rounded-lg hover:opacity-85 transition-opacity">
                         Découvrir nos produits
                     </a>
                 </div>
             @endif
         </div>
 
-        <!-- Résumé Panier -->
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow-lg p-6 sticky top-24">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Résumé</h2>
+        {{-- ══════════════════════════════
+             RÉSUMÉ
+        ══════════════════════════════ --}}
+        <div class="sticky top-[72px]">
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
 
-                <div class="space-y-4 mb-6 pb-6 border-b border-gray-200">
-                    <div class="flex justify-between text-gray-700">
-                        <span>Nombre d'articles</span>
-                        <span class="font-semibold">{{ $items ? count($items) : 0 }}</span>
+                <div class="px-5 py-4 border-b border-[#efefed]">
+                    <span class="text-[13px] font-medium text-[#0a0a0a]">Résumé</span>
+                </div>
+
+                <div class="px-5 py-4 border-b border-[#efefed] space-y-3">
+                    <div class="flex items-center justify-between text-[13px]">
+                        <span class="text-[#666660] font-light">Nombre d'articles</span>
+                        <span class="font-mono font-medium text-[#0a0a0a]">{{ $items ? count($items) : 0 }}</span>
                     </div>
-                    <div class="flex justify-between text-gray-700">
-                        <span>Sous-total</span>
-                        <span class="font-semibold">{{ number_format($total ?? 0, 0, '', ' ') }} F CFA</span>
+                    <div class="flex items-center justify-between text-[13px]">
+                        <span class="text-[#666660] font-light">Sous-total</span>
+                        <span class="font-mono font-medium text-[#0a0a0a]">{{ number_format($total ?? 0, 0, ',', ' ') }} FCFA</span>
                     </div>
                     @if($items && count($items) > 0)
-                        <div class="flex justify-between text-gray-700">
-                            <span>Frais de livraison</span>
-                            <span class="font-semibold">
-                                @if(($total ?? 0) > 100)
-                                    Gratuit
-                                @else
-                                    2 500 F CFA
-                                @endif
+                        <div class="flex items-center justify-between text-[13px]">
+                            <span class="text-[#666660] font-light">Livraison</span>
+                            <span class="font-mono font-medium {{ ($total ?? 0) > 100 ? 'text-[#15803d]' : 'text-[#0a0a0a]' }}">
+                                {{ ($total ?? 0) > 100 ? 'Gratuite' : '2 500 FCFA' }}
                             </span>
                         </div>
-                        @if($total > 0 && ($total ?? 0) <= 100)
-                            <p class="text-xs text-gray-500">Livraison gratuite à partir de 100 €</p>
-                        @endif
                     @endif
                 </div>
 
-                <div class="flex justify-between text-xl font-bold text-gray-900 mb-6">
-                    <span>Total</span>
-                    <span>
-                        @if($items && count($items) > 0)
-                            {{ number_format(($total ?? 0) + (($total ?? 0) > 100 ? 0 : 2500), 0, '', ' ') }} F CFA
-                        @else
-                            0 F CFA
-                        @endif
-                    </span>
+                <div class="px-5 py-4 border-b border-[#efefed] flex items-baseline justify-between">
+                    <span class="text-[13px] font-medium text-[#0a0a0a]">Total</span>
+                    <div class="text-right">
+                        <div class="font-mono text-[18px] font-medium text-[#0a0a0a] tracking-tight">
+                            @if($items && count($items) > 0)
+                                {{ number_format(($total ?? 0) + (($total ?? 0) > 100 ? 0 : 2500), 0, ',', ' ') }}
+                            @else
+                                0
+                            @endif
+                        </div>
+                        <div class="text-[10px] text-[#a0a09a]">FCFA</div>
+                    </div>
                 </div>
 
                 @if($items && count($items) > 0)
-                    @auth
-                        <a href="{{ route('commandes.create') }}" class="w-full block px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-bold text-center mb-3">
-                            Procéder au paiement
+                    <div class="px-5 py-4 space-y-2 border-b border-[#efefed]">
+                        @auth
+                            <a href="{{ route('commandes.create') }}"
+                               class="block w-full py-3 bg-[#0a0a0a] text-white text-[13px] font-medium text-center rounded-lg hover:opacity-85 transition-opacity">
+                                Commander →
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}"
+                               class="block w-full py-3 bg-[#0a0a0a] text-white text-[13px] font-medium text-center rounded-lg hover:opacity-85 transition-opacity">
+                                Se connecter pour commander
+                            </a>
+                        @endauth
+                        <a href="{{ route('produits.catalogue') }}"
+                           class="block w-full py-2.5 text-[12px] text-[#666660] text-center border border-[#e0e0dc] rounded-lg hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                            ← Continuer les achats
                         </a>
-                    @else
-                        <a href="{{ route('login') }}" class="w-full block px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-bold text-center mb-3">
-                            Se connecter pour commander
-                        </a>
-                    @endauth
-
-                    <button type="button" class="w-full px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-gray-400 transition font-medium">
-                        Continuer les achats
-                    </button>
+                    </div>
                 @endif
 
-                <!-- Informations Supplémentaires -->
-                <div class="mt-8 pt-6 border-t border-gray-200 space-y-3 text-sm text-gray-600">
-                    <div class="flex items-start gap-2">
-                        <span>🚚</span>
-                        <p><strong>Livraison rapide</strong> - 2 à 5 jours ouvrables</p>
+                {{-- Trust badges --}}
+                <div class="px-5 py-4 space-y-3">
+                    <div class="flex items-start gap-3">
+                        <div class="w-7 h-7 border border-[#e0e0dc] rounded-md bg-[#f7f7f5] flex items-center justify-center flex-shrink-0">
+                            <svg class="w-3.5 h-3.5 text-[#666660]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        </div>
+                        <div>
+                            <div class="text-[12px] font-medium text-[#0a0a0a]">Livraison rapide</div>
+                            <div class="text-[11px] text-[#a0a09a] font-light">2 à 5 jours ouvrables</div>
+                        </div>
                     </div>
-                    <div class="flex items-start gap-2">
-                        <span>🔒</span>
-                        <p><strong>Paiement sécurisé</strong> - Vos données sont protégées</p>
+                    <div class="flex items-start gap-3">
+                        <div class="w-7 h-7 border border-[#e0e0dc] rounded-md bg-[#f7f7f5] flex items-center justify-center flex-shrink-0">
+                            <svg class="w-3.5 h-3.5 text-[#666660]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <div>
+                            <div class="text-[12px] font-medium text-[#0a0a0a]">Paiement sécurisé</div>
+                            <div class="text-[11px] text-[#a0a09a] font-light">Vos données sont protégées</div>
+                        </div>
                     </div>
-                    <div class="flex items-start gap-2">
-                        <span>↩️</span>
-                        <p><strong>Retours gratuits</strong> - 30 jours pour changer d'avis</p>
+                    <div class="flex items-start gap-3">
+                        <div class="w-7 h-7 border border-[#e0e0dc] rounded-md bg-[#f7f7f5] flex items-center justify-center flex-shrink-0">
+                            <svg class="w-3.5 h-3.5 text-[#666660]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.92"/></svg>
+                        </div>
+                        <div>
+                            <div class="text-[12px] font-medium text-[#0a0a0a]">Retours gratuits</div>
+                            <div class="text-[11px] text-[#a0a09a] font-light">30 jours pour changer d'avis</div>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
+
     </div>
 </div>
+
+<script>
+function stepQty(inputId, delta, form) {
+    const input = document.getElementById(inputId);
+    const newVal = Math.max(1, Math.min(parseInt(input.max) || 99, parseInt(input.value) + delta));
+    input.value = newVal;
+    form.submit();
+}
+</script>
+
 @endsection

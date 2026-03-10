@@ -93,47 +93,39 @@
                                 {{ number_format($commande->total, 0, ',', ' ') }} XOF
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                    {{ $commande->statut === 'livree' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $commande->statut === 'expediee' ? 'bg-blue-100 text-blue-800' : '' }}
-                                    {{ $commande->statut === 'confirmee' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                    {{ $commande->statut === 'en_attente' ? 'bg-gray-100 text-gray-800' : '' }}
-                                    {{ $commande->statut === 'annulee' ? 'bg-red-100 text-red-800' : '' }}
-                                ">
-                                    {{ match($commande->statut) {
-                                        'en_attente' => 'En attente',
-                                        'confirmee' => '✅ Confirmée',
-                                        'expediee' => '🚚 Expédiée',
-                                        'livree' => 'Livrée',
-                                        'annulee' => 'Annulée',
-                                        default => ucfirst($commande->statut),
-                                    } }}
-                                </span>
+                                @if($commande->statut === 'livree')
+                                    <span class="badge badge-ok">Livrée</span>
+                                @elseif($commande->statut === 'expediee')
+                                    <span class="badge badge-ok">Expédiée</span>
+                                @elseif($commande->statut === 'confirmee')
+                                    <span class="badge badge-ok">Confirmée</span>
+                                @elseif($commande->statut === 'en_attente')
+                                    <span class="badge badge-warn">En attente</span>
+                                @elseif($commande->statut === 'annulee')
+                                    <span class="badge badge-err">Annulée</span>
+                                @else
+                                    <span class="badge">{{ $commande->statut }}</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                    {{ $commande->delivery_status === 'delivered' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $commande->delivery_status === 'in_transit' ? 'bg-blue-100 text-blue-800' : '' }}
-                                    {{ $commande->delivery_status === 'pending' ? 'bg-gray-100 text-gray-800' : '' }}
-                                ">
-                                    {{ match($commande->delivery_status ?? 'pending') {
-                                        'pending' => 'Attente',
-                                        'in_transit' => '📍 Transit',
-                                        'delivered' => 'Livré',
-                                        default => 'N/A',
-                                    } }}
-                                </span>
+                                @if($commande->delivery_status === 'delivered')
+                                    <span class="badge badge-ok">Livré</span>
+                                @elseif($commande->delivery_status === 'in_transit')
+                                    <span class="badge badge-warn">Transit</span>
+                                @else
+                                    <span class="badge badge-warn">Attente</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">
                                 {{ $commande->created_at->format('d/m/Y H:i') }}
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex gap-2">
-                                    <a href="{{ route('admin.orders.show', $commande) }}" class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200 transition">
-                                        👁️ Voir
+                                    <a href="{{ route('admin.orders.show', $commande) }}" class="px-3 py-1 bg-black text-white rounded text-sm hover:opacity-85 transition">
+                                        Voir
                                     </a>
-                                    <a href="{{ route('admin.orders.tracking', $commande) }}" class="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200 transition">
-                                        📍 Suivi
+                                    <a href="{{ route('admin.orders.tracking', $commande) }}" class="px-3 py-1 bg-black text-white rounded text-sm hover:opacity-85 transition">
+                                        Suivi
                                     </a>
                                 </div>
                             </td>

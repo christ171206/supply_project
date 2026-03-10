@@ -43,25 +43,25 @@
         @else
             <div class="space-y-4">
                 @foreach($disputes as $dispute)
-                    <div class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition">
+                    <div class="border border-gray-200 rounded-xl p-6 hover:bg-off-white transition">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
-                                    <h3 class="text-lg font-bold text-gray-900">{{ $dispute->subject ?? 'Litige #' . $dispute->id }}</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900">{{ $dispute->subject ?? 'Litige #' . $dispute->id }}</h3>
                                     @if($dispute->status === 'open')
-                                        <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">🔴 Ouvert</span>
+                                        <span class="badge badge-err">Ouvert</span>
                                     @elseif($dispute->status === 'in_progress')
-                                        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">🟡 En cours</span>
+                                        <span class="badge badge-warn">En cours</span>
                                     @elseif($dispute->status === 'resolved')
-                                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">🔵 Résolu</span>
+                                        <span class="badge badge-ok">Résolu</span>
                                     @else
-                                        <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">⚪ Fermé</span>
+                                        <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">Fermé</span>
                                     @endif
                                 </div>
-                                
-                                <p class="text-gray-700 text-sm">{{ $dispute->description ?? 'Aucune description' }}</p>
+
+                                <p class="text-gray-600 text-sm">{{ $dispute->description ?? 'Aucune description' }}</p>
                             </div>
-                            <a href="{{ route('admin.disputes.show', $dispute->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold ml-4">
+                            <a href="{{ route('admin.disputes.show', $dispute->id) }}" class="text-black hover:opacity-70 font-semibold ml-4">
                                 Voir →
                             </a>
                         </div>

@@ -34,7 +34,7 @@ class CommandeController extends Controller
             abort(403);
         }
 
-        $lignes = $commande->ligneCommandes()->with('produit')->get();
+        $lignes = $commande->ligneCommandes()->with('produit.user')->get();
         $payment = $commande->payment;
 
         return view('commandes.show', compact('commande', 'lignes', 'payment'));
@@ -105,7 +105,7 @@ class CommandeController extends Controller
                 }
             ],
             'accept_conditions' => 'required|accepted',
-            'phone_payment' => 'required_if:payment_method,wave,orange_money,mtn_money,moov_money|string',
+            'phone_payment' => 'nullable|string',
         ], [
             'quartier_id.required' => 'Veuillez sélectionner un quartier',
             'quartier_id.exists' => 'Le quartier sélectionné n\'existe pas',
@@ -113,7 +113,13 @@ class CommandeController extends Controller
             'adresse_detail.min' => 'L\'adresse doit contenir au moins 5 caractères',
             'telephone_livraison.required' => 'Le téléphone de livraison est obligatoire',
             'accept_conditions.required' => 'Vous devez accepter les conditions',
-            'phone_payment.required_if' => 'Le numéro de téléphone est obligatoire pour ce mode de paiement',
+            'accept_conditions.accepted' => 'Vous devez accepter les conditions d\'utilisation',
+            'phone_payment.string' => 'Le numéro de téléphone doit être valide',
+        ]);
+
+        Log::info('Validation réussie', [
+            'payment_method' => $request->payment_method,
+            'has_phone_payment' => !empty($request->phone_payment),
         ]);
 
         $user = auth()->user();

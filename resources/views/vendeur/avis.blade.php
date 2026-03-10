@@ -1,82 +1,73 @@
 @extends('vendeur.layout-dashboard')
 
 @section('content')
-<div class="p-8">
+<div class="p-8 bg-white min-h-screen">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900">⭐ Avis Clients</h1>
-        <p class="text-gray-600 mt-2">Consultez et gérez les avis sur vos produits</p>
+        <h1 class="text-3xl font-serif text-[#0a0a0a] mb-2">Avis Clients</h1>
+        <p class="text-[13px] text-[#666660] font-light">Consultez et gérez les avis sur vos produits</p>
     </div>
 
     <!-- Stats Avis -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <!-- Note Moyenne -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+        <div class="bg-white border border-[#e0e0dc] rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-semibold">Note Moyenne</p>
-                    <p class="text-4xl font-bold text-gray-900 mt-2">{{ number_format($noteMoyenne, 1) }}/5</p>
+                    <p class="text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Note Moyenne</p>
+                    <p class="text-2xl font-mono font-bold text-[#0a0a0a]">{{ number_format($noteMoyenne, 1) }}/5</p>
                 </div>
-                <div class="text-5xl">⭐</div>
             </div>
         </div>
 
         <!-- Total Avis -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+        <div class="bg-white border border-[#e0e0dc] rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-semibold">Total d'Avis</p>
-                    <p class="text-4xl font-bold text-gray-900 mt-2">{{ $nombreAvis }}</p>
+                    <p class="text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Total d'Avis</p>
+                    <p class="text-2xl font-mono font-bold text-[#0a0a0a]">{{ $nombreAvis }}</p>
                 </div>
-                <div class="text-5xl">💬</div>
             </div>
         </div>
 
         <!-- 5 Étoiles -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+        <div class="bg-white border border-[#e0e0dc] rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-semibold">⭐⭐⭐⭐⭐</p>
-                    <p class="text-4xl font-bold text-green-600 mt-2">{{ $avisParNote[5] ?? 0 }}</p>
+                    <p class="text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Excellentes</p>
+                    <p class="text-2xl font-mono font-bold text-[#15803d]">{{ $avisParNote[5] ?? 0 }}</p>
                 </div>
-                <div class="text-5xl">😍</div>
             </div>
         </div>
 
         <!-- Avis Critiques (1-2 étoiles) -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+        <div class="bg-white border border-[#e0e0dc] rounded-lg p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-600 text-sm font-semibold">⭐ ou ⭐⭐</p>
-                    <p class="text-4xl font-bold text-red-600 mt-2">{{ ($avisParNote[1] ?? 0) + ($avisParNote[2] ?? 0) }}</p>
+                    <p class="text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Critiques</p>
+                    <p class="text-2xl font-mono font-bold text-[#dc2626]">{{ ($avisParNote[1] ?? 0) + ($avisParNote[2] ?? 0) }}</p>
                 </div>
-                <div class="text-5xl">⚠️</div>
             </div>
         </div>
     </div>
 
     <!-- Graphique Répartition -->
-    <div class="bg-white rounded-xl shadow-md border border-gray-100 p-8 mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Répartition des Notes</h2>
-        <div class="space-y-5">
+    <div class="bg-white border border-[#e0e0dc] rounded-lg p-6 mb-8">
+        <h2 class="text-lg font-medium text-[#0a0a0a] mb-6">Répartition des Notes</h2>
+        <div class="space-y-4">
             @for($i = 5; $i >= 1; $i--)
-                <div class="flex items-center gap-6">
-                    <div class="w-32 flex-shrink-0">
-                        <div class="flex gap-1">
-                            @for($j = 1; $j <= 5; $j++)
-                                <span class="text-xl">{{ $j <= $i ? '⭐' : '☆' }}</span>
-                            @endfor
-                        </div>
-                    </div>
+                <div class="flex items-center gap-4">
+                    <div class="w-20 flex-shrink-0 text-[13px] font-mono text-[#0a0a0a]">{{ $i }}★</div>
                     <div class="flex-1 min-w-0">
-                        <div class="h-6 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                                class="h-full rounded-full transition-all duration-500"
-                                style="width: {{ $nombreAvis > 0 ? (($avisParNote[$i] ?? 0) / $nombreAvis * 100) : 0 }}%; background: linear-gradient(90deg, rgb(251, 191, 36), rgb(34, 197, 94));"
-                            ></div>
+                        <div class="h-4 bg-[#f7f7f5] rounded overflow-hidden border border-[#e0e0dc]">
+                            @php
+                                $percentage = $nombreAvis > 0 ? (($avisParNote[$i] ?? 0) / $nombreAvis * 100) : 0;
+                                $bgColor = $i >= 4 ? '#22c55e' : ($i >= 3 ? '#f59e0b' : '#dc2626');
+                            @endphp
+                            <div class="h-full transition-all" style="width: {{ $percentage }}%; background: {{ $bgColor }};"></div>
                         </div>
                     </div>
-                    <span class="w-12 text-right font-bold text-gray-900 flex-shrink-0">{{ $avisParNote[$i] ?? 0 }}</span>
+                    <span class="w-12 text-right font-mono text-[13px] text-[#0a0a0a] flex-shrink-0">{{ $avisParNote[$i] ?? 0 }}</span>
                 </div>
             @endfor
         </div>

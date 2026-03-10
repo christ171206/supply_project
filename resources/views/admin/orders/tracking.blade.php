@@ -15,7 +15,7 @@
         <div class="lg:col-span-1">
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-clipboard class="w-5 h-5" /><span>Détails de la Commande</span></h2>
-                
+
                 <div class="space-y-4">
                     <!-- Client -->
                     <div>
@@ -37,15 +37,15 @@
                         <p class="text-sm text-gray-600 font-medium">STATUT COMMANDE</p>
                         <div class="mt-2">
                             @if($commande->statut === 'en_attente')
-                                <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">⏳ En attente</span>
+                                <span class="badge badge-warn">En attente</span>
                             @elseif($commande->statut === 'confirmee')
-                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">✅ Confirmée</span>
+                                <span class="badge badge-ok">Confirmée</span>
                             @elseif($commande->statut === 'expediee')
-                                <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">🚚 Expédiée</span>
+                                <span class="badge badge-ok">Expédiée</span>
                             @elseif($commande->statut === 'livree')
-                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">✔️ Livrée</span>
+                                <span class="badge badge-ok">Livrée</span>
                             @elseif($commande->statut === 'annulee')
-                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">❌ Annulée</span>
+                                <span class="badge badge-err">Annulée</span>
                             @else
                                 <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">{{ $commande->statut }}</span>
                             @endif
@@ -57,15 +57,15 @@
                         <p class="text-sm text-gray-600 font-medium">STATUT LIVRAISON</p>
                         <div class="mt-2">
                             @if($commande->delivery_status === 'pending')
-                                <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">⏳ En attente</span>
+                                <span class="badge badge-warn">En attente</span>
                             @elseif($commande->delivery_status === 'picked_up')
-                                <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">📦 Enlevée</span>
+                                <span class="badge badge-warn">Enlevée</span>
                             @elseif($commande->delivery_status === 'in_transit')
-                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">🚚 En transit</span>
+                                <span class="badge badge-warn">En transit</span>
                             @elseif($commande->delivery_status === 'delivered')
-                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">✅ Livrée</span>
+                                <span class="badge badge-ok">Livrée</span>
                             @elseif($commande->delivery_status === 'failed')
-                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">❌ Échouée</span>
+                                <span class="badge badge-err">Échouée</span>
                             @else
                                 <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">{{ $commande->delivery_status }}</span>
                             @endif
@@ -113,7 +113,7 @@
                     <div class="text-center py-12">
                         <p class="text-gray-500 text-lg">❌ Aucun événement de suivi enregistré</p>
                         <p class="text-gray-400 text-sm mt-2">Les informations de livraison s'afficheront ici une fois que le colis sera en transit.</p>
-                        
+
                         <!-- Message si table n'existe pas -->
                         @if(!\Illuminate\Support\Facades\Schema::hasTable('delivery_trackings'))
                             <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
@@ -175,7 +175,7 @@
                                             {{ $event->created_at->diffForHumans() }}
                                         </span>
                                     </div>
-                                    
+
                                     @if($event->latitude && $event->longitude)
                                         <p class="text-xs text-gray-500 mt-2">
                                             📍 {{ $event->latitude }}, {{ $event->longitude }}
@@ -191,18 +191,18 @@
             <!-- Actions admin -->
             <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
                 <h3 class="text-lg font-bold text-gray-900 mb-4">⚙️ Actions Admin</h3>
-                
+
                 <div class="space-y-3">
                     <a href="{{ route('admin.orders.show', $commande) }}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-center transition">
                         👁️ Voir Détails Complets
                     </a>
-                    
+
                     @if($commande->statut !== 'cancelled')
                         <a href="{{ route('admin.orders.show', $commande) }}" class="block w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-4 rounded-lg text-center transition">
                             ✏️ Modifier Commande
                         </a>
                     @endif
-                    
+
                     <a href="{{ route('admin.orders.index') }}" class="block w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg text-center transition">
                         ← Retour à la Liste
                     </a>

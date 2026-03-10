@@ -1,81 +1,89 @@
 @extends('layouts.guest')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-secondary-50 px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-    <div class="w-full max-w-md">
-        <!-- Logo/Titre -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Supply</h1>
-            <h2 class="text-2xl font-bold text-gray-900">Mot de passe oublié?</h2>
-            <p class="text-gray-600 mt-2">Pas de souci! Nous vous aiderons à le réinitialiser.</p>
-        </div>
+<div class="grid grid-cols-1 md:grid-cols-2 min-h-screen">
+    <!-- LEFT PANEL -->
+    <div class="bg-white border-r border-gray-200 p-12 sticky top-0 overflow-y-auto">
+        <a href="{{ route('accueil') }}" class="auth-back inline-flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-12 transition">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+            Retour à l'accueil
+        </a>
 
-        <!-- Instructions -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p class="text-sm text-blue-900">
-                📧 Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
-            </p>
-        </div>
-
-        <!-- Formulaire -->
-        <form method="POST" action="{{ route('password.email') }}" class="bg-white rounded-2xl shadow-xl p-8">
-            @csrf
-
-            <!-- Email -->
-            <div class="mb-6">
-                <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
-                    📧 Adresse Email
-                </label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value="{{ old('email') }}"
-                    required
-                    autofocus
-                    placeholder="exemple@email.com"
-                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition @error('email') border-red-500 @enderror"
-                >
-                @error('email')
-                    <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
-                @enderror
+        <div class="auth-brand mb-8">
+            <div class="auth-brand-icon w-8 h-8 bg-black rounded-lg flex items-center justify-center mb-2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" class="w-4 h-4">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
             </div>
+            <span class="text-sm font-medium">Supply</span>
+        </div>
 
-            <!-- Message de succès -->
+        <h2 class="font-serif text-3xl leading-tight mb-3">Mot de passe<br><em class="italic text-gray-600">oublié ?</em></h2>
+        <p class="text-sm text-gray-600 font-light mb-8 max-w-xs">Pas de souci ! Nous vous aiderons à réinitialiser votre mot de passe en quelques étapes.</p>
+
+        <div class="space-y-5">
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center flex-shrink-0 text-xs">✉</div>
+                <div>
+                    <strong class="text-sm">Email de réinitialisation</strong>
+                    <p class="text-xs text-gray-600 font-light">Entrez votre adresse email pour recevoir un lien de réinitialisation.</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center flex-shrink-0 text-xs">🔗</div>
+                <div>
+                    <strong class="text-sm">Lien sécurisé</strong>
+                    <p class="text-xs text-gray-600 font-light">Cliquez le lien du mail pour créer un nouveau mot de passe.</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center flex-shrink-0 text-xs">🔐</div>
+                <div>
+                    <strong class="text-sm">Mot de passe fort</strong>
+                    <p class="text-xs text-gray-600 font-light">Choisissez un nouveau mot de passe sécurisé et unique.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="bg-off-white p-12 flex items-center justify-center">
+        <div class="w-full max-w-sm">
+            <h1 class="font-serif text-2xl mb-1">Réinitialiser</h1>
+            <p class="text-xs text-gray-600 mb-6">Entrez votre email pour recevoir le lien de réinitialisation.</p>
+
             @if (session('status'))
-                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p class="text-green-800 text-sm">
-                        {{ session('status') }}
-                    </p>
+                <div class="mb-4 p-3 bg-white border border-gray-200 rounded-lg text-xs text-black">
+                    {{ session('status') }}
                 </div>
             @endif
 
-            <!-- Boutons -->
-            <div class="space-y-3">
-                <button
-                    type="submit"
-                    class="w-full px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-lg hover:from-primary-600 hover:to-primary-700 transition duration-200 shadow-lg hover:shadow-xl"
-                >
-                    🔗 Envoyer le Lien de Réinitialisation
+            <form method="POST" action="{{ route('password.email') }}" class="space-y-4">
+                @csrf
+
+                <div>
+                    <label class="text-xs font-mono uppercase text-gray-600 mb-2 block">Adresse Email</label>
+                    <input type="email" name="email" value="{{ old('email') }}" required autofocus
+                        placeholder="vous@example.com"
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-black focus:outline-none transition" />
+                    @error('email')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <button type="submit" class="w-full bg-black text-white py-2 rounded-lg text-sm font-medium hover:opacity-85 transition">
+                    Envoyer le lien
                 </button>
+            </form>
 
-                <a
-                    href="{{ route('login') }}"
-                    class="block w-full text-center px-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition duration-200"
-                >
-                    ← Retour à la Connexion
-                </a>
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-600">
+                    Vous vous souvenez ?
+                    <a href="{{ route('login') }}" class="text-black font-medium hover:underline">Se connecter</a>
+                </p>
             </div>
-        </form>
-
-        <!-- Lien inscription -->
-        <div class="mt-6 text-center">
-            <p class="text-gray-600">
-                Pas encore inscrit?
-                <a href="{{ route('register') }}" class="text-primary-600 font-bold hover:text-primary-700">
-                    Créer un compte
-                </a>
-            </p>
         </div>
     </div>
 </div>

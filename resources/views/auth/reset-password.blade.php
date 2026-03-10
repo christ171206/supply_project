@@ -1,99 +1,91 @@
 @extends('layouts.guest')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-secondary-50 px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-    <div class="w-full max-w-md">
-        <!-- Logo/Titre -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Supply</h1>
-            <h2 class="text-2xl font-bold text-gray-900">Réinitialiser le Mot de Passe</h2>
-            <p class="text-gray-600 mt-2">Entrez votre nouveau mot de passe sécurisé</p>
+<div class="grid grid-cols-1 md:grid-cols-2 min-h-screen">
+    <!-- LEFT PANEL -->
+    <div class="bg-white border-r border-gray-200 p-12 sticky top-0 overflow-y-auto">
+        <a href="{{ route('accueil') }}" class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-12 transition">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+            Retour
+        </a>
+
+        <div class="mb-8">
+            <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center mb-2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" class="w-4 h-4">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+            </div>
+            <span class="text-sm font-medium">Supply</span>
         </div>
 
-        <!-- Formulaire -->
-        <form method="POST" action="{{ route('password.store') }}" class="bg-white rounded-2xl shadow-xl p-8">
-            @csrf
+        <h2 class="font-serif text-3xl leading-tight mb-3">Nouveau<br><em class="italic text-gray-600">mot de passe</em></h2>
+        <p class="text-sm text-gray-600 font-light mb-8 max-w-xs">Créez un mot de passe sécurisé et unique pour protéger votre compte.</p>
 
-            <!-- Token Caché -->
-            <input type="hidden" name="token" value="{{ $request->route('token') }}">
-
-            <!-- Email (lecture seule) -->
-            <div class="mb-6">
-                <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
-                    📧 Adresse Email
-                </label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value="{{ old('email', $request->email) }}"
-                    required
-                    readonly
-                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed"
-                >
+        <div class="space-y-5">
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center flex-shrink-0 text-xs">A-z</div>
+                <div>
+                    <strong class="text-sm">Minimum 8 caractères</strong>
+                    <p class="text-xs text-gray-600 font-light">Majuscules, minuscules, chiffres.</p>
+                </div>
             </div>
-
-            <!-- Nouveau Mot de Passe -->
-            <div class="mb-6">
-                <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
-                    <x-heroicon-o-lock-closed class=\"w-5 h-5\" /><span>Nouveau Mot de Passe</span>
-                </label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    required
-                    placeholder="Minimum 8 caractères"
-                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition @error('password') border-red-500 @enderror"
-                >
-                @error('password')
-                    <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
-                @enderror
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center flex-shrink-0 text-xs">✓</div>
+                <div>
+                    <strong class="text-sm">Confirmation</strong>
+                    <p class="text-xs text-gray-600 font-light">Confirmer votre nouveau mot de passe.</p>
+                </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Confirmation Mot de Passe -->
-            <div class="mb-6">
-                <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-2">
-                    ✓ Confirmation
-                </label>
-                <input
-                    type="password"
-                    id="password_confirmation"
-                    name="password_confirmation"
-                    required
-                    placeholder="Confirmer le mot de passe"
-                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
-                >
-            </div>
+    <!-- RIGHT PANEL -->
+    <div class="bg-off-white p-12 flex items-center justify-center">
+        <div class="w-full max-w-sm">
+            <h1 class="font-serif text-2xl mb-1">Réinitialiser</h1>
+            <p class="text-xs text-gray-600 mb-6">Entrez votre nouvelle clé sécurisée.</p>
 
-            <!-- Conseils Mot de Passe -->
-            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-                <p class="text-sm text-amber-900 font-semibold mb-2">💡 Conseils de sécurité:</p>
-                <ul class="text-sm text-amber-800 space-y-1">
-                    <li>✓ Minimum 8 caractères</li>
-                    <li>✓ Lettres majuscules et minuscules</li>
-                    <li>✓ Au moins un chiffre</li>
-                    <li>✓ Au moins un caractère spécial (!@#$%)</li>
-                </ul>
-            </div>
+            <form method="POST" action="{{ route('password.store') }}" class="space-y-4">
+                @csrf
+                <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
-            <!-- Boutons -->
-            <div class="space-y-3">
-                <button
-                    type="submit"
-                    class="w-full px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-lg hover:from-primary-600 hover:to-primary-700 transition duration-200 shadow-lg hover:shadow-xl"
-                >
-                    🔄 Réinitialiser le Mot de Passe
+                <div>
+                    <label class="text-xs font-mono uppercase text-gray-600 mb-2 block">Email</label>
+                    <input type="email" value="{{ old('email', $request->email) }}" readonly
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-600" />
+                </div>
+
+                <div>
+                    <label class="text-xs font-mono uppercase text-gray-600 mb-2 block">Nouveau mot de passe</label>
+                    <input type="password" name="password" required
+                        placeholder="••••••••"
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-black focus:outline-none transition" />
+                    @error('password')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="text-xs font-mono uppercase text-gray-600 mb-2 block">Confirmation</label>
+                    <input type="password" name="password_confirmation" required
+                        placeholder="••••••••"
+                        class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-black focus:outline-none transition" />
+                </div>
+
+                <button type="submit" class="w-full bg-black text-white py-2 rounded-lg text-sm font-medium hover:opacity-85 transition">
+                    Réinitialiser
                 </button>
+            </form>
 
-                <a
-                    href="{{ route('login') }}"
-                    class="block w-full text-center px-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition duration-200"
-                >
-                    ← Retour à la Connexion
-                </a>
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-600">
+                    Se souvient ?
+                    <a href="{{ route('login') }}" class="text-black font-medium hover:underline">Se connecter</a>
+                </p>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 @endsection

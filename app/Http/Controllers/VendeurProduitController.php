@@ -663,6 +663,511 @@ class VendeurProduitController extends Controller
     }
 
     /**
+     * Exporter les statistiques en CSV ou PDF
+     */
+    /**
+     * Exporter les statistiques en CSV ou PDF avec formats différents
+     */
+    public function exportStatistiques(Request $request)
+    {
+        $format = $request->get('format', 'csv');
+        $periode = (int)$request->get('periode', 7);
+        $user = Auth::user();
+
+        // Récupérer les données complètes
+        $stats = $this->getStatistiquesCompletes($user, $periode);
+
+        switch ($format) {
+            case 'csv-complet':
+                return $this->exportCSVComplet($user, $stats, $periode);
+            case 'pdf-complet':
+                return $this->exportPDFComplet($user, $stats, $periode);
+            case 'csv':
+            default:
+                return $this->exportCSV($user, $stats, $periode);
+        }
+    }
+
+    /**
+     * Récupérer toutes les statistiques complètes
+     */
+    private function getStatistiquesCompletes($user, $periode)
+    {
+        $dateDebut = now()->subDays($periode);
+
+        // 💰 KPIs
+        $totalCA = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->where('created_at', '>=', $dateDebut)
+            ->sum('total');
+
+        $nombreCommandes = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->where('created_at', '>=', $dateDebut)
+            ->distinct()
+            ->count('commandes.id');
+
+        $panierMoyen = $nombreCommandes > 0 ? $totalCA / $nombreCommandes : 0;
+
+        // ⭐ Avis
+        $avis = DB::table('avis')
+            ->join('produits', 'avis.produit_id', '=', 'produits.id')
+            ->where('produits.user_id', $user->id)
+            ->select('avis.*');
+
+        $noteMoyenne = (clone $avis)->avg('note') ?? 0;
+        $nombreAvis = (clone $avis)->count();
+
+        // 🏆 Top 5 produits
+        $topProduits = Produit::where('user_id', $user->id)
+            ->with(['ligneCommandes' => function ($q) use ($dateDebut) {
+                $q->whereHas('commande', function ($q2) use ($dateDebut) {
+                    $q2->where('created_at', '>=', $dateDebut);
+                });
+            }])
+            ->get()
+            ->map(function ($p) {
+                $p->ventes_nombre = $p->ligneCommandes->count();
+                $p->ventes_total = $p->ligneCommandes->sum(function ($lc) {
+                    return $lc->quantite * $lc->prix_unitaire;
+                });
+                return $p;
+            })
+            ->sortByDesc('ventes_total')
+            ->take(5)
+            ->values();
+
+        // 📦 Statut des commandes
+        $commandesEnAttente = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('created_at', '>=', $dateDebut)->where('statut', 'en_attente')->distinct()->count('commandes.id');
+
+        $commandesConfirmees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('created_at', '>=', $dateDebut)->where('statut', 'confirmee')->distinct()->count('commandes.id');
+
+        $commandesExpediees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('created_at', '>=', $dateDebut)->where('statut', 'expediee')->distinct()->count('commandes.id');
+
+        $commandeslivrees = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })->where('created_at', '>=', $dateDebut)->where('statut', 'livree')->distinct()->count('commandes.id');
+
+        // 📊 Répartition par catégorie
+        $repartitionCategories = [];
+        $categories = Categorie::with(['produits' => function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        }])->get();
+
+        foreach ($categories as $categorie) {
+            $produitsCat = $categorie->produits;
+            if ($produitsCat->count() > 0) {
+                $montant = 0;
+                $nombre = 0;
+                foreach ($produitsCat as $p) {
+                    $ventes = $p->ligneCommandes->filter(function ($lc) use ($dateDebut) {
+                        return $lc->commande->created_at >= $dateDebut;
+                    });
+                    $montant += $ventes->sum(function ($lc) {
+                        return $lc->quantite * $lc->prix_unitaire;
+                    });
+                    $nombre += $ventes->count();
+                }
+                if ($montant > 0) {
+                    $repartitionCategories[$categorie->nom] = [
+                        'montant' => $montant,
+                        'nombre' => $nombre
+                    ];
+                }
+            }
+        }
+
+        // 📈 Évolution du CA par jour
+        $evolutionCA = Commande::selectRaw('DATE(created_at) as date, SUM(total) as montant')
+            ->whereHas('ligneCommandes.produit', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->where('created_at', '>=', $dateDebut)
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [date('d/m/Y', strtotime($item->date)) => $item->montant];
+            });
+
+        return [
+            'totalCA' => $totalCA,
+            'nombreCommandes' => $nombreCommandes,
+            'panierMoyen' => $panierMoyen,
+            'noteMoyenne' => $noteMoyenne,
+            'nombreAvis' => $nombreAvis,
+            'topProduits' => $topProduits,
+            'commandesEnAttente' => $commandesEnAttente,
+            'commandesConfirmees' => $commandesConfirmees,
+            'commandesExpediees' => $commandesExpediees,
+            'commandeslivrees' => $commandeslivrees,
+            'repartitionCategories' => $repartitionCategories,
+            'evolutionCA' => $evolutionCA
+        ];
+    }
+
+    /**
+     * Générer et télécharger CSV simple
+     */
+    private function exportCSV($user, $stats, $periode)
+    {
+        $filename = 'statistiques_' . $user->id . '_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ];
+
+        $callback = function () use ($user, $stats, $periode) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
+
+            // En-tête
+            fputcsv($file, ['STATISTIQUES VENDEUR'], ';');
+            fputcsv($file, ['Période: Derniers ' . $periode . ' jours'], ';');
+            fputcsv($file, ['Date d\'export: ' . now()->format('d/m/Y H:i:s')], ';');
+            fputcsv($file, [], ';');
+
+            // KPIs
+            fputcsv($file, ['INDICATEURS CLÉS'], ';');
+            fputcsv($file, ['Métrique', 'Valeur'], ';');
+            fputcsv($file, ['Chiffre d\'Affaires', number_format($stats['totalCA'], 0, ',', ' ') . ' CFA'], ';');
+            fputcsv($file, ['Nombre de Commandes', $stats['nombreCommandes']], ';');
+            fputcsv($file, ['Panier Moyen', number_format($stats['panierMoyen'], 0, ',', ' ') . ' CFA'], ';');
+            fputcsv($file, ['Note Moyenne', round($stats['noteMoyenne'], 1) . '/5'], ';');
+            fputcsv($file, ['Nombre d\'Avis', $stats['nombreAvis']], ';');
+            fputcsv($file, [], ';');
+
+            // Statut des commandes
+            fputcsv($file, ['STATUT DES COMMANDES'], ';');
+            fputcsv($file, ['Statut', 'Nombre'], ';');
+            fputcsv($file, ['En Attente', $stats['commandesEnAttente']], ';');
+            fputcsv($file, ['Confirmées', $stats['commandesConfirmees']], ';');
+            fputcsv($file, ['Expédiées', $stats['commandesExpediees']], ';');
+            fputcsv($file, ['Livrées', $stats['commandeslivrees']], ';');
+            fputcsv($file, [], ';');
+
+            // Top produits
+            fputcsv($file, ['TOP 5 PRODUITS'], ';');
+            fputcsv($file, ['Position', 'Produit', 'Nombre de Ventes', 'Chiffre d\'Affaires'], ';');
+            foreach ($stats['topProduits'] as $idx => $produit) {
+                fputcsv($file, [$idx + 1, $produit->nom, $produit->ventes_nombre, number_format($produit->ventes_total, 0, ',', ' ') . ' CFA'], ';');
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Générer et télécharger CSV complet (avec catégories et évolution)
+     */
+    private function exportCSVComplet($user, $stats, $periode)
+    {
+        $filename = 'statistiques_complet_' . $user->id . '_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ];
+
+        $callback = function () use ($user, $stats, $periode) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
+
+            // En-tête
+            fputcsv($file, ['STATISTIQUES VENDEUR COMPLÈTES'], ';');
+            fputcsv($file, ['Période: Derniers ' . $periode . ' jours'], ';');
+            fputcsv($file, ['Date d\'export: ' . now()->format('d/m/Y H:i:s')], ';');
+            fputcsv($file, [], ';');
+
+            // KPIs
+            fputcsv($file, ['INDICATEURS CLÉS'], ';');
+            fputcsv($file, ['Métrique', 'Valeur'], ';');
+            fputcsv($file, ['Chiffre d\'Affaires', number_format($stats['totalCA'], 0, ',', ' ') . ' CFA'], ';');
+            fputcsv($file, ['Nombre de Commandes', $stats['nombreCommandes']], ';');
+            fputcsv($file, ['Panier Moyen', number_format($stats['panierMoyen'], 0, ',', ' ') . ' CFA'], ';');
+            fputcsv($file, ['Note Moyenne', round($stats['noteMoyenne'], 1) . '/5'], ';');
+            fputcsv($file, ['Nombre d\'Avis', $stats['nombreAvis']], ';');
+            fputcsv($file, [], ';');
+
+            // Statut des commandes
+            fputcsv($file, ['STATUT DES COMMANDES'], ';');
+            fputcsv($file, ['Statut', 'Nombre'], ';');
+            fputcsv($file, ['En Attente', $stats['commandesEnAttente']], ';');
+            fputcsv($file, ['Confirmées', $stats['commandesConfirmees']], ';');
+            fputcsv($file, ['Expédiées', $stats['commandesExpediees']], ';');
+            fputcsv($file, ['Livrées', $stats['commandeslivrees']], ';');
+            fputcsv($file, [], ';');
+
+            // Top produits
+            fputcsv($file, ['TOP 5 PRODUITS'], ';');
+            fputcsv($file, ['Position', 'Produit', 'Nombre de Ventes', 'Chiffre d\'Affaires'], ';');
+            foreach ($stats['topProduits'] as $idx => $produit) {
+                fputcsv($file, [$idx + 1, $produit->nom, $produit->ventes_nombre, number_format($produit->ventes_total, 0, ',', ' ') . ' CFA'], ';');
+            }
+            fputcsv($file, [], ';');
+
+            // Répartition par catégorie
+            fputcsv($file, ['RÉPARTITION PAR CATÉGORIE'], ';');
+            fputcsv($file, ['Catégorie', 'Montant', 'Nombre de Ventes', 'Pourcentage'], ';');
+            $totalCA = $stats['totalCA'];
+            foreach ($stats['repartitionCategories'] as $categorie => $data) {
+                $pourcentage = $totalCA > 0 ? round(($data['montant'] / $totalCA) * 100, 2) . '%' : '0%';
+                fputcsv($file, [$categorie, number_format($data['montant'], 0, ',', ' ') . ' CFA', $data['nombre'], $pourcentage], ';');
+            }
+            fputcsv($file, [], ';');
+
+            // Évolution du CA par jour
+            fputcsv($file, ['ÉVOLUTION DU CA PAR JOUR'], ';');
+            fputcsv($file, ['Date', 'Montant'], ';');
+            foreach ($stats['evolutionCA'] as $date => $montant) {
+                fputcsv($file, [$date, number_format($montant, 0, ',', ' ') . ' CFA'], ';');
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Générer et télécharger PDF complet (avec graphiques ASCII et tableaux)
+     */
+    private function exportPDFComplet($user, $stats, $periode)
+    {
+        // Génération du graphique ASCII pour l'évolution du CA
+        $chartEvolution = $this->generateASCIIChart($stats['evolutionCA'], 'Évolution du CA (derniers ' . $periode . ' jours)');
+
+        // Génération du graphique ASCII pour la répartition par catégorie
+        $chartCategories = $this->generateASCIIChart(
+            array_map(function ($v) { return $v['montant']; }, $stats['repartitionCategories']),
+            'Répartition par Catégorie',
+            array_keys($stats['repartitionCategories'])
+        );
+
+        $html = '<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Statistiques Vendeur Complètes</title>
+            <style>
+                * { margin: 0; padding: 0; }
+                body { font-family: "Geist", Arial, sans-serif; margin: 40px; color: #0a0a0a; line-height: 1.6; }
+                h1 { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0a0a0a; padding-bottom: 15px; font-size: 28px; }
+                h2 { margin-top: 30px; margin-bottom: 15px; background-color: #f7f7f5; padding: 12px; border-left: 4px solid #0a0a0a; font-size: 16px; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 12px; }
+                table th, table td { padding: 10px; text-align: left; border: 1px solid #e0e0dc; }
+                table th { background-color: #f7f7f5; font-weight: 600; }
+                .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 25px; }
+                .kpi-box { padding: 12px; border: 1px solid #e0e0dc; border-radius: 6px; }
+                .kpi-label { font-size: 10px; color: #a0a09a; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+                .kpi-value { font-size: 18px; font-weight: 700; color: #0a0a0a; margin-top: 5px; font-family: "Geist Mono", monospace; }
+                .meta { text-align: center; color: #a0a09a; font-size: 11px; margin: 25px 0; }
+                .chart { margin: 25px 0; padding: 15px; background-color: #f7f7f5; border: 1px solid #e0e0dc; border-radius: 6px; }
+                .chart pre { font-family: "Courier New", monospace; font-size: 11px; overflow-x: auto; }
+                .status-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; }
+                .status-box { padding: 12px; border: 1px solid #e0e0dc; border-radius: 6px; text-align: center; }
+                .status-label { font-size: 11px; color: #a0a09a; text-transform: uppercase; }
+                .status-value { font-size: 20px; font-weight: 700; margin-top: 5px; }
+                @media print {
+                    body { margin: 0; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Statistiques Vendeur - Rapport Complet</h1>
+            <div class="meta">
+                <p>Période: Derniers ' . $periode . ' jours</p>
+                <p>Date d\'export: ' . now()->format('d/m/Y H:i:s') . '</p>
+            </div>
+
+            <h2>Indicateurs Clés</h2>
+            <div class="kpi-grid">
+                <div class="kpi-box">
+                    <div class="kpi-label">Chiffre d\'Affaires</div>
+                    <div class="kpi-value">' . number_format($stats['totalCA'], 0, ',', ' ') . ' CFA</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">Commandes</div>
+                    <div class="kpi-value">' . $stats['nombreCommandes'] . '</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">Panier Moyen</div>
+                    <div class="kpi-value">' . number_format($stats['panierMoyen'], 0, ',', ' ') . ' CFA</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">Note Moyenne</div>
+                    <div class="kpi-value">' . round($stats['noteMoyenne'], 1) . '/5</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">Avis</div>
+                    <div class="kpi-value">' . $stats['nombreAvis'] . '</div>
+                </div>
+            </div>
+
+            <h2>Statut des Commandes</h2>
+            <div class="status-grid">
+                <div class="status-box">
+                    <div class="status-label">En Attente</div>
+                    <div class="status-value">' . $stats['commandesEnAttente'] . '</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">Confirmées</div>
+                    <div class="status-value">' . $stats['commandesConfirmees'] . '</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">Expédiées</div>
+                    <div class="status-value">' . $stats['commandesExpediees'] . '</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">Livrées</div>
+                    <div class="status-value">' . $stats['commandeslivrees'] . '</div>
+                </div>
+            </div>
+
+            <h2>Top 5 Produits</h2>
+            <table>
+                <tr>
+                    <th>Position</th>
+                    <th>Produit</th>
+                    <th>Ventes</th>
+                    <th>Chiffre d\'Affaires</th>
+                </tr>';
+
+        foreach ($stats['topProduits'] as $idx => $produit) {
+            $html .= '<tr>
+                <td>' . ($idx + 1) . '</td>
+                <td>' . htmlspecialchars($produit->nom) . '</td>
+                <td>' . $produit->ventes_nombre . '</td>
+                <td>' . number_format($produit->ventes_total, 0, ',', ' ') . ' CFA</td>
+            </tr>';
+        }
+
+        $html .= '</table>
+
+            <h2>Répartition par Catégorie</h2>
+            <table>
+                <tr>
+                    <th>Catégorie</th>
+                    <th>Montant</th>
+                    <th>Ventes</th>
+                    <th>Pourcentage</th>
+                </tr>';
+
+        $totalCA = $stats['totalCA'];
+        foreach ($stats['repartitionCategories'] as $categorie => $data) {
+            $pourcentage = $totalCA > 0 ? round(($data['montant'] / $totalCA) * 100, 2) : 0;
+            $html .= '<tr>
+                <td>' . htmlspecialchars($categorie) . '</td>
+                <td>' . number_format($data['montant'], 0, ',', ' ') . ' CFA</td>
+                <td>' . $data['nombre'] . '</td>
+                <td>' . $pourcentage . '%</td>
+            </tr>';
+        }
+
+        $html .= '</table>
+
+            <h2>Graphique - Répartition par Catégorie</h2>
+            <div class="chart">
+                <pre>' . htmlspecialchars($chartCategories) . '</pre>
+            </div>
+
+            <h2>Évolution du Chiffre d\'Affaires</h2>
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Montant</th>
+                </tr>';
+
+        foreach ($stats['evolutionCA'] as $date => $montant) {
+            $html .= '<tr>
+                <td>' . htmlspecialchars($date) . '</td>
+                <td>' . number_format($montant, 0, ',', ' ') . ' CFA</td>
+            </tr>';
+        }
+
+        $html .= '</table>
+
+            <h2>Graphique - Évolution du CA</h2>
+            <div class="chart">
+                <pre>' . htmlspecialchars($chartEvolution) . '</pre>
+            </div>
+
+        </body>
+        </html>';
+
+        return response()->view('pdf', ['html' => $html])
+            ->header('Content-Type', 'text/html; charset=utf-8')
+            ->header('Content-Disposition', 'inline; filename="statistiques_complet_' . now()->format('Y-m-d') . '.pdf"');
+    }
+
+    /**
+     * Générer un graphique ASCII en barres
+     */
+    private function generateASCIIChart($data, $title = '', $labels = null)
+    {
+        if (empty($data)) {
+            return $title . "\n" . "Aucune donnée disponible";
+        }
+
+        $chart = $title . "\n";
+        $chart .= str_repeat("─", 50) . "\n\n";
+
+        if (!is_array($data) || (isset($data[0]) && is_array($data[0]))) {
+            return $chart . "Format de données invalide";
+        }
+
+        $values = $this->is_assoc($data) ? array_values($data) : $data;
+        $keys = $this->is_assoc($data) ? array_keys($data) : ($labels ?? array_keys($data));
+
+        if (empty($values)) {
+            return $chart . "Aucune donnée disponible";
+        }
+
+        $maxValue = max($values);
+        if ($maxValue == 0) {
+            $maxValue = 1;
+        }
+
+        $maxLabelWidth = max(array_map('strlen', array_map('strval', $keys)));
+        $chartWidth = 40;
+
+        foreach ($keys as $idx => $label) {
+            $value = $values[$idx] ?? 0;
+            $barLength = (int)(($value / $maxValue) * $chartWidth);
+            $bar = str_repeat("█", max(0, $barLength));
+            $label_str = substr((string)$label, 0, $maxLabelWidth);
+            $label_str = str_pad($label_str, $maxLabelWidth, " ", STR_PAD_RIGHT);
+
+            $chart .= sprintf("%s │ %s %s\n", $label_str, $bar, number_format($value, 0, ',', ' '));
+        }
+
+        $chart .= "\n" . str_repeat("─", 50) . "\n";
+
+        return $chart;
+    }
+
+    /**
+     * Helper pour vérifier si un array est associatif
+     */
+    private function is_assoc($arr)
+    {
+        if (array() === $arr) return false;
+        return array_keys($arr) !== range(0, count($arr) - 1);
+    }
+
+    /**
      * Afficher les Messages
      */
     public function messages(Request $request)

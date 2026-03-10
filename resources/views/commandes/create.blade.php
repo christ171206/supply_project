@@ -4,26 +4,26 @@
 <!-- Conteneur pour les notifications Toast -->
 <div id="notification-container" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+<div class="min-h-screen bg-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header avec progression -->
         <div class="mb-8">
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+            <h1 class="text-4xl font-bold text-[#0a0a0a] mb-2">
                 🛍️ Finaliser votre Commande
             </h1>
-            <p class="text-gray-600">Complétez les étapes ci-dessous pour confirmer votre achat</p>
+            <p class="text-[#666660]">Complétez les étapes ci-dessous pour confirmer votre achat</p>
 
             <!-- Indicateurs de progression -->
             <div class="flex items-center gap-2 mt-6 max-w-2xl">
-                <div class="flex-1 h-1 bg-blue-500 rounded-full"></div>
-                <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">1</div>
-                <div class="flex-1 h-1 bg-blue-500 rounded-full"></div>
-                <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">2</div>
-                <div class="flex-1 h-1 bg-blue-500 rounded-full"></div>
-                <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">3</div>
-                <div class="flex-1 h-1 bg-gray-300 rounded-full"></div>
+                <div class="flex-1 h-1 bg-[#0a0a0a] rounded-full"></div>
+                <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center text-sm font-bold">1</div>
+                <div class="flex-1 h-1 bg-[#0a0a0a] rounded-full"></div>
+                <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center text-sm font-bold">2</div>
+                <div class="flex-1 h-1 bg-[#0a0a0a] rounded-full"></div>
+                <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center text-sm font-bold">3</div>
+                <div class="flex-1 h-1 bg-[#e0e0dc] rounded-full"></div>
             </div>
-            <div class="flex justify-between mt-2 text-xs text-gray-600">
+            <div class="flex justify-between mt-2 text-xs text-[#666660]">
                 <span>Livraison</span>
                 <span>Paiement</span>
                 <span>Confirmation</span>
@@ -38,17 +38,17 @@
                 @csrf
 
                 <!-- Section Livraison -->
-                <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow p-8">
+                <div class="bg-white rounded-lg border border-[#e0e0dc] shadow-sm p-8">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white flex items-center justify-center font-bold">
+                        <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center font-bold">
                             📍
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-900">Adresse de Livraison</h2>
+                        <h2 class="text-2xl font-bold text-[#0a0a0a]">Adresse de Livraison</h2>
                     </div>
 
                     <!-- Pays (nouveau) -->
                     <div class="mb-6">
-                        <label for="pays" class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
+                        <label for="pays" class="block text-xs font-bold text-\[#2a2a28\] mb-2 uppercase tracking-wide">
                             🌍 Pays
                         </label>
                         <input
@@ -57,20 +57,20 @@
                             name="pays"
                             value="{{ old('pays', 'Côte d\'Ivoire') }}"
                             placeholder="Ex: Côte d'Ivoire, France, Sénégal..."
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-base"
+                            class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base"
                         />
                         @error('pays')
-                            <p class="text-red-500 text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
+                            <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
                         @enderror
-                        <p class="text-xs text-gray-500 mt-1">Entrez le nom du pays</p>
+                        <p class="text-xs text-\[#a0a09a\] mt-1">Entrez le nom du pays</p>
                     </div>
 
                     <!-- Tabs pour Recherche vs Manuel -->
-                    <div class="flex gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
-                        <button type="button" class="location-tab active flex-1 px-4 py-2 rounded-md font-semibold transition-all bg-white text-blue-600 border-2 border-blue-300" data-tab="search">
+                    <div class="flex gap-2 mb-6 bg-\[#f7f7f5\] p-1 rounded-lg">
+                        <button type="button" class="location-tab active flex-1 px-4 py-2 rounded-md font-semibold transition-all bg-white text-\[#0a0a0a\] border-2 border-\[#0a0a0a\]/30" data-tab="search">
                             🔍 Recherche Rapide
                         </button>
-                        <button type="button" class="location-tab flex-1 px-4 py-2 rounded-md font-semibold transition-all text-gray-600 border-2 border-transparent" data-tab="manual">
+                        <button type="button" class="location-tab flex-1 px-4 py-2 rounded-md font-semibold transition-all text-\[#666660\] border-2 border-transparent" data-tab="manual">
                             📍 Sélection Manuelle
                         </button>
                     </div>
@@ -82,13 +82,13 @@
                                 type="text"
                                 id="location-search"
                                 placeholder="Tapez pour chercher (Abidjan, Yopougon, Cocody...)"
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-base"
+                                class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base"
                                 autocomplete="off"
                             />
                             <div class="absolute right-4 top-3 text-gray-400 text-lg pointer-events-none">🔎</div>
-                            <div id="search-results" class="absolute top-full left-0 right-0 bg-white border-2 border-gray-300 rounded-lg mt-1 hidden max-h-72 overflow-y-auto shadow-xl"></div>
+                            <div id="search-results" class="absolute top-full left-0 right-0 bg-white border border-\[#e0e0dc\] rounded-lg mt-1 hidden max-h-72 overflow-y-auto shadow-xl"></div>
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">✨ Meilleur moyen: tapez une ville, un quartier ou un district</p>
+                        <p class="text-xs text-\[#a0a09a\] mt-2">✨ Meilleur moyen: tapez une ville, un quartier ou un district</p>
                     </div>
 
                     <!-- Sélecteurs en cascade améliorés -->
@@ -96,13 +96,13 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <!-- Région -->
                             <div class="flex flex-col">
-                                <label for="region" class="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+                                <label for="region" class="block text-xs font-semibold text-\[#666660\] mb-2 uppercase tracking-wide">
                                     Région / Ville
                                 </label>
                                 <select
                                     id="region"
                                     name="region_id"
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-base bg-white cursor-pointer hover:border-gray-400"
+                                    class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base bg-white cursor-pointer hover:border-\[#0a0a0a\]/20"
                                 >
                                     <option value="">⏳ Chargement...</option>
                                 </select>
@@ -110,13 +110,13 @@
 
                             <!-- District -->
                             <div class="flex flex-col">
-                                <label for="district" class="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+                                <label for="district" class="block text-xs font-semibold text-\[#666660\] mb-2 uppercase tracking-wide">
                                     District
                                 </label>
                                 <select
                                     id="district"
                                     name="district_id"
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-base bg-white cursor-pointer hover:border-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500"
+                                    class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base bg-white cursor-pointer hover:border-\[#0a0a0a\]/20 disabled:bg-\[#f7f7f5\] disabled:cursor-not-allowed disabled:text-\[#a0a09a\]"
                                     disabled
                                 >
                                     <option value="">-- Sélectionner --</option>
@@ -125,13 +125,13 @@
 
                             <!-- Commune -->
                             <div class="flex flex-col">
-                                <label for="commune" class="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+                                <label for="commune" class="block text-xs font-semibold text-\[#666660\] mb-2 uppercase tracking-wide">
                                     Commune
                                 </label>
                                 <select
                                     id="commune"
                                     name="commune_id"
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-base bg-white cursor-pointer hover:border-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500"
+                                    class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base bg-white cursor-pointer hover:border-\[#0a0a0a\]/20 disabled:bg-\[#f7f7f5\] disabled:cursor-not-allowed disabled:text-\[#a0a09a\]"
                                     disabled
                                 >
                                     <option value="">-- Sélectionner --</option>
@@ -140,13 +140,13 @@
 
                             <!-- Quartier -->
                             <div class="flex flex-col">
-                                <label for="quartier" class="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+                                <label for="quartier" class="block text-xs font-semibold text-\[#666660\] mb-2 uppercase tracking-wide">
                                     Quartier
                                 </label>
                                 <select
                                     id="quartier"
                                     name="quartier_manual"
-                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-base bg-white cursor-pointer hover:border-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500"
+                                    class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base bg-white cursor-pointer hover:border-\[#0a0a0a\]/20 disabled:bg-\[#f7f7f5\] disabled:cursor-not-allowed disabled:text-\[#a0a09a\]"
                                     disabled
                                 >
                                     <option value="">-- Sélectionner --</option>
@@ -157,61 +157,61 @@
 
                     <!-- Adresse détaillée -->
                     <div class="mb-6">
-                        <label for="adresse_detail" class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
+                        <label for="adresse_detail" class="block text-xs font-bold text-\[#2a2a28\] mb-2 uppercase tracking-wide">
                             Adresse Détaillée
                         </label>
                         <textarea
                             id="adresse_detail"
                             name="adresse_detail"
                             rows="3"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-base resize-none"
+                            class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base resize-none"
                             placeholder="Ex: 123 rue Principale, Immeuble A, Appartement 5, près de la pharmacie..."
                             required>{{ old('adresse_detail') }}</textarea>
                         @error('adresse_detail')
-                            <p class="text-red-500 text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
+                            <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
                         @enderror
-                        <p class="text-xs text-gray-500 mt-1">Soyez le plus précis possible pour faciliter la livraison</p>
+                        <p class="text-xs text-\[#a0a09a\] mt-1">Soyez le plus précis possible pour faciliter la livraison</p>
                     </div>
 
                     <!-- Téléphone de livraison -->
                     <div>
-                        <label for="telephone_livraison" class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
+                        <label for="telephone_livraison" class="block text-xs font-bold text-\[#2a2a28\] mb-2 uppercase tracking-wide">
                             📱 Téléphone de Livraison
                         </label>
                         <input
                             type="tel"
                             id="telephone_livraison"
                             name="telephone_livraison"
-                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-base"
+                            class="w-full px-4 py-3 border border-\[#e0e0dc\] rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all text-base"
                             placeholder="+225 01 23 45 67 89"
                             inputmode="numeric"
                             required>
                         @error('telephone_livraison')
-                            <p class="text-red-500 text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
+                            <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
                         @enderror
-                        <p class="text-xs text-gray-500 mt-1">Format: 10 chiffres (ex: 0123456789)</p>
+                        <p class="text-xs text-\[#a0a09a\] mt-1">Format: 10 chiffres (ex: 0123456789)</p>
                     </div>
                 </div>
 
                 <!-- Section Paiement -->
-                <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow p-8">
+                <div class="bg-white rounded-lg shadow-sm transition-shadow p-8">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 text-white flex items-center justify-center font-bold">
+                        <div class="w-10 h-10 rounded-full bg-[#0a0a0a] text-white flex items-center justify-center font-bold">
                             💳
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-900">Méthode de Paiement</h2>
+                        <h2 class="text-2xl font-bold text-\[#0a0a0a\]">Méthode de Paiement</h2>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <!-- Wave -->
                         <label class="payment-option cursor-pointer">
                             <input type="radio" name="payment_method" value="wave" class="hidden" required>
-                            <div class="p-4 border-2 border-gray-300 rounded-lg hover:border-emerald-400 hover:bg-emerald-50 transition-all duration-200 group">
+                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-emerald-400 hover:bg-emerald-50 transition-all duration-200 group">
                                 <div class="flex items-center gap-4">
                                     <img src="{{ asset('images/payments/wave.png') }}" alt="Wave" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
                                     <div>
-                                        <p class="font-bold text-gray-900 text-sm">Wave</p>
-                                        <p class="text-xs text-gray-600">Paiement sécurisé</p>
+                                        <p class="font-bold text-\[#0a0a0a\] text-sm">Wave</p>
+                                        <p class="text-xs text-\[#666660\]">Paiement sécurisé</p>
                                     </div>
                                 </div>
                             </div>
@@ -220,12 +220,12 @@
                         <!-- Orange Money -->
                         <label class="payment-option cursor-pointer">
                             <input type="radio" name="payment_method" value="orange_money" class="hidden" required>
-                            <div class="p-4 border-2 border-gray-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-all duration-200 group">
+                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-all duration-200 group">
                                 <div class="flex items-center gap-4">
                                     <img src="{{ asset('images/payments/orange money.png') }}" alt="Orange Money" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
                                     <div>
-                                        <p class="font-bold text-gray-900 text-sm">Orange Money</p>
-                                        <p class="text-xs text-gray-600">Porte-monnaie Orange</p>
+                                        <p class="font-bold text-\[#0a0a0a\] text-sm">Orange Money</p>
+                                        <p class="text-xs text-\[#666660\]">Porte-monnaie Orange</p>
                                     </div>
                                 </div>
                             </div>
@@ -234,12 +234,12 @@
                         <!-- MTN Money -->
                         <label class="payment-option cursor-pointer">
                             <input type="radio" name="payment_method" value="mtn_money" class="hidden" required>
-                            <div class="p-4 border-2 border-gray-300 rounded-lg hover:border-yellow-400 hover:bg-yellow-50 transition-all duration-200 group">
+                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-yellow-400 hover:bg-yellow-50 transition-all duration-200 group">
                                 <div class="flex items-center gap-4">
                                     <img src="{{ asset('images/payments/mtn money.png') }}" alt="MTN Money" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
                                     <div>
-                                        <p class="font-bold text-gray-900 text-sm">MTN Money</p>
-                                        <p class="text-xs text-gray-600">Service MTN</p>
+                                        <p class="font-bold text-\[#0a0a0a\] text-sm">MTN Money</p>
+                                        <p class="text-xs text-\[#666660\]">Service MTN</p>
                                     </div>
                                 </div>
                             </div>
@@ -248,12 +248,12 @@
                         <!-- Moov Money -->
                         <label class="payment-option cursor-pointer">
                             <input type="radio" name="payment_method" value="moov_money" class="hidden" required>
-                            <div class="p-4 border-2 border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 group">
+                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 group">
                                 <div class="flex items-center gap-4">
                                     <img src="{{ asset('images/payments/moov money.png') }}" alt="Moov Money" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
                                     <div>
-                                        <p class="font-bold text-gray-900 text-sm">Moov Money</p>
-                                        <p class="text-xs text-gray-600">Service Moov</p>
+                                        <p class="font-bold text-\[#0a0a0a\] text-sm">Moov Money</p>
+                                        <p class="text-xs text-\[#666660\]">Service Moov</p>
                                     </div>
                                 </div>
                             </div>
@@ -262,12 +262,12 @@
                         <!-- À la Livraison -->
                         <label class="payment-option cursor-pointer sm:col-span-2">
                             <input type="radio" name="payment_method" value="cash" class="hidden" required>
-                            <div class="p-4 border-2 border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-all duration-200 group">
+                            <div class="p-4 border border-\[#e0e0dc\] rounded-lg hover:border-green-400 hover:bg-green-50 transition-all duration-200 group">
                                 <div class="flex items-center gap-4">
                                     <img src="{{ asset('images/payments/a la livraison.jfif') }}" alt="À la Livraison" class="w-16 h-16 object-cover rounded-lg group-hover:scale-110 transition-transform">
                                     <div>
-                                        <p class="font-bold text-gray-900 text-sm">À la Livraison</p>
-                                        <p class="text-xs text-gray-600">Paiement en espèces à la réception</p>
+                                        <p class="font-bold text-\[#0a0a0a\] text-sm">À la Livraison</p>
+                                        <p class="text-xs text-\[#666660\]">Paiement en espèces à la réception</p>
                                     </div>
                                 </div>
                             </div>
@@ -275,8 +275,8 @@
                     </div>
 
                     <!-- Champ téléphone dynamique -->
-                    <div id="phone-payment-section" class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg hidden">
-                        <label for="phone_payment" class="block text-sm font-semibold text-gray-700 mb-2">
+                    <div id="phone-payment-section" class="mt-6 p-4 bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg hidden">
+                        <label for="phone_payment" class="block text-sm font-semibold text-\[#2a2a28\] mb-2">
                             📱 Numéro de Téléphone (paiement mobile)
                         </label>
                         <input
@@ -284,31 +284,31 @@
                             name="phone_payment"
                             id="phone_payment"
                             placeholder="+225 01 23 45 67 89"
-                            class="w-full px-4 py-2 border-2 border-blue-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                            class="w-full px-4 py-2 border-2 border-\[#0a0a0a\]/30 rounded-lg focus:border-\[#0a0a0a\] focus:ring-1 focus:ring-\[#0a0a0a\]/10 transition-all"
                         />
                     </div>
 
                     @error('payment_method')
-                        <p class="text-red-500 text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
+                        <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Section Conditions -->
-                <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow p-8">
+                <div class="bg-white rounded-lg shadow-sm transition-shadow p-8">
                     <label class="flex items-start gap-3 cursor-pointer group">
                         <input
                             type="checkbox"
                             name="accept_conditions"
                             required
-                            class="mt-1.5 w-5 h-5 rounded border-2 border-gray-300 cursor-pointer accent-blue-600 flex-shrink-0"
+                            class="mt-1.5 w-5 h-5 rounded border border-\[#e0e0dc\] cursor-pointer accent-\[#0a0a0a\] flex-shrink-0"
                         />
-                        <span class="text-sm text-gray-700 group-hover:text-gray-900 leading-relaxed">
-                            J'accepte les <a href="#" class="text-blue-600 hover:underline font-semibold">conditions d'utilisation</a>
-                            et la <a href="#" class="text-blue-600 hover:underline font-semibold">politique de confidentialité</a>
+                        <span class="text-sm text-\[#2a2a28\] group-hover:text-\[#0a0a0a\] leading-relaxed">
+                            J'accepte les <a href="#" class="text-\[#0a0a0a\] hover:underline font-semibold">conditions d'utilisation</a>
+                            et la <a href="#" class="text-\[#0a0a0a\] hover:underline font-semibold">politique de confidentialité</a>
                         </span>
                     </label>
                     @error('accept_conditions')
-                        <p class="text-red-500 text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
+                        <p class="text-\[#dc2626\] text-sm mt-2 flex items-center gap-1">❌ {{ $message }}</p>
                     @enderror
                 </div>
 
@@ -318,10 +318,10 @@
 
                 <!-- Boutons d'action -->
                 <div class="flex flex-col sm:flex-row gap-3 pt-4">
-                    <a href="{{ route('panier.index') }}" class="px-6 py-4 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition font-bold text-center shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                    <a href="{{ route('panier.index') }}" class="px-6 py-4 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition font-bold text-center shadow-sm flex items-center justify-center gap-2">
                         ← Retour au Panier
                     </a>
-                    <button type="submit" class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition font-bold shadow-md hover:shadow-lg flex items-center justify-center gap-2 flex-1" id="submit-btn">
+                    <button type="submit" class="px-6 py-4 bg-[#0a0a0a] hover:bg-[#2a2a28] text-white rounded-lg transition font-bold shadow-sm flex items-center justify-center gap-2 flex-1" id="submit-btn">
                         ✓ Confirmer la Commande
                     </button>
                 </div>
@@ -330,39 +330,39 @@
 
         <!-- Résumé Récapitulatif (Sticky) -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow p-6 sticky top-24">
+            <div class="bg-white rounded-lg shadow-sm transition-shadow p-6 sticky top-24">
                 <div class="flex items-center gap-3 mb-6">
                     <div class="text-2xl">📦</div>
-                    <h3 class="text-2xl font-bold text-gray-900">Résumé</h3>
+                    <h3 class="text-2xl font-bold text-\[#0a0a0a\]">Résumé</h3>
                 </div>
 
                 <!-- Produits -->
                 <div class="space-y-4 mb-6 pb-6 border-b-2 border-gray-200 max-h-96 overflow-y-auto">
                     @forelse($items as $item)
-                        <div class="flex justify-between items-start text-sm hover:bg-gray-50 p-3 rounded-lg transition">
+                        <div class="flex justify-between items-start text-sm hover:bg-\[#f7f7f5\] p-3 rounded-lg transition">
                             <div class="flex-1">
-                                <p class="font-bold text-gray-900">{{ $item->produit->nom }}</p>
-                                <p class="text-gray-600 text-xs mt-1">Quantité: <span class="font-semibold">{{ $item->quantite }}</span></p>
-                                <p class="text-blue-600 text-xs mt-1">@ {{ number_format($item->prix_unitaire, 0, '', ' ') }} F CFA</p>
+                                <p class="font-bold text-\[#0a0a0a\]">{{ $item->produit->nom }}</p>
+                                <p class="text-\[#666660\] text-xs mt-1">Quantité: <span class="font-semibold">{{ $item->quantite }}</span></p>
+                                <p class="text-\[#0a0a0a\] text-xs mt-1">@ {{ number_format($item->prix_unitaire, 0, '', ' ') }} F CFA</p>
                             </div>
-                            <p class="font-bold text-gray-900 ml-2">{{ number_format($item->quantite * $item->prix_unitaire, 0, '', ' ') }} F</p>
+                            <p class="font-bold text-\[#0a0a0a\] ml-2">{{ number_format($item->quantite * $item->prix_unitaire, 0, '', ' ') }} F</p>
                         </div>
                     @empty
-                        <p class="text-center text-gray-500 py-4">Aucun article</p>
+                        <p class="text-center text-\[#a0a09a\] py-4">Aucun article</p>
                     @endforelse
                 </div>
 
                 <!-- Frais de livraison -->
-                <div class="space-y-3 mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
-                    <div class="flex justify-between text-gray-700">
+                <div class="space-y-3 mb-6 p-4 bg-[#f7f7f5] rounded-lg">
+                    <div class="flex justify-between text-\[#2a2a28\]">
                         <span class="font-semibold">Sous-total</span>
-                        <span class="font-bold text-gray-900">{{ number_format($total, 0, '', ' ') }} F CFA</span>
+                        <span class="font-bold text-\[#0a0a0a\]">{{ number_format($total, 0, '', ' ') }} F CFA</span>
                     </div>
-                    <div class="flex justify-between text-gray-700">
+                    <div class="flex justify-between text-\[#2a2a28\]">
                         <span class="font-semibold flex items-center gap-2">
                             🚚 Livraison
                         </span>
-                        <span class="font-bold text-gray-900" id="shipping-cost">
+                        <span class="font-bold text-\[#0a0a0a\]" id="shipping-cost">
                             @if($total > 100)
                                 Gratuit ✓
                             @else
@@ -373,7 +373,7 @@
                 </div>
 
                 <!-- Total final -->
-                <div class="flex justify-between items-center px-4 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white">
+                <div class="flex justify-between items-center px-4 py-4 bg-[#0a0a0a] rounded-xl text-white">
                     <span class="font-bold text-lg">Total TTC</span>
                     <span class="text-3xl font-bold" id="total-amount">
                         @if($total > 100)
@@ -387,10 +387,10 @@
 
                 <!-- Infos client -->
                 <div class="mt-6 pt-6 border-t-2 border-gray-200 text-sm">
-                    <p class="text-gray-600 mb-2 font-semibold">Vos informations:</p>
+                    <p class="text-\[#666660\] mb-2 font-semibold">Vos informations:</p>
                     <div class="space-y-2">
-                        <p class="text-gray-700"><strong>👤 Nom:</strong> <br/><span class="text-blue-600">{{ auth()->user()->name }}</span></p>
-                        <p class="text-gray-700"><strong>📧 Email:</strong> <br/><span class="text-blue-600">{{ auth()->user()->email }}</span></p>
+                        <p class="text-\[#2a2a28\]"><strong>👤 Nom:</strong> <br/><span class="text-\[#0a0a0a\]">{{ auth()->user()->name }}</span></p>
+                        <p class="text-\[#2a2a28\]"><strong>📧 Email:</strong> <br/><span class="text-\[#0a0a0a\]">{{ auth()->user()->email }}</span></p>
                     </div>
                 </div>
 
@@ -410,11 +410,11 @@
     }
 
     .payment-option input[type="radio"]:checked + div {
-        @apply border-blue-500 bg-blue-50 shadow-md;
+        @apply border-\[#0a0a0a\] bg-\[#f7f7f5\] shadow-md;
     }
 
     .payment-option input[type="radio"]:checked + div p:first-child {
-        @apply text-blue-600 font-bold;
+        @apply text-\[#0a0a0a\] font-bold;
     }
 
     /* Animation au focus */
@@ -485,11 +485,11 @@
     }
 
     .toast-error {
-        @apply bg-red-500 text-white;
+        @apply bg-\[#dc2626\] text-white;
     }
 
     .toast-info {
-        @apply bg-blue-500 text-white;
+        @apply bg-\[#0a0a0a\] text-white;
     }
 
     .toast-warning {
@@ -498,11 +498,11 @@
 
     /* ========== Payment Method Selection ========== */
     .payment-option input[type="radio"]:checked + div {
-        @apply border-blue-500 border-4 bg-blue-50 shadow-lg;
+        @apply border-\[#0a0a0a\] border-4 bg-\[#f7f7f5\] shadow-lg;
     }
 
     .payment-option input[type="radio"]:checked + div p:first-child {
-        @apply text-blue-600 font-bold;
+        @apply text-\[#0a0a0a\] font-bold;
     }
 
 </style>
@@ -532,8 +532,8 @@
 
                 // Désactiver tous les tabs
                 document.querySelectorAll('.location-tab').forEach(t => {
-                    t.classList.remove('active', 'bg-white', 'text-blue-600', 'border-blue-300');
-                    t.classList.add('text-gray-600', 'border-transparent');
+                    t.classList.remove('active', 'bg-white', 'text-\[#0a0a0a\]', 'border-\[#0a0a0a\]/30');
+                    t.classList.add('text-\[#666660\]', 'border-transparent');
                 });
 
                 // Cacher toutes les sections
@@ -542,8 +542,8 @@
                 });
 
                 // Activer le tab cliqué
-                tab.classList.add('active', 'bg-white', 'text-blue-600', 'border-blue-300');
-                tab.classList.remove('text-gray-600', 'border-transparent');
+                tab.classList.add('active', 'bg-white', 'text-\[#0a0a0a\]', 'border-\[#0a0a0a\]/30');
+                tab.classList.remove('text-\[#666660\]', 'border-transparent');
 
                 // Afficher la section correspondante
                 document.getElementById(`${tabName}-tab`).classList.remove('hidden');
@@ -584,10 +584,10 @@
                 document.querySelectorAll('.payment-option').forEach(option => {
                     const input = option.querySelector('input[name="payment_method"]');
                     if (input?.checked) {
-                        option.querySelector('div').classList.add('ring-2', 'ring-blue-500');
+                        option.querySelector('div').classList.add('ring-2', 'ring-\[#0a0a0a\]');
                         showNotification(`✓ ${e.target.value.replace(/_/g, ' ').toUpperCase()} sélectionné`, 'success');
                     } else {
-                        option.querySelector('div').classList.remove('ring-2', 'ring-blue-500');
+                        option.querySelector('div').classList.remove('ring-2', 'ring-\[#0a0a0a\]');
                     }
                 });
 
@@ -762,7 +762,7 @@
                 .then(r => r.json())
                 .then(data => {
                     if (!data.data || data.data.length === 0) {
-                        resultsDiv.innerHTML = '<div class="px-4 py-4 text-center text-gray-500 text-sm">✗ Aucun résultat trouvé</div>';
+                        resultsDiv.innerHTML = '<div class="px-4 py-4 text-center text-\[#a0a09a\] text-sm">✗ Aucun résultat trouvé</div>';
                     } else {
                         // Réorganiser les résultats pour mettre les Quartiers en premier
                         let reorganizedData = [];
@@ -780,14 +780,14 @@
 
                         let html = '';
                         reorganizedData.forEach(group => {
-                            html += `<div class="px-4 py-3 bg-gray-100 text-xs font-bold text-gray-600 sticky top-0 border-b border-gray-200">📌 ${group.group}</div>`;
+                            html += `<div class="px-4 py-3 bg-\[#f7f7f5\] text-xs font-bold text-\[#666660\] sticky top-0 border-b border-gray-200">📌 ${group.group}</div>`;
                             group.items.forEach(item => {
                                 const displayText = item.display || item.name;
-                                const breadcrumb = item.breadcrumb ? ` <div class="text-gray-500 text-xs mt-0.5">${item.breadcrumb}</div>` : '';
-                                const isQuartier = item.type === 'quartier' ? 'font-bold text-blue-600' : '';
-                                html += `<button type="button" class="search-result-item w-full text-left px-4 py-3 hover:bg-blue-100 border-b border-gray-100 transition duration-150 flex justify-between items-start ${isQuartier}" data-type="${item.type}" data-id="${item.id}" data-name="${item.name}">
+                                const breadcrumb = item.breadcrumb ? ` <div class="text-\[#a0a09a\] text-xs mt-0.5">${item.breadcrumb}</div>` : '';
+                                const isQuartier = item.type === 'quartier' ? 'font-bold text-\[#0a0a0a\]' : '';
+                                html += `<button type="button" class="search-result-item w-full text-left px-4 py-3 hover:bg-\[#f7f7f5\] border-b border-gray-100 transition duration-150 flex justify-between items-start ${isQuartier}" data-type="${item.type}" data-id="${item.id}" data-name="${item.name}">
                                     <div class="flex-1">
-                                        <div class="font-semibold text-gray-900 text-sm ${isQuartier}">${displayText} ${item.type === 'quartier' ? '✓' : ''}</div>
+                                        <div class="font-semibold text-\[#0a0a0a\] text-sm ${isQuartier}">${displayText} ${item.type === 'quartier' ? '✓' : ''}</div>
                                         ${breadcrumb}
                                     </div>
                                     <span class="text-gray-400 ml-2">→</span>
@@ -801,7 +801,7 @@
                 })
                 .catch(err => {
                     console.error('Erreur:', err);
-                    resultsDiv.innerHTML = '<div class="px-4 py-4 text-center text-red-500 text-sm">⚠️ Erreur lors de la recherche</div>';
+                    resultsDiv.innerHTML = '<div class="px-4 py-4 text-center text-\[#dc2626\] text-sm">⚠️ Erreur lors de la recherche</div>';
                     resultsDiv.classList.remove('hidden');
                 });
         }, 250);
@@ -914,10 +914,11 @@
                     let hasError = false;
                     const errors = [];
 
-                    if (!quartierIdFinal) {
-                        errors.push('Veuillez sélectionner un quartier');
-                        hasError = true;
-                    }
+                    // Quartier ID est optionnel (voir contrôleur)
+                    // if (!quartierIdFinal) {
+                    //     errors.push('Veuillez sélectionner un quartier');
+                    //     hasError = true;
+                    // }
 
                     if (!adresseDetail || adresseDetail.length < 5) {
                         errors.push('Adresse détaillée invalide (min. 5 caractères)');
@@ -957,8 +958,13 @@
 
                     // Si tout est valide, remplir le champ hidden et soumettre
                     console.log('✓ Tous les champs valides');
-                    console.log('✓ Remplissage du quartier_id:', quartierIdFinal);
-                    document.getElementById('hidden-quartier-id').value = quartierIdFinal;
+                    console.log('✓ Remplissage du quartier_id:', quartierIdFinal || '(optionnel)');
+                    
+                    // Remplir les champs cachés même s'ils sont vides (quartier_id est nullable)
+                    if (quartierIdFinal) {
+                        document.getElementById('hidden-quartier-id').value = quartierIdFinal;
+                    }
+                    
                     showNotification('✓ Commande validée, envoi en cours...', 'success');
 
                     // Désactiver le bouton pour éviter les doubles clics
@@ -982,6 +988,7 @@
                             }
 
                             console.log('📤 Appel de form.submit()...');
+                            showNotification('✓ Redirection vers votre commande...', 'success');
                             form.submit();
                             console.log('✓ form.submit() a été appelée');
                         } catch (submitError) {

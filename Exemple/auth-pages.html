@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supply — Auth Pages</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0a0a0a;--white:#fff;--off:#f7f7f5;
+  --g100:#efefed;--g200:#e0e0dc;--g400:#a0a09a;--g600:#666660;--g800:#2a2a28;
+  --font-d:'Instrument Serif',serif;--font-b:'Geist',sans-serif;--font-m:'Geist Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-b);background:var(--off);color:var(--black);min-height:100vh}
+
+/* ── TABS (demo only) ── */
+.demo-tabs{display:flex;gap:8px;padding:20px 32px;background:var(--white);border-bottom:1px solid var(--g200)}
+.demo-tab{font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;border:1px solid var(--g200);color:var(--g600);background:transparent;font-family:var(--font-b);transition:all .15s}
+.demo-tab:hover{color:var(--black);border-color:var(--g400)}
+.demo-tab.active{background:var(--black);color:#fff;border-color:var(--black)}
+
+/* ── PAGE SHELL ── */
+.auth-page{display:none;min-height:calc(100vh - 57px)}
+.auth-page.visible{display:grid;grid-template-columns:1fr 1fr}
+
+/* ── LEFT PANEL ── */
+.auth-left{
+  padding:48px 56px;
+  display:flex;flex-direction:column;justify-content:center;
+  border-right:1px solid var(--g200);
+  background:var(--white);
+  position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto;
+}
+.auth-back{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--g400);text-decoration:none;margin-bottom:48px;transition:color .15s}
+.auth-back:hover{color:var(--black)}
+.auth-back svg{width:14px;height:14px}
+
+.auth-brand{display:flex;align-items:center;gap:8px;margin-bottom:32px}
+.auth-brand-icon{width:30px;height:30px;background:var(--black);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.auth-brand-icon svg{width:14px;height:14px;color:#fff}
+.auth-brand-name{font-size:15px;font-weight:500;letter-spacing:-.02em}
+
+.auth-tagline{font-family:var(--font-d);font-size:34px;letter-spacing:-.02em;line-height:1.1;color:var(--black);margin-bottom:14px}
+.auth-tagline em{font-style:italic;color:var(--g600)}
+.auth-sub{font-size:14px;color:var(--g400);font-weight:300;line-height:1.7;margin-bottom:40px;max-width:340px}
+
+.features-group{margin-bottom:32px}
+.features-group-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--g400);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.features-group-label::after{content:'';flex:1;height:1px;background:var(--g200)}
+.feature-list{display:flex;flex-direction:column;gap:12px}
+.feature-item{display:flex;align-items:flex-start;gap:12px}
+.feature-icon{width:32px;height:32px;border-radius:8px;border:1px solid var(--g200);background:var(--off);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.feature-text strong{display:block;font-size:13px;font-weight:500;color:var(--black);margin-bottom:1px}
+.feature-text span{font-size:12px;color:var(--g400);font-weight:300}
+
+/* ── RIGHT PANEL (form) ── */
+.auth-right{
+  padding:48px 56px;
+  display:flex;flex-direction:column;justify-content:center;
+  overflow-y:auto;
+}
+.form-card{max-width:420px;width:100%}
+
+.form-title{font-family:var(--font-d);font-size:28px;letter-spacing:-.02em;color:var(--black);margin-bottom:4px}
+.form-subtitle{font-size:13px;color:var(--g400);font-weight:300;margin-bottom:32px}
+
+/* FIELDS */
+.field{margin-bottom:18px}
+.field-label{font-size:11px;font-weight:500;letter-spacing:.04em;color:var(--g600);margin-bottom:6px;display:block}
+.field-input{
+  width:100%;padding:10px 14px;
+  font-family:var(--font-b);font-size:13px;color:var(--black);
+  background:var(--white);border:1px solid var(--g200);border-radius:8px;
+  outline:none;transition:border-color .15s;
+}
+.field-input::placeholder{color:var(--g400);font-weight:300}
+.field-input:hover{border-color:var(--g400)}
+.field-input:focus{border-color:var(--black)}
+.field-hint{font-size:11px;color:var(--g400);margin-top:5px;font-weight:300}
+
+.field-pw{position:relative}
+.field-pw .field-input{padding-right:40px}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--g400);transition:color .15s;padding:2px}
+.pw-toggle:hover{color:var(--black)}
+.pw-toggle svg{width:15px;height:15px}
+
+/* SELECT */
+.field-select{
+  width:100%;padding:10px 14px;
+  font-family:var(--font-b);font-size:13px;color:var(--black);
+  background:var(--white);border:1px solid var(--g200);border-radius:8px;
+  outline:none;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a0a09a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  padding-right:36px;transition:border-color .15s;
+}
+.field-select:hover{border-color:var(--g400)}
+.field-select:focus{border-color:var(--black)}
+
+/* ROLE SELECTOR */
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.role-option{
+  position:relative;padding:14px;
+  border:1px solid var(--g200);border-radius:8px;cursor:pointer;
+  transition:all .15s;background:var(--white);
+}
+.role-option:hover{border-color:var(--g400)}
+.role-option.selected{border-color:var(--black);background:var(--off)}
+.role-option input[type=radio]{position:absolute;opacity:0;pointer-events:none}
+.role-radio{
+  width:14px;height:14px;border-radius:50%;
+  border:1.5px solid var(--g200);
+  display:inline-block;vertical-align:middle;
+  margin-right:8px;transition:all .15s;flex-shrink:0;
+  position:relative;
+}
+.role-option.selected .role-radio{border-color:var(--black);background:var(--black)}
+.role-option.selected .role-radio::after{
+  content:'';position:absolute;inset:3px;
+  background:#fff;border-radius:50%;
+}
+.role-name{font-size:13px;font-weight:500;color:var(--black)}
+.role-desc{font-size:11px;color:var(--g400);font-weight:300;margin-top:4px;margin-left:22px}
+
+/* VENDOR NOTE */
+.vendor-note{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;
+  border:1px solid var(--g200);border-radius:8px;
+  font-size:12px;color:var(--g600);
+  background:var(--off);margin-bottom:18px;
+}
+.vendor-note svg{width:14px;height:14px;color:var(--g400);flex-shrink:0}
+
+/* VENDOR FIELDS (hidden by default) */
+.vendor-fields{display:none}
+.vendor-fields.show{display:block}
+
+/* CHECKBOX */
+.check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:24px}
+.check-box{
+  width:16px;height:16px;border:1.5px solid var(--g200);border-radius:4px;
+  flex-shrink:0;margin-top:1px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.check-box.checked{background:var(--black);border-color:var(--black)}
+.check-box.checked svg{display:block}
+.check-box svg{display:none;width:10px;height:10px;color:#fff}
+.check-label{font-size:12px;color:var(--g600);font-weight:300;line-height:1.5}
+.check-label a{color:var(--black);text-decoration:underline;text-underline-offset:2px}
+
+/* REMEMBER / FORGOT */
+.login-extras{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.remember-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g600);cursor:pointer}
+.forgot-link{font-size:12px;color:var(--g600);text-decoration:none;border-bottom:1px solid var(--g200);padding-bottom:1px;transition:all .15s}
+.forgot-link:hover{color:var(--black);border-color:var(--black)}
+
+/* SUBMIT */
+.btn-submit{
+  width:100%;padding:12px;
+  background:var(--black);color:#fff;
+  font-size:13px;font-weight:500;letter-spacing:-.01em;
+  border:none;border-radius:8px;cursor:pointer;
+  transition:opacity .15s;margin-bottom:20px;
+  font-family:var(--font-b);
+}
+.btn-submit:hover{opacity:.85}
+.btn-submit:disabled{opacity:.35;cursor:not-allowed}
+
+/* DIVIDER */
+.form-divider{display:flex;align-items:center;gap:12px;margin-bottom:20px;font-size:11px;color:var(--g400)}
+.form-divider::before,.form-divider::after{content:'';flex:1;height:1px;background:var(--g200)}
+
+/* TEST ACCOUNTS */
+.test-accounts{border:1px solid var(--g200);border-radius:8px;overflow:hidden}
+.test-accounts-head{padding:10px 14px;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);background:var(--off);border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:6px}
+.test-account-item{padding:12px 14px;border-bottom:1px solid var(--g100);cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:space-between}
+.test-account-item:last-child{border-bottom:none}
+.test-account-item:hover{background:var(--off)}
+.test-account-name{font-size:12px;font-weight:500;color:var(--black);margin-bottom:4px}
+.test-account-creds{display:flex;gap:6px}
+.test-cred{font-family:var(--font-m);font-size:10px;color:var(--g600);background:var(--off);padding:2px 6px;border-radius:4px;border:1px solid var(--g100)}
+.test-fill-btn{font-size:11px;color:var(--g400);border-bottom:1px solid var(--g200);padding-bottom:1px;transition:all .15s}
+.test-account-item:hover .test-fill-btn{color:var(--black);border-color:var(--black)}
+
+/* FOOTER LINK */
+.form-footer{text-align:center;font-size:12px;color:var(--g400)}
+.form-footer a{color:var(--black);font-weight:500;text-decoration:none;border-bottom:1px solid var(--g200);padding-bottom:1px}
+.form-footer a:hover{border-color:var(--black)}
+.form-footer-also{margin-top:6px;font-size:11px;color:var(--g400)}
+.form-footer-also a{color:var(--g600);text-decoration:underline;text-underline-offset:2px}
+
+/* TEXTAREA */
+.field-textarea{
+  width:100%;padding:10px 14px;
+  font-family:var(--font-b);font-size:13px;color:var(--black);
+  background:var(--white);border:1px solid var(--g200);border-radius:8px;
+  outline:none;transition:border-color .15s;resize:vertical;min-height:80px;
+}
+.field-textarea::placeholder{color:var(--g400);font-weight:300}
+.field-textarea:hover{border-color:var(--g400)}
+.field-textarea:focus{border-color:var(--black)}
+</style>
+</head>
+<body>
+
+<!-- Demo tabs -->
+<div class="demo-tabs">
+  <button class="demo-tab active" onclick="showPage('login')">Login</button>
+  <button class="demo-tab" onclick="showPage('register')">Register (Client)</button>
+  <button class="demo-tab" onclick="showPage('register-vendor')">Register (Vendeur)</button>
+</div>
+
+<!-- ══════════════════════════════════ LOGIN ══════════════════════════════════ -->
+<div class="auth-page visible" id="page-login">
+  <div class="auth-left">
+    <a href="#" class="auth-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Retour à l'accueil
+    </a>
+
+    <div class="auth-brand">
+      <div class="auth-brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <span class="auth-brand-name">Supply</span>
+    </div>
+
+    <h2 class="auth-tagline">Accède à tes<br><em>favoris & commandes</em></h2>
+    <p class="auth-sub">Connecte-toi pour bénéficier d'une meilleure expérience d'achat et gérer tes commandes.</p>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-icon">♡</div>
+        <div class="feature-text">
+          <strong>Favoris sauvegardés</strong>
+          <span>Retrouve tous tes articles préférés en un clic.</span>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📋</div>
+        <div class="feature-text">
+          <strong>Historique de commandes</strong>
+          <span>Suivi simple de tes achats et livraisons.</span>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-text">
+          <strong>Checkout rapide</strong>
+          <span>Enregistre tes infos pour commander plus vite.</span>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">💬</div>
+        <div class="feature-text">
+          <strong>Chat avec vendeurs</strong>
+          <span>Communique directement avec nos vendeurs.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="form-card">
+      <h1 class="form-title">Se connecter</h1>
+      <p class="form-subtitle">Accédez à votre compte Supply</p>
+
+      <div class="field">
+        <label class="field-label">Adresse email</label>
+        <input class="field-input" type="email" placeholder="votre@email.com">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Mot de passe</label>
+        <div class="field-pw">
+          <input class="field-input" type="password" placeholder="••••••••">
+          <button class="pw-toggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="login-extras">
+        <label class="remember-row">
+          <div class="check-box" id="remember-check" onclick="toggleCheck(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          Se souvenir de moi
+        </label>
+        <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+      </div>
+
+      <button class="btn-submit">Se connecter</button>
+
+      <div class="form-divider">Comptes de test</div>
+
+      <div class="test-accounts">
+        <div class="test-accounts-head">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          Disponibles pour la démo
+        </div>
+        <div class="test-account-item">
+          <div>
+            <div class="test-account-name">Vendeur Test</div>
+            <div class="test-account-creds">
+              <span class="test-cred">testshop@supply.ci</span>
+              <span class="test-cred">testshop123</span>
+            </div>
+          </div>
+          <span class="test-fill-btn">Remplir →</span>
+        </div>
+        <div class="test-account-item">
+          <div>
+            <div class="test-account-name">Client Test</div>
+            <div class="test-account-creds">
+              <span class="test-cred">client@supply.ci</span>
+              <span class="test-cred">client123</span>
+            </div>
+          </div>
+          <span class="test-fill-btn">Remplir →</span>
+        </div>
+      </div>
+
+      <div style="height:20px"></div>
+      <div class="form-footer">
+        Pas encore de compte ? <a href="#">Créer un compte</a>
+        <div class="form-footer-also">Tu peux aussi <a href="#">continuer sans te connecter</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ REGISTER ══════════════════════════════════ -->
+<div class="auth-page" id="page-register">
+  <div class="auth-left">
+    <a href="#" class="auth-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Retour à l'accueil
+    </a>
+    <div class="auth-brand">
+      <div class="auth-brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <span class="auth-brand-name">Supply</span>
+    </div>
+    <h2 class="auth-tagline">Rejoins Supply<br><em>dès maintenant</em></h2>
+    <p class="auth-sub">Que tu sois acheteur ou vendeur, Supply t'offre les meilleures opportunités.</p>
+
+    <div class="features-group">
+      <div class="features-group-label">Pour les Clients</div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">♡</div>
+          <div class="feature-text"><strong>Favoris illimités</strong><span>Sauvegarde tes produits préférés</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🚚</div>
+          <div class="feature-text"><strong>Livraison rapide</strong><span>2-5 jours en Côte d'Ivoire</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">💬</div>
+          <div class="feature-text"><strong>Support direct</strong><span>Chat avec les vendeurs</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="features-group">
+      <div class="features-group-label">Pour les Vendeurs</div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          <div class="feature-text"><strong>Tableau de bord complet</strong><span>Gère ton stock et tes ventes</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🌍</div>
+          <div class="feature-text"><strong>Audience large</strong><span>Accès à des milliers d'acheteurs</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-text"><strong>Paiements sécurisés</strong><span>Reçois tes gains rapidement</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="form-card">
+      <h1 class="form-title">Créer un compte</h1>
+      <p class="form-subtitle">Débute ton aventure Supply</p>
+
+      <div class="field">
+        <label class="field-label">Nom complet</label>
+        <input class="field-input" type="text" placeholder="Kouassi Jean">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Pays</label>
+        <select class="field-select">
+          <option>🇨🇮  Côte d'Ivoire</option>
+          <option>🇸🇳  Sénégal</option>
+          <option>🇧🇫  Burkina Faso</option>
+          <option>🇲🇱  Mali</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" placeholder="votre@email.com">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Mot de passe</label>
+        <div class="field-pw">
+          <input class="field-input" type="password" placeholder="••••••••">
+          <button class="pw-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="field-hint">Minimum 8 caractères</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Confirmer mot de passe</label>
+        <div class="field-pw">
+          <input class="field-input" type="password" placeholder="••••••••">
+          <button class="pw-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Je suis un…</label>
+        <div class="role-grid">
+          <div class="role-option selected" onclick="selectRole(this,'register')">
+            <input type="radio" name="role" value="client" checked>
+            <span class="role-radio"></span><span class="role-name">Client</span>
+            <div class="role-desc">Achète des produits informatiques</div>
+          </div>
+          <div class="role-option" onclick="selectRole(this,'register')">
+            <input type="radio" name="role" value="vendor">
+            <span class="role-radio"></span><span class="role-name">Vendeur</span>
+            <div class="role-desc">Vends tes produits informatiques</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="check-row">
+        <div class="check-box" onclick="toggleCheck(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-label">J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a></span>
+      </div>
+
+      <button class="btn-submit">Créer mon compte</button>
+      <div class="form-footer">Déjà un compte ? <a href="#">Se connecter</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ REGISTER VENDOR ══════════════════════════════════ -->
+<div class="auth-page" id="page-register-vendor">
+  <div class="auth-left">
+    <a href="#" class="auth-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Retour à l'accueil
+    </a>
+    <div class="auth-brand">
+      <div class="auth-brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <span class="auth-brand-name">Supply</span>
+    </div>
+    <h2 class="auth-tagline">Rejoins Supply<br><em>dès maintenant</em></h2>
+    <p class="auth-sub">Que tu sois acheteur ou vendeur, Supply t'offre les meilleures opportunités.</p>
+    <div class="features-group">
+      <div class="features-group-label">Pour les Vendeurs</div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          <div class="feature-text"><strong>Tableau de bord complet</strong><span>Gère ton stock et tes ventes</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🌍</div>
+          <div class="feature-text"><strong>Audience large</strong><span>Accès à des milliers d'acheteurs</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-text"><strong>Paiements sécurisés</strong><span>Reçois tes gains rapidement</span></div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">✅</div>
+          <div class="feature-text"><strong>Vérification rapide</strong><span>Boutique active en 24–48h</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="form-card">
+      <h1 class="form-title">Créer un compte</h1>
+      <p class="form-subtitle">Débute ton aventure Supply</p>
+
+      <div class="field">
+        <label class="field-label">Nom complet</label>
+        <input class="field-input" type="text" placeholder="Kouassi Jean">
+      </div>
+      <div class="field">
+        <label class="field-label">Pays</label>
+        <select class="field-select">
+          <option>🇨🇮  Côte d'Ivoire</option>
+          <option>🇸🇳  Sénégal</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" placeholder="votre@email.com">
+      </div>
+      <div class="field">
+        <label class="field-label">Mot de passe</label>
+        <div class="field-pw">
+          <input class="field-input" type="password" placeholder="••••••••">
+          <button class="pw-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="field-hint">Minimum 8 caractères</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Confirmer mot de passe</label>
+        <div class="field-pw">
+          <input class="field-input" type="password" placeholder="••••••••">
+          <button class="pw-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Je suis un…</label>
+        <div class="role-grid">
+          <div class="role-option" onclick="selectRole(this,'register-vendor')">
+            <input type="radio" name="role2" value="client">
+            <span class="role-radio"></span><span class="role-name">Client</span>
+            <div class="role-desc">Achète des produits informatiques</div>
+          </div>
+          <div class="role-option selected" onclick="selectRole(this,'register-vendor')">
+            <input type="radio" name="role2" value="vendor" checked>
+            <span class="role-radio"></span><span class="role-name">Vendeur</span>
+            <div class="role-desc">Vends tes produits informatiques</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VENDOR NOTE -->
+      <div class="vendor-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        Votre demande sera vérifiée avant activation de votre boutique
+      </div>
+
+      <!-- VENDOR EXTRA FIELDS -->
+      <div class="field">
+        <label class="field-label">Nom de la boutique</label>
+        <input class="field-input" type="text" placeholder="Ma Boutique">
+      </div>
+      <div class="field">
+        <label class="field-label">Téléphone</label>
+        <input class="field-input" type="tel" placeholder="+225 05 01 23 45 67">
+        <div class="field-hint">Format Côte d'Ivoire : +225 ou 0X XX XX XX XX</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Adresse</label>
+        <textarea class="field-textarea" placeholder="Votre adresse"></textarea>
+      </div>
+
+      <div class="check-row">
+        <div class="check-box" onclick="toggleCheck(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-label">J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a></span>
+      </div>
+
+      <button class="btn-submit">Créer mon compte</button>
+      <div class="form-footer">Déjà un compte ? <a href="#">Se connecter</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('visible');
+  event.target.classList.add('active');
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+}
+
+function selectRole(option, pageId) {
+  const grid = option.closest('.role-grid');
+  grid.querySelectorAll('.role-option').forEach(o => o.classList.remove('selected'));
+  option.classList.add('selected');
+}
+</script>
+</body>
+</html>

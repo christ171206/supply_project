@@ -1,0 +1,212 @@
+/* ============================================================
+   supply-tokens.css
+   Design tokens — thème "Neutral Minimal"
+   Importer dans app.css : @import 'supply-tokens.css';
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ── Couleurs ── */
+  --color-black:      #0a0a0a;
+  --color-white:      #ffffff;
+  --color-off-white:  #f7f7f5;   /* fond de page */
+  --color-gray-50:    #f7f7f5;
+  --color-gray-100:   #efefed;   /* hover léger */
+  --color-gray-200:   #e0e0dc;   /* bordures */
+  --color-gray-400:   #a0a09a;   /* texte désactivé / placeholder */
+  --color-gray-600:   #666660;   /* texte secondaire */
+  --color-gray-800:   #2a2a28;   /* texte fort */
+
+  /* Badge stock */
+  --color-stock-ok:   #22c55e;
+  --color-stock-out:  #f87171;
+
+  /* ── Typographie ── */
+  --font-display: 'Instrument Serif', serif;
+  --font-body:    'Geist', sans-serif;
+  --font-mono:    'Geist Mono', monospace;
+
+  /* ── Radii ── */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-full: 9999px;
+
+  /* ── Spacing ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ── Borders ── */
+  --border-thin:   1px solid var(--color-gray-200);
+  --border-medium: 1px solid var(--color-gray-400);
+  --border-strong: 1px solid var(--color-black);
+
+  /* ── Shadows ── */
+  --shadow-none: none;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+
+  /* ── Transitions ── */
+  --transition-fast:   all 0.15s ease;
+  --transition-normal: all 0.25s ease;
+
+  /* ── Z-index ── */
+  --z-navbar:  50;
+  --z-modal:   100;
+  --z-tooltip: 200;
+}
+
+/* ── Reset minimal ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  background: var(--color-off-white);
+  color: var(--color-black);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* ── Utilitaires globaux ── */
+.font-display { font-family: var(--font-display); }
+.font-mono    { font-family: var(--font-mono); }
+
+/* ── Boutons ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-body);
+  font-size: 13px; font-weight: 500;
+  padding: 9px 20px;
+  border-radius: var(--radius-lg);
+  cursor: pointer; border: none;
+  transition: var(--transition-fast);
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-gray-600);
+  border: var(--border-thin);
+}
+.btn-ghost:hover {
+  border-color: var(--color-gray-800);
+  color: var(--color-black);
+}
+
+.btn-sm { font-size: 11px; padding: 6px 14px; }
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: var(--radius-sm);
+  font-size: 10px; font-weight: 500;
+  font-family: var(--font-mono);
+}
+.badge-pending {
+  background: #fdf6ec;
+  color: #b45309;
+}
+.badge-success {
+  background: #f0fdf4;
+  color: #15803d;
+}
+.badge-error {
+  background: #fef2f2;
+  color: #dc2626;
+}
+.badge-neutral {
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+.badge-dark {
+  background: var(--color-black);
+  color: white;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--color-white);
+  border: var(--border-thin);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+.card-padded { padding: var(--space-6); }
+
+/* ── Data grid (comme dans l'email) ── */
+.data-grid {
+  border: var(--border-thin);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.data-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  border-bottom: var(--border-thin);
+}
+.data-row:last-child { border-bottom: none; }
+.data-key {
+  padding: 10px 14px;
+  font-size: 12px; color: var(--color-gray-400);
+  background: var(--color-gray-50);
+  border-right: var(--border-thin);
+}
+.data-val {
+  padding: 10px 14px;
+  font-size: 12px; color: var(--color-black);
+  font-family: var(--font-mono);
+}
+
+/* ── Section headers ── */
+.section-eyebrow {
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-gray-400);
+  margin-bottom: 12px;
+}
+.section-heading {
+  font-family: var(--font-display);
+  font-size: 32px; letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.section-heading em {
+  font-style: italic;
+  color: var(--color-gray-600);
+}
+
+/* ── Inputs ── */
+.input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 13px; font-weight: 400;
+  color: var(--color-black);
+  background: var(--color-white);
+  border: var(--border-thin);
+  border-radius: var(--radius-lg);
+  padding: 9px 14px;
+  outline: none;
+  transition: var(--transition-fast);
+}
+.input::placeholder { color: var(--color-gray-400); font-weight: 300; }
+.input:hover  { border-color: var(--color-gray-400); }
+.input:focus  { border-color: var(--color-black); }
+
+/* ── Dividers ── */
+.divider { border: none; border-top: var(--border-thin); }
+
+/* ── Navbar height helper ── */
+.navbar-height { height: 56px; }

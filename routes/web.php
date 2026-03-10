@@ -75,6 +75,7 @@ Route::post('/panier/vider', [PanierController::class, 'vider'])->name('panier.v
 
 // Favoris (accessible sans auth - affichage des favoris)
 Route::get('/favoris', [FavoriteController::class, 'index'])->name('favoris.index');
+Route::get('/favoris/{productId}/check', [FavoriteController::class, 'isFavorited'])->name('favoris.check');
 
 // Routes authentifiées
 Route::middleware('auth')->group(function () {
@@ -105,9 +106,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/avis', [AvisController::class, 'store'])->name('avis.store');
     Route::delete('/avis/{avis}', [AvisController::class, 'destroy'])->name('avis.destroy');
 
-    // Favoris (toggle et check authentifiés)
+    // Favoris (toggle authentifié)
     Route::post('/favoris/{productId}/toggle', [FavoriteController::class, 'toggle'])->name('favoris.toggle');
-    Route::get('/favoris/{productId}/check', [FavoriteController::class, 'isFavorited'])->name('favoris.check');
 
     // Messages
     Route::get('/messages', [MessageController::class, 'index'])->name('client.messages');
@@ -138,6 +138,7 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
 
     // Statistiques
     Route::get('/statistiques', [VendeurProduitController::class, 'statistiques'])->name('statistiques');
+    Route::get('/statistiques/export', [VendeurProduitController::class, 'exportStatistiques'])->name('statistiques.export');
 
     // Messages
     Route::get('/messages', [VendeurProduitController::class, 'messages'])->name('messages');

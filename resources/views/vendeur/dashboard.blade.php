@@ -1,208 +1,208 @@
 @extends('vendeur.layout-dashboard')
 
 @section('content')
-<div class="space-y-8">
-    <!-- Header -->
-    <div class ="ml-6">
-        <h1   class="text-4xl font-bold text-gray-900"> Tableau de Bord</h1>
-        <p class="text-gray-500 mt-2">Gérez votre boutique en ligne</p>
-    </div>
+<div class="pb-20">
 
-    <!-- Statistiques de Performance -->
-    <div class ="ml-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Statistiques de Performance</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Chiffre d'affaires total -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-semibold uppercase tracking-wider">Chiffre d'affaires</p>
-                        <p class="text-3xl font-bold text-green-600 mt-3">{{ number_format($totalVentes, 0, ',', ' ') }}</p>
-                        <p class="text-gray-500 text-xs mt-1">FCFA</p>
-                    </div>
-                    <div class="opacity-20"><x-heroicon-o-banknotes class="w-12 h-12 text-green-600" /></div>
+    {{-- ══════════════════════════════
+         HEADER — fond noir
+    ══════════════════════════════ --}}
+    <div class="bg-[#0a0a0a] px-8 pt-10 pb-8 mb-8">
+        <div class="text-[10px] font-medium tracking-[0.15em] uppercase text-white/40 mb-3">Espace vendeur</div>
+        <h1 class="font-serif text-[36px] tracking-tight text-white leading-none">
+            Tableau de Bord
+        </h1>
+        <p class="text-[13px] text-white/50 font-light mt-2">Gérez votre boutique en ligne</p>
+
+        {{-- KPIs inline dans le header --}}
+        <div class="flex items-center gap-6 mt-6 pt-6 border-t border-white/10">
+            <div>
+                <div class="font-mono text-[22px] font-medium text-white leading-none">
+                    {{ number_format($totalVentes, 0, ',', ' ') }}
+                    <span class="text-[13px] text-white/40 font-sans font-light">FCFA</span>
                 </div>
+                <div class="text-[10px] text-white/40 tracking-[0.08em] uppercase mt-1">Chiffre d'affaires</div>
             </div>
-
-            <!-- Nombre de commandes -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-semibold uppercase tracking-wider">Commandes</p>
-                        <p class="text-3xl font-bold text-blue-600 mt-3">{{ $nombreCommandes }}</p>
-                        <p class="text-gray-500 text-xs mt-1">Total reçues</p>
-                    </div>
-                    <div class="opacity-20"><x-heroicon-o-cube class="w-12 h-12 text-blue-600" /></div>
-                </div>
+            <div class="w-px h-8 bg-white/10"></div>
+            <div>
+                <div class="font-mono text-[22px] font-medium text-white leading-none">{{ $nombreCommandes }}</div>
+                <div class="text-[10px] text-white/40 tracking-[0.08em] uppercase mt-1">Commandes</div>
             </div>
-
-            <!-- Panier moyen -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-semibold uppercase tracking-wider">Panier Moyen</p>
-                        <p class="text-3xl font-bold text-purple-600 mt-3">{{ $nombreCommandes > 0 ? number_format($totalVentes / $nombreCommandes, 0, ',', ' ') : '0' }}</p>
-                        <p class="text-gray-500 text-xs mt-1">FCFA</p>
-                    </div>
-                    <div class="opacity-20"><x-heroicon-o-shopping-cart class="w-12 h-12 text-purple-600" /></div>
-                </div>
+            <div class="w-px h-8 bg-white/10"></div>
+            <div>
+                <div class="font-mono text-[22px] font-medium text-white leading-none">{{ $tauxCompletion }}%</div>
+                <div class="text-[10px] text-white/40 tracking-[0.08em] uppercase mt-1">Complétion</div>
             </div>
-
-            <!-- Taux de complétion -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-gray-600 text-sm font-semibold uppercase tracking-wider">Taux Complétion</p>
-                        <p class="text-3xl font-bold text-cyan-600 mt-3">{{ $tauxCompletion }}%</p>
-                        <p class="text-gray-500 text-xs mt-1">Commandes livrées</p>
-                    </div>
-                    <div class="opacity-20"><x-heroicon-o-check-circle class="w-12 h-12 text-cyan-600" /></div>
+            <div class="w-px h-8 bg-white/10"></div>
+            <div>
+                <div class="font-mono text-[22px] font-medium text-white leading-none">
+                    {{ $nombreCommandes > 0 ? number_format($totalVentes / $nombreCommandes, 0, ',', ' ') : '0' }}
+                    <span class="text-[13px] text-white/40 font-sans font-light">FCFA</span>
                 </div>
+                <div class="text-[10px] text-white/40 tracking-[0.08em] uppercase mt-1">Panier moyen</div>
             </div>
         </div>
     </div>
 
-    <!-- Statut des Commandes -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Statut des Commandes</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- En attente -->
-            <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border border-yellow-200">
-                <div class="flex items-center justify-between mb-3">
-                    <x-heroicon-o-clock class="w-8 h-8 text-yellow-600" />
-                    <span class="text-xs font-bold text-yellow-700 uppercase">En attente</span>
+    <div class="px-8 space-y-8">
+
+    {{-- ══════════════════════════════
+         STATUT COMMANDES — hover inversé + grands chiffres
+    ══════════════════════════════ --}}
+    <div>
+        <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-4">Statut des commandes</div>
+        <div class="grid grid-cols-4 gap-px bg-[#e0e0dc] border border-[#e0e0dc] rounded-xl overflow-hidden">
+
+            <div class="bg-white px-5 py-6 hover:bg-[#0a0a0a] group transition-colors cursor-default">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b]"></span>
+                    <span class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] group-hover:text-white/50 transition-colors">En attente</span>
                 </div>
-                <p class="text-4xl font-bold text-yellow-600">{{ $commandesEnAttente }}</p>
-                <p class="text-sm text-yellow-700 mt-2">À traiter rapidement</p>
+                <div class="font-mono text-[40px] font-medium text-[#0a0a0a] group-hover:text-white leading-none tracking-tight transition-colors">{{ $commandesEnAttente }}</div>
+                <div class="text-[11px] text-[#a0a09a] group-hover:text-white/40 font-light mt-2 transition-colors">À valider</div>
             </div>
 
-            <!-- Confirmées -->
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
-                <div class="flex items-center justify-between mb-3">
-                    <x-heroicon-o-check-circle class="w-8 h-8 text-blue-600" />
-                    <span class="text-xs font-bold text-blue-700 uppercase">Confirmées</span>
+            <div class="bg-white px-5 py-6 hover:bg-[#0a0a0a] group transition-colors cursor-default">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#60a5fa]"></span>
+                    <span class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] group-hover:text-white/50 transition-colors">Confirmées</span>
                 </div>
-                <p class="text-4xl font-bold text-blue-600">{{ $commandesConfirmees }}</p>
-                <p class="text-sm text-blue-700 mt-2">Prêtes à expédier</p>
+                <div class="font-mono text-[40px] font-medium text-[#0a0a0a] group-hover:text-white leading-none tracking-tight transition-colors">{{ $commandesConfirmees }}</div>
+                <div class="text-[11px] text-[#a0a09a] group-hover:text-white/40 font-light mt-2 transition-colors">Prêtes</div>
             </div>
 
-            <!-- Expédiées -->
-            <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-6 border border-indigo-200">
-                <div class="flex items-center justify-between mb-3">
-                    <x-heroicon-o-cube class="w-8 h-8 text-indigo-600" />
-                    <span class="text-xs font-bold text-indigo-700 uppercase">Expédiées</span>
+            <div class="bg-white px-5 py-6 hover:bg-[#0a0a0a] group transition-colors cursor-default">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#a78bfa]"></span>
+                    <span class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] group-hover:text-white/50 transition-colors">Expédiées</span>
                 </div>
-                <p class="text-4xl font-bold text-indigo-600">{{ $commandesExpediees }}</p>
-                <p class="text-sm text-indigo-700 mt-2">En route vers clients</p>
+                <div class="font-mono text-[40px] font-medium text-[#0a0a0a] group-hover:text-white leading-none tracking-tight transition-colors">{{ $commandesExpediees }}</div>
+                <div class="text-[11px] text-[#a0a09a] group-hover:text-white/40 font-light mt-2 transition-colors">En route</div>
             </div>
 
-            <!-- Livrées -->
-            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
-                <div class="flex items-center justify-between mb-3">
-                    <x-heroicon-o-star class="w-8 h-8 text-green-600" />
-                    <span class="text-xs font-bold text-green-700 uppercase">Livrées</span>
+            <div class="bg-white px-5 py-6 hover:bg-[#0a0a0a] group transition-colors cursor-default">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#22c55e]"></span>
+                    <span class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] group-hover:text-white/50 transition-colors">Livrées</span>
                 </div>
-                <p class="text-4xl font-bold text-green-600">{{ $commandeslivrees }}</p>
-                <p class="text-sm text-green-700 mt-2">Clients satisfaits</p>
+                <div class="font-mono text-[40px] font-medium text-[#0a0a0a] group-hover:text-white leading-none tracking-tight transition-colors">{{ $commandeslivrees }}</div>
+                <div class="text-[11px] text-[#a0a09a] group-hover:text-white/40 font-light mt-2 transition-colors">Complètes</div>
             </div>
+
         </div>
     </div>
 
-    <!-- Alerte Stock Critique -->
+    {{-- ══════════════════════════════
+         ALERTE STOCK CRITIQUE
+    ══════════════════════════════ --}}
     @if($produitsStockFaible->count() > 0)
-        <div class="bg-red-50 border-l-4 border-red-600 rounded-lg p-6">
-            <div class="flex items-start gap-4">
-                <x-heroicon-o-exclamation-triangle class="w-8 h-8 text-red-600 flex-shrink-0 mt-1" />
-                <div class="flex-1">
-                    <h3 class="font-bold text-red-900 mb-4">Alerte : Stock Critique Détecté!</h3>
-                    <p class="text-red-800 mb-4">{{ $produitsStockFaible->count() }} produit(s) nécessitent un réapprovisionnement immédiat</p>
-
-                    <div class="space-y-3">
-                        @foreach($produitsStockFaible as $produit)
-                            <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-red-200">
-                                <div>
-                                    <p class="font-semibold text-gray-900">{{ $produit->nom }}</p>
-                                    <p class="text-sm text-gray-600">Stock: {{ $produit->stock }} / Min: {{ $produit->stock_minimum }}</p>
-                                </div>
-                                <a href="{{ route('vendeur.produits.edit', $produit->id) }}" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition text-sm">
-                                    <x-heroicon-o-pencil-square class="w-4 h-4" /> Modifier
-                                </a>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            <div class="flex items-center gap-2 px-5 py-4 border-b border-[#efefed]">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#f87171]"></span>
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Stock critique</span>
+                <span class="ml-auto text-[10px] font-mono bg-[#fef2f2] text-[#dc2626] px-2 py-0.5 rounded">
+                    {{ $produitsStockFaible->count() }} produit{{ $produitsStockFaible->count() > 1 ? 's' : '' }}
+                </span>
             </div>
+            @foreach($produitsStockFaible as $produit)
+                <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                    <div>
+                        <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $produit->nom }}</div>
+                        <div class="text-[11px] text-[#a0a09a] font-mono font-light mt-0.5">Stock : {{ $produit->stock }} / Min : {{ $produit->stock_minimum }}</div>
+                    </div>
+                    <a href="{{ route('vendeur.produits.edit', $produit->id) }}"
+                       class="text-[11px] font-medium bg-[#0a0a0a] text-white px-3 py-1.5 rounded-md hover:opacity-85 transition-opacity">
+                        Modifier
+                    </a>
+                </div>
+            @endforeach
         </div>
     @endif
 
-    <!-- Actions Rapides -->
+    {{-- ══════════════════════════════
+         ACTIONS RAPIDES
+    ══════════════════════════════ --}}
     <div>
-        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-star class="w-6 h-6 text-yellow-500" /> Actions Rapides</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a href="{{ route('vendeur.produits.create') }}" class="flex items-center gap-3 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition">
-                <x-heroicon-o-light-bulb class="w-8 h-8 text-blue-600 flex-shrink-0" />
+        <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-4">Actions rapides</div>
+        <div class="grid grid-cols-3 gap-px bg-[#e0e0dc] border border-[#e0e0dc] rounded-xl overflow-hidden">
+
+            <a href="{{ route('vendeur.produits.create') }}" class="bg-white px-5 py-5 flex items-center gap-4 hover:bg-[#0a0a0a] group transition-colors">
+                <div class="w-9 h-9 border border-[#e0e0dc] rounded-lg bg-[#f7f7f5] flex items-center justify-center flex-shrink-0 group-hover:border-white/20 group-hover:bg-white/10 transition-colors">
+                    <svg class="w-4 h-4 text-[#666660] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4v16m8-8H4"/></svg>
+                </div>
                 <div>
-                    <p class="font-bold text-gray-900">Ajouter Produit</p>
-                    <p class="text-sm text-gray-600">Créer un nouveau produit</p>
+                    <div class="text-[13px] font-medium text-[#0a0a0a] group-hover:text-white transition-colors">Ajouter produit</div>
+                    <div class="text-[11px] text-[#a0a09a] font-light group-hover:text-white/60 transition-colors">Nouveau produit</div>
                 </div>
             </a>
-            <a href="{{ route('vendeur.produits.index') }}" class="flex items-center gap-3 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition">
-                <x-heroicon-o-pencil-square class="w-8 h-8 text-green-600 flex-shrink-0" />
+
+            <a href="{{ route('vendeur.produits.index') }}" class="bg-white px-5 py-5 flex items-center gap-4 hover:bg-[#0a0a0a] group transition-colors">
+                <div class="w-9 h-9 border border-[#e0e0dc] rounded-lg bg-[#f7f7f5] flex items-center justify-center flex-shrink-0 group-hover:border-white/20 group-hover:bg-white/10 transition-colors">
+                    <svg class="w-4 h-4 text-[#666660] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </div>
                 <div>
-                    <p class="font-bold text-gray-900">Gérer Produits</p>
-                    <p class="text-sm text-gray-600">Modifier vos produits</p>
+                    <div class="text-[13px] font-medium text-[#0a0a0a] group-hover:text-white transition-colors">Gérer produits</div>
+                    <div class="text-[11px] text-[#a0a09a] font-light group-hover:text-white/60 transition-colors">Modifier vos produits</div>
                 </div>
             </a>
-            <a href="{{ route('vendeur.commandes') }}" class="flex items-center gap-3 p-6 bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition">
-                <div class="text-3xl"><x-heroicon-o-cube class="w-8 h-8" /></div>
+
+            <a href="{{ route('vendeur.commandes') }}" class="bg-white px-5 py-5 flex items-center gap-4 hover:bg-[#0a0a0a] group transition-colors">
+                <div class="w-9 h-9 border border-[#e0e0dc] rounded-lg bg-[#f7f7f5] flex items-center justify-center flex-shrink-0 group-hover:border-white/20 group-hover:bg-white/10 transition-colors">
+                    <svg class="w-4 h-4 text-[#666660] group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+                </div>
                 <div>
-                    <p class="font-bold text-gray-900">Voir Commandes</p>
-                    <p class="text-sm text-gray-600">Gérer vos commandes</p>
+                    <div class="text-[13px] font-medium text-[#0a0a0a] group-hover:text-white transition-colors">Voir commandes</div>
+                    <div class="text-[11px] text-[#a0a09a] font-light group-hover:text-white/60 transition-colors">Toutes vos commandes</div>
                 </div>
             </a>
+
         </div>
     </div>
 
-    <!-- Dernières Commandes -->
-    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Dernières Commandes</h2>
-
+    {{-- ══════════════════════════════
+         DERNIÈRES COMMANDES
+    ══════════════════════════════ --}}
+    <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-[#efefed]">
+            <span class="text-[13px] font-medium text-[#0a0a0a]">Dernières commandes</span>
+            <a href="{{ route('vendeur.commandes') }}" class="text-[11px] text-[#a0a09a] border-b border-[#e0e0dc] pb-px hover:text-[#0a0a0a] hover:border-[#0a0a0a] transition-all">Voir tout →</a>
+        </div>
         @if($derniereCommandes->count() > 0)
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
-                        <tr class="border-b-2 border-gray-200">
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Client</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">N° Commande</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Date</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Montant</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Statut</th>
-                            <th class="text-center py-3 px-4 font-bold text-gray-700">Action</th>
+                        <tr class="border-b border-[#efefed] bg-[#f7f7f5]">
+                            <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Client</th>
+                            <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">N°</th>
+                            <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Date</th>
+                            <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Montant</th>
+                            <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Statut</th>
+                            <th class="px-5 py-3"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($derniereCommandes as $commande)
-                            <tr class="border-b hover:bg-blue-50 transition">
-                                <td class="py-4 px-4">
-                                    <span class="font-semibold text-gray-900">{{ $commande->user->name }}</span>
-                                </td>
-                                <td class="py-4 px-4 font-bold text-blue-600">#{{ $commande->id }}</td>
-                                <td class="py-4 px-4 text-gray-700">{{ $commande->created_at->format('d/m/Y H:i') }}</td>
-                                <td class="py-4 px-4 font-semibold text-green-600">{{ number_format($commande->total, 0, ',', ' ') }} FCFA</td>
-                                <td class="py-4 px-4">
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold
-                                        @if($commande->statut === 'en_attente') bg-yellow-100 text-yellow-800
-                                        @elseif($commande->statut === 'confirmee') bg-blue-100 text-blue-800
-                                        @elseif($commande->statut === 'expediee') bg-indigo-100 text-indigo-800
-                                        @elseif($commande->statut === 'livree') bg-green-100 text-green-800
-                                        @else bg-red-100 text-red-800 @endif">
+                            <tr class="border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                                <td class="px-5 py-3.5 text-[13px] font-medium text-[#0a0a0a]">{{ $commande->user->name }}</td>
+                                <td class="px-5 py-3.5 font-mono text-[12px] text-[#666660]">#{{ $commande->id }}</td>
+                                <td class="px-5 py-3.5 font-mono text-[12px] text-[#a0a09a]">{{ $commande->created_at->format('d/m/y') }}</td>
+                                <td class="px-5 py-3.5 font-mono text-[12px] font-medium text-[#0a0a0a]">{{ number_format($commande->total, 0, ',', ' ') }} FCFA</td>
+                                <td class="px-5 py-3.5">
+                                    @php
+                                        $badge = match($commande->statut) {
+                                            'en_attente' => ['bg-[#fdf6ec] text-[#b45309]', 'bg-[#f59e0b]'],
+                                            'confirmee'  => ['bg-[#eff6ff] text-[#2563eb]',  'bg-[#60a5fa]'],
+                                            'expediee'   => ['bg-[#f5f3ff] text-[#7c3aed]',  'bg-[#a78bfa]'],
+                                            'livree'     => ['bg-[#f0fdf4] text-[#15803d]',  'bg-[#22c55e]'],
+                                            default      => ['bg-[#f7f7f5] text-[#666660]',  'bg-[#a0a09a]'],
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center gap-1.5 text-[10px] font-medium font-mono px-2 py-1 rounded {{ $badge[0] }}">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $badge[1] }}"></span>
                                         {{ ucfirst(str_replace('_', ' ', $commande->statut)) }}
                                     </span>
                                 </td>
-                                <td class="py-4 px-4 text-center">
-                                    <a href="{{ route('vendeur.commandes.show', $commande->id) }}" class="text-blue-600 hover:text-blue-700 font-bold">
-                                        Voir →
-                                    </a>
+                                <td class="px-5 py-3.5 text-right">
+                                    <a href="{{ route('vendeur.commandes.show', $commande->id) }}" class="text-[11px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors">Voir →</a>
                                 </td>
                             </tr>
                         @endforeach
@@ -210,76 +210,69 @@
                 </table>
             </div>
         @else
-            <p class="text-center text-gray-500 py-8">Aucune commande reçue pour l'instant</p>
+            <div class="px-5 py-10 text-center text-[13px] text-[#a0a09a] font-light">Aucune commande reçue</div>
         @endif
     </div>
 
-    <!-- Top Produits -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Top Produits - Les 5 Plus Vendus</h2>
-        @if($topProduits->count() > 0)
-            <div class="space-y-3">
+    {{-- ══════════════════════════════
+         TOP PRODUITS + AVIS — 2 colonnes
+    ══════════════════════════════ --}}
+    <div class="grid grid-cols-2 gap-px bg-[#e0e0dc] border border-[#e0e0dc] rounded-xl overflow-hidden">
+
+        <div class="bg-white">
+            <div class="px-5 py-4 border-b border-[#efefed]">
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Top produits</span>
+            </div>
+            @if($topProduits->count() > 0)
                 @foreach($topProduits as $index => $produit)
-                    <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
-                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                            {{ $index + 1 }}
+                    <div class="flex items-center gap-4 px-5 py-3.5 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                        <span class="w-5 text-[11px] font-mono text-[#a0a09a] flex-shrink-0">{{ $index + 1 }}</span>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[13px] font-medium text-[#0a0a0a] truncate">{{ $produit->nom }}</div>
+                            <div class="text-[11px] text-[#a0a09a] font-light">{{ $produit->categorie->nom }}</div>
                         </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-gray-900 text-lg">{{ $produit->nom }}</p>
-                            <p class="text-sm text-gray-600">{{ $produit->categorie->nom }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-green-600 text-lg">{{ number_format($produit->ventes_total ?? 0, 0, ',', ' ') }} FCFA</p>
-                            <p class="text-xs text-gray-500">{{ $produit->ventes_nombre ?? 0 }} ventes</p>
+                        <div class="text-right flex-shrink-0">
+                            <div class="font-mono text-[12px] font-medium text-[#0a0a0a]">{{ number_format($produit->ventes_total ?? 0, 0, ',', ' ') }} FCFA</div>
+                            <div class="text-[10px] text-[#a0a09a]">{{ $produit->ventes_nombre ?? 0 }} ventes</div>
                         </div>
                     </div>
                 @endforeach
-            </div>
-        @else
-            <div class="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
-                <p class="text-gray-500 text-lg">Aucune vente enregistrée pour l'instant</p>
-            </div>
-        @endif
-    </div>
+            @else
+                <div class="px-5 py-10 text-center text-[13px] text-[#a0a09a] font-light">Aucune vente</div>
+            @endif
+        </div>
 
-    <!-- Avis Clients Récents -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Avis Clients Récents</h2>
-        @if($avisRecents->count() > 0)
-            <div class="space-y-4">
+        <div class="bg-white">
+            <div class="px-5 py-4 border-b border-[#efefed]">
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Avis clients récents</span>
+            </div>
+            @if($avisRecents->count() > 0)
                 @foreach($avisRecents as $avis)
-                    <div class="p-6 border border-gray-200 rounded-xl hover:shadow-lg transition bg-gradient-to-r from-gray-50 to-white">
-                        <div class="flex items-start justify-between mb-3">
+                    <div class="px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                        <div class="flex items-start justify-between mb-2">
                             <div>
-                                <p class="font-bold text-gray-900 text-lg">{{ $avis->user->name }}</p>
-                                <p class="text-sm text-gray-600 mt-1">{{ $avis->produit->nom }}</p>
+                                <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $avis->user->name }}</div>
+                                <div class="text-[11px] text-[#a0a09a] font-light mt-0.5 truncate max-w-[160px]">{{ $avis->produit->nom }}</div>
                             </div>
-                            <div class="text-right">
-                                <div class="flex gap-1 justify-end mb-2">
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <div class="flex gap-0.5">
                                     @for($i = 1; $i <= 5; $i++)
-                                        <span class="text-xl">{{ $i <= $avis->note ? '⭐' : '☆' }}</span>
+                                        <span class="text-[11px] {{ $i <= $avis->note ? 'text-[#0a0a0a]' : 'text-[#e0e0dc]' }}">★</span>
                                     @endfor
                                 </div>
-                                <p class="text-xs text-gray-500">{{ $avis->created_at->format('d/m/Y') }}</p>
+                                <span class="font-mono text-[10px] text-[#a0a09a]">{{ $avis->created_at->format('d/m/y') }}</span>
                             </div>
                         </div>
-                        <p class="text-gray-700 leading-relaxed">{{ $avis->commentaire }}</p>
+                        <p class="text-[12px] text-[#666660] font-light leading-relaxed line-clamp-2">{{ $avis->commentaire }}</p>
                     </div>
                 @endforeach
-            </div>
-        @else
-            <div class="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
-                <p class="text-gray-500 text-lg">Aucun avis pour l'instant</p>
-            </div>
-        @endif
+            @else
+                <div class="px-5 py-10 text-center text-[13px] text-[#a0a09a] font-light">Aucun avis</div>
+            @endif
+        </div>
+
     </div>
 
-    <!-- Conseil -->
-    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <p class="flex items-start gap-3">
-            <span class="text-2xl">💡</span>
-            <span class="text-blue-900"><strong>Conseil du Jour :</strong> Vérifiez régulièrement votre stock, répondez rapidement aux messages des clients et maintenez une excellente note. C'est la clé du succès sur Supply !</span>
-        </p>
-    </div>
+    </div>{{-- /px-8 --}}
 </div>
 @endsection

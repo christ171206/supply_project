@@ -5,15 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>@yield('title', 'Supply - Boutique Informatique')</title>
+        <title>@yield('title', 'Supply — Boutique Minimaliste')</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
-        <style>
-            * { font-family: 'Inter', sans-serif; }
-            body { background-color: #f9fafb; }
-        </style>
+        <!-- Fonts from Google -->
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/css/modals.css', 'resources/js/app.js'])
@@ -21,14 +16,13 @@
         <!-- Socket.io Client Library -->
         <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
         <script>
-            // Configuration Socket.io URL
             window.SOCKET_IO_URL = '{{ env('SOCKET_IO_URL', 'http://localhost:3000') }}';
         </script>
     </head>
-    <body class="font-sans antialiased bg-gray-50">
+    <body class="font-body bg-off-white text-black antialiased">
         <div class="min-h-screen flex flex-col">
             <!-- Navigation -->
-            @include('layouts.navigation-client')
+            @include('components.navbar')
 
             <!-- Page Content -->
             <main class="flex-grow">
@@ -36,88 +30,31 @@
             </main>
 
             <!-- Footer -->
-            <footer class="bg-gray-900 text-gray-300 border-t border-gray-800 mt-20">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                        <!-- About -->
-                        <div class="space-y-4">
-                            <h3 class="text-white font-bold text-lg flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                Supply
-                            </h3>
-                            <p class="text-sm text-gray-400 leading-relaxed">
-                                Votre boutique informatique de confiance en Côte d'Ivoire. Livraison rapide, prix compétitifs, service client réactif.
-                            </p>
-                        </div>
-
-                        <!-- Quick Links -->
-                        <div>
-                            <h3 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Navigation</h3>
-                            <ul class="space-y-3 text-sm">
-                                <li><a href="{{ route('accueil') }}" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><span>→</span> Accueil</a></li>
-                                <li><a href="{{ route('produits.catalogue') }}" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><span>→</span> Catalogue</a></li>
-                                <li><a href="{{ route('panier.index') }}" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><span>→</span> Panier</a></li>
-                            </ul>
-                        </div>
-
-                        <!-- Customer Service -->
-                        <div>
-                            <h3 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Support</h3>
-                            <ul class="space-y-3 text-sm">
-                                <li><a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><span>?</span> FAQ</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><x-heroicon-o-document-text class="w-4 h-4" /><span>Conditions</span></a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200 flex items-center gap-2"><x-heroicon-o-lock-closed class="w-4 h-4" /><span>Confidentialité</span></a></li>
-                            </ul>
-                        </div>
-
-                        <!-- Contact -->
-                        <div>
-                            <h3 class="text-white font-bold mb-4 text-sm uppercase tracking-wider">Contact</h3>
-                            <ul class="space-y-3 text-sm">
-                                <li class="text-gray-400 flex items-center gap-2"><x-heroicon-o-envelope class="w-4 h-4" /><a href="mailto:info@supply.ci" class="hover:text-primary-400 transition">info@supply.ci</a></li>
-                                <li class="text-gray-400 flex items-center gap-2"><x-heroicon-o-phone class="w-4 h-4" /><a href="tel:+22527200000" class="hover:text-primary-400 transition">+225 27 20 00 00 00</a></li>
-                                <li class="text-gray-400 flex items-center gap-2"><x-heroicon-o-map-pin class="w-4 h-4" /><span>Abidjan, Côte d'Ivoire</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-gray-800 pt-8">
-                        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                            <p class="text-sm text-gray-500">&copy; 2026 Supply. Tous droits réservés.</p>
-                            <div class="flex gap-6">
-                                <a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200">𝕏</a>
-                                <a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200">f</a>
-                                <a href="#" class="text-gray-400 hover:text-primary-400 transition duration-200">in</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            @include('partials.footer-minimal')
         </div>
 
-        <!-- Modal Quantité Global -->
-        <div id="quantity-modal" class="modal-hidden fixed inset-0 bg-black/50 backdrop-blur-sm items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-8 animate-scale-in border border-gray-200">
-                <!-- Header -->
-                <h3 class="text-2xl font-bold text-gray-900 mb-6">Ajouter au panier</h3>
+        <!-- Modals -->
+        <div id="quantity-modal" class="modal-hidden fixed inset-0 bg-black/40 backdrop-blur items-center justify-center z-100 p-4">
+            <div class="bg-white rounded-xl border border-[#e0e0dc] w-full max-w-md p-8 transition duration-25">
+                <h3 class="text-display-2 font-display mb-6">Ajouter au panier</h3>
 
                 <!-- Détails Produit -->
-                <div class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
-                    <p class="text-sm text-gray-600 mb-1">Produit</p>
-                    <p id="modal-product-name" class="font-bold text-gray-900 mb-4">-</p>
+                <div class="bg-[#f7f7f5] rounded-lg p-4 mb-6 border border-[#e0e0dc]">
+                    <p class="text-xs text-[#666660] mb-1">Produit</p>
+                    <p id="modal-product-name" class="font-bold text-[#0a0a0a] mb-4">-</p>
 
-                    <p class="text-sm text-gray-600 mb-1">Stock disponible</p>
-                    <p id="modal-stock" class="font-bold text-accent-600">-</p>
+                    <p class="text-sm text-[#666660] mb-1">Stock disponible</p>
+                    <p id="modal-stock" class="font-bold text-[#0a0a0a]">-</p>
                 </div>
 
                 <!-- Sélecteur de Quantité -->
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-3">Quantité</label>
+                    <label class="block text-sm font-semibold text-[#2a2a28] mb-3">Quantité</label>
                     <div class="flex items-center gap-3">
                         <button
                             type="button"
                             onclick="decreaseQuantity()"
-                            class="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition"
+                            class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#efefed] text-[#0a0a0a] font-bold hover:bg-[#e0e0dc] transition"
                         >
                             −
                         </button>
@@ -126,12 +63,12 @@
                             id="modal-quantity"
                             value="1"
                             min="1"
-                            class="flex-1 text-center text-xl font-bold py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            class="flex-1 text-center text-xl font-bold py-2 border border-[#e0e0dc] rounded-lg focus:outline-none focus:border-[#0a0a0a] bg-white"
                         >
                         <button
                             type="button"
                             onclick="increaseQuantity()"
-                            class="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-200 text-gray-900 font-bold hover:bg-gray-300 transition"
+                            class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#efefed] text-[#0a0a0a] font-bold hover:bg-[#e0e0dc] transition"
                         >
                             +
                         </button>
@@ -139,9 +76,9 @@
                 </div>
 
                 <!-- Prix Total -->
-                <div class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
-                    <p class="text-sm text-gray-600 mb-1">Prix total</p>
-                    <p id="modal-total-price" class="text-3xl font-bold text-primary-600">-</p>
+                <div class="bg-[#f7f7f5] rounded-lg p-4 mb-6 border border-[#e0e0dc]">
+                    <p class="text-sm text-[#666660] mb-1">Prix total</p>
+                    <p id="modal-total-price" class="text-3xl font-bold text-[#0a0a0a]">-</p>
                 </div>
 
                 <!-- Boutons -->
@@ -149,14 +86,14 @@
                     <button
                         type="button"
                         onclick="closeQuantityModal()"
-                        class="flex-1 px-4 py-3 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition"
+                        class="flex-1 px-4 py-3 bg-[#efefed] text-[#0a0a0a] font-bold rounded-lg hover:bg-[#e0e0dc] transition"
                     >
                         Annuler
                     </button>
                     <button
                         type="button"
                         onclick="submitAddToCart()"
-                        class="flex-1 px-4 py-3 bg-primary-600 text-white font-bold rounded-lg hover:bg-primary-700 transition"
+                        class="flex-1 px-4 py-3 bg-[#0a0a0a] text-white font-bold rounded-lg hover:bg-[#2a2a28] transition"
                     >
                         Ajouter
                     </button>
@@ -256,12 +193,14 @@
             // Afficher une notification de succès
             function showSuccessNotification(message) {
                 const notification = document.createElement('div');
-                notification.className = 'fixed top-4 right-4 bg-accent-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in';
+                notification.className = 'fixed top-4 right-4 bg-[#0a0a0a] text-white px-6 py-3 rounded-lg shadow-lg z-50';
                 notification.textContent = message;
+                notification.style.animation = 'slideIn 0.3s ease-in-out';
                 document.body.appendChild(notification);
 
                 setTimeout(() => {
-                    notification.remove();
+                    notification.style.animation = 'slideOut 0.3s ease-in-out';
+                    setTimeout(() => notification.remove(), 300);
                 }, 3000);
             }
 
@@ -353,13 +292,15 @@
                 const buttons = document.querySelectorAll(`[data-favorite-btn="${productId}"]`);
                 buttons.forEach(btn => {
                     if (isFavorited) {
-                        btn.classList.remove('text-gray-400');
-                        btn.classList.add('text-red-500', 'animate-pulse');
-                        btn.innerHTML = '❤️';
+                        btn.classList.remove('text-[#a0a09a]');
+                        btn.classList.add('text-[#dc2626]');
+                        // Use a filled heart SVG
+                        btn.innerHTML = '<svg class="w-6 h-6 inline" fill="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
                     } else {
-                        btn.classList.remove('text-red-500', 'animate-pulse');
-                        btn.classList.add('text-gray-400');
-                        btn.innerHTML = '<x-heroicon-o-heart class="w-6 h-6" />';
+                        btn.classList.remove('text-[#dc2626]');
+                        btn.classList.add('text-[#a0a09a]');
+                        // Use an outline heart SVG
+                        btn.innerHTML = '<svg class="w-6 h-6 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
                     }
                 });
             }
@@ -399,7 +340,18 @@
             }
 
             // Sync on page load if user just logged in
-            document.addEventListener('DOMContentLoaded', syncLocalFavoritesToDatabase);
+            document.addEventListener('DOMContentLoaded', function() {
+                syncLocalFavoritesToDatabase();
+                
+                // Check favorite status for all favorite buttons on the page
+                const favoriteButtons = document.querySelectorAll('[data-favorite-btn]');
+                favoriteButtons.forEach(btn => {
+                    const productId = btn.dataset.favoritBtn;
+                    if (productId) {
+                        checkFavoriteStatus(productId);
+                    }
+                });
+            });
             @endauth
         </script>
         </script>

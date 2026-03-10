@@ -7,26 +7,13 @@
 
         <title>{{ config('app.name', 'Supply') }}</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <!-- Fonts from Google -->
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-        <!-- Scripts -->
+        <!-- Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased bg-gray-50">
-        <div class="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div class="w-full max-w-md">
-                <!-- Logo & En-tête -->
-                <div class="mb-8">
-                    <a href="/" class="inline-flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-lg bg-primary-600 flex items-center justify-center text-white text-2xl font-bold">
-                            S
-                        </div>
-                        <span class="text-3xl font-bold text-gray-900">Supply</span>
-                    </a>
-                    <p class="mt-4 text-gray-600">Votre boutique informatique en ligne</p>
-                </div>
-
-                <!-- Carte principale -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 space-y-6">
+    <body class="font-body bg-white text-black antialiased">
+        @yield('content')
+    </body>
+</html>

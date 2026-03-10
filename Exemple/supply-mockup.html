@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supply — Catalogue</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --off-white: #f7f7f5;
+  --gray-50: #f7f7f5;
+  --gray-100: #efefed;
+  --gray-200: #e0e0dc;
+  --gray-400: #a0a09a;
+  --gray-600: #666660;
+  --gray-800: #2a2a28;
+  --font-display: 'Instrument Serif', serif;
+  --font-body: 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--white);
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAVBAR ─── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gray-200);
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 32px;
+  gap: 0;
+}
+
+.nav-brand {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 500; color: var(--black);
+  text-decoration: none; letter-spacing: -0.02em;
+  margin-right: 40px;
+}
+.nav-brand-icon {
+  width: 28px; height: 28px;
+  background: var(--black);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-brand-icon svg { width: 14px; height: 14px; color: white; }
+
+.nav-links {
+  display: flex; align-items: center; gap: 4px; flex: 1;
+}
+.nav-link {
+  font-size: 13px; font-weight: 400; color: var(--gray-600);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.nav-link:hover, .nav-link.active { color: var(--black); background: var(--gray-100); }
+
+.nav-search {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px; color: var(--gray-400);
+  cursor: text;
+  transition: border-color 0.15s;
+  width: 220px;
+  margin-right: 16px;
+}
+.nav-search:hover { border-color: var(--gray-400); }
+.nav-search svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.nav-actions {
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s; position: relative;
+  text-decoration: none; color: var(--gray-600);
+}
+.nav-icon-btn:hover { background: var(--gray-100); color: var(--black); }
+.nav-icon-btn svg { width: 17px; height: 17px; }
+.nav-icon-btn .badge {
+  position: absolute; top: 4px; right: 4px;
+  width: 8px; height: 8px;
+  background: var(--black); border-radius: 50%;
+  border: 2px solid white;
+}
+.nav-cta {
+  background: var(--black); color: var(--white);
+  font-size: 12px; font-weight: 500;
+  padding: 8px 16px; border-radius: 7px;
+  text-decoration: none; letter-spacing: -0.01em;
+  transition: opacity 0.15s;
+  margin-left: 4px;
+}
+.nav-cta:hover { opacity: 0.85; }
+
+/* ─── HERO SECTION ─── */
+.hero {
+  padding: 80px 32px 64px;
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+}
+
+.hero-text {}
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 500; color: var(--gray-400);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero-eyebrow-line {
+  width: 24px; height: 1px; background: var(--gray-400);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: 52px; line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  margin-bottom: 20px;
+}
+.hero-title em { font-style: italic; color: var(--gray-600); }
+
+.hero-desc {
+  font-size: 15px; font-weight: 300;
+  color: var(--gray-600); line-height: 1.7;
+  max-width: 400px; margin-bottom: 36px;
+}
+
+.hero-actions {
+  display: flex; align-items: center; gap: 12px;
+}
+.btn-primary {
+  background: var(--black); color: white;
+  font-size: 13px; font-weight: 500;
+  padding: 11px 24px; border-radius: 8px;
+  text-decoration: none; letter-spacing: -0.01em;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-ghost {
+  font-size: 13px; color: var(--gray-600);
+  text-decoration: none; display: flex; align-items: center; gap: 6px;
+}
+.btn-ghost:hover { color: var(--black); }
+
+.hero-stats {
+  display: flex; gap: 32px; margin-top: 48px;
+  padding-top: 32px; border-top: 1px solid var(--gray-200);
+}
+.stat-item {}
+.stat-num {
+  font-family: var(--font-mono);
+  font-size: 22px; font-weight: 500;
+  letter-spacing: -0.03em; color: var(--black);
+}
+.stat-label { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+.hero-visual {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.hero-card-mini {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px; overflow: hidden;
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+.hero-card-mini:hover { border-color: var(--gray-400); }
+.hero-card-mini:first-child { grid-column: 1 / -1; display: flex; align-items: center; gap: 20px; }
+.hcm-img {
+  width: 80px; height: 80px; border-radius: 8px;
+  background: var(--gray-200); object-fit: cover; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+}
+.hcm-img-sq {
+  width: 100%; aspect-ratio: 1;
+  background: var(--gray-200); border-radius: 8px; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+}
+.hcm-name { font-size: 13px; font-weight: 500; color: var(--black); margin-bottom: 2px; }
+.hcm-price { font-family: var(--font-mono); font-size: 13px; color: var(--gray-600); }
+
+/* ─── SECTION ─── */
+.section {
+  padding: 64px 32px;
+  max-width: 1200px; margin: 0 auto;
+}
+.section-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 40px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 32px; letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.section-title em { font-style: italic; color: var(--gray-600); }
+.section-subtitle {
+  font-size: 13px; color: var(--gray-400); font-weight: 300; margin-top: 4px;
+}
+.section-link {
+  font-size: 13px; color: var(--gray-600); text-decoration: none;
+  display: flex; align-items: center; gap: 4px;
+  border-bottom: 1px solid var(--gray-200);
+  padding-bottom: 1px;
+}
+.section-link:hover { color: var(--black); border-color: var(--black); }
+
+/* ─── FILTER BAR ─── */
+.filter-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 32px; flex-wrap: wrap;
+}
+.filter-chip {
+  font-size: 12px; font-weight: 400;
+  padding: 6px 14px; border-radius: 20px;
+  border: 1px solid var(--gray-200);
+  cursor: pointer; transition: all 0.15s;
+  color: var(--gray-600);
+}
+.filter-chip:hover { border-color: var(--gray-400); color: var(--black); }
+.filter-chip.active {
+  background: var(--black); color: white; border-color: var(--black);
+}
+
+/* ─── PRODUCT GRID ─── */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--gray-200);
+}
+
+/* ─── PRODUCT CARD ─── */
+.product-card {
+  background: var(--white);
+  padding: 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  display: flex; flex-direction: column;
+}
+.product-card:hover { background: var(--gray-50); }
+
+.card-top {
+  position: relative; margin-bottom: 16px;
+}
+.card-image {
+  width: 100%; aspect-ratio: 1;
+  border-radius: 8px; background: var(--gray-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; overflow: hidden;
+  border: 1px solid var(--gray-100);
+  transition: border-color 0.15s;
+}
+.product-card:hover .card-image { border-color: var(--gray-200); }
+
+.card-badges {
+  position: absolute; top: 8px; left: 8px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.badge-stock {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: white; border: 1px solid var(--gray-200);
+  padding: 3px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 500; color: var(--gray-800);
+  font-family: var(--font-mono);
+}
+.badge-stock-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #22c55e; flex-shrink: 0;
+}
+.badge-cat {
+  background: var(--black); color: white;
+  padding: 3px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 500;
+}
+
+.card-fav {
+  position: absolute; top: 8px; right: 8px;
+  width: 30px; height: 30px;
+  background: white; border: 1px solid var(--gray-200);
+  border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; opacity: 0; transition: opacity 0.15s;
+}
+.product-card:hover .card-fav { opacity: 1; }
+.card-fav svg { width: 14px; height: 14px; color: var(--gray-600); }
+
+.card-body { flex: 1; display: flex; flex-direction: column; }
+.card-name {
+  font-size: 13px; font-weight: 500; color: var(--black);
+  letter-spacing: -0.01em; margin-bottom: 4px;
+  line-height: 1.4;
+}
+.card-desc {
+  font-size: 12px; color: var(--gray-400); font-weight: 300;
+  line-height: 1.5; flex: 1;
+}
+
+.card-vendor {
+  display: flex; align-items: center; gap: 5px;
+  margin-top: 12px; font-size: 11px; color: var(--gray-400);
+}
+.card-vendor-dot {
+  width: 14px; height: 14px; border-radius: 3px;
+  background: var(--gray-200); flex-shrink: 0;
+}
+
+.card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--gray-100);
+  gap: 8px;
+}
+.card-price {}
+.card-price-amount {
+  font-family: var(--font-mono);
+  font-size: 15px; font-weight: 500;
+  letter-spacing: -0.02em; color: var(--black);
+}
+.card-price-currency {
+  font-size: 10px; color: var(--gray-400);
+  font-weight: 400; margin-top: 1px;
+}
+.card-actions {
+  display: flex; gap: 6px; align-items: center;
+}
+.btn-detail {
+  font-size: 11px; color: var(--gray-600);
+  text-decoration: none; padding: 6px 10px;
+  border: 1px solid var(--gray-200); border-radius: 6px;
+  transition: all 0.15s;
+}
+.btn-detail:hover { border-color: var(--gray-800); color: var(--black); }
+.btn-add {
+  font-size: 11px; font-weight: 500;
+  background: var(--black); color: white;
+  padding: 6px 14px; border-radius: 6px;
+  border: none; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-add:hover { opacity: 0.8; }
+
+/* ─── DIVIDER ─── */
+.page-divider {
+  max-width: 1200px; margin: 0 auto 0;
+  border: none; border-top: 1px solid var(--gray-200);
+}
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--gray-200);
+  padding: 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1200px; margin: 64px auto 0;
+  font-size: 12px; color: var(--gray-400);
+}
+footer strong { color: var(--black); font-weight: 500; }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.product-card {
+  animation: fadeUp 0.4s ease both;
+}
+.product-card:nth-child(1) { animation-delay: 0.05s; }
+.product-card:nth-child(2) { animation-delay: 0.1s; }
+.product-card:nth-child(3) { animation-delay: 0.15s; }
+.product-card:nth-child(4) { animation-delay: 0.2s; }
+.product-card:nth-child(5) { animation-delay: 0.25s; }
+.product-card:nth-child(6) { animation-delay: 0.3s; }
+.product-card:nth-child(7) { animation-delay: 0.35s; }
+.product-card:nth-child(8) { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="#" class="nav-brand">
+    <div class="nav-brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    Supply
+  </a>
+
+  <div class="nav-links">
+    <a href="#" class="nav-link active">Accueil</a>
+    <a href="#" class="nav-link">Catalogue</a>
+  </div>
+
+  <div class="nav-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    Rechercher un produit…
+  </div>
+
+  <div class="nav-actions">
+    <a href="#" class="nav-icon-btn" title="Panier">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="badge"></span>
+    </a>
+    <a href="#" class="nav-icon-btn" title="Favoris">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </a>
+    <a href="#" class="nav-icon-btn" title="Rapport">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    </a>
+    <a href="#" class="nav-cta">Créer un compte</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-text">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      Marketplace B2B · Côte d'Ivoire
+    </div>
+    <h1 class="hero-title">Le matériel tech,<br><em>sans compromis.</em></h1>
+    <p class="hero-desc">Des milliers de produits informatiques sourcés directement auprès de vendeurs vérifiés. Livraison rapide, prix transparents.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">Explorer le catalogue</a>
+      <a href="#" class="btn-ghost">
+        Devenir vendeur
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">2 400+</div>
+        <div class="stat-label">Produits listés</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">186</div>
+        <div class="stat-label">Vendeurs actifs</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">99%</div>
+        <div class="stat-label">Vendeurs vérifiés</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-card-mini">
+      <div class="hcm-img">🖥️</div>
+      <div>
+        <div class="hcm-name">Intel Core i7-13700K</div>
+        <div class="hcm-price">480 000 FCFA</div>
+      </div>
+    </div>
+    <div class="hero-card-mini">
+      <div class="hcm-img-sq">🎮</div>
+      <div class="hcm-name">AMD Ryzen 9</div>
+      <div class="hcm-price">680 000 FCFA</div>
+    </div>
+    <div class="hero-card-mini">
+      <div class="hcm-img-sq">💾</div>
+      <div class="hcm-name">DDR5 32 Go</div>
+      <div class="hcm-price">220 000 FCFA</div>
+    </div>
+  </div>
+</div>
+
+<hr class="page-divider">
+
+<!-- PRODUCTS SECTION -->
+<div class="section">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Produits <em>en vedette</em></div>
+      <div class="section-subtitle">Nos meilleures ventes de la semaine</div>
+    </div>
+    <a href="#" class="section-link">Voir tout →</a>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-chip active">Tous</span>
+    <span class="filter-chip">Processeurs</span>
+    <span class="filter-chip">Mémoire RAM</span>
+    <span class="filter-chip">Alimentations</span>
+    <span class="filter-chip">Refroidissement</span>
+    <span class="filter-chip">Stockage</span>
+  </div>
+
+  <div class="product-grid">
+
+    <!-- Card 1 -->
+    <div class="product-card">
+      <div class="card-top">
+        <div class="card-image">🌀</div>
+        <div class="card-badges">
+          <span class="badge-stock"><span class="badge-stock-dot"></span>40 en stock</span>
+          <span class="badge-cat">Refroidissement</span>
+        </div>
+        <div class="card-fav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Ventilateur Thermaltake RGB 120mm</div>
+        <div class="card-desc">Lot de 3 ventilateurs RGB 120 mm pour gamer</div>
+        <div class="card-vendor">
+          <div class="card-vendor-dot"></div>
+          Boutique d'essai
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          <div class="card-price-amount">95 000</div>
+          <div class="card-price-currency">FCFA</div>
+        </div>
+        <div class="card-actions">
+          <a href="#" class="btn-detail">Détails</a>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="product-card">
+      <div class="card-top">
+        <div class="card-image">💾</div>
+        <div class="card-badges">
+          <span class="badge-stock"><span class="badge-stock-dot"></span>40 en stock</span>
+          <span class="badge-cat">Mémoire RAM</span>
+        </div>
+        <div class="card-fav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">G.Skill Trident Z5 32 Go DDR5</div>
+        <div class="card-desc">Mémoire vive DDR5 32 Go (2×16 Go) 6 000 MHz pour le jeu</div>
+        <div class="card-vendor">
+          <div class="card-vendor-dot"></div>
+          Boutique d'essai
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          <div class="card-price-amount">220 000</div>
+          <div class="card-price-currency">FCFA</div>
+        </div>
+        <div class="card-actions">
+          <a href="#" class="btn-detail">Détails</a>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="product-card">
+      <div class="card-top">
+        <div class="card-image">🔴</div>
+        <div class="card-badges">
+          <span class="badge-stock"><span class="badge-stock-dot"></span>13 en stock</span>
+          <span class="badge-cat">Processeurs</span>
+        </div>
+        <div class="card-fav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">AMD Ryzen 9 7950X3D</div>
+        <div class="card-desc">CPU gaming 16 cœurs 3D V-Cache ultra rapide</div>
+        <div class="card-vendor">
+          <div class="card-vendor-dot"></div>
+          Boutique d'essai
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          <div class="card-price-amount">680 000</div>
+          <div class="card-price-currency">FCFA</div>
+        </div>
+        <div class="card-actions">
+          <a href="#" class="btn-detail">Détails</a>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="product-card">
+      <div class="card-top">
+        <div class="card-image">🔵</div>
+        <div class="card-badges">
+          <span class="badge-stock"><span class="badge-stock-dot"></span>20 en stock</span>
+          <span class="badge-cat">Processeurs</span>
+        </div>
+        <div class="card-fav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Intel Core i7-13700K</div>
+        <div class="card-desc">CPU puissant 16 cœurs gaming et travail</div>
+        <div class="card-vendor">
+          <div class="card-vendor-dot"></div>
+          Boutique d'essai
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          <div class="card-price-amount">480 000</div>
+          <div class="card-price-currency">FCFA</div>
+        </div>
+        <div class="card-actions">
+          <a href="#" class="btn-detail">Détails</a>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="product-card">
+      <div class="card-top">
+        <div class="card-image">🖥️</div>
+        <div class="card-badges">
+          <span class="badge-stock"><span class="badge-stock-dot"></span>8 en stock</span>
+          <span class="badge-cat">Stockage</span>
+        </div>
+        <div class="card-fav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Samsung 990 Pro SSD 2 To</div>
+        <div class="card-desc">NVMe M.2 PCIe 4.0 — 7 450 Mo/s en lecture</div>
+        <div class="card-vendor">
+          <div class="card-vendor-dot"></div>
+          Boutique d'essai
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          <div class="card-price-amount">185 000</div>
+          <div class="card-price-currency">FCFA</div>
+        </div>
+        <div class="card-actions">
+          <a href="#" class="btn-detail">Détails</a>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="product-card">
+      <div class="card-top">
+        <div class="card-image">⚡</div>
+        <div class="card-badges">
+          <span class="badge-stock"><span class="badge-stock-dot"></span>25 en stock</span>
+          <span class="badge-cat">Alimentations</span>
+        </div>
+        <div class="card-fav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Corsair RM850x 850W Gold</div>
+        <div class="card-desc">Alimentation modulaire 80+ Gold, 850W silencieuse</div>
+        <div class="card-vendor">
+          <div class="card-vendor-dot"></div>
+          Boutique d'essai
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          <div class="card-price-amount">145 000</div>
+          <div class="card-price-currency">FCFA</div>
+        </div>
+        <div class="card-actions">
+          <a href="#" class="btn-detail">Détails</a>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 7 -->
+    <div class="product-card">
+      <div class="card-top">
+        <div class="card-image">🎯</div>
+        <div class="card-badges">
+          <span class="badge-stock"><span class="badge-stock-dot"></span>15 en stock</span>
+          <span class="badge-cat">Refroidissement</span>
+        </div>
+        <div class="card-fav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Noctua NH-D15 Chromax Black</div>
+        <div class="card-desc">Ventirad dual-tower silencieux, compatible AM5 / LGA1700</div>
+        <div class="card-vendor">
+          <div class="card-vendor-dot"></div>
+          Boutique d'essai
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          <div class="card-price-amount">110 000</div>
+          <div class="card-price-currency">FCFA</div>
+        </div>
+        <div class="card-actions">
+          <a href="#" class="btn-detail">Détails</a>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 8 -->
+    <div class="product-card">
+      <div class="card-top">
+        <div class="card-image">📡</div>
+        <div class="card-badges">
+          <span class="badge-stock"><span class="badge-stock-dot"></span>32 en stock</span>
+          <span class="badge-cat">Réseau</span>
+        </div>
+        <div class="card-fav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">TP-Link Archer AXE75</div>
+        <div class="card-desc">Routeur Wi-Fi 6E tri-bande, 4 804 Mbps, couverture 230 m²</div>
+        <div class="card-vendor">
+          <div class="card-vendor-dot"></div>
+          Boutique d'essai
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">
+          <div class="card-price-amount">78 000</div>
+          <div class="card-price-currency">FCFA</div>
+        </div>
+        <div class="card-actions">
+          <a href="#" class="btn-detail">Détails</a>
+          <button class="btn-add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>Supply</strong>
+  <span>Plateforme e-commerce · Côte d'Ivoire · © 2026</span>
+  <span>Email automatique — ne pas répondre</span>
+</footer>
+
+</body>
+</html>

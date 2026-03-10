@@ -133,36 +133,36 @@
             <h3 class="text-lg font-bold text-gray-900 mb-6">Accès Rapides</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <a href="{{ route('produits.catalogue') }}"
-                   class="group bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl shadow-lg p-8 text-center font-bold transition transform hover:scale-105">
-                    <div class="text-4xl mb-3 group-hover:scale-110 transition flex justify-center">
+                   class="group bg-black text-white rounded-xl p-8 text-center font-semibold transition hover:opacity-90 border border-black">
+                    <div class="text-4xl mb-3 flex justify-center">
                         <x-heroicon-o-shopping-bags class="w-12 h-12" />
                     </div>
                     <span>Continuer les Achats</span>
                 </a>
                 <a href="{{ route('panier.index') }}"
-                   class="group bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl shadow-lg p-8 text-center font-bold transition transform hover:scale-105">
-                    <div class="text-4xl mb-3 group-hover:scale-110 transition flex justify-center">
+                   class="group bg-black text-white rounded-xl p-8 text-center font-semibold transition hover:opacity-90 border border-black">
+                    <div class="text-4xl mb-3 flex justify-center">
                         <x-heroicon-o-shopping-cart class="w-12 h-12" />
                     </div>
                     <span>Voir Panier</span>
                 </a>
                 <a href="{{ route('client.messages') }}"
-                   class="group bg-gradient-to-br from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white rounded-xl shadow-lg p-8 text-center font-bold transition transform hover:scale-105">
-                    <div class="text-4xl mb-3 group-hover:scale-110 transition flex justify-center">
+                   class="group bg-black text-white rounded-xl p-8 text-center font-semibold transition hover:opacity-90 border border-black">
+                    <div class="text-4xl mb-3 flex justify-center">
                         <x-heroicon-o-chat-bubble-left class="w-12 h-12" />
                     </div>
                     <span>Messages</span>
                 </a>
                 <a href="{{ route('client.commandes') }}"
-                   class="group bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl shadow-lg p-8 text-center font-bold transition transform hover:scale-105">
-                    <div class="text-4xl mb-3 group-hover:scale-110 transition flex justify-center">
+                   class="group bg-black text-white rounded-xl p-8 text-center font-semibold transition hover:opacity-90 border border-black">
+                    <div class="text-4xl mb-3 flex justify-center">
                         <x-heroicon-o-cube class="w-12 h-12" />
                     </div>
                     <span>Mes Commandes</span>
                 </a>
                 <a href="{{ route('client.profil') }}"
-                   class="group bg-gradient-to-br from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl shadow-lg p-8 text-center font-bold transition transform hover:scale-105">
-                    <div class="text-4xl mb-3 group-hover:scale-110 transition flex justify-center">
+                   class="group bg-black text-white rounded-xl p-8 text-center font-semibold transition hover:opacity-90 border border-black">
+                    <div class="text-4xl mb-3 flex justify-center">
                         <x-heroicon-o-user class="w-12 h-12" />
                     </div>
                     <span>Mon Profil</span>
