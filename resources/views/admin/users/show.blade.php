@@ -1,329 +1,367 @@
 @extends('layouts.admin-layout')
 
-@section('title', 'Utilisateur - ' . $user->name)
+@section('title', $user->name . ' — Supply Admin')
+
+@section('breadcrumb')
+    Espace Admin &nbsp;/&nbsp;
+    <a href="{{ route('admin.users.index') }}" class="hover:text-[#0a0a0a] transition-colors">Utilisateurs</a>
+    &nbsp;/&nbsp; {{ $user->name }}
+@endsection
 
 @section('content')
-<div class="space-y-8">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-        <div>
-            <a href="{{ route('admin.users.index') }}" class="text-blue-600 hover:text-blue-700 font-semibold mb-2 inline-block">← Retour aux utilisateurs</a>
-            <h1 class="text-4xl font-bold text-gray-900">{{ $user->name }}</h1>
-            <p class="text-gray-500 mt-2">{{ ucfirst($user->role) }} • Créé le {{ $user->created_at->format('d/m/Y à H:i') }}</p>
-        </div>
-        <div class="text-right">
-            @if($user->is_banned)
-                <span class="inline-block px-4 py-2 rounded-full text-sm font-bold bg-red-100 text-red-800">🚫 BANNI</span>
-            @elseif($user->role === 'vendor' && $user->vendor_status === 'pending')
-                <span class="inline-block px-4 py-2 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800">⏳ En attente d'approbation</span>
-            @elseif($user->email_verified_at)
-                <span class="inline-block px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-800">✓ Vérifié</span>
-            @else
-                <span class="inline-block px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-800">⏳ Non vérifié</span>
-            @endif
+<div class="pb-16">
+
+    {{-- HEADER --}}
+    <div class="bg-[#0a0a0a] px-8 pt-10 pb-8 mb-8">
+        <a href="{{ route('admin.users.index') }}"
+           class="inline-flex items-center gap-1.5 text-[11px] text-white/40 hover:text-white/70 transition-colors mb-4">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Retour aux utilisateurs
+        </a>
+        <div class="flex items-start justify-between">
+            <div>
+                <div class="text-[10px] font-medium tracking-[0.15em] uppercase text-white/40 mb-2">Utilisateur</div>
+                <h1 class="font-serif text-[32px] tracking-tight text-white leading-none">{{ $user->name }}</h1>
+                <div class="flex items-center gap-3 mt-3">
+                    <span class="font-mono text-[12px] text-white/50">{{ ucfirst($user->role ?? 'client') }}</span>
+                    <span class="w-1 h-1 rounded-full bg-white/20"></span>
+                    <span class="font-mono text-[12px] text-white/50">{{ $user->created_at->format('d/m/Y') }}</span>
+                </div>
+            </div>
+            @php
+                if ($user->is_banned)              { $st = ['bg-[#fef2f2] text-[#dc2626]','bg-[#f87171]','Banni']; }
+                elseif ($user->role === 'vendor' && ($user->vendor_status ?? '') === 'pending') { $st = ['bg-[#fdf6ec] text-[#b45309]','bg-[#f59e0b]','En attente']; }
+                elseif ($user->email_verified_at)  { $st = ['bg-[#f0fdf4] text-[#15803d]','bg-[#22c55e]','Vérifié']; }
+                else                               { $st = ['bg-[#f7f7f5] text-[#a0a09a]','bg-[#a0a09a]','Non vérifié']; }
+            @endphp
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium px-3 py-1.5 rounded-md {{ $st[0] }}">
+                <span class="w-1.5 h-1.5 rounded-full {{ $st[1] }}"></span>{{ $st[2] }}
+            </span>
         </div>
     </div>
 
-    <!-- User Info Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Personal Information -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">👤 Informations Personnelles</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Email</label>
-                    <p class="text-gray-900 mt-1">{{ $user->email }}</p>
-                    @if($user->email_verified_at)
-                        <p class="text-xs text-green-600 font-semibold mt-1">✓ Vérifié le {{ $user->email_verified_at->format('d/m/Y') }}</p>
-                    @endif
-                </div>
-                <div>
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Pays</label>
-                    <p class="text-gray-900 mt-1">{{ $user->country ?? 'Non spécifié' }}</p>
-                </div>
-                <div>
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Téléphone</label>
-                    <p class="text-gray-900 mt-1">{{ $user->phone ?? 'Non spécifié' }}</p>
-                </div>
-                <div>
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Adresse</label>
-                    <p class="text-gray-900 mt-1">{{ $user->address ?? 'Non spécifié' }}</p>
-                </div>
+    <div class="px-8 space-y-5">
+
+    {{-- INFOS GÉNÉRALES --}}
+    <div class="grid grid-cols-2 gap-px bg-[#e0e0dc] border border-[#e0e0dc] rounded-xl overflow-hidden">
+
+        {{-- Informations personnelles --}}
+        <div class="bg-white px-6 py-5">
+            <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-4">Informations personnelles</div>
+            <div class="space-y-3.5">
+                @foreach([
+                    ['label'=>'Email',     'value'=>$user->email,              'mono'=>true],
+                    ['label'=>'Pays',      'value'=>$user->country ?? '—',     'mono'=>false],
+                    ['label'=>'Téléphone', 'value'=>$user->phone ?? '—',       'mono'=>true],
+                    ['label'=>'Adresse',   'value'=>$user->address ?? '—',     'mono'=>false],
+                ] as $row)
+                    <div class="flex items-start gap-4">
+                        <span class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] w-20 flex-shrink-0 pt-0.5">{{ $row['label'] }}</span>
+                        <span class="{{ $row['mono'] ? 'font-mono text-[12px]' : 'text-[13px]' }} text-[#0a0a0a]">{{ $row['value'] }}</span>
+                    </div>
+                @endforeach
+                @if($user->email_verified_at)
+                    <div class="flex items-center gap-1.5 pt-1">
+                        <svg class="w-3 h-3 text-[#22c55e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span class="text-[11px] text-[#15803d] font-light">Email vérifié le {{ $user->email_verified_at->format('d/m/Y') }}</span>
+                    </div>
+                @endif
             </div>
         </div>
 
-        <!-- Role & Status -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">🏷️ Rôle & Statut</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Rôle</label>
-                    <div class="mt-2">
-                        @if($user->role === 'vendor')
-                            <span class="inline-block px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-800">👨‍💼 Vendeur</span>
-                        @elseif($user->role === 'admin')
-                            <span class="inline-block px-3 py-1 rounded-full text-sm font-bold bg-purple-100 text-purple-800">👑 Admin</span>
-                        @else
-                            <span class="inline-block px-3 py-1 rounded-full text-sm font-bold bg-gray-100 text-gray-800">👤 Client</span>
-                        @endif
-                    </div>
+        {{-- Rôle & statut --}}
+        <div class="bg-white px-6 py-5">
+            <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-4">Rôle & statut</div>
+            <div class="space-y-3.5">
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] w-20 flex-shrink-0">Rôle</span>
+                    @php
+                        $roleBadge = match($user->role ?? '') {
+                            'admin'  => 'bg-[#fef2f2] text-[#dc2626]',
+                            'vendor' => 'bg-[#fdf6ec] text-[#b45309]',
+                            default  => 'bg-[#eff6ff] text-[#2563eb]',
+                        };
+                    @endphp
+                    <span class="inline-flex items-center text-[10px] font-mono font-medium px-2 py-1 rounded {{ $roleBadge }}">
+                        {{ ucfirst($user->role ?? 'client') }}
+                    </span>
                 </div>
 
                 @if($user->role === 'vendor')
-                    <div>
-                        <label class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Statut Vendeur</label>
-                        <p class="text-gray-900 mt-1">
-                            @if($user->vendor_status === 'pending')
-                                <span class="text-yellow-700 font-semibold">⏳ En attente d'approbation</span>
-                            @elseif($user->vendor_status === 'approved')
-                                <span class="text-green-700 font-semibold">✓ Approuvé</span>
-                            @elseif($user->vendor_status === 'rejected')
-                                <span class="text-red-700 font-semibold">✗ Rejeté</span>
-                            @endif
-                        </p>
+                    <div class="flex items-center gap-4">
+                        <span class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] w-20 flex-shrink-0">Statut</span>
+                        @php
+                            $vsb = match($user->vendor_status ?? '') {
+                                'approved' => ['bg-[#f0fdf4] text-[#15803d]','bg-[#22c55e]','Approuvé'],
+                                'rejected' => ['bg-[#fef2f2] text-[#dc2626]','bg-[#f87171]','Rejeté'],
+                                default    => ['bg-[#fdf6ec] text-[#b45309]','bg-[#f59e0b]','En attente'],
+                            };
+                        @endphp
+                        <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded {{ $vsb[0] }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $vsb[1] }}"></span>{{ $vsb[2] }}
+                        </span>
                     </div>
-                    <div>
-                        <label class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Nom de Boutique</label>
-                        <p class="text-gray-900 mt-1">{{ $user->shop_name ?? 'Non défini' }}</p>
+                    <div class="flex items-start gap-4">
+                        <span class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] w-20 flex-shrink-0 pt-0.5">Boutique</span>
+                        <span class="text-[13px] text-[#0a0a0a]">{{ $user->shop_name ?? '—' }}</span>
                     </div>
-                    <div>
-                        <label class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Téléphone Boutique</label>
-                        <p class="text-gray-900 mt-1">{{ $user->boutique_telephone ?? 'Non défini' }}</p>
+                    <div class="flex items-start gap-4">
+                        <span class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] w-20 flex-shrink-0 pt-0.5">Tél boutique</span>
+                        <span class="font-mono text-[12px] text-[#0a0a0a]">{{ $user->boutique_telephone ?? '—' }}</span>
                     </div>
                 @endif
 
-                <div>
-                    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Statut Bannissement</label>
-                    <div class="mt-2">
-                        @if($user->is_banned)
-                            <span class="inline-block px-3 py-1 rounded-full text-sm font-bold bg-red-100 text-red-800">🚫 BANNI</span>
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] w-20 flex-shrink-0">Banni</span>
+                    @if($user->is_banned)
+                        <div>
+                            <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded bg-[#fef2f2] text-[#dc2626]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#f87171]"></span>Oui
+                            </span>
                             @if($user->banned_until)
-                                <p class="text-xs text-red-600 mt-1">Jusqu'au {{ $user->banned_until->format('d/m/Y') }}</p>
+                                <div class="text-[11px] text-[#a0a09a] font-light mt-1">Jusqu'au {{ $user->banned_until->format('d/m/Y') }}</div>
                             @else
-                                <p class="text-xs text-red-600 mt-1">Banni indéfiniment</p>
+                                <div class="text-[11px] text-[#a0a09a] font-light mt-1">Indéfiniment</div>
                             @endif
-                        @else
-                            <span class="inline-block px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800">✓ Non banni</span>
-                        @endif
-                    </div>
+                        </div>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded bg-[#f0fdf4] text-[#15803d]">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#22c55e]"></span>Non
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Shop Description (if vendor) -->
-    @if($user->role === 'vendor')
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">📝 Description de Boutique</h2>
-            <p class="text-gray-700 leading-relaxed">{{ $user->boutique_description ?? 'Aucune description fournie' }}</p>
+    {{-- Description boutique --}}
+    @if($user->role === 'vendor' && $user->boutique_description)
+        <div class="bg-white border border-[#e0e0dc] rounded-xl px-6 py-5">
+            <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-3">Description de boutique</div>
+            <p class="text-[13px] text-[#2a2a28] font-light leading-relaxed">{{ $user->boutique_description }}</p>
         </div>
     @endif
 
-    <!-- Documents (for vendors) -->
+    {{-- Documents KYC --}}
     @if($user->role === 'vendor' && $user->documents && $user->documents->count() > 0)
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">📄 Documents KYC</h2>
-            <div class="space-y-4">
-                @foreach($user->documents as $document)
-                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition">
-                        <div>
-                            <p class="font-semibold text-gray-900">{{ ucfirst(str_replace('_', ' ', $document->document_type)) }}</p>
-                            <p class="text-sm text-gray-600">Créé le {{ $document->created_at->format('d/m/Y') }}</p>
-                        </div>
-                        <div class="text-right">
-                            @if($document->status === 'verified')
-                                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">✓ Vérifié</span>
-                            @elseif($document->status === 'pending')
-                                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">⏳ En attente</span>
-                            @elseif($document->status === 'rejected')
-                                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">✗ Rejeté</span>
-                            @endif
-                        </div>
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-[#efefed]">
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Documents KYC</span>
+                <a href="{{ route('admin.users.documents', $user) }}"
+                   class="text-[11px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors border-b border-[#e0e0dc] pb-px">
+                    Voir tout →
+                </a>
+            </div>
+            @foreach($user->documents as $doc)
+                @php
+                    $db2 = match($doc->status ?? '') {
+                        'verified' => ['bg-[#f0fdf4] text-[#15803d]','bg-[#22c55e]','Vérifié'],
+                        'rejected' => ['bg-[#fef2f2] text-[#dc2626]','bg-[#f87171]','Rejeté'],
+                        default    => ['bg-[#fdf6ec] text-[#b45309]','bg-[#f59e0b]','En attente'],
+                    };
+                @endphp
+                <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                    <div>
+                        <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
+                        <div class="font-mono text-[11px] text-[#a0a09a]">{{ $doc->created_at->format('d/m/Y') }}</div>
                     </div>
-                @endforeach
-            </div>
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded {{ $db2[0] }}">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $db2[1] }}"></span>{{ $db2[2] }}
+                    </span>
+                </div>
+            @endforeach
         </div>
     @endif
 
-    <!-- Products (for vendors) -->
+    {{-- Produits (vendor) --}}
     @if($user->role === 'vendor' && $user->produits && $user->produits->count() > 0)
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-heroicon-o-cube class="w-6 h-6" /><span>Produits ({{ $user->produits->count() }})</span></h2>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b-2 border-gray-200">
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Produit</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Prix</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Stock</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Créé le</th>
-                            <th class="text-center py-3 px-4 font-bold text-gray-700">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($user->produits as $product)
-                            <tr class="border-b hover:bg-blue-50 transition">
-                                <td class="py-4 px-4">
-                                    <a href="#" class="font-semibold text-blue-600 hover:text-blue-700">{{ $product->nom }}</a>
-                                </td>
-                                <td class="py-4 px-4 text-gray-700">{{ number_format($product->prix, 0, ',', ' ') }} FCFA</td>
-                                <td class="py-4 px-4">
-                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold {{ $product->stock < 5 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
-                                        {{ $product->stock }} u.
-                                    </span>
-                                </td>
-                                <td class="py-4 px-4 text-gray-600">{{ $product->created_at->format('d/m/Y') }}</td>
-                                <td class="py-4 px-4 text-center">
-                                    <a href="#" class="text-blue-600 hover:text-blue-700 font-bold text-sm">Voir</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-[#efefed]">
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Produits ({{ $user->produits->count() }})</span>
             </div>
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-[#efefed] bg-[#f7f7f5]">
+                        <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Produit</th>
+                        <th class="text-right px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Prix</th>
+                        <th class="text-center px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Stock</th>
+                        <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Créé</th>
+                        <th class="px-5 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($user->produits as $product)
+                        <tr class="border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                            <td class="px-5 py-3.5 text-[13px] font-medium text-[#0a0a0a]">{{ $product->nom }}</td>
+                            <td class="px-5 py-3.5 text-right font-mono text-[12px] font-medium text-[#0a0a0a]">
+                                {{ number_format($product->prix, 0, ',', ' ') }} <span class="text-[10px] text-[#a0a09a] font-sans">F</span>
+                            </td>
+                            <td class="px-5 py-3.5 text-center">
+                                <span class="font-mono text-[12px] {{ $product->stock < 5 ? 'text-[#dc2626]' : 'text-[#15803d]' }}">{{ $product->stock }}</span>
+                            </td>
+                            <td class="px-5 py-3.5 font-mono text-[11px] text-[#a0a09a]">{{ $product->created_at->format('d/m/Y') }}</td>
+                            <td class="px-5 py-3.5 text-right">
+                                <a href="{{ route('admin.products.show', $product) }}"
+                                   class="text-[11px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors">Voir →</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     @endif
 
-    <!-- Orders (for customers) -->
+    {{-- Commandes (client) --}}
     @if($user->role === 'customer' && $user->commandes && $user->commandes->count() > 0)
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-heroicon-o-clipboard class="w-6 h-6" /><span>Commandes ({{ $user->commandes->count() }})</span></h2>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b-2 border-gray-200">
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">N° Commande</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Montant</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Statut</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Date</th>
-                            <th class="text-center py-3 px-4 font-bold text-gray-700">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($user->commandes as $order)
-                            <tr class="border-b hover:bg-blue-50 transition">
-                                <td class="py-4 px-4 font-bold text-blue-600">#{{ $order->id }}</td>
-                                <td class="py-4 px-4 font-semibold text-green-600">{{ number_format($order->total, 0, ',', ' ') }} FCFA</td>
-                                <td class="py-4 px-4">
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold 
-                                        @if($order->statut === 'en_attente') bg-yellow-100 text-yellow-800
-                                        @elseif($order->statut === 'confirmee') bg-blue-100 text-blue-800
-                                        @elseif($order->statut === 'expediee') bg-indigo-100 text-indigo-800
-                                        @elseif($order->statut === 'livree') bg-green-100 text-green-800
-                                        @else bg-red-100 text-red-800 @endif">
-                                        {{ match($order->statut) {
-                                            'en_attente' => 'En attente',
-                                            'confirmee' => 'Confirmée',
-                                            'expediee' => 'Expédiée',
-                                            'livree' => 'Livrée',
-                                            'annulee' => 'Annulée',
-                                            default => ucfirst(str_replace('_', ' ', $order->statut))
-                                        } }}
-                                    </span>
-                                </td>
-                                <td class="py-4 px-4 text-gray-600">{{ $order->created_at->format('d/m/Y') }}</td>
-                                <td class="py-4 px-4 text-center">
-                                    <a href="{{ route('admin.orders.show', $order->id) }}" class="text-blue-600 hover:text-blue-700 font-bold text-sm">Voir</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-[#efefed]">
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Commandes ({{ $user->commandes->count() }})</span>
             </div>
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-[#efefed] bg-[#f7f7f5]">
+                        @foreach(['N°','Montant','Statut','Date',''] as $h)
+                            <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">{{ $h }}</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($user->commandes as $order)
+                        @php
+                            $ob = match($order->statut) {
+                                'en_attente' => ['bg-[#fdf6ec] text-[#b45309]','bg-[#f59e0b]','En attente'],
+                                'confirmee'  => ['bg-[#eff6ff] text-[#2563eb]', 'bg-[#60a5fa]','Confirmée'],
+                                'expediee'   => ['bg-[#f5f3ff] text-[#7c3aed]', 'bg-[#a78bfa]','Expédiée'],
+                                'livree'     => ['bg-[#f0fdf4] text-[#15803d]', 'bg-[#22c55e]','Livrée'],
+                                default      => ['bg-[#fef2f2] text-[#dc2626]', 'bg-[#f87171]',ucfirst(str_replace('_',' ',$order->statut))],
+                            };
+                        @endphp
+                        <tr class="border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                            <td class="px-5 py-3.5 font-mono text-[12px] text-[#666660]">#{{ $order->id }}</td>
+                            <td class="px-5 py-3.5 font-mono text-[12px] font-medium text-[#0a0a0a]">{{ number_format($order->total, 0, ',', ' ') }} FCFA</td>
+                            <td class="px-5 py-3.5">
+                                <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded {{ $ob[0] }}">
+                                    <span class="w-1.5 h-1.5 rounded-full {{ $ob[1] }}"></span>{{ $ob[2] }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-3.5 font-mono text-[11px] text-[#a0a09a]">{{ $order->created_at->format('d/m/Y') }}</td>
+                            <td class="px-5 py-3.5 text-right">
+                                <a href="{{ route('admin.orders.show', $order->id) }}"
+                                   class="text-[11px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors">Voir →</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     @endif
 
-    <!-- Disputes -->
+    {{-- Litiges --}}
     @if($user->disputes && $user->disputes->count() > 0)
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-heroicon-o-exclamation-triangle class="w-6 h-6" /><span>Litiges ({{ $user->disputes->count() }})</span></h2>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b-2 border-gray-200">
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Titre</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Statut</th>
-                            <th class="text-left py-3 px-4 font-bold text-gray-700">Date</th>
-                            <th class="text-center py-3 px-4 font-bold text-gray-700">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($user->disputes as $dispute)
-                            <tr class="border-b hover:bg-red-50 transition">
-                                <td class="py-4 px-4 font-semibold text-gray-900">{{ $dispute->titre }}</td>
-                                <td class="py-4 px-4">
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold 
-                                        @if($dispute->status === 'open') bg-red-100 text-red-800
-                                        @elseif($dispute->status === 'in_progress') bg-yellow-100 text-yellow-800
-                                        @elseif($dispute->status === 'resolved') bg-green-100 text-green-800
-                                        @else bg-gray-100 text-gray-800 @endif">
-                                        {{ ucfirst(str_replace('_', ' ', $dispute->status)) }}
-                                    </span>
-                                </td>
-                                <td class="py-4 px-4 text-gray-600">{{ $dispute->created_at->format('d/m/Y') }}</td>
-                                <td class="py-4 px-4 text-center">
-                                    <a href="{{ route('admin.disputes.show', $dispute->id) }}" class="text-red-600 hover:text-red-700 font-bold text-sm">Voir</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-[#efefed]">
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Litiges ({{ $user->disputes->count() }})</span>
             </div>
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-[#efefed] bg-[#f7f7f5]">
+                        @foreach(['Titre','Statut','Date',''] as $h)
+                            <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">{{ $h }}</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($user->disputes as $dispute)
+                        @php
+                            $dsb = match($dispute->status ?? 'open') {
+                                'open'        => ['bg-[#fef2f2] text-[#dc2626]','bg-[#f87171]','Ouvert'],
+                                'in_progress' => ['bg-[#fdf6ec] text-[#b45309]','bg-[#f59e0b]','En cours'],
+                                'resolved'    => ['bg-[#f0fdf4] text-[#15803d]','bg-[#22c55e]','Résolu'],
+                                default       => ['bg-[#f7f7f5] text-[#a0a09a]','bg-[#a0a09a]','Fermé'],
+                            };
+                        @endphp
+                        <tr class="border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                            <td class="px-5 py-3.5 text-[13px] font-medium text-[#0a0a0a]">{{ $dispute->titre }}</td>
+                            <td class="px-5 py-3.5">
+                                <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded {{ $dsb[0] }}">
+                                    <span class="w-1.5 h-1.5 rounded-full {{ $dsb[1] }}"></span>{{ $dsb[2] }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-3.5 font-mono text-[11px] text-[#a0a09a]">{{ $dispute->created_at->format('d/m/Y') }}</td>
+                            <td class="px-5 py-3.5 text-right">
+                                <a href="{{ route('admin.disputes.show', $dispute->id) }}"
+                                   class="text-[11px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors">Voir →</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     @endif
 
-    <!-- Actions -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">⚙️ Actions</h2>
-        <div class="flex flex-wrap gap-4">
+    {{-- ACTIONS --}}
+    <div class="bg-white border border-[#e0e0dc] rounded-xl px-6 py-5">
+        <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-4">Actions</div>
+        <div class="flex flex-wrap gap-2">
+
             @if(!$user->is_banned)
-                <form method="POST" action="{{ route('admin.users.ban', $user->id) }}" style="display: inline;"
-                      data-confirm="Êtes-vous sûr de vouloir bannir cet utilisateur ?"
+                <form method="POST" action="{{ route('admin.users.ban', $user->id) }}"
+                      data-confirm="Bannir cet utilisateur ?"
                       data-confirm-title="Bannir l'utilisateur"
                       data-confirm-type="danger"
                       data-confirm-button="Bannir">
                     @csrf
-                    <button type="submit" class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition">
-                        🚫 Bannir cet utilisateur
+                    <button type="submit"
+                            class="text-[12px] font-medium text-[#dc2626] border border-[#fecaca] px-4 py-2 rounded-lg
+                                   hover:bg-[#fef2f2] transition-all">
+                        Bannir l'utilisateur
                     </button>
                 </form>
             @else
-                <form method="POST" action="{{ route('admin.users.unban', $user->id) }}" style="display: inline;"
-                      data-confirm="Êtes-vous sûr de vouloir débannir cet utilisateur ?"
+                <form method="POST" action="{{ route('admin.users.unban', $user->id) }}"
+                      data-confirm="Débannir cet utilisateur ?"
                       data-confirm-title="Débannir l'utilisateur"
                       data-confirm-type="success"
                       data-confirm-button="Débannir">
                     @csrf
-                    <button type="submit" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold transition">
-                        ✓ Débannir cet utilisateur
+                    <button type="submit"
+                            class="text-[12px] font-medium text-[#15803d] border border-[#bbf7d0] px-4 py-2 rounded-lg
+                                   hover:bg-[#f0fdf4] transition-all">
+                        Débannir l'utilisateur
                     </button>
                 </form>
             @endif
 
-            @if($user->role === 'vendor' && $user->vendor_status === 'pending')
-                <form method="POST" action="{{ route('admin.users.approve-vendor', $user) }}" style="display: inline;"
+            @if($user->role === 'vendor' && ($user->vendor_status ?? '') === 'pending')
+                <form method="POST" action="{{ route('admin.users.approve-vendor', $user) }}"
                       data-confirm="Approuver ce vendeur ?"
                       data-confirm-title="Approuver le vendeur"
                       data-confirm-type="success"
                       data-confirm-button="Approuver">
                     @csrf
-                    <button type="submit" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold transition">
-                        ✓ Approuver le vendeur
+                    <button type="submit"
+                            class="text-[12px] font-medium text-[#15803d] border border-[#bbf7d0] px-4 py-2 rounded-lg
+                                   hover:bg-[#f0fdf4] transition-all">
+                        Approuver le vendeur
                     </button>
                 </form>
-
-                <form method="POST" action="{{ route('admin.users.reject-vendor', $user) }}" style="display: inline;"
+                <form method="POST" action="{{ route('admin.users.reject-vendor', $user) }}"
                       data-confirm="Rejeter ce vendeur ?"
                       data-confirm-title="Rejeter le vendeur"
                       data-confirm-type="danger"
                       data-confirm-button="Rejeter">
                     @csrf
-                    <button type="submit" class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold transition">
-                        ✗ Rejeter le vendeur
+                    <button type="submit"
+                            class="text-[12px] font-medium text-[#666660] border border-[#e0e0dc] px-4 py-2 rounded-lg
+                                   hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                        Rejeter le vendeur
                     </button>
                 </form>
             @endif
+
         </div>
+    </div>
+
     </div>
 </div>
 @endsection

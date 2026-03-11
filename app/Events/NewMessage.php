@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Commande;
+use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -10,24 +10,22 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OrderCreated implements ShouldBroadcastNow
+class NewMessage implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(public Commande $commande) {}
+    public function __construct(public Message $message) {}
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
      */
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('vendor-notifications.'.$this->commande->vendeur_id),
+            new PrivateChannel('user-messages.'.$this->message->destinataire_id),
         ];
     }
 
@@ -36,7 +34,7 @@ class OrderCreated implements ShouldBroadcastNow
      */
     public function broadcastAs(): string
     {
-        return 'order.created';
+        return 'message.received';
     }
 
     /**
@@ -45,13 +43,13 @@ class OrderCreated implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'id' => $this->commande->id,
-            'numero' => $this->commande->numero,
-            'client' => $this->commande->user->prenom . ' ' . $this->commande->user->nom,
-            'montant' => number_format($this->commande->montant_total, 0),
-            'devise' => 'FCFA',
-            'created_at' => $this->commande->created_at->format('Y-m-d H:i:s'),
-            'message' => 'Nouvelle commande #'.$this->commande->numero,
+            'id' => $this->message->id,
+            'from_user_id' => $this->message->user_id,
+            'from_name' => $this->message->user->prenom . ' ' . $this->message->user->nom,
+            'from_avatar' => $this->message->user->photo_profil,
+            'content' => $this->message->contenu,
+            'created_at' => $this->message->created_at->format('Y-m-d H:i:s'),
+            'message' => $this->message->user->prenom . ' vous a envoyé un message',
         ];
     }
 }

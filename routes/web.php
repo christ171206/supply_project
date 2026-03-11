@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\PanierController;
 use App\Http\Controllers\CommandeController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AvisController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\VendeurProduitController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ValidationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\VendorStatisticsController;
+use App\Http\Controllers\CloudinaryImageController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NotificationController;
 
@@ -73,6 +75,9 @@ Route::patch('/panier/{itemId}', [PanierController::class, 'modifier'])->name('p
 Route::delete('/panier/{itemId}', [PanierController::class, 'supprimer'])->name('panier.supprimer');
 Route::post('/panier/vider', [PanierController::class, 'vider'])->name('panier.vider');
 
+// Webhook Stripe (public - CSRF exempt via middleware)
+Route::post('/webhooks/stripe', [PaymentController::class, 'handleWebhook'])->name('webhooks.stripe')->withoutMiddleware('web');
+
 // Favoris (accessible sans auth - affichage des favoris)
 Route::get('/favoris', [FavoriteController::class, 'index'])->name('favoris.index');
 Route::get('/favoris/{productId}/check', [FavoriteController::class, 'isFavorited'])->name('favoris.check');
@@ -96,6 +101,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/commandes/{id}/download-pdf', [CommandeController::class, 'downloadPDF'])->name('commandes.download-pdf');
     Route::post('/commandes', [CommandeController::class, 'store'])->name('commandes.store');
     Route::get('/commandes/{id}/payment-success', [CommandeController::class, 'paymentSuccess'])->name('commandes.payment-success');
+
+    // Paiement Stripe
+    Route::get('/commandes/{id}/payment', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/create-intent', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
+    Route::post('/payment/confirm', [PaymentController::class, 'confirm'])->name('payment.confirm');
 
     // Profil (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -169,6 +179,15 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
     Route::get('/api/statistics/sales', [VendorStatisticsController::class, 'getSalesData'])->name('statistics.sales');
     Route::get('/api/statistics/inventory', [VendorStatisticsController::class, 'getInventoryStatus'])->name('statistics.inventory');
     Route::get('/api/statistics/customers', [VendorStatisticsController::class, 'getCustomerMetrics'])->name('statistics.customers');
+
+    // Cloudinary Image Management
+    Route::prefix('produits/{produitId}/images')->group(function () {
+        Route::get('/', [CloudinaryImageController::class, 'gallery'])->name('vendeur.images.gallery');
+        Route::post('/upload', [CloudinaryImageController::class, 'upload'])->name('vendeur.images.upload');
+        Route::delete('/{imageId}', [CloudinaryImageController::class, 'delete'])->name('vendeur.images.delete');
+        Route::patch('/{imageId}/primary', [CloudinaryImageController::class, 'setPrimary'])->name('vendeur.images.set-primary');
+        Route::post('/reorder', [CloudinaryImageController::class, 'reorder'])->name('vendeur.images.reorder');
+    });
 
     // Role Switching - Vendeur to Client only
     Route::post('/switch-client', [VendeurProduitController::class, 'switchToClient'])->name('switch-client');

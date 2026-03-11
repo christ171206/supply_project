@@ -89,7 +89,7 @@ class CommandeController extends Controller
         ]);
 
         $request->validate([
-            'payment_method' => 'required|in:wave,orange_money,mtn_money,moov_money,cash',
+            'payment_method' => 'required|in:wave,orange_money,mtn_money,moov_money,cash,card',
             'quartier_id' => 'nullable|exists:ci_quartiers,id',
             'adresse_detail' => 'required|string|min:5',
             'pays' => 'nullable|string|max:255',
@@ -234,7 +234,12 @@ class CommandeController extends Controller
             // Rediriger vers la page de confirmation avec possibilité de paiement
             $redirectUrl = route('commandes.show', $commande->id);
 
-            // Si paiement mobile, initier la transaction de paiement
+            // Si paiement par carte, rediriger vers Stripe
+            if ($request->payment_method === 'card') {
+                return redirect()->route('payment.show', $commande->id);
+            }
+
+            // Si paiement mobile, initier la transaction de paiement (CinetPay)
             if (in_array($request->payment_method, ['wave', 'orange_money', 'mtn_money', 'moov_money'])) {
                 try {
                     $paymentService = new PaymentService();
@@ -369,7 +374,21 @@ class CommandeController extends Controller
             'statut' => 'required|in:en_attente,confirmee,expediee,livree'
         ]);
 
-        $commande->update(['statut' => $request->statut]);
+        // Sauvegarder l'ancien statut
+        $oldStatus = $commande->statut;
+        $newStatus = $request->statut;
+
+        // Mettre à jour le statut
+        $commande->update(['statut' => $newStatus]);
+
+        // Dispatcher l'événement de changement de statut
+        try {
+            \Illuminate\Support\Facades\Event::dispatch(
+                new \App\Events\OrderStatusChanged($commande, $oldStatus, $newStatus)
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Erreur dispatch OrderStatusChanged: ' . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', 'Statut de la commande mis à jour avec succès!');
     }

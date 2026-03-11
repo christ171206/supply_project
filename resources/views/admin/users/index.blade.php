@@ -1,544 +1,352 @@
 @extends('layouts.admin-layout')
 
-@section('content')
-<style>
-    .filter-card {
-        background: white;
-        border-radius: 0.75rem;
-        border: 1px solid #e5e7eb;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
+@section('title', 'Utilisateurs — Supply Admin')
 
-    .table-card {
-        background: white;
-        border-radius: 0.75rem;
-        border: 1px solid #e5e7eb;
-        overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .table-custom {
-        margin-bottom: 0;
-        border-collapse: collapse;
-    }
-
-    .table-custom thead {
-        background-color: #f9fafb;
-        border-bottom: 2px solid #e5e7eb;
-    }
-
-    .table-custom thead th {
-        padding: 1rem;
-        font-weight: 600;
-        color: #374151;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .table-custom tbody td {
-        padding: 1rem;
-        border-bottom: 1px solid #f3f4f6;
-        color: #6b7280;
-    }
-
-    .table-custom tbody tr:hover {
-        background-color: #f9fafb;
-    }
-
-    .user-avatar {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .badge-custom {
-        display: inline-block;
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.375rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .badge-success {
-        background-color: #dcfce7;
-        color: #166534;
-    }
-
-    .badge-danger {
-        background-color: #fee2e2;
-        color: #991b1b;
-    }
-
-    .badge-info {
-        background-color: #dbeafe;
-        color: #1e40af;
-    }
-
-    .badge-warning {
-        background-color: #fef3c7;
-        color: #92400e;
-    }
-
-    .btn-custom {
-        padding: 0.375rem 0.75rem;
-        border-radius: 0.375rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .btn-custom:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-view {
-        background-color: #dbeafe;
-        color: #1e40af;
-    }
-
-    .btn-documents {
-        background-color: #fef3c7;
-        color: #92400e;
-    }
-
-    .btn-ban {
-        background-color: #fee2e2;
-        color: #991b1b;
-    }
-
-    .btn-unban {
-        background-color: #dcfce7;
-        color: #166534;
-    }
-
-    .filter-input {
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-        transition: all 0.2s ease;
-    }
-
-    .filter-input:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .btn-filter {
-        background-color: #667eea;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .btn-filter:hover {
-        background-color: #5a67d8;
-    }
-
-    .stats-header {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-
-    .stat-box {
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.75rem;
-        padding: 1.25rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .stat-number {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: #667eea;
-    }
-
-    .stat-label {
-        font-size: 0.875rem;
-        color: #6b7280;
-        margin-top: 0.5rem;
-        font-weight: 600;
-    }
-
-    .modal-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .modal-overlay.active {
-        display: flex;
-    }
-
-    .modal-content {
-        background: white;
-        border-radius: 0.75rem;
-        box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-        max-width: 500px;
-        width: 90%;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-
-    .modal-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .modal-title {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #1f2937;
-    }
-
-    .modal-close {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        color: #6b7280;
-        cursor: pointer;
-    }
-
-    .modal-body {
-        padding: 1.5rem;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    .form-label {
-        display: block;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.5rem;
-    }
-
-    .form-control {
-        width: 100%;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .modal-footer {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid #e5e7eb;
-        display: flex;
-        gap: 1rem;
-        justify-content: flex-end;
-    }
-
-    .btn-secondary {
-        background-color: #e5e7eb;
-        color: #374151;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    .btn-danger-modal {
-        background-color: #ef4444;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    .pagination {
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-top: 2rem;
-        padding: 1rem 0;
-    }
-
-    .pagination a, .pagination span {
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        text-decoration: none;
-        color: #667eea;
-    }
-
-    .pagination span.active {
-        background-color: #667eea;
-        color: white;
-    }
-</style>
-
-<!-- Page Header -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-    <div>
-        <h1 style="font-size: 2rem; font-weight: 700; color: #1f2937; margin: 0;" class="flex items-center gap-2"><x-heroicon-o-user-group class="w-8 h-8" /><span>Gestion des Utilisateurs</span></h1>
-        <p style="color: #6b7280; margin-top: 0.5rem;">Gérez les utilisateurs, vendeurs et administrateurs de la plateforme</p>
-    </div>
-</div>
-
-<!-- Stats Header -->
-<div class="stats-header">
-    <div class="stat-box">
-        <div class="stat-number">{{ $users->total() }}</div>
-        <div class="stat-label">Utilisateurs totaux</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-number">{{ $users->count() }}</div>
-        <div class="stat-label">Sur cette page</div>
-    </div>
-</div>
-
-<!-- Filtres -->
-<div class="filter-card">
-    <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
-        <div>
-            <label class="form-label">Rechercher</label>
-            <input type="text" name="search" class="filter-input" placeholder="Nom, email, téléphone..." value="{{ request('search') }}" style="width: 100%;">
-        </div>
-        <div>
-            <label class="form-label">Rôle</label>
-            <select name="role" class="filter-input" style="width: 100%;">
-                <option value="">Tous les rôles</option>
-                <option value="client" {{ request('role') === 'client' ? 'selected' : '' }}>Client</option>
-                <option value="vendor" {{ request('role') === 'vendor' ? 'selected' : '' }}>Vendeur</option>
-                <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Administrateur</option>
-            </select>
-        </div>
-        <div>
-            <label class="form-label">Statut</label>
-            <select name="status" class="filter-input" style="width: 100%;">
-                <option value="">Tous les statuts</option>
-                <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Actif</option>
-                <option value="banned" {{ request('status') === 'banned' ? 'selected' : '' }}>Banni</option>
-            </select>
-        </div>
-        <button type="submit" class="btn-filter">🔍 Filtrer</button>
-    </form>
-</div>
-
-<!-- Tableau des utilisateurs -->
-<div class="table-card">
-    <table class="table-custom" style="width: 100%;">
-        <thead>
-            <tr>
-                <th>Utilisateur</th>
-                <th>Email</th>
-                <th>Rôle</th>
-                <th>Téléphone</th>
-                <th>Statut</th>
-                <th>Inscrit</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($users as $user)
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div class="user-avatar">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
-                            <div>
-                                <strong style="color: #1f2937;">{{ $user->name }}</strong>
-                                @if($user->is_admin)
-                                    <span class="badge-custom badge-danger" style="margin-left: 0.5rem;">Admin</span>
-                                @endif
-                            </div>
-                        </div>
-                    </td>
-                    <td><code style="background: #f3f4f6; padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-size: 0.75rem;">{{ $user->email }}</code></td>
-                    <td>
-                        <span class="badge-custom 
-                            @if($user->role === 'admin') badge-danger
-                            @elseif($user->role === 'vendor') badge-warning
-                            @else badge-info
-                            @endif">
-                            {{ ucfirst($user->role) }}
-                        </span>
-                    </td>
-                    <td>{{ $user->phone ?? '—' }}</td>
-                    <td>
-                        @if($user->is_banned)
-                            <span class="badge-custom badge-danger">🚫 Banni</span>
-                        @else
-                            <span class="badge-custom badge-success">✓ Actif</span>
-                        @endif
-                    </td>
-                    <td style="font-size: 0.875rem;">{{ $user->created_at->format('d M Y') }}</td>
-                    <td>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <a href="{{ route('admin.users.show', $user) }}" class="btn-custom btn-view">Voir</a>
-                            @if($user->role === 'vendor')
-                                <a href="{{ route('admin.users.documents', $user) }}" class="btn-custom btn-documents">📄</a>
-                            @endif
-                            @if(!$user->is_banned)
-                                <button type="button" class="btn-custom btn-ban" onclick="openBanModal({{ $user->id }}, '{{ $user->name }}')">Bannir</button>
-                            @else
-                                <form id="unban-form-{{ $user->id }}" action="{{ route('admin.users.unban', $user) }}" method="POST" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="btn-custom btn-unban">Débannir</button>
-                                </form>
-                            @endif
-                        </div>
-                    </td>
-                </tr>
-
-
-                <!-- Modal de bannissement -->
-                <div id="banModal{{ $user->id }}" class="modal-overlay">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">🚫 Bannir {{ $user->name }}</h5>
-                            <button class="modal-close" onclick="closeBanModal({{ $user->id }})">×</button>
-                        </div>
-                        <form action="{{ route('admin.users.ban', $user) }}" method="POST">
-                            @csrf
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label class="form-label">Raison du bannissement *</label>
-                                    <select name="reason" class="form-control" required>
-                                        <option value="">Sélectionner une raison</option>
-                                        <option value="fraud">🚨 Fraude détectée</option>
-                                        <option value="late_delivery">⏰ Livraison tardive répétée</option>
-                                        <option value="policy_violation">Violation des conditions</option>
-                                        <option value="harassment">🤐 Harcèlement utilisateurs</option>
-                                        <option value="counterfeit">Produits contrefaits</option>
-                                        <option value="other">📝 Autre</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Détails du bannissement *</label>
-                                    <textarea name="details" class="form-control" rows="4" required placeholder="Expliquez la raison du bannissement..."></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Durée (en jours, 0 = permanent)</label>
-                                    <input type="number" name="duration" class="form-control" min="0" placeholder="Laissez vide ou 0 pour permanent">
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn-secondary" onclick="closeBanModal({{ $user->id }})">Annuler</button>
-                                <button type="submit" class="btn-danger-modal">Bannir l'utilisateur</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            @empty
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 3rem 1rem; color: #9ca3af;">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
-                        <strong>Aucun utilisateur trouvé</strong>
-                        <p style="font-size: 0.875rem; margin-top: 0.25rem;">Modifiez vos critères de recherche et réessayez</p>
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
-
-<!-- Pagination -->
-@if($users->hasPages())
-    <div class="pagination">
-        {{-- Lien vers la première page --}}
-        @if($users->onFirstPage())
-            <span style="opacity: 0.5; cursor: not-allowed;">← Précédent</span>
-        @else
-            <a href="{{ $users->appends(request()->query())->url(1) }}">← Précédent</a>
-        @endif
-
-        {{-- Numéros de pages --}}
-        @for($page = 1; $page <= $users->lastPage(); $page++)
-            @if($page == $users->currentPage())
-                <span class="active">{{ $page }}</span>
-            @elseif($page == 1 || $page == $users->lastPage() || abs($page - $users->currentPage()) <= 1)
-                <a href="{{ $users->appends(request()->query())->url($page) }}">{{ $page }}</a>
-            @elseif($page == 2 && $users->currentPage() > 3)
-                <span style="opacity: 0.5;">...</span>
-            @endif
-        @endfor
-
-        {{-- Lien vers la page suivante --}}
-        @if($users->hasMorePages())
-            <a href="{{ $users->nextPageUrl() }}{{ request()->query() ? '&' . http_build_query(request()->query()) : '' }}">Suivant →</a>
-        @else
-            <span style="opacity: 0.5; cursor: not-allowed;">Suivant →</span>
-        @endif
-    </div>
-@endif
-
+@section('breadcrumb')
+    Espace Admin &nbsp;/&nbsp; Utilisateurs
 @endsection
 
+@section('content')
+<div class="pb-16">
+
+    {{-- ══════════════════════════════
+         HEADER
+    ══════════════════════════════ --}}
+    <div class="bg-[#0a0a0a] px-8 pt-10 pb-8 mb-8">
+        <div class="text-[10px] font-medium tracking-[0.15em] uppercase text-white/40 mb-3">Administration</div>
+        <h1 class="font-serif text-[32px] tracking-tight text-white leading-none">Utilisateurs</h1>
+        <div class="flex items-center gap-4 mt-4 pt-4 border-t border-white/10">
+            <div>
+                <div class="font-mono text-[22px] font-medium text-white leading-none">{{ $users->total() }}</div>
+                <div class="text-[10px] text-white/40 tracking-[0.08em] uppercase mt-1">Au total</div>
+            </div>
+            <div class="w-px h-8 bg-white/10"></div>
+            <div>
+                <div class="font-mono text-[22px] font-medium text-white leading-none">{{ $users->count() }}</div>
+                <div class="text-[10px] text-white/40 tracking-[0.08em] uppercase mt-1">Sur cette page</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-8 space-y-5">
+
+    {{-- Filtres --}}
+    <form method="GET"
+          class="bg-white border border-[#e0e0dc] rounded-xl px-5 py-4 flex items-end gap-4 flex-wrap">
+        <div class="flex-1 min-w-[180px]">
+            <label class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">
+                Rechercher
+            </label>
+            <input type="text" name="search" value="{{ request('search') }}"
+                   placeholder="Nom, email, téléphone…"
+                   class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                          placeholder-[#a0a09a] focus:bg-white focus:border-[#0a0a0a] outline-none transition-all">
+        </div>
+        <div class="w-40">
+            <label class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">Rôle</label>
+            <select name="role"
+                    class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                           focus:bg-white focus:border-[#0a0a0a] outline-none transition-all">
+                <option value="">Tous</option>
+                <option value="client"  {{ request('role') === 'client'  ? 'selected' : '' }}>Client</option>
+                <option value="vendor"  {{ request('role') === 'vendor'  ? 'selected' : '' }}>Vendeur</option>
+                <option value="admin"   {{ request('role') === 'admin'   ? 'selected' : '' }}>Admin</option>
+            </select>
+        </div>
+        <div class="w-40">
+            <label class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">Statut</label>
+            <select name="status"
+                    class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                           focus:bg-white focus:border-[#0a0a0a] outline-none transition-all">
+                <option value="">Tous</option>
+                <option value="active"  {{ request('status') === 'active'  ? 'selected' : '' }}>Actif</option>
+                <option value="banned"  {{ request('status') === 'banned'  ? 'selected' : '' }}>Banni</option>
+            </select>
+        </div>
+        <button type="submit"
+                class="bg-[#0a0a0a] text-white text-[12px] font-medium px-4 py-2 rounded-lg hover:opacity-85 transition-opacity flex items-center gap-1.5">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Filtrer
+        </button>
+        @if(request('search') || request('role') || request('status'))
+            <a href="{{ route('admin.users.index') }}"
+               class="text-[11px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors border-b border-[#e0e0dc] pb-px self-end mb-0.5">
+                Réinitialiser
+            </a>
+        @endif
+    </form>
+
+    {{-- Tableau --}}
+    <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-[#efefed] bg-[#f7f7f5]">
+                    <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Utilisateur</th>
+                    <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Email</th>
+                    <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Rôle</th>
+                    <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Téléphone</th>
+                    <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Statut</th>
+                    <th class="text-left px-5 py-3 text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a]">Inscrit</th>
+                    <th class="px-5 py-3"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($users as $user)
+                    @php
+                        $roleBadge = match($user->role ?? '') {
+                            'admin'  => 'bg-[#fef2f2] text-[#dc2626]',
+                            'vendor' => 'bg-[#fdf6ec] text-[#b45309]',
+                            default  => 'bg-[#eff6ff] text-[#2563eb]',
+                        };
+                    @endphp
+                    <tr class="border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+
+                        {{-- Nom --}}
+                        <td class="px-5 py-3.5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-[#0a0a0a] rounded-md flex items-center justify-center
+                                            text-white text-[11px] font-medium flex-shrink-0">
+                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $user->name }}</div>
+                                    @if($user->is_admin)
+                                        <span class="text-[10px] font-mono font-medium text-[#dc2626]">ADMIN</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </td>
+
+                        {{-- Email --}}
+                        <td class="px-5 py-3.5">
+                            <span class="font-mono text-[11px] text-[#666660]">{{ $user->email }}</span>
+                        </td>
+
+                        {{-- Rôle --}}
+                        <td class="px-5 py-3.5">
+                            <span class="inline-flex items-center text-[10px] font-mono font-medium px-2 py-1 rounded {{ $roleBadge }}">
+                                {{ ucfirst($user->role ?? '—') }}
+                            </span>
+                        </td>
+
+                        {{-- Téléphone --}}
+                        <td class="px-5 py-3.5 font-mono text-[12px] text-[#a0a09a]">
+                            {{ $user->phone ?? '—' }}
+                        </td>
+
+                        {{-- Statut --}}
+                        <td class="px-5 py-3.5">
+                            @if($user->is_banned)
+                                <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded bg-[#fef2f2] text-[#dc2626]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#f87171]"></span>Banni
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded bg-[#f0fdf4] text-[#15803d]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#22c55e]"></span>Actif
+                                </span>
+                            @endif
+                        </td>
+
+                        {{-- Date --}}
+                        <td class="px-5 py-3.5 font-mono text-[11px] text-[#a0a09a]">
+                            {{ $user->created_at->format('d/m/Y') }}
+                        </td>
+
+                        {{-- Actions --}}
+                        <td class="px-5 py-3.5">
+                            <div class="flex items-center gap-1.5 justify-end">
+                                <a href="{{ route('admin.users.show', $user) }}"
+                                   class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
+                                          hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                                    Voir
+                                </a>
+                                @if($user->role === 'vendor')
+                                    <a href="{{ route('admin.users.documents', $user) }}"
+                                       class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
+                                              hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                                        Docs
+                                    </a>
+                                @endif
+                                @if(!$user->is_banned)
+                                    <button type="button"
+                                            onclick="openBanModal({{ $user->id }})"
+                                            class="text-[11px] font-medium text-[#dc2626] border border-[#fecaca] px-2.5 py-1.5 rounded-lg
+                                                   hover:bg-[#fef2f2] transition-all">
+                                        Bannir
+                                    </button>
+                                @else
+                                    <form action="{{ route('admin.users.unban', $user) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit"
+                                                class="text-[11px] font-medium text-[#15803d] border border-[#bbf7d0] px-2.5 py-1.5 rounded-lg
+                                                       hover:bg-[#f0fdf4] transition-all">
+                                            Débannir
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="px-5 py-16 text-center">
+                            <div class="w-10 h-10 border border-[#e0e0dc] rounded-xl flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-5 h-5 text-[#a0a09a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                            </div>
+                            <p class="text-[13px] font-medium text-[#0a0a0a] mb-1">Aucun utilisateur trouvé</p>
+                            <p class="text-[12px] text-[#a0a09a] font-light">Modifiez vos critères de recherche</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    {{-- Pagination --}}
+    @if($users->hasPages())
+        <div class="flex items-center justify-between">
+            <div class="text-[11px] font-mono text-[#a0a09a]">
+                {{ $users->firstItem() }}–{{ $users->lastItem() }} / {{ $users->total() }}
+            </div>
+            <div class="flex items-center gap-1">
+                @if($users->onFirstPage())
+                    <span class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#e0e0dc] text-[11px] cursor-default">←</span>
+                @else
+                    <a href="{{ $users->appends(request()->query())->previousPageUrl() }}"
+                       class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
+                              hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all text-[11px]">←</a>
+                @endif
+
+                @foreach($users->getUrlRange(max(1, $users->currentPage()-2), min($users->lastPage(), $users->currentPage()+2)) as $page => $url)
+                    @if($page == $users->currentPage())
+                        <span class="w-8 h-8 flex items-center justify-center bg-[#0a0a0a] text-white rounded-lg text-[11px] font-mono">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}"
+                           class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
+                                  hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all text-[11px] font-mono">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                @if($users->hasMorePages())
+                    <a href="{{ $users->appends(request()->query())->nextPageUrl() }}"
+                       class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
+                              hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all text-[11px]">→</a>
+                @else
+                    <span class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#e0e0dc] text-[11px] cursor-default">→</span>
+                @endif
+            </div>
+        </div>
+    @endif
+
+    </div>{{-- /px-8 --}}
+</div>
+
+{{-- ══════════════════════════════
+     MODALS BAN — un par user
+══════════════════════════════ --}}
+@foreach($users as $user)
+    @if(!$user->is_banned)
+        <div id="banModal{{ $user->id }}"
+             class="fixed inset-0 z-50 hidden items-center justify-center"
+             style="background:rgba(0,0,0,0.4);">
+            <div class="bg-white border border-[#e0e0dc] rounded-xl w-[460px] overflow-hidden"
+                 style="box-shadow:0 20px 40px rgba(0,0,0,0.12);">
+
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-6 py-4 border-b border-[#efefed]">
+                    <div>
+                        <div class="text-[13px] font-medium text-[#0a0a0a]">Bannir l'utilisateur</div>
+                        <div class="text-[11px] text-[#a0a09a] font-light mt-0.5">{{ $user->name }}</div>
+                    </div>
+                    <button onclick="closeBanModal({{ $user->id }})"
+                            class="w-7 h-7 flex items-center justify-center text-[#a0a09a] hover:text-[#0a0a0a] transition-colors">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Body --}}
+                <form action="{{ route('admin.users.ban', $user) }}" method="POST">
+                    @csrf
+                    <div class="px-6 py-5 space-y-4">
+                        <div>
+                            <label class="block text-[11px] font-medium text-[#666660] mb-1.5">Raison</label>
+                            <select name="reason" required
+                                    class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                                           focus:bg-white focus:border-[#0a0a0a] outline-none transition-all">
+                                <option value="">Sélectionner…</option>
+                                <option value="fraud">Fraude détectée</option>
+                                <option value="late_delivery">Livraison tardive répétée</option>
+                                <option value="policy_violation">Violation des conditions</option>
+                                <option value="harassment">Harcèlement</option>
+                                <option value="counterfeit">Produits contrefaits</option>
+                                <option value="other">Autre</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-[#666660] mb-1.5">Détails</label>
+                            <textarea name="details" rows="3" required
+                                      placeholder="Expliquez la raison du bannissement…"
+                                      class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                                             placeholder-[#a0a09a] focus:bg-white focus:border-[#0a0a0a] outline-none transition-all resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-[#666660] mb-1.5">
+                                Durée (jours) — laisser vide pour permanent
+                            </label>
+                            <input type="number" name="duration" min="0"
+                                   placeholder="Permanent"
+                                   class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                                          placeholder-[#a0a09a] focus:bg-white focus:border-[#0a0a0a] outline-none transition-all">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 px-6 py-4 border-t border-[#efefed]">
+                        <button type="button" onclick="closeBanModal({{ $user->id }})"
+                                class="text-[12px] font-medium text-[#666660] border border-[#e0e0dc] px-4 py-2 rounded-lg
+                                       hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                            Annuler
+                        </button>
+                        <button type="submit"
+                                class="text-[12px] font-medium text-white bg-[#dc2626] px-4 py-2 rounded-lg
+                                       hover:opacity-85 transition-opacity">
+                            Bannir l'utilisateur
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+@endforeach
+@endsection
+
+@section('scripts')
 <script>
-    function openBanModal(userId, userName) {
-        const modal = document.getElementById('banModal' + userId);
-        if (modal) {
-            modal.classList.add('active');
-        }
+function openBanModal(id) {
+    const m = document.getElementById('banModal' + id);
+    if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+function closeBanModal(id) {
+    const m = document.getElementById('banModal' + id);
+    if (m) { m.style.display = 'none'; document.body.style.overflow = ''; }
+}
+document.addEventListener('click', e => {
+    if (e.target.id?.startsWith('banModal')) {
+        e.target.style.display = 'none';
+        document.body.style.overflow = '';
     }
-
-    function closeBanModal(userId) {
-        const modal = document.getElementById('banModal' + userId);
-        if (modal) {
-            modal.classList.remove('active');
-        }
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('[id^="banModal"]').forEach(m => {
+            m.style.display = 'none';
+        });
+        document.body.style.overflow = '';
     }
-
-    // Fermer le modal si on clique en dehors
-    document.addEventListener('click', function(event) {
-        if (event.target.classList.contains('modal-overlay')) {
-            event.target.classList.remove('active');
-        }
-    });
-
-    // Support de la touche Échap pour fermer les modaux
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            document.querySelectorAll('.modal-overlay.active').forEach(modal => {
-                modal.classList.remove('active');
-            });
-        }
-    });
+});
 </script>
+@endsection

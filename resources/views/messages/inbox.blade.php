@@ -245,17 +245,19 @@
                         </div>
                     </div>
                 @else
-                    <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 p-12 text-center h-[600px] flex items-center justify-center">
+                    <div class="bg-white border border-[#e0e0dc] rounded-xl p-12 text-center h-[600px] flex items-center justify-center">
                         <div>
-                            <x-heroicon-o-chat-bubble-left class="w-20 h-20 mb-3 mx-auto text-gray-400" />
-                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Sélectionnez une conversation</h3>
-                            <p class="text-gray-600">Choisissez une conversation à gauche pour commencer à discuter</p>
+                            <svg class="w-16 h-16 mx-auto text-[#e0e0dc] mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <h3 class="text-[14px] font-medium text-[#0a0a0a] mb-1">Sélectionnez une conversation</h3>
+                            <p class="text-[12px] text-[#a0a09a]">Choisissez une conversation à gauche pour commencer</p>
                         </div>
                     </div>
                 @endif
             </div>
         </div>
-    </div>
-</div>
-@endsection
 
+    </div>
+    </div>
+    @endsection

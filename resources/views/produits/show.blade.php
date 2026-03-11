@@ -222,42 +222,97 @@
          AVIS CLIENTS
     ══════════════════════════════ --}}
     <div class="mb-12">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="font-serif text-[22px] tracking-tight">
-                Avis <em class="italic text-[#666660]">Clients</em>
-            </h2>
-            @if($avis && $avis->count() > 0)
-                <span class="text-[11px] font-mono text-[#a0a09a]">{{ $avis->count() }} avis</span>
-            @endif
+        {{-- En-tête avec note moyenne --}}
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden mb-6">
+            <div class="px-6 py-5 flex items-start justify-between md:flex-row flex-col gap-6">
+                {{-- Note moyenne --}}
+                <div class="flex items-center gap-6">
+                    @if($nombreAvis > 0)
+                        <div class="text-center">
+                            <div class="text-5xl font-bold text-[#0a0a0a] font-mono mb-1">
+                                {{ number_format($noteMoyenne, 1) }}
+                            </div>
+                            <div class="flex gap-0.5 text-[#0a0a0a] text-lg justify-center mb-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <span class="{{ $i <= round($noteMoyenne) ? '' : 'opacity-30' }}">★</span>
+                                @endfor
+                            </div>
+                            <p class="text-[12px] text-[#a0a09a]">{{ $nombreAvis }} avis{{ $nombreAvis > 1 ? 's' : '' }}</p>
+                        </div>
+
+                        {{-- Distribution des notes --}}
+                        <div class="space-y-2">
+                            @php $notes = [5, 4, 3, 2, 1]; @endphp
+                            @foreach($notes as $note)
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[12px] text-[#a0a09a] w-6 text-right font-mono">{{ $note }}★</span>
+                                    <div class="w-24 h-2 bg-[#efefed] rounded-full overflow-hidden">
+                                        <div class="h-full bg-[#0a0a0a] rounded-full transition-all"
+                                             style="width: {{ ($distributionNotes[$note] / max(1, $nombreAvis)) * 100 }}%">
+                                        </div>
+                                    </div>
+                                    <span class="text-[11px] text-[#a0a09a] w-8 text-right">{{ $distributionNotes[$note] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <svg class="w-10 h-10 text-[#e0e0dc] mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345h5.518c.486 0 .688.657.324.891l-4.46 3.596a.563.563 0 00-.168.606l2.125 5.111c.307.763-.278 1.575-1.048 1.575a.563.563 0 01-.472-.257l-4.46-3.596a.563.563 0 00-.686 0l-4.46 3.596a.563.563 0 01-.473.257c-.77 0-1.355-.812-1.048-1.575l2.125-5.111a.563.563 0 00-.168-.606l-4.46-3.596c-.364-.233-.162-.89.324-.89h5.518a.563.563 0 00.475-.345L11.48 3.5z"/>
+                            </svg>
+                            <p class="text-[13px] text-[#a0a09a] font-light">Aucun avis pour le moment</p>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- CTA --}}
+                @auth
+                    <div class="flex-1 md:text-right">
+                        <p class="text-[12px] text-[#a0a09a] mb-3">
+                            @if($nombreAvis === 0)
+                                Soyez le premier à laisser un avis
+                            @else
+                                Vous avez acheté ce produit ?
+                            @endif
+                        </p>
+                        <a href="#review-form" class="inline-block bg-[#0a0a0a] text-white text-[12px] font-medium px-5 py-2.5 rounded-lg hover:opacity-85 transition-opacity">
+                            Laisser un avis
+                        </a>
+                    </div>
+                @endauth
+            </div>
         </div>
 
-        @if($avis && $avis->count() > 0)
+        {{-- Liste des avis --}}
+        @if($nombreAvis > 0)
             <div class="border border-[#e0e0dc] rounded-xl overflow-hidden mb-6">
                 @foreach($avis as $av)
-                    <div class="px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
-                        <div class="flex items-start justify-between mb-2">
-                            <div class="flex items-center gap-3">
-                                <div class="w-7 h-7 bg-[#0a0a0a] text-white rounded-md flex items-center justify-center text-[11px] font-medium flex-shrink-0">
+                    <div class="px-5 py-5 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-3 flex-1">
+                                <div class="w-8 h-8 bg-[#0a0a0a] text-white rounded-md flex items-center justify-center text-[12px] font-medium flex-shrink-0">
                                     {{ strtoupper(substr($av->user->name, 0, 1)) }}
                                 </div>
-                                <div>
+                                <div class="flex-1 min-w-0">
                                     <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $av->user->name }}</div>
-                                    <div class="text-[11px] text-[#a0a09a] font-mono">{{ $av->created_at->locale('fr')->diffForHumans() }}</div>
+                                    <div class="text-[11px] text-[#a0a09a]">{{ $av->created_at->locale('fr')->diffForHumans() }}</div>
                                 </div>
                             </div>
-                            <div class="flex gap-0.5 text-[#a0a09a] text-sm">
+                            <div class="flex gap-0.5 text-[#0a0a0a] text-sm ml-4">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <span class="{{ $i <= $av->note ? 'text-[#0a0a0a]' : '' }}">★</span>
+                                    <span class="{{ $i <= $av->note ? '' : 'opacity-30' }}">★</span>
                                 @endfor
                             </div>
                         </div>
-                        <p class="text-[13px] text-[#666660] font-light leading-relaxed pl-10">{{ $av->commentaire }}</p>
+                        <p class="text-[13px] text-[#666660] font-light leading-relaxed mb-3">{{ $av->commentaire }}</p>
                         @auth
                             @if(auth()->id() === $av->user_id)
-                                <div class="pl-10 mt-2">
+                                <div class="flex gap-2">
                                     <form action="{{ route('avis.destroy', $av->id) }}" method="POST" class="inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="text-[11px] text-[#dc2626] hover:underline">Supprimer</button>
+                                        <button type="submit" class="text-[11px] text-[#dc2626] hover:underline cursor-pointer">
+                                            Supprimer
+                                        </button>
                                     </form>
                                 </div>
                             @endif
@@ -265,38 +320,85 @@
                     </div>
                 @endforeach
             </div>
-        @else
-            <div class="bg-white border border-[#e0e0dc] rounded-xl px-6 py-12 text-center mb-6">
-                <svg class="w-8 h-8 text-[#e0e0dc] mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                </svg>
-                <p class="text-[13px] text-[#a0a09a] font-light">Aucun avis pour le moment</p>
-            </div>
+
+            {{-- Pagination avis --}}
+            @if($avis->hasPages())
+                <div class="flex justify-center mb-6">
+                    {{ $avis->links('pagination::tailwind') }}
+                </div>
+            @endif
         @endif
 
         {{-- Formulaire avis --}}
         @auth
-            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
-                <div class="px-5 py-4 border-b border-[#efefed]">
-                    <div class="text-[13px] font-medium text-[#0a0a0a]">Laisser un avis</div>
-                    <div class="text-[12px] text-[#a0a09a] font-light mt-0.5">Aidez les autres clients à faire le bon choix</div>
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden" id="review-form">
+                <div class="px-5 py-4 border-b border-[#efefed] bg-[#f7f7f5]">
+                    <div class="text-[13px] font-medium text-[#0a0a0a]">✍️ Laisser un avis</div>
+                    <div class="text-[12px] text-[#a0a09a] font-light mt-1">Aidez les autres clients à faire le bon choix</div>
                 </div>
                 <div class="p-5">
                     <form action="{{ route('avis.store') }}" method="POST" class="space-y-4">
                         @csrf
                         <input type="hidden" name="produit_id" value="{{ $produit->id }}">
 
+                        {{-- Sélecteur d'étoiles --}}
                         <div>
-                            <div class="text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Note</div>
-                            <div class="flex gap-2" id="rating-stars">
+                            <label class="block text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-3">Votre note</label>
+                            <div class="flex gap-1" id="rating-stars">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <label class="cursor-pointer text-xl text-[#e0e0dc] hover:text-[#0a0a0a] transition-colors">
-                                        <input type="radio" name="note" value="{{ $i }}" class="hidden rating-input" required>
+                                    <label class="cursor-pointer text-3xl text-[#e0e0dc] hover:text-[#0a0a0a] transition-colors">
+                                        <input type="radio" name="note" value="{{ $i }}" class="hidden rating-input" required {{ old('note') == $i ? 'checked' : '' }}>
                                         <span class="rating-star">★</span>
                                     </label>
                                 @endfor
                             </div>
+                            @error('note')
+                                <p class="text-[11px] text-[#dc2626] mt-1.5">{{ $message }}</p>
+                            @enderror
                         </div>
+
+                        {{-- Commentaire --}}
+                        <div>
+                            <label class="block text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Commentaire</label>
+                            <textarea
+                                name="commentaire"
+                                rows="4"
+                                placeholder="Partagez votre expérience avec ce produit…"
+                                minlength="10"
+                                maxlength="1000"
+                                required
+                                class="w-full border border-[#e0e0dc] rounded-lg px-4 py-3 text-[13px] font-light text-[#0a0a0a] placeholder:text-[#a0a09a] outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] hover:border-[#a0a09a] transition-all resize-none bg-white"
+                            >{{ old('commentaire') }}</textarea>
+                            <div class="flex justify-between mt-1.5">
+                                <span class="text-[10px] text-[#a0a09a]">Minimum 10 caractères</span>
+                                <span class="text-[10px] text-[#a0a09a]" id="char-count">0 / 1000</span>
+                            </div>
+                            @error('commentaire')
+                                <p class="text-[11px] text-[#dc2626] mt-1.5">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Boutons --}}
+                        <div class="flex gap-2 pt-2">
+                            <button type="submit" class="flex-1 bg-[#0a0a0a] text-white text-[13px] font-medium px-5 py-3 rounded-lg hover:opacity-85 transition-opacity">
+                                Publier mon avis
+                            </button>
+                            <button type="reset" class="px-5 py-3 border border-[#e0e0dc] text-[13px] text-[#666660] rounded-lg hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                                Réinitialiser
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @else
+            <div class="bg-white border border-[#e0e0dc] rounded-xl px-6 py-8 text-center">
+                <p class="text-[13px] text-[#a0a09a] font-light mb-4">Connectez-vous pour laisser un avis</p>
+                <a href="{{ route('login') }}" class="inline-block bg-[#0a0a0a] text-white text-[12px] font-medium px-5 py-2.5 rounded-lg hover:opacity-85 transition-opacity">
+                    Se connecter
+                </a>
+            </div>
+        @endauth
+    </div>
 
                         <div>
                             <div class="text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Commentaire</div>
@@ -491,18 +593,48 @@ async function submitContactForm(event) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // ──── SYSTÈME D'NOTES INTERACTIF ────
     const labels = document.querySelectorAll('#rating-stars label');
     const stars  = document.querySelectorAll('#rating-stars .rating-star');
     const inputs = document.querySelectorAll('#rating-stars .rating-input');
+
     labels.forEach((label, i) => {
-        label.addEventListener('mouseenter', () => stars.forEach((s, j) => s.parentElement.classList.toggle('text-[#0a0a0a]', j <= i)));
-        label.addEventListener('click', () => inputs[i].checked = true);
+        label.addEventListener('mouseenter', () => {
+            stars.forEach((s, j) => {
+                s.parentElement.classList.toggle('text-[#0a0a0a]', j <= i);
+            });
+        });
+        label.addEventListener('click', () => {
+            inputs[i].checked = true;
+        });
     });
-    document.getElementById('rating-stars')?.addEventListener('mouseleave', () => {
-        const sel = Array.from(inputs).findIndex(inp => inp.checked);
-        stars.forEach((s, j) => s.parentElement.classList.toggle('text-[#0a0a0a]', j <= sel));
-    });
+
+    const ratingContainer = document.getElementById('rating-stars');
+    if (ratingContainer) {
+        ratingContainer.addEventListener('mouseleave', () => {
+            const selectedIndex = Array.from(inputs).findIndex(inp => inp.checked);
+            stars.forEach((s, j) => {
+                s.parentElement.classList.toggle('text-[#0a0a0a]', j <= selectedIndex);
+            });
+        });
+    }
+
+    // ──── COMPTEUR DE CARACTÈRES ────
+    const textarea = document.querySelector('textarea[name="commentaire"]');
+    if (textarea) {
+        const updateCount = () => {
+            const count = textarea.value.length;
+            const counter = document.getElementById('char-count');
+            if (counter) {
+                counter.textContent = `${count} / 1000`;
+            }
+        };
+        textarea.addEventListener('input', updateCount);
+        // Initialiser
+        updateCount();
+    }
 });
+
 </script>
 
 @endsection

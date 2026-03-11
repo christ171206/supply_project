@@ -18,6 +18,22 @@ class Payment extends Model
         'response_data',
         'payment_initiated_at',
         'payment_confirmed_at',
+        // Colonnes Stripe
+        'stripe_payment_intent_id',
+        'stripe_charge_id',
+        'stripe_response',
+        'payment_type',
+        'stripe_status',
+        'stripe_webhook_received_at',
+        'idempotency_key',
+    ];
+
+    protected $casts = [
+        'stripe_response' => 'array',
+        'response_data' => 'array',
+        'payment_initiated_at' => 'datetime',
+        'payment_confirmed_at' => 'datetime',
+        'stripe_webhook_received_at' => 'datetime',
     ];
 
     public function commande()
@@ -25,3 +41,4 @@ class Payment extends Model
         return $this->belongsTo(Commande::class);
     }
 }
+

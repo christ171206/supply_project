@@ -1,170 +1,201 @@
 @extends('layouts.admin-layout')
 
-@section('title', 'Documents - ' . $user->name)
+@section('title', 'Documents — ' . $user->name . ' — Supply Admin')
+
+@section('breadcrumb')
+    Espace Admin &nbsp;/&nbsp;
+    <a href="{{ route('admin.users.index') }}" class="hover:text-[#0a0a0a] transition-colors">Utilisateurs</a>
+    &nbsp;/&nbsp;
+    <a href="{{ route('admin.users.show', $user->id) }}" class="hover:text-[#0a0a0a] transition-colors">{{ $user->name }}</a>
+    &nbsp;/&nbsp; Documents
+@endsection
 
 @section('content')
-<div class="space-y-8">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-        <div>
-            <a href="{{ route('admin.users.show', $user->id) }}" class="text-blue-600 hover:text-blue-700 font-semibold mb-2 inline-block">← Retour au profil</a>
-            <h1 class="text-4xl font-bold text-gray-900">Documents de {{ $user->name }}</h1>
-            <p class="text-gray-500 mt-2">Vérification KYC • {{ $user->email }}</p>
+<div class="pb-16">
+
+    {{-- HEADER --}}
+    <div class="bg-[#0a0a0a] px-8 pt-10 pb-8 mb-8">
+        <a href="{{ route('admin.users.show', $user->id) }}"
+           class="inline-flex items-center gap-1.5 text-[11px] text-white/40 hover:text-white/70 transition-colors mb-4">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Retour au profil
+        </a>
+        <div class="flex items-start justify-between">
+            <div>
+                <div class="text-[10px] font-medium tracking-[0.15em] uppercase text-white/40 mb-2">Vérification KYC</div>
+                <h1 class="font-serif text-[32px] tracking-tight text-white leading-none">Documents</h1>
+                <div class="flex items-center gap-3 mt-3">
+                    <span class="font-mono text-[12px] text-white/50">{{ $user->name }}</span>
+                    <span class="w-1 h-1 rounded-full bg-white/20"></span>
+                    <span class="font-mono text-[12px] text-white/50">{{ $user->email }}</span>
+                </div>
+            </div>
+
+            {{-- Badge global --}}
+            @php
+                $pending  = $documents->get('pending',  collect())->count();
+                $verified = $documents->get('verified', collect())->count();
+                $rejected = $documents->get('rejected', collect())->count();
+                $total    = $pending + $verified + $rejected;
+                if ($total === 0)                    { $gb = ['bg-[#f7f7f5] text-[#a0a09a]','bg-[#a0a09a]','Aucun doc']; }
+                elseif ($pending === 0 && $rejected === 0) { $gb = ['bg-[#f0fdf4] text-[#15803d]','bg-[#22c55e]','Tous vérifiés']; }
+                elseif ($rejected > 0)               { $gb = ['bg-[#fef2f2] text-[#dc2626]','bg-[#f87171]','Rejeté(s)']; }
+                else                                 { $gb = ['bg-[#fdf6ec] text-[#b45309]','bg-[#f59e0b]','En attente']; }
+            @endphp
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium px-3 py-1.5 rounded-md {{ $gb[0] }}">
+                <span class="w-1.5 h-1.5 rounded-full {{ $gb[1] }}"></span>{{ $gb[2] }}
+            </span>
         </div>
-        <div class="text-right">
-            @if($documents->get('verified', collect())->count() === count($documents->flatten()))
-                <span class="inline-block px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-800">✓ Tous vérifiés</span>
-            @elseif($documents->get('pending', collect())->count() > 0)
-                <span class="inline-block px-4 py-2 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800">⏳ En attente</span>
-            @elseif($documents->get('rejected', collect())->count() > 0)
-                <span class="inline-block px-4 py-2 rounded-full text-sm font-bold bg-red-100 text-red-800">✗ Rejeté</span>
-            @endif
+
+        {{-- Stats inline --}}
+        <div class="flex items-center gap-6 mt-6 pt-6 border-t border-white/10">
+            @foreach([
+                ['v'=>$total,    'l'=>'Total'],
+                ['v'=>$pending,  'l'=>'En attente'],
+                ['v'=>$verified, 'l'=>'Vérifiés'],
+                ['v'=>$rejected, 'l'=>'Rejetés'],
+            ] as $i => $s)
+                @if($i>0)<div class="w-px h-8 bg-white/10"></div>@endif
+                <div>
+                    <div class="font-mono text-[22px] font-medium text-white leading-none">{{ $s['v'] }}</div>
+                    <div class="text-[10px] text-white/40 tracking-[0.08em] uppercase mt-1">{{ $s['l'] }}</div>
+                </div>
+            @endforeach
         </div>
     </div>
 
-    <!-- Documents Tabs -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-        <!-- Pending Documents -->
-        @if($documents->get('pending', collect())->count() > 0)
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2"><x-heroicon-o-clock class="w-6 h-6" /><span>Documents en Attente ({{ $documents->get('pending', collect())->count() }})</span></h2>
-                <div class="space-y-4">
-                    @foreach($documents->get('pending', []) as $document)
-                        <div class="flex items-start justify-between p-6 border border-yellow-200 rounded-xl bg-yellow-50 hover:bg-yellow-100 transition">
-                            <div class="flex-1">
-                                <p class="font-bold text-gray-900 text-lg">{{ ucfirst(str_replace('_', ' ', $document->document_type)) }}</p>
-                                <p class="text-sm text-gray-600 mt-1">Créé le {{ $document->created_at->format('d/m/Y à H:i') }}</p>
-                                @if($document->file_path)
-                                    <p class="text-xs text-gray-500 mt-2">Fichier : {{ basename($document->file_path) }}</p>
-                                @endif
-                            </div>
-                            <div class="text-right flex gap-3">
-                                @if($document->file_path)
-                                    <a href="{{ asset('storage/' . $document->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm transition">
-                                        📥 Voir
-                                    </a>
-                                @endif
-                                <form method="POST" action="{{ route('admin.users.approve-document', $document->id) }}" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-sm transition">
-                                        ✓ Approuver
-                                    </button>
-                                </form>
-                                <form method="POST" action="{{ route('admin.users.reject-document', $document->id) }}" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold text-sm transition">
-                                        ✗ Rejeter
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
+    <div class="px-8 space-y-5">
 
-        <!-- Verified Documents -->
-        @if($documents->get('verified', collect())->count() > 0)
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">✓ Documents Vérifiés ({{ $documents->get('verified', collect())->count() }})</h2>
-                <div class="space-y-4">
-                    @foreach($documents->get('verified', []) as $document)
-                        <div class="flex items-start justify-between p-6 border border-green-200 rounded-xl bg-green-50">
-                            <div class="flex-1">
-                                <p class="font-bold text-gray-900 text-lg">{{ ucfirst(str_replace('_', ' ', $document->document_type)) }}</p>
-                                <p class="text-sm text-gray-600 mt-1">Créé le {{ $document->created_at->format('d/m/Y à H:i') }}</p>
-                                @if($document->verified_at)
-                                    <p class="text-xs text-green-700 font-semibold mt-2">Vérifié le {{ $document->verified_at->format('d/m/Y à H:i') }}</p>
-                                @endif
-                            </div>
-                            <div class="text-right">
-                                @if($document->file_path)
-                                    <a href="{{ asset('storage/' . $document->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm transition">
-                                        📥 Voir
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+    @if($documents->isEmpty())
+        <div class="bg-white border border-[#e0e0dc] rounded-xl px-5 py-16 text-center">
+            <div class="w-10 h-10 border border-[#e0e0dc] rounded-xl flex items-center justify-center mx-auto mb-3">
+                <svg class="w-5 h-5 text-[#a0a09a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                </svg>
             </div>
-        @endif
-
-        <!-- Rejected Documents -->
-        @if($documents->get('rejected', collect())->count() > 0)
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">✗ Documents Rejetés ({{ $documents->get('rejected', collect())->count() }})</h2>
-                <div class="space-y-4">
-                    @foreach($documents->get('rejected', []) as $document)
-                        <div class="flex items-start justify-between p-6 border border-red-200 rounded-xl bg-red-50 hover:bg-red-100 transition">
-                            <div class="flex-1">
-                                <p class="font-bold text-gray-900 text-lg">{{ ucfirst(str_replace('_', ' ', $document->document_type)) }}</p>
-                                <p class="text-sm text-gray-600 mt-1">Créé le {{ $document->created_at->format('d/m/Y à H:i') }}</p>
-                                @if($document->rejection_reason)
-                                    <p class="text-sm text-red-700 font-semibold mt-2 bg-white p-3 rounded border border-red-200 mt-3">
-                                        <strong>Motif du rejet :</strong> {{ $document->rejection_reason }}
-                                    </p>
-                                @endif
-                            </div>
-                            <div class="text-right flex gap-3">
-                                @if($document->file_path)
-                                    <a href="{{ asset('storage/' . $document->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm transition">
-                                        📥 Voir
-                                    </a>
-                                @endif
-                                <form method="POST" action="{{ route('admin.users.approve-document', $document->id) }}" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-sm transition">
-                                        ✓ Approuver
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
-        <!-- No Documents -->
-        @if($documents->isEmpty())
-            <div class="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
-                <p class="text-gray-500 text-lg">Aucun document soumis</p>
-                <p class="text-gray-400 text-sm mt-2">Ce vendeur n'a pas encore soumis de documents</p>
-            </div>
-        @endif
-    </div>
-
-    <!-- Summary Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-semibold uppercase tracking-wider">Total Documents</p>
-                    <p class="text-3xl font-bold text-gray-900 mt-2">{{ $documents->flatten()->count() }}</p>
-                </div>
-                <div class="text-4xl opacity-20">📋</div>
-            </div>
+            <p class="text-[13px] font-medium text-[#0a0a0a] mb-1">Aucun document soumis</p>
+            <p class="text-[12px] text-[#a0a09a] font-light">Ce vendeur n'a pas encore soumis de documents</p>
         </div>
+    @else
 
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-semibold uppercase tracking-wider">En Attente</p>
-                    <p class="text-3xl font-bold text-yellow-600 mt-2">{{ $documents->get('pending', collect())->count() }}</p>
+        {{-- EN ATTENTE --}}
+        @if($pending > 0)
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+                <div class="flex items-center gap-2.5 px-5 py-4 border-b border-[#efefed] bg-[#fdf6ec]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b]"></span>
+                    <span class="text-[13px] font-medium text-[#b45309]">En attente ({{ $pending }})</span>
                 </div>
-                <div class="text-4xl opacity-20">⏳</div>
+                @foreach($documents->get('pending', []) as $doc)
+                    <div class="flex items-start justify-between px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                        <div class="flex-1 min-w-0 mr-4">
+                            <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
+                            <div class="font-mono text-[11px] text-[#a0a09a] mt-1">{{ $doc->created_at->format('d/m/Y · H:i') }}</div>
+                            @if($doc->file_path)
+                                <div class="text-[11px] text-[#a0a09a] font-light mt-0.5">{{ basename($doc->file_path) }}</div>
+                            @endif
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            @if($doc->file_path)
+                                <a href="{{ asset('storage/'.$doc->file_path) }}" target="_blank"
+                                   class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
+                                          hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                                    Voir
+                                </a>
+                            @endif
+                            <form method="POST" action="{{ route('admin.users.approve-document', $doc->id) }}" class="inline">
+                                @csrf
+                                <button type="submit"
+                                        class="text-[11px] font-medium text-[#15803d] border border-[#bbf7d0] px-2.5 py-1.5 rounded-lg
+                                               hover:bg-[#f0fdf4] transition-all">
+                                    Approuver
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ route('admin.users.reject-document', $doc->id) }}" class="inline">
+                                @csrf
+                                <button type="submit"
+                                        class="text-[11px] font-medium text-[#dc2626] border border-[#fecaca] px-2.5 py-1.5 rounded-lg
+                                               hover:bg-[#fef2f2] transition-all">
+                                    Rejeter
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endforeach
             </div>
-        </div>
+        @endif
 
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-600 text-sm font-semibold uppercase tracking-wider">Vérifiés</p>
-                    <p class="text-3xl font-bold text-green-600 mt-2">{{ $documents->get('verified', collect())->count() }}</p>
+        {{-- VÉRIFIÉS --}}
+        @if($verified > 0)
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+                <div class="flex items-center gap-2.5 px-5 py-4 border-b border-[#efefed] bg-[#f0fdf4]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#22c55e]"></span>
+                    <span class="text-[13px] font-medium text-[#15803d]">Vérifiés ({{ $verified }})</span>
                 </div>
-                <div class="text-4xl opacity-20">✓</div>
+                @foreach($documents->get('verified', []) as $doc)
+                    <div class="flex items-start justify-between px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                        <div class="flex-1 min-w-0 mr-4">
+                            <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
+                            <div class="font-mono text-[11px] text-[#a0a09a] mt-1">{{ $doc->created_at->format('d/m/Y · H:i') }}</div>
+                            @if($doc->verified_at)
+                                <div class="flex items-center gap-1.5 mt-1">
+                                    <svg class="w-3 h-3 text-[#22c55e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span class="text-[11px] text-[#15803d] font-light">Vérifié le {{ $doc->verified_at->format('d/m/Y') }}</span>
+                                </div>
+                            @endif
+                        </div>
+                        @if($doc->file_path)
+                            <a href="{{ asset('storage/'.$doc->file_path) }}" target="_blank"
+                               class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
+                                      hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all flex-shrink-0">
+                                Voir
+                            </a>
+                        @endif
+                    </div>
+                @endforeach
             </div>
-        </div>
+        @endif
+
+        {{-- REJETÉS --}}
+        @if($rejected > 0)
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+                <div class="flex items-center gap-2.5 px-5 py-4 border-b border-[#efefed] bg-[#fef2f2]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#f87171]"></span>
+                    <span class="text-[13px] font-medium text-[#dc2626]">Rejetés ({{ $rejected }})</span>
+                </div>
+                @foreach($documents->get('rejected', []) as $doc)
+                    <div class="flex items-start justify-between px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
+                        <div class="flex-1 min-w-0 mr-4">
+                            <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
+                            <div class="font-mono text-[11px] text-[#a0a09a] mt-1">{{ $doc->created_at->format('d/m/Y · H:i') }}</div>
+                            @if($doc->rejection_reason)
+                                <div class="mt-2 px-3 py-2 bg-[#fef2f2] border border-[#fecaca] rounded-lg">
+                                    <span class="text-[11px] text-[#dc2626] font-light">{{ $doc->rejection_reason }}</span>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            @if($doc->file_path)
+                                <a href="{{ asset('storage/'.$doc->file_path) }}" target="_blank"
+                                   class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
+                                          hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                                    Voir
+                                </a>
+                            @endif
+                            <form method="POST" action="{{ route('admin.users.approve-document', $doc->id) }}" class="inline">
+                                @csrf
+                                <button type="submit"
+                                        class="text-[11px] font-medium text-[#15803d] border border-[#bbf7d0] px-2.5 py-1.5 rounded-lg
+                                               hover:bg-[#f0fdf4] transition-all">
+                                    Approuver
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+    @endif
     </div>
 </div>
 @endsection

@@ -50,6 +50,14 @@ class Produit extends Model
         return $this->hasMany(Avis::class);
     }
 
+    /**
+     * Images Cloudinary du produit
+     */
+    public function cloudinaryImages()
+    {
+        return $this->hasMany(ProduitImage::class);
+    }
+
     public function stocks()
     {
         return $this->hasMany(Stock::class);

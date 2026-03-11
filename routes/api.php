@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\DeliveryLocationController;
 use App\Http\Controllers\Api\PaymentCinemaController;
 use App\Http\Controllers\Api\OrderValidationController;
+use App\Http\Controllers\RealtimeNotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Routes de localisation Côte d'Ivoire (publiques)
@@ -38,6 +39,14 @@ Route::middleware('auth:sanctum')->prefix('payments')->group(function () {
     Route::post('check-status', [PaymentCinemaController::class, 'checkStatus']);
     Route::post('cancel', [PaymentCinemaController::class, 'cancel']);
     Route::get('history', [PaymentCinemaController::class, 'history']);
+});
+
+// Routes Pusher Notifications en temps réel (authentifiées)
+Route::middleware('auth:sanctum')->prefix('notifications')->group(function () {
+    Route::get('init', [RealtimeNotificationController::class, 'init']);
+    Route::get('/', [RealtimeNotificationController::class, 'index']);
+    Route::get('sound', [RealtimeNotificationController::class, 'sound']);
+    Route::post('test', [RealtimeNotificationController::class, 'test']);
 });
 
 // Webhook de notification de paiement (publique)

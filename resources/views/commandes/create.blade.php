@@ -181,6 +181,20 @@
                     </label>
                     @endforeach
 
+                    {{-- Paiement par Carte (Stripe) --}}
+                    <label class="payment-option cursor-pointer">
+                        <input type="radio" name="payment_method" value="card" class="hidden" required>
+                        <div class="flex items-center gap-3 px-4 py-4 bg-white hover:bg-[#f7f7f5] transition-colors">
+                            <div class="w-9 h-9 rounded-md flex-shrink-0 bg-gradient-to-br from-[#625df8] to-[#0a0a0a] flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            </div>
+                            <div>
+                                <div class="text-[13px] font-medium text-[#0a0a0a]">Carte Bancaire</div>
+                                <div class="text-[11px] text-[#a0a09a] font-light">Visa, Mastercard, etc.</div>
+                            </div>
+                        </div>
+                    </label>
+
                     {{-- À la livraison — pleine largeur --}}
                     <label class="payment-option cursor-pointer col-span-2">
                         <input type="radio" name="payment_method" value="cash" class="hidden" required>

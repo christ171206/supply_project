@@ -172,6 +172,19 @@
                 @enderror
             </div>
 
+            <!-- Cloudinary Gallery Link (if editing) -->
+            @if(isset($produit))
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-blue-900">✨ Galerie d'images Cloudinary</p>
+                        <p class="text-xs text-blue-700 mt-1">Gères les images du produit avec optimisation automatique</p>
+                    </div>
+                    <a href="{{ route('vendeur.images.gallery', $produit->id) }}" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                        Accéder à la galerie
+                    </a>
+                </div>
+            @endif
+
             <!-- Boutons -->
             <div class="flex justify-end gap-3 pt-6 border-t border-[#e0e0dc]">
                 <a href="{{ route('vendeur.produits.index') }}" class="px-4 py-2.5 border border-[#e0e0dc] text-[#0a0a0a] text-sm font-medium rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition">

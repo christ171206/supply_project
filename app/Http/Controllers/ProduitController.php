@@ -101,10 +101,26 @@ class ProduitController extends Controller
             ->latest()
             ->paginate(5);
 
+        // Statistiques des avis
+        $allAvis = $produit->avis()->get();
+        $noteMoyenne = round($allAvis->avg('note') ?? 0, 1);
+        $nombreAvis = $allAvis->count();
+        $distributionNotes = [
+            5 => $allAvis->where('note', 5)->count(),
+            4 => $allAvis->where('note', 4)->count(),
+            3 => $allAvis->where('note', 3)->count(),
+            2 => $allAvis->where('note', 2)->count(),
+            1 => $allAvis->where('note', 1)->count(),
+        ];
+
         return view('produits.show', [
             'produit' => $produit,
             'produitsSimilaires' => $produitsSimilaires,
             'avis' => $avis,
+            'noteMoyenne' => $noteMoyenne,
+            'nombreAvis' => $nombreAvis,
+            'distributionNotes' => $distributionNotes,
         ]);
     }
+
 }

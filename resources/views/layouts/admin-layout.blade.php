@@ -1,294 +1,298 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Admin — Supply')</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/css/modals.css', 'resources/js/app.js'])
+    <script>window.SOCKET_IO_URL = '{{ env('SOCKET_IO_URL', 'http://localhost:3000') }}';</script>
+</head>
+<body class="antialiased bg-[#f7f7f5]" style="font-family:'Geist',sans-serif; font-weight:300;">
 
-        <title>@yield('title', 'Admin Dashboard - Supply')</title>
+<div class="flex min-h-screen">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
+    {{-- ══════════════════════════════
+         SIDEBAR — fond noir
+    ══════════════════════════════ --}}
+    <aside id="sidebar"
+           class="w-[220px] bg-[#0a0a0a] flex flex-col sticky top-0 h-screen flex-shrink-0 z-50
+                  fixed md:relative -translate-x-full md:translate-x-0 transition-transform duration-300">
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/css/modals.css', 'resources/js/app.js'])
-
-        <script>
-            window.SOCKET_IO_URL = '{{ env('SOCKET_IO_URL', 'http://localhost:3000') }}';
-        </script>
-    </head>
-    <body class="font-sans antialiased bg-gray-50">
-        <div class="flex min-h-screen">
-            <!-- Sidebar -->
-            <aside id="sidebar" class="fixed left-0 top-0 z-1000 h-screen w-72 bg-white border-r border-gray-200 overflow-y-auto shadow-sm md:relative md:translate-x-0 -translate-x-full transition-transform duration-300">
-                <!-- Logo -->
-                <div class="border-b border-gray-200 p-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        </div>
-                        <h1 class="text-xl font-bold text-gray-900">Supply Admin</h1>
-                    </div>
+        {{-- Logo --}}
+        <div class="px-5 pt-6 pb-5 border-b border-white/10">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
+                <div class="w-7 h-7 bg-white rounded-md flex items-center justify-center flex-shrink-0">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5" class="w-3.5 h-3.5">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
                 </div>
-
-                <!-- Navigation -->
-                <nav class="p-4 space-y-1">
-                    <!-- Admin Section -->
-                    <div class="mb-8">
-                        <p class="px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Administration</p>
-                        <div class="space-y-1">
-                            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {{ Route::currentRouteName() === 'admin.dashboard' ? 'bg-blue-50 text-blue-600 font-semibold' : '' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9M9 12l3-3m0 0l3 3m-3-3v6" /></svg>
-                                <span>Dashboard</span>
-                            </a>
-                            <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {{ Route::currentRouteName() === 'admin.users.index' ? 'bg-blue-50 text-blue-600 font-semibold' : '' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 8.646 4 4 0 010-8.646M12 14H8m0 0a4 4 0 00-4 4v2h16v-2a4 4 0 00-4-4h-4z" /></svg>
-                                <span>Utilisateurs</span>
-                            </a>
-                            <a href="{{ route('admin.products.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {{ Route::currentRouteName() === 'admin.products.index' ? 'bg-blue-50 text-blue-600 font-semibold' : '' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m0 0L4 7m16 0v10l-8 4m0-10L4 7v10l8 4" /></svg>
-                                <span>Produits</span>
-                            </a>
-                            <a href="{{ route('admin.orders.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {{ Route::currentRouteName() === 'admin.orders.index' ? 'bg-blue-50 text-blue-600 font-semibold' : '' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                                <span>Commandes</span>
-                            </a>
-                            <a href="{{ route('admin.disputes.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition {{ Route::currentRouteName() === 'admin.disputes.index' ? 'bg-blue-50 text-blue-600 font-semibold' : '' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                <span>Litiges</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Autres sections (désactivées) -->
-                    <div class="mb-8 opacity-50">
-                        <p class="px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Rapports</p>
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 cursor-not-allowed">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                <span>Audit Logs</span>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-
-                <!-- Logout -->
-                <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition font-medium">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                            <span>Déconnexion</span>
-                        </button>
-                    </form>
+                <div>
+                    <div class="text-[14px] font-medium text-white leading-none">Supply</div>
+                    <div class="text-[9px] font-medium tracking-[0.12em] uppercase text-white/30 mt-0.5">Admin</div>
                 </div>
-            </aside>
+            </a>
+        </div>
 
-            <!-- Main Content -->
-            <div class="flex-1 flex flex-col">
-                <!-- Mode Client Banner (si activé) -->
-                @if(session('admin_client_mode'))
-                    <div class="bg-yellow-50 border-b-2 border-yellow-400 px-6 py-3 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 24 24"><path d="M15 13H9v-2h6v2zm0-6H9v2h6V7zm6 6v5H3v-5h3V5c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v1h3zm-2 3H5v2h14v-2z"/></svg>
-                            <div>
-                                <p class="font-semibold text-yellow-900 flex items-center gap-2"><x-heroicon-o-eye class="w-5 h-5" /><span>Mode Visualisation Client Activé</span></p>
-                                <p class="text-xs text-yellow-700">Vous visualisez la plateforme comme un client. Vous ne pouvez pas passer de commande.</p>
-                            </div>
-                        </div>
-                        <form method="POST" action="{{ route('admin.mode.client-exit') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition font-semibold text-sm whitespace-nowrap">
-                                Quitter Mode Client
-                            </button>
-                        </form>
-                    </div>
-                @endif
+        {{-- Nav --}}
+        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+            <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/25 px-3 pt-1 pb-2">
+                Administration
+            </div>
 
-                <!-- Topbar -->
-                <header class="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between h-16 px-6">
-                        <button id="hamburger-btn" class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition">
-                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-                        </button>
-                        
-                        <!-- Center spacer -->
-                        <div></div>
-                        
-                        <!-- Right section: Notifications + Profile -->
-                        <div class="flex items-center gap-6">
-                            <!-- Notifications -->
-                            <div class="relative group">
-                                <button class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition">
-                                    <x-heroicon-o-bell class="w-5 h-5" />
-                                    @if(isset($unreadNotificationsCount) && $unreadNotificationsCount > 0)
-                                        <span class="absolute top-1 right-1 px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-max">{{ $unreadNotificationsCount }}</span>
-                                    @endif
-                                </button>
-                                
-                                <!-- Notifications Dropdown -->
-                                <div class="absolute right-0 mt-0 w-96 bg-white rounded-lg shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                    <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                                        <h3 class="text-sm font-bold text-gray-900">Notifications</h3>
-                                        @if(isset($unreadNotificationsCount) && $unreadNotificationsCount > 0)
-                                            <span class="text-xs text-gray-500">{{ $unreadNotificationsCount }} non lue{{ $unreadNotificationsCount > 1 ? 's' : '' }}</span>
-                                        @endif
-                                    </div>
-                                    <div class="max-h-96 overflow-y-auto">
-                                        @if(isset($adminNotifications) && $adminNotifications->count() > 0)
-                                            @foreach($adminNotifications as $notification)
-                                                <div class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 transition flex items-start justify-between group/item">
-                                                    <div class="flex-1 flex items-start gap-3">
-                                                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-lg
-                                                            @if($notification->type === 'new_vendor_registration') bg-orange-100
-                                                            @elseif($notification->type === 'vendor_documents_submitted') bg-purple-100
-                                                            @else bg-blue-100
-                                                            @endif">
-                                                            @if($notification->type === 'new_vendor_registration')
-                                                                🏪
-                                                            @elseif($notification->type === 'vendor_documents_submitted')
-                                                                📄
-                                                            @else
-                                                                🔔
-                                                            @endif
-                                                        </div>
-                                                        <div class="flex-1 min-w-0">
-                                                            <p class="text-xs font-semibold text-gray-900">{{ $notification->titre }}</p>
-                                                            <p class="text-xs text-gray-500 mt-1">{{ Str::limit($notification->message, 60) }}</p>
-                                                            <p class="text-xs text-gray-400 mt-1">{{ $notification->created_at->diffForHumans() }}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition ml-2 flex-shrink-0">
-                                                        <form action="{{ route('notifications.mark-as-read', $notification->id) }}" method="POST" class="inline">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <button type="submit" class="p-1 text-gray-400 hover:text-green-600 transition" title="Marquer comme lu">
-                                                                <x-heroicon-o-check-circle class="w-4 h-4" />
-                                                            </button>
-                                                        </form>
-                                                        <form action="{{ route('notifications.delete', $notification->id) }}" method="POST" class="inline">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="p-1 text-gray-400 hover:text-red-600 transition" title="Supprimer">
-                                                                <x-heroicon-o-trash class="w-4 h-4" />
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <div class="px-4 py-8 text-center">
-                                                <x-heroicon-o-bell-slash class="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                                                <p class="text-sm text-gray-500">Aucune notification</p>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    
-                                    @if(isset($adminNotifications) && $adminNotifications->count() > 0)
-                                        <div class="p-3 border-t border-gray-100 text-center">
-                                            <a href="{{ route('notifications.index') }}" class="text-xs text-blue-600 hover:text-blue-700 font-semibold">Voir toutes les notifications</a>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
+            @php
+                $navItems = [
+                    ['route'=>'admin.dashboard',      'label'=>'Dashboard',    'icon'=>'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>'],
+                    ['route'=>'admin.users.index',    'label'=>'Utilisateurs', 'icon'=>'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'],
+                    ['route'=>'admin.products.index', 'label'=>'Produits',     'icon'=>'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>'],
+                    ['route'=>'admin.orders.index',   'label'=>'Commandes',    'icon'=>'<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/>'],
+                    ['route'=>'admin.disputes.index', 'label'=>'Litiges',      'icon'=>'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'],
+                ];
+            @endphp
 
-                            <!-- Mode Client Toggle -->
-                            @if(!session('admin_client_mode'))
-                                <form method="POST" action="{{ route('admin.mode.client-enter') }}" class="inline">
-                                    @csrf
-                                    <button type="submit" class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200 transition font-semibold flex items-center gap-1">
-                                        <x-heroicon-o-eye class="w-3 h-3" /> Mode Client
-                                    </button>
-                                </form>
-                            @endif
+            @foreach($navItems as $item)
+                @php $active = Route::currentRouteName() === $item['route']; @endphp
+                <a href="{{ route($item['route']) }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+                          {{ $active ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        {!! $item['icon'] !!}
+                    </svg>
+                    {{ $item['label'] }}
+                </a>
+            @endforeach
 
-                            <!-- Profile Dropdown -->
-                            <div class="relative group">
-                                <button class="flex items-center gap-3 hover:bg-gray-100 rounded-lg px-3 py-2 transition">
-                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs">
-                                        {{ substr(auth()->user()->name, 0, 1) }}
-                                    </div>
-                                    <div class="hidden sm:block text-left">
-                                        <p class="text-xs font-semibold text-gray-900">{{ auth()->user()->name }}</p>
-                                        <p class="text-xs text-gray-500">Admin</p>
-                                    </div>
-                                    <x-heroicon-o-chevron-down class="w-4 h-4 text-gray-400" />
-                                </button>
+            <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/15 px-3 pt-5 pb-2">Rapports</div>
+            <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] text-white/20 cursor-not-allowed select-none">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Audit Logs
+            </div>
+        </nav>
 
-                                <!-- Profile Dropdown Menu -->
-                                <div class="absolute right-0 mt-0 w-48 bg-white rounded-lg shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                    <!-- Profile Info -->
-                                    <div class="px-4 py-3 border-b border-gray-100">
-                                        <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
-                                        <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
-                                    </div>
-
-                                    <!-- Menu Items -->
-                                    <div class="py-2">
-                                        <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                            <x-heroicon-o-user class="w-4 h-4" />
-                                            <span>Profil</span>
-                                        </a>
-                                        
-                                        <a href="{{ route('admin.security.index') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                            <x-heroicon-o-lock-closed class="w-4 h-4" />
-                                            <span>Sécurité</span>
-                                        </a>
-
-                                        <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                            <x-heroicon-o-cog-6-tooth class="w-4 h-4" />
-                                            <span>Paramètres</span>
-                                        </a>
-
-                                        <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                            <x-heroicon-o-document-text class="w-4 h-4" />
-                                            <span>Documentation</span>
-                                        </a>
-                                    </div>
-
-                                    <!-- Divider -->
-                                    <div class="border-t border-gray-100 py-2">
-                                        <form action="{{ route('logout') }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
-                                                <x-heroicon-o-arrow-right-on-rectangle class="w-4 h-4" />
-                                                <span>Déconnexion</span>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                <!-- Content -->
-                <main class="flex-1 overflow-auto">
-                    <div class="p-8">
-                        @yield('content')
-                    </div>
-                </main>
+        {{-- User row --}}
+        <div class="border-t border-white/10 px-3 py-3 space-y-0.5">
+            <a href="{{ route('accueil') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium
+                      text-white/50 hover:text-white hover:bg-white/10 transition-all">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M19 12H5M12 5l-7 7 7 7"/>
+                </svg>
+                Vue client
+            </a>
+            <div class="flex items-center gap-3 px-3 py-3 border-t border-white/10 mt-1">
+                <div class="w-7 h-7 bg-white/15 rounded-md flex items-center justify-center text-white text-[11px] font-medium flex-shrink-0">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[12px] font-medium text-white truncate">{{ auth()->user()->name }}</div>
+                    <div class="text-[10px] text-white/40 font-light">Administrateur</div>
+                </div>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" title="Déconnexion"
+                            class="w-6 h-6 flex items-center justify-center text-white/30 hover:text-white/70 transition-colors">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                    </button>
+                </form>
             </div>
         </div>
 
-        <script>
-            // Mobile sidebar toggle
-            const hamburgerBtn = document.getElementById('hamburger-btn');
-            const sidebar = document.getElementById('sidebar');
-            hamburgerBtn?.addEventListener('click', () => {
-                sidebar.classList.toggle('-translate-x-full');
-            });
+    </aside>
 
-            // Close sidebar when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!sidebar?.contains(e.target) && !hamburgerBtn?.contains(e.target)) {
-                    sidebar?.classList.add('-translate-x-full');
-                }
-            });
-        </script>
+    {{-- ══════════════════════════════
+         MAIN
+    ══════════════════════════════ --}}
+    <div class="flex-1 flex flex-col min-w-0">
 
-        <!-- Composant Modal de Confirmation -->
-        @include('components.confirmation-modal')
-    </body>
+        {{-- Banner mode client --}}
+        @if(session('admin_client_mode'))
+            <div class="bg-[#fdf6ec] border-b border-[#fde68a] px-6 py-2.5 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b]"></span>
+                    <span class="text-[12px] font-medium text-[#b45309]">
+                        Mode visualisation client — vous ne pouvez pas passer de commande
+                    </span>
+                </div>
+                <form method="POST" action="{{ route('admin.mode.client-exit') }}">
+                    @csrf
+                    <button type="submit"
+                            class="text-[11px] font-medium text-[#b45309] border border-[#fde68a] px-3 py-1.5 rounded-lg hover:bg-[#fde68a] transition-colors">
+                        Quitter →
+                    </button>
+                </form>
+            </div>
+        @endif
+
+        {{-- Topbar --}}
+        <header class="h-[52px] bg-white border-b border-[#e0e0dc] flex items-center justify-between px-6 sticky top-0 z-40 flex-shrink-0">
+
+            <button id="hamburger-btn"
+                    class="md:hidden w-8 h-8 flex items-center justify-center text-[#666660] hover:text-[#0a0a0a] transition-colors">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+
+            <div class="text-[12px] text-[#a0a09a] font-light hidden md:block">
+                @yield('breadcrumb', 'Espace Admin')
+            </div>
+
+            <div class="flex items-center gap-3 ml-auto">
+
+                {{-- Mode client --}}
+                @if(!session('admin_client_mode'))
+                    <form method="POST" action="{{ route('admin.mode.client-enter') }}">
+                        @csrf
+                        <button type="submit"
+                                class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-3 py-1.5
+                                       rounded-lg hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                            Mode client
+                        </button>
+                    </form>
+                @endif
+
+                {{-- Notifs --}}
+                <div class="relative group">
+                    <button class="relative w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg
+                                   text-[#666660] hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        @if(isset($unreadNotificationsCount) && $unreadNotificationsCount > 0)
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-[#0a0a0a] text-white text-[9px]
+                                         font-mono rounded-sm flex items-center justify-center leading-none">
+                                {{ $unreadNotificationsCount }}
+                            </span>
+                        @endif
+                    </button>
+
+                    <div class="absolute right-0 mt-1 w-[320px] bg-white border border-[#e0e0dc] rounded-xl overflow-hidden
+                                opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50"
+                         style="box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#efefed]">
+                            <span class="text-[13px] font-medium text-[#0a0a0a]">Notifications</span>
+                            @if(isset($unreadNotificationsCount) && $unreadNotificationsCount > 0)
+                                <span class="text-[10px] font-mono text-[#a0a09a]">
+                                    {{ $unreadNotificationsCount }} non lue{{ $unreadNotificationsCount > 1 ? 's' : '' }}
+                                </span>
+                            @endif
+                        </div>
+                        <div class="max-h-80 overflow-y-auto divide-y divide-[#efefed]">
+                            @if(isset($adminNotifications) && $adminNotifications->count() > 0)
+                                @foreach($adminNotifications as $n)
+                                    <div class="px-4 py-3.5 hover:bg-[#f7f7f5] transition-colors flex items-start gap-3">
+                                        <div class="w-7 h-7 bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-3.5 h-3.5 text-[#666660]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-[12px] font-medium text-[#0a0a0a] truncate">{{ $n->titre }}</div>
+                                            <div class="text-[11px] text-[#a0a09a] font-light mt-0.5">{{ Str::limit($n->message, 55) }}</div>
+                                            <div class="font-mono text-[10px] text-[#a0a09a] mt-1">{{ $n->created_at->diffForHumans() }}</div>
+                                        </div>
+                                        <div class="flex flex-col gap-1 flex-shrink-0">
+                                            <form action="{{ route('notifications.mark-as-read', $n->id) }}" method="POST">
+                                                @csrf @method('PATCH')
+                                                <button class="w-5 h-5 flex items-center justify-center text-[#a0a09a] hover:text-[#22c55e] transition-colors">
+                                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('notifications.delete', $n->id) }}" method="POST">
+                                                @csrf @method('DELETE')
+                                                <button class="w-5 h-5 flex items-center justify-center text-[#a0a09a] hover:text-[#dc2626] transition-colors">
+                                                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="px-4 py-10 text-center">
+                                    <p class="text-[12px] text-[#a0a09a] font-light">Aucune notification</p>
+                                </div>
+                            @endif
+                        </div>
+                        @if(isset($adminNotifications) && $adminNotifications->count() > 0)
+                            <div class="px-4 py-3 border-t border-[#efefed] text-center">
+                                <a href="{{ route('notifications.index') }}"
+                                   class="text-[11px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors border-b border-[#e0e0dc] pb-px">
+                                    Voir toutes →
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Profil --}}
+                <div class="relative group">
+                    <button class="flex items-center gap-2 border border-[#e0e0dc] rounded-lg px-2.5 py-1.5 hover:border-[#2a2a28] transition-all">
+                        <div class="w-5 h-5 bg-[#0a0a0a] rounded-sm flex items-center justify-center text-white text-[10px] font-medium">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </div>
+                        <span class="text-[12px] font-medium text-[#0a0a0a]">{{ auth()->user()->name }}</span>
+                        <svg class="w-3 h-3 text-[#a0a09a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+                    <div class="absolute right-0 mt-1 w-[200px] bg-white border border-[#e0e0dc] rounded-xl overflow-hidden
+                                opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50"
+                         style="box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+                        <div class="px-4 py-3 border-b border-[#efefed]">
+                            <div class="text-[12px] font-medium text-[#0a0a0a]">{{ auth()->user()->name }}</div>
+                            <div class="text-[11px] text-[#a0a09a] font-light truncate">{{ auth()->user()->email }}</div>
+                        </div>
+                        <div class="py-1">
+                            @foreach([
+                                ['route'=>'admin.profile.edit',   'label'=>'Profil'],
+                                ['route'=>'admin.security.index', 'label'=>'Sécurité'],
+                                ['route'=>'admin.settings.index', 'label'=>'Paramètres'],
+                            ] as $it)
+                                <a href="{{ route($it['route']) }}"
+                                   class="block px-4 py-2.5 text-[12px] text-[#2a2a28] hover:bg-[#f7f7f5] transition-colors">
+                                    {{ $it['label'] }}
+                                </a>
+                            @endforeach
+                        </div>
+                        <div class="border-t border-[#efefed] py-1">
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                        class="w-full text-left px-4 py-2.5 text-[12px] text-[#dc2626] hover:bg-[#fef2f2] transition-colors">
+                                    Déconnexion
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <main class="flex-1">@yield('content')</main>
+
+    </div>
+</div>
+
+<script>
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const sidebar = document.getElementById('sidebar');
+    hamburgerBtn?.addEventListener('click', e => { e.stopPropagation(); sidebar.classList.toggle('-translate-x-full'); });
+    document.addEventListener('click', e => {
+        if (!sidebar?.contains(e.target) && !hamburgerBtn?.contains(e.target))
+            sidebar?.classList.add('-translate-x-full');
+    });
+</script>
+@include('components.confirmation-modal')
+@yield('scripts')
+</body>
 </html>
