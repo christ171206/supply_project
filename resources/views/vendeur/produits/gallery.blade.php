@@ -128,7 +128,7 @@
     const progressBar = document.getElementById('progressBar');
     const uploadPercentage = document.getElementById('uploadPercentage');
     const imagesGrid = document.getElementById('imagesGrid');
-    
+
     // Base path for image operations
     const produitId = {{ $produit->id }};
     const baseImagePath = `/vendeur/produits/${produitId}/images`;
@@ -137,7 +137,7 @@
     function getDeleteUrl(imageId) {
         return `${baseImagePath}/${imageId}`;
     }
-    
+
     function getSetPrimaryUrl(imageId) {
         return `${baseImagePath}/${imageId}/primary`;
     }

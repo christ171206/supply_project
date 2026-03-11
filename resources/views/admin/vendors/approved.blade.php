@@ -48,7 +48,7 @@
                                 <small>{{ $vendor->vendor_approved_at ? $vendor->vendor_approved_at->format('d/m/Y') : '—' }}</small>
                             </td>
                             <td>
-                                <a href="{{ route('admin.vendors.show', $vendor) }}" 
+                                <a href="{{ route('admin.vendors.show', $vendor) }}"
                                    class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-eye"></i> Détails
                                 </a>

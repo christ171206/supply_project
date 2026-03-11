@@ -40,7 +40,7 @@
                         <strong>Nom :</strong> {{ $category->nom }}
                     </p>
                     <p>
-                        <strong>Description :</strong> 
+                        <strong>Description :</strong>
                         {{ $category->description ?? 'Aucune description' }}
                     </p>
                     <p>
