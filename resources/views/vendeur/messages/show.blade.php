@@ -33,7 +33,13 @@
             <h3 class="text-sm font-bold text-[#0a0a0a] mb-4 uppercase tracking-[0.05em]">Produit discuté</h3>
             <div class="flex gap-4">
                 @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
-                    <img src="{{ asset('storage/produits/' . $produit->images[0]) }}" alt="{{ $produit->nom }}" class="w-24 h-24 object-cover rounded-lg border border-[#e0e0dc]">
+                    @php
+                        $imgPath = $produit->images ? (is_array($produit->images) ? $produit->images[0] : $produit->images) : '';
+                        $fullPath = $imgPath ? (strpos($imgPath, 'produits/') === 0 ? $imgPath : 'produits/' . $imgPath) : '';
+                    @endphp
+                    @if($fullPath)
+                        <img src="{{ asset('storage/' . $fullPath) }}" alt="{{ $produit->nom }}" class="w-24 h-24 object-cover rounded-lg border border-[#e0e0dc] lazy" loading="lazy">
+                    @endif
                 @elseif($produit->image)
                     <img src="{{ asset('storage/produits/' . $produit->image) }}" alt="{{ $produit->nom }}" class="w-24 h-24 object-cover rounded-lg border border-[#e0e0dc]">
                 @else
@@ -77,7 +83,13 @@
                             @if($msg->produit)
                                 <div class="w-20 h-20 flex-shrink-0">
                                     @if($msg->produit->images && is_array($msg->produit->images) && count($msg->produit->images) > 0)
-                                        <img src="{{ asset('storage/produits/' . $msg->produit->images[0]) }}" alt="{{ $msg->produit->nom }}" class="w-full h-full object-cover rounded-lg border border-[#e0e0dc]">
+                                        @php
+                                            $imgPath = $msg->produit->images ? (is_array($msg->produit->images) ? $msg->produit->images[0] : $msg->produit->images) : '';
+                                            $fullPath = $imgPath ? (strpos($imgPath, 'produits/') === 0 ? $imgPath : 'produits/' . $imgPath) : '';
+                                        @endphp
+                                        @if($fullPath)
+                                            <img src="{{ asset('storage/' . $fullPath) }}" alt="{{ $msg->produit->nom }}" class="w-full h-full object-cover rounded-lg border border-[#e0e0dc] lazy" loading="lazy">
+                                        @endif
                                     @elseif($msg->produit->image)
                                         <img src="{{ asset('storage/produits/' . $msg->produit->image) }}" alt="{{ $msg->produit->nom }}" class="w-full h-full object-cover rounded-lg border border-[#e0e0dc]">
                                     @else

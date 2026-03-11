@@ -86,9 +86,15 @@
                 {{-- Image --}}
                 <div class="relative h-44 bg-[#f7f7f5] overflow-hidden border-b border-[#efefed]">
                     @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
-                        <img src="{{ asset('storage/produits/' . $produit->images[0]) }}"
+                        @php
+                            $imgPath = $produit->images ? (is_array($produit->images) ? $produit->images[0] : $produit->images) : '';
+                            $fullPath = $imgPath ? (strpos($imgPath, 'produits/') === 0 ? $imgPath : 'produits/' . $imgPath) : '';
+                        @endphp
+                        @if($fullPath)
+                            <img src="{{ asset('storage/' . $fullPath) }}" loading="lazy"
                              alt="{{ $produit->nom }}"
                              class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300">
+                        @endif
                     @elseif($produit->image)
                         <img src="{{ asset('storage/produits/' . $produit->image) }}"
                              alt="{{ $produit->nom }}"

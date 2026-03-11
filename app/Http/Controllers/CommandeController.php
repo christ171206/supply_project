@@ -7,9 +7,11 @@ use App\Models\LigneCommande;
 use App\Models\Produit;
 use App\Models\Payment;
 use App\Services\PaymentService;
+use App\Mail\ClientOrderStatusUpdatedMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class CommandeController extends Controller
 {
@@ -380,6 +382,17 @@ class CommandeController extends Controller
 
         // Mettre à jour le statut
         $commande->update(['statut' => $newStatus]);
+
+        // Envoyer un email au client si le statut a changé
+        try {
+            if ($oldStatus !== $newStatus && $commande->user && $commande->user->email) {
+                Mail::to($commande->user->email)->send(
+                    new ClientOrderStatusUpdatedMail($commande)
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error('Erreur envoi email ClientOrderStatusUpdatedMail: ' . $e->getMessage());
+        }
 
         // Dispatcher l'événement de changement de statut
         try {

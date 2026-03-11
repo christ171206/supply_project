@@ -12,8 +12,14 @@
     <div class="relative mb-4">
         <div class="w-full aspect-square rounded-lg bg-[#f7f7f5] border border-[#efefed] flex items-center justify-center overflow-hidden group-hover:border-[#e0e0dc] transition-colors">
             @if($product->images && is_array($product->images) && count($product->images) > 0)
-                <img src="{{ asset('storage/' . $product->images[0]) }}" alt="{{ $product->nom }}"
+                @php
+                    $imgPath = $product->images ? (is_array($product->images) ? $product->images[0] : $product->images) : '';
+                    $fullPath = $imgPath ? (strpos($imgPath, 'produits/') === 0 ? $imgPath : 'produits/' . $imgPath) : '';
+                @endphp
+                @if($fullPath)
+                    <img src="{{ asset('storage/' . $fullPath) }}" alt="{{ $product->nom }}"
                      class="w-full h-full object-cover">
+                @endif
             @elseif($product->image)
                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nom }}"
                      class="w-full h-full object-cover">

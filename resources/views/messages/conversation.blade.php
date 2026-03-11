@@ -39,9 +39,15 @@
                                 <div class="max-w-xs lg:max-w-md bg-[#f7f7f5] border border-[#e0e0dc] rounded-xl p-4">
                                     <div class="flex gap-3">
                                         @if($msg->produit->images && is_array($msg->produit->images) && count($msg->produit->images) > 0)
-                                            <img src="{{ asset('storage/' . $msg->produit->images[0]) }}" alt="{{ $msg->produit->nom }}" class="w-20 h-20 object-cover rounded-lg border border-[#e0e0dc]">
+                                            @php
+                                                $imgPath = $msg->produit->images ? (is_array($msg->produit->images) ? $msg->produit->images[0] : $msg->produit->images) : '';
+                                                $fullPath = $imgPath ? (strpos($imgPath, 'produits/') === 0 ? $imgPath : 'produits/' . $imgPath) : '';
+                                            @endphp
+                                            @if($fullPath)
+                                                <img src="{{ asset('storage/' . $fullPath) }}" alt="{{ $msg->produit->nom }}" class="w-20 h-20 object-cover rounded-lg border border-[#e0e0dc]">
+                                            @endif
                                         @elseif($msg->produit->image)
-                                            <img src="{{ asset('storage/produits/' . $msg->produit->image) }}" alt="{{ $msg->produit->nom }}" class="w-20 h-20 object-cover rounded-lg border border-[#e0e0dc]">
+                                            <img src="{{ asset('storage/' . $msg->produit->image) }}" alt="{{ $msg->produit->nom }}" class="w-20 h-20 object-cover rounded-lg border border-[#e0e0dc] lazy" loading="lazy">
                                         @else
                                             <div class="w-20 h-20 bg-[#e0e0dc] rounded-lg flex items-center justify-center text-[#a0a09a]">
                                                 <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

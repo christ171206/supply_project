@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-[1100px] mx-auto px-8 py-10 pb-20">
+<div class="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-10 pb-20">
 
     {{-- ── HEADER ── --}}
-    <div class="flex items-center gap-3 mb-8">
-        <svg class="w-5 h-5 text-[#a0a09a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+    <div class="flex items-center gap-3 mb-6 sm:mb-8">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#a0a09a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
         </svg>
-        <h1 class="font-serif text-[28px] tracking-tight text-[#0a0a0a] leading-none">Mon Panier</h1>
+        <h1 class="font-serif text-xl sm:text-2xl md:text-[28px] tracking-tight text-[#0a0a0a] leading-none">Mon Panier</h1>
     </div>
 
     {{-- ── FLASH MESSAGES ── --}}
@@ -25,7 +25,7 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-[1fr_300px] gap-6 items-start">
+    <div class="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6 md:gap-8 items-start">
 
         {{-- ══════════════════════════════
              ARTICLES
@@ -44,9 +44,13 @@
                         <div class="flex gap-4 px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
 
                             {{-- Thumb --}}
-                            <div class="w-16 h-16 rounded-lg border border-[#e0e0dc] bg-[#f7f7f5] overflow-hidden flex items-center justify-center flex-shrink-0">
+                            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border border-[#e0e0dc] bg-[#f7f7f5] overflow-hidden flex items-center justify-center flex-shrink-0">
                                 @if($item->produit->images && is_array($item->produit->images) && count($item->produit->images) > 0)
-                                    <img src="{{ asset('storage/produits/' . $item->produit->images[0]) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover">
+                                    @php
+                                        $imgPath = $item->produit->images[0];
+                                        $fullPath = strpos($imgPath, 'produits/') === 0 ? $imgPath : 'produits/' . $imgPath;
+                                    @endphp
+                                    <img src="{{ asset('storage/' . $fullPath) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover lazy" loading="lazy">
                                 @elseif($item->produit->image)
                                     <img src="{{ asset('storage/produits/' . $item->produit->image) }}" alt="{{ $item->produit->nom }}" class="w-full h-full object-cover">
                                 @else
@@ -104,16 +108,16 @@
                 </div>
 
                 {{-- Actions bas --}}
-                <div class="flex items-center justify-between">
+                <div class="flex flex-col sm:flex-row md:flex-col items-center justify-between gap-3 md:gap-0">
                     <a href="{{ route('produits.catalogue') }}"
-                       class="flex items-center gap-1.5 text-[12px] text-[#666660] hover:text-[#0a0a0a] transition-colors">
+                       class="flex-1 sm:flex-none md:w-full flex items-center justify-center gap-1.5 text-[12px] text-[#666660] hover:text-[#0a0a0a] transition-colors">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
                         Continuer les achats
                     </a>
-                    <form action="{{ route('panier.vider') }}" method="POST">
+                    <form action="{{ route('panier.vider') }}" method="POST" class="flex-1 sm:flex-none md:w-full">
                         @csrf
                         <button type="submit"
-                            class="text-[12px] text-[#a0a09a] hover:text-[#dc2626] transition-colors flex items-center gap-1.5">
+                            class="w-full text-[12px] text-[#a0a09a] hover:text-[#dc2626] transition-colors flex items-center justify-center gap-1.5">
                             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
                             Vider le panier
                         </button>
@@ -122,14 +126,14 @@
 
             @else
                 {{-- ── PANIER VIDE ── --}}
-                <div class="bg-white border border-[#e0e0dc] rounded-xl px-6 py-16 text-center">
-                    <svg class="w-10 h-10 text-[#e0e0dc] mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <div class="bg-white border border-[#e0e0dc] rounded-xl px-4 sm:px-6 py-12 sm:py-16 text-center">
+                    <svg class="w-8 h-8 sm:w-10 sm:h-10 text-[#e0e0dc] mx-auto mb-3 sm:mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
                     </svg>
-                    <h2 class="text-[15px] font-medium text-[#0a0a0a] mb-2">Votre panier est vide</h2>
-                    <p class="text-[13px] text-[#a0a09a] font-light mb-6">Commencez vos achats en explorant notre catalogue</p>
+                    <h2 class="text-[14px] sm:text-[15px] font-medium text-[#0a0a0a] mb-1 sm:mb-2">Votre panier est vide</h2>
+                    <p class="text-[12px] sm:text-[13px] text-[#a0a09a] font-light mb-4 sm:mb-6">Commencez vos achats en explorant notre catalogue</p>
                     <a href="{{ route('produits.catalogue') }}"
-                       class="inline-block bg-[#0a0a0a] text-white text-[12px] font-medium px-6 py-2.5 rounded-lg hover:opacity-85 transition-opacity">
+                       class="inline-block bg-[#0a0a0a] text-white text-[12px] font-medium px-5 sm:px-6 py-2.5 rounded-lg hover:opacity-85 transition-opacity">
                         Découvrir nos produits
                     </a>
                 </div>
@@ -139,8 +143,8 @@
         {{-- ══════════════════════════════
              RÉSUMÉ
         ══════════════════════════════ --}}
-        <div class="sticky top-[72px]">
-            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+        <div class="sticky top-[72px] md:top-[72px] w-full md:w-[300px]">
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden md:w-[300px]">
 
                 <div class="px-5 py-4 border-b border-[#efefed]">
                     <span class="text-[13px] font-medium text-[#0a0a0a]">Résumé</span>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\EmailVerificationCodeMail;
 use App\Mail\NewVendorRegistrationNotification;
+use App\Mail\AdminNewVendorRegistrationMail;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -108,7 +109,7 @@ class RegisteredUserController extends Controller
         Mail::to($user->email)->queue(new EmailVerificationCodeMail($user, $verificationCode));
 
         // Si c'est un vendeur, créer une notification dans le dashboard pour l'admin
-        // L'email n'est pas envoyé pour éviter de surcharger MailTrap en développement
+        // ET envoyer un email à l'admin
         if ($request->role === 'vendor') {
             $admins = User::where('is_admin', true)->get();
             foreach ($admins as $admin) {
@@ -120,6 +121,13 @@ class RegisteredUserController extends Controller
                     'message' => $user->shop_name . ' (' . $user->email . ') a demandé à devenir vendeur. À vérifier.',
                     'lu' => false,
                 ]);
+
+                // Envoyer l'email à l'admin
+                try {
+                    Mail::to($admin->email)->send(new AdminNewVendorRegistrationMail($user, $admin));
+                } catch (\Exception $e) {
+                    Log::error('Erreur envoi email admin nouveau vendeur: ' . $e->getMessage());
+                }
             }
             Log::info('Notification vendeur créée', ['vendor_id' => $user->id]);
         }

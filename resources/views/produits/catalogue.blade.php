@@ -1,22 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-[1200px] mx-auto px-8 py-10 pb-20">
+<div class="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-8 py-6 md:py-10 pb-16 md:pb-20">
 
     {{-- ── HEADER ── --}}
-    <div class="mb-8">
-        <h1 class="font-serif text-[28px] tracking-tight text-[#0a0a0a] leading-tight">
+    <div class="mb-6 md:mb-8">
+        <h1 class="font-serif text-xl sm:text-2xl md:text-[28px] tracking-tight text-[#0a0a0a] leading-tight">
             Catalogue <em class="italic text-[#666660]">Produits</em>
         </h1>
-        <p class="text-[13px] text-[#a0a09a] font-light mt-1">{{ count($produits) ?? 0 }} produits disponibles</p>
+        <p class="text-xs sm:text-[13px] text-[#a0a09a] font-light mt-1">{{ count($produits) ?? 0 }} produits disponibles</p>
     </div>
 
-    <div class="grid grid-cols-[220px_1fr] gap-7 items-start">
+    <div class="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-7 items-start">
 
         {{-- ══════════════════════════════
              SIDEBAR FILTRES
         ══════════════════════════════ --}}
-        <aside class="sticky top-[72px]">
+        <aside class="hidden md:block sticky top-[72px]">
             <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
 
                 <form method="GET" action="{{ route('produits.catalogue') }}">
@@ -39,47 +39,32 @@
                     <div class="p-4 border-b border-[#efefed]">
                         <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-3">Catégories</div>
                         <div class="flex flex-col gap-0.5">
-                            <label class="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors hover:bg-[#f7f7f5] {{ !request('categorie') ? 'bg-[#0a0a0a]' : '' }} group" onclick="filterByCategory('')">
+                            <label class="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors hover:bg-[#f7f7f5] {{ !request('categorie') ? 'bg-[#0a0a0a]' : '' }} group">
                                 <div class="w-3.5 h-3.5 rounded-[3px] border flex-shrink-0 flex items-center justify-center transition-all
                                     {{ !request('categorie') ? 'border-transparent bg-white' : 'border-[#e0e0dc]' }}">
                                     @if(!request('categorie'))
                                         <svg class="w-2.5 h-2.5 text-[#0a0a0a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                                     @endif
                                 </div>
+                                <input type="checkbox" value="" class="hidden" {{ !request('categorie') ? 'checked' : '' }}>
                                 <span class="text-[12px] flex-1 {{ !request('categorie') ? 'text-white font-medium' : 'text-[#666660]' }}">Toutes</span>
                                 <span class="text-[10px] font-mono {{ !request('categorie') ? 'text-white/60' : 'text-[#a0a09a]' }}">{{ $produits->total() ?? count($produits) }}</span>
                             </label>
 
                             @foreach($categories as $cat)
-                                <label class="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors hover:bg-[#f7f7f5] {{ request('categorie') == $cat->id ? 'bg-[#0a0a0a]' : '' }}" onclick="filterByCategory('{{ $cat->id }}')">
+                                <label class="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors hover:bg-[#f7f7f5] {{ request('categorie') == $cat->id ? 'bg-[#0a0a0a]' : '' }}">
                                     <div class="w-3.5 h-3.5 rounded-[3px] border flex-shrink-0 flex items-center justify-center transition-all
                                         {{ request('categorie') == $cat->id ? 'border-transparent bg-white' : 'border-[#e0e0dc]' }}">
                                         @if(request('categorie') == $cat->id)
                                             <svg class="w-2.5 h-2.5 text-[#0a0a0a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                                         @endif
                                     </div>
+                                    <input type="checkbox" name="categorie" value="{{ $cat->id }}" class="hidden" {{ request('categorie') == $cat->id ? 'checked' : '' }}>
                                     <span class="text-[12px] flex-1 {{ request('categorie') == $cat->id ? 'text-white font-medium' : 'text-[#666660]' }}">{{ $cat->nom }}</span>
                                 </label>
                             @endforeach
                         </div>
                     </div>
-
-                    <script>
-                        function filterByCategory(categoryId) {
-                            const form = document.querySelector('form');
-                            let categoryInput = form.querySelector('input[name="categorie"]');
-                            
-                            if (!categoryInput) {
-                                categoryInput = document.createElement('input');
-                                categoryInput.type = 'hidden';
-                                categoryInput.name = 'categorie';
-                                form.appendChild(categoryInput);
-                            }
-                            
-                            categoryInput.value = categoryId;
-                            form.submit();
-                        }
-                    </script>
 
                     {{-- Prix --}}
                     <div class="p-4 border-b border-[#efefed]">
@@ -151,7 +136,7 @@
             @if($produits && count($produits) > 0)
 
                 {{-- Grille --}}
-                <div class="grid grid-cols-3 gap-px bg-[#e0e0dc] border border-[#e0e0dc] rounded-xl overflow-hidden mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#e0e0dc] border border-[#e0e0dc] rounded-xl overflow-hidden mb-8">
                     @foreach($produits as $produit)
                         @include('components.carte-produit', ['produit' => $produit])
                     @endforeach

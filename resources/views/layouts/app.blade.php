@@ -34,8 +34,8 @@
         </div>
 
         <!-- Modals -->
-        <div id="quantity-modal" class="modal-hidden fixed inset-0 bg-black/40 backdrop-blur items-center justify-center z-100 p-4">
-            <div class="bg-white rounded-xl border border-[#e0e0dc] w-full max-w-md p-8 transition duration-25">
+        <div id="quantity-modal" class="modal-hidden fixed inset-0 bg-black/40 backdrop-blur items-center justify-center z-100 p-3 sm:p-4">
+            <div class="bg-white rounded-xl border border-[#e0e0dc] w-full max-w-md p-4 sm:p-8 transition duration-25 overflow-y-auto max-h-[90vh] sm:max-h-none">
                 <h3 class="text-display-2 font-display mb-6">Ajouter au panier</h3>
 
                 <!-- Détails Produit -->

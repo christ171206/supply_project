@@ -45,7 +45,7 @@ return [
     */
 
     'namespaces' => [
-        'mail' => resource_path('views/mail'),
+        'mail' => resource_path('views/emails'),
     ],
 
 ];

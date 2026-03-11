@@ -5,17 +5,26 @@
         <div class="w-full aspect-square bg-[#f7f7f5] border border-[#efefed] overflow-hidden flex items-center justify-center transition-colors duration-150 group-hover:border-[#e0e0dc]">
 
             @if($produit->images && is_array($produit->images) && count($produit->images) > 0)
+                {{-- Détecter ancien vs nouveau format d'image --}}
+                @php
+                    $imagePath = $produit->images[0];
+                    // Si le chemin commence par "produits/", c'est un nouveau produit
+                    // Sinon c'est un ancien produit (juste le nom du fichier), ajouter "produits/"
+                    $fullImagePath = strpos($imagePath, 'produits/') === 0 ? $imagePath : 'produits/' . $imagePath;
+                @endphp
                 <img
-                    src="{{ asset('storage/produits/' . $produit->images[0]) }}"
+                    src="{{ asset('storage/' . $fullImagePath) }}"
                     alt="{{ $produit->nom }}"
-                    class="w-full h-full object-cover"
+                    class="w-full h-full object-cover lazy"
+                    loading="lazy"
                     onerror="this.parentElement.querySelector('.img-placeholder').style.display='flex'; this.style.display='none';"
                 >
             @elseif($produit->image)
                 <img
                     src="{{ asset('storage/produits/' . $produit->image) }}"
                     alt="{{ $produit->nom }}"
-                    class="w-full h-full object-cover"
+                    class="w-full h-full object-cover lazy"
+                    loading="lazy"
                     onerror="this.parentElement.querySelector('.img-placeholder').style.display='flex'; this.style.display='none';"
                 >
             @endif

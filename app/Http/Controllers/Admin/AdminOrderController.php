@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Commande;
 use App\Models\Dispute;
 use App\Models\DeliveryTracking;
+use App\Mail\ClientOrderStatusUpdatedMail;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class AdminOrderController extends Controller
 {
@@ -68,6 +71,15 @@ class AdminOrderController extends Controller
         ]);
 
         $commande->update(['statut' => $request->input('status')]);
+
+        // Envoyer un email de notification au client
+        try {
+            Mail::to($commande->user->email)->send(
+                new ClientOrderStatusUpdatedMail($commande)
+            );
+        } catch (\Exception $e) {
+            Log::error('Erreur envoi email statut commande: ' . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', 'Statut de la commande mis à jour.');
     }

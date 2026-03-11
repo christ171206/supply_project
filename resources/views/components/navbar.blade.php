@@ -1,5 +1,5 @@
 {{-- Navbar Minimaliste - Design Neutral Minimal --}}
-<nav class="sticky top-0 z-50 bg-white/92 backdrop-blur-md border-b border-[#e0e0dc] h-14 flex items-center px-8 gap-0">
+<nav class="sticky top-0 z-50 bg-white/92 backdrop-blur-md border-b border-[#e0e0dc] h-14 flex items-center px-4 sm:px-8 gap-0">
 
     {{-- Brand --}}
     <a href="{{ route('accueil') }}" class="flex items-center gap-2 text-[15px] font-medium text-[#0a0a0a] tracking-tight no-underline mr-10">
@@ -27,7 +27,7 @@
 
     {{-- Search --}}
     <form action="{{ route('produits.catalogue') }}" method="GET"
-          class="flex items-center gap-2 border border-[#e0e0dc] rounded-lg px-3.5 py-1.5 text-[13px] text-[#a0a09a] w-56 mr-4 hover:border-[#a0a09a] transition-colors duration-150 focus-within:border-[#0a0a0a]">
+          class="hidden sm:flex items-center gap-2 border border-[#e0e0dc] rounded-lg px-3.5 py-1.5 text-[13px] text-[#a0a09a] w-40 md:w-56 mr-2 md:mr-4 hover:border-[#a0a09a] transition-colors duration-150 focus-within:border-[#0a0a0a]">
         <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
