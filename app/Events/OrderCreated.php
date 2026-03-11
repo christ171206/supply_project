@@ -3,55 +3,15 @@
 namespace App\Events;
 
 use App\Models\Commande;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OrderCreated implements ShouldBroadcastNow
+class OrderCreated
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, SerializesModels;
 
     /**
      * Create a new event instance.
      */
     public function __construct(public Commande $commande) {}
-
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
-    public function broadcastOn(): array
-    {
-        return [
-            new PrivateChannel('vendor-notifications.'.$this->commande->vendeur_id),
-        ];
-    }
-
-    /**
-     * The event's broadcast name.
-     */
-    public function broadcastAs(): string
-    {
-        return 'order.created';
-    }
-
-    /**
-     * Get the data to broadcast.
-     */
-    public function broadcastWith(): array
-    {
-        return [
-            'id' => $this->commande->id,
-            'numero' => $this->commande->numero,
-            'client' => $this->commande->user->prenom . ' ' . $this->commande->user->nom,
-            'montant' => number_format($this->commande->montant_total, 0),
-            'devise' => 'FCFA',
-            'created_at' => $this->commande->created_at->format('Y-m-d H:i:s'),
-            'message' => 'Nouvelle commande #'.$this->commande->numero,
-        ];
-    }
 }

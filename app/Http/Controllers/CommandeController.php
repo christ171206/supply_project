@@ -547,4 +547,19 @@ class CommandeController extends Controller
             return redirect()->back()->with('error', '❌ Erreur lors de la suppression: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Afficher la page de test de paiement
+     */
+    public function paymentTest($id)
+    {
+        $commande = Commande::findOrFail($id);
+
+        // Vérifier que l'utilisateur est propriétaire
+        if (auth()->user()->id !== $commande->user_id) {
+            abort(403);
+        }
+
+        return view('commandes.payment-test', compact('commande'));
+    }
 }

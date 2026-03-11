@@ -16,7 +16,7 @@
             <!-- Basic Info -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-clipboard class="w-5 h-5" /><span>Informations Générales</span></h2>
-                
+
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -50,7 +50,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-gray-600 font-medium">Vendeur</p>
-                            <p class="text-gray-900 font-semibold">{{ $produit->user->shop_name ?? $produit->user->name }}</p>
+                            <p class="text-gray-900 font-semibold">{{ $produit->vendeur?->shop_name ?? $produit->vendeur?->name ?? 'Vendeur supprimé' }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-600 font-medium">Créé le</p>
@@ -62,41 +62,32 @@
 
             <!-- Stock Management -->
             <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2"><x-heroicon-o-cube class="w-5 h-5" /><span>Gestion du Stock</span></h2>
-                
-                @if($produit->stock)
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-4 bg-blue-50 rounded-lg">
-                                <p class="text-sm text-gray-600 font-medium">Quantité</p>
-                                <p class="text-3xl font-bold text-blue-600 mt-2">{{ $produit->stock->quantite }}</p>
-                            </div>
-                            <div class="p-4 @if($produit->stock->quantite <= $produit->stock->alerte_quantite) bg-red-50 @else bg-yellow-50 @endif rounded-lg">
-                                <p class="text-sm text-gray-600 font-medium">Alerte Minimum</p>
-                                <p class="text-3xl font-bold @if($produit->stock->quantite <= $produit->stock->alerte_quantite) text-red-600 @else text-yellow-600 @endif mt-2">
-                                    {{ $produit->stock->alerte_quantite }}
-                                </p>
-                            </div>
+                <h2 class="text-xl font-bold text-gray-900 mb-4">📦 Gestion du Stock</h2>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <p class="text-sm text-gray-600 font-medium">Quantité</p>
+                            <p class="text-3xl font-bold text-blue-600 mt-2">{{ $produit->stock }}</p>
                         </div>
-
-                        @if($produit->stock->quantite <= $produit->stock->alerte_quantite)
-                            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
-                                <p class="text-red-800 text-sm"><x-heroicon-o-exclamation-triangle class="w-4 h-4 inline" /> <strong>Stock Critique:</strong> Le stock est en dessous du minimum recommandé</p>
-                            </div>
-                        @endif
-
-                        <!-- Adjust Stock Form -->
-                        <form method="POST" action="{{ route('admin.products.adjust-stock', $produit->id) }}" class="flex gap-2">
-                            @csrf
-                            <input type="number" name="quantite" placeholder="Quantité" required class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
-                                Ajuster
-                            </button>
-                        </form>
+                        <div class="p-4 @if($produit->stock <= $produit->stock_minimum) bg-red-50 @else bg-yellow-50 @endif rounded-lg">
+                            <p class="text-sm text-gray-600 font-medium">Minimum</p>
+                            <p class="text-3xl font-bold @if($produit->stock <= $produit->stock_minimum) text-red-600 @else text-yellow-600 @endif mt-2">
+                                {{ $produit->stock_minimum }}
+                            </p>
+                        </div>
                     </div>
-                @else
-                    <p class="text-gray-500">❌ Aucune information de stock</p>
-                @endif
+
+                    @if($produit->stock <= $produit->stock_minimum)
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <p class="text-red-800 text-sm">⚠️ <strong>Stock Critique:</strong> Le stock est en dessous du minimum recommandé</p>
+                        </div>
+                    @endif
+
+                    <div class="p-3 bg-gray-50 rounded-lg border border-[#e0e0dc]">
+                        <p class="text-[12px] text-[#a0a09a] font-light">ℹ️ Gestion du stock: Responsabilité du Vendeur</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Stock History -->
@@ -133,7 +124,7 @@
             <!-- Quick Actions -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-4">⚙️ Actions</h2>
-                
+
                 <div class="space-y-3">
                     @if($produit->actif)
                         <form method="POST" action="{{ route('admin.products.disable', $produit->id) }}" class="w-full">

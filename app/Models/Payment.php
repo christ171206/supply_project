@@ -41,4 +41,3 @@ class Payment extends Model
         return $this->belongsTo(Commande::class);
     }
 }
-

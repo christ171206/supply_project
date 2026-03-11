@@ -29,7 +29,7 @@ class CloudinaryImageService
 
     /**
      * Télécharger une image vers Cloudinary
-     * 
+     *
      * @param UploadedFile $file
      * @param string $folder (e.g., "products", "vendors")
      * @param string $publicId (e.g., "product_123")
@@ -39,7 +39,7 @@ class CloudinaryImageService
     {
         try {
             $tempPath = $file->getRealPath();
-            
+
             if (!$publicId) {
                 $publicId = $folder . '/' . Str::slug($file->getClientOriginalName(), '-') . '_' . time();
             }
@@ -49,18 +49,18 @@ class CloudinaryImageService
                 fopen($tempPath, 'r'),
                 $file->getClientOriginalName()
             )
-            ->post("{$this->baseUrl}/{$this->cloudName}/image/upload", [
-                'api_key' => $this->apiKey,
-                'public_id' => $publicId,
-                'folder' => $this->folder . '/' . $folder,
-                'resource_type' => 'auto',
-                'quality' => 'auto',
-                'fetch_format' => 'auto',
-                // Optimisations
-                'transformation' => [
-                    ['quality' => 'auto', 'fetch_format' => 'auto'],
-                ],
-            ]);
+                ->post("{$this->baseUrl}/{$this->cloudName}/image/upload", [
+                    'api_key' => $this->apiKey,
+                    'public_id' => $publicId,
+                    'folder' => $this->folder . '/' . $folder,
+                    'resource_type' => 'auto',
+                    'quality' => 'auto',
+                    'fetch_format' => 'auto',
+                    // Optimisations
+                    'transformation' => [
+                        ['quality' => 'auto', 'fetch_format' => 'auto'],
+                    ],
+                ]);
 
             if ($response->failed()) {
                 return [
@@ -91,7 +91,7 @@ class CloudinaryImageService
 
     /**
      * Supprimer une image de Cloudinary
-     * 
+     *
      * @param string $publicId
      * @return bool
      */
@@ -122,7 +122,7 @@ class CloudinaryImageService
 
     /**
      * Générer une URL optimisée pour une image
-     * 
+     *
      * @param string $publicId
      * @param array $options (width, height, quality, format, etc.)
      * @return string
@@ -163,7 +163,7 @@ class CloudinaryImageService
 
     /**
      * Récupérer les métadonnées d'une image
-     * 
+     *
      * @param string $publicId
      * @return array
      */
@@ -192,7 +192,7 @@ class CloudinaryImageService
 
     /**
      * Générer une URL de transformations multiples pour une galerie
-     * 
+     *
      * @param string $publicId
      * @return array
      */
@@ -220,7 +220,7 @@ class CloudinaryImageService
 
     /**
      * Récupérer la clé publique pour les signatures côté client
-     * 
+     *
      * @return string
      */
     public function getCloudName()
@@ -230,21 +230,21 @@ class CloudinaryImageService
 
     /**
      * Générer une signature pour les uploads côté client (Widget Cloudinary)
-     * 
+     *
      * @param array $params
      * @return array
      */
     public function generateSignature($params = [])
     {
         $timestamp = time();
-        
+
         $paramsToSign = array_merge($params, [
             'timestamp' => $timestamp,
             'api_key' => $this->apiKey,
         ]);
 
         ksort($paramsToSign);
-        
+
         $paramsString = '';
         foreach ($paramsToSign as $key => $value) {
             if (is_array($value)) {

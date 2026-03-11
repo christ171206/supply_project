@@ -43,15 +43,15 @@
         <!-- Gallery Grid -->
         <div class="mb-8">
             <h2 class="text-lg font-medium text-black mb-6">Images du produit</h2>
-            
+
             @if($images->count() > 0)
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="imagesGrid">
                     @foreach($images as $image)
                         <div class="group relative border border-gray-200 rounded-lg overflow-hidden hover:border-black transition-colors" data-image-id="{{ $image->id }}">
                             <!-- Image -->
                             <div class="aspect-square bg-gray-100 overflow-hidden">
-                                <img 
-                                    src="{{ $image->cloudinary_url }}" 
+                                <img
+                                    src="{{ $image->cloudinary_url }}"
                                     alt="{{ $produit->nom }}"
                                     class="w-full h-full object-cover"
                                 >
@@ -69,14 +69,14 @@
                                 <!-- Actions -->
                                 <div class="flex gap-3 flex-wrap justify-center">
                                     @if(!$image->is_primary)
-                                        <button 
+                                        <button
                                             class="px-3 py-2 bg-white text-black hover:bg-gray-100 rounded font-medium text-sm transition-colors set-primary-btn"
                                             data-image-id="{{ $image->id }}"
                                         >
                                             Définir comme principale
                                         </button>
                                     @endif
-                                    <button 
+                                    <button
                                         class="px-3 py-2 bg-red-600 text-white hover:bg-red-700 rounded font-medium text-sm transition-colors delete-image-btn"
                                         data-image-id="{{ $image->id }}"
                                     >
@@ -128,11 +128,23 @@
     const progressBar = document.getElementById('progressBar');
     const uploadPercentage = document.getElementById('uploadPercentage');
     const imagesGrid = document.getElementById('imagesGrid');
+    
+    // Base path for image operations
     const produitId = {{ $produit->id }};
+    const baseImagePath = `/vendeur/produits/${produitId}/images`;
+
+    // Helper functions to generate URLs
+    function getDeleteUrl(imageId) {
+        return `${baseImagePath}/${imageId}`;
+    }
+    
+    function getSetPrimaryUrl(imageId) {
+        return `${baseImagePath}/${imageId}/primary`;
+    }
 
     // Upload Zone Handlers
     uploadZone.addEventListener('click', () => fileInput.click());
-    
+
     uploadZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadZone.classList.add('border-black', 'bg-gray-50');
@@ -173,7 +185,7 @@
             const formData = new FormData();
             formData.append('image', file);
 
-            fetch(`/vendeur/produits/${produitId}/images/upload`, {
+            fetch(`${baseImagePath}/upload`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -248,7 +260,7 @@
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = imageHtml;
         imagesGrid.insertBefore(tempDiv.firstElementChild, imagesGrid.firstChild);
-        
+
         attachEventListeners();
     }
 
@@ -261,7 +273,7 @@
     });
 
     function setPrimaryImage(imageId) {
-        fetch(`/vendeur/produits/${produitId}/images/${imageId}/primary`, {
+        fetch(getSetPrimaryUrl(imageId), {
             method: 'PATCH',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -294,7 +306,7 @@
     });
 
     function deleteImage(imageId) {
-        fetch(`/vendeur/produits/${produitId}/images/${imageId}`, {
+        fetch(getDeleteUrl(imageId), {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -307,7 +319,7 @@
                 if (imageElement) {
                     imageElement.closest('.group').remove();
                     showToast('Image supprimée avec succès');
-                    
+
                     // Reload if no images left
                     if (document.querySelectorAll('[data-image-id]').length === 0) {
                         setTimeout(() => location.reload(), 1500);
@@ -327,16 +339,16 @@
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toastMessage');
-        
+
         toastMessage.textContent = message;
         toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded hidden z-50 max-w-sm transition-all ${
-            type === 'error' 
-                ? 'bg-red-600 text-white' 
+            type === 'error'
+                ? 'bg-red-600 text-white'
                 : 'bg-black text-white'
         }`;
-        
+
         toast.classList.remove('hidden');
-        
+
         setTimeout(() => {
             toast.classList.add('hidden');
         }, 3000);

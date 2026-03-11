@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Script pour configurer les comptes de test avec des mots de passe standards
  * Exécution: php setup-test-accounts.php
@@ -75,4 +76,3 @@ if ($admin) {
 echo "\n=== ✅ Comptes de test configurés ===\n";
 echo "\nAccédez à: http://127.0.0.1:8000/login\n";
 echo "Les comptes apparaîtront dans la section 'Comptes de test'\n\n";
-?>

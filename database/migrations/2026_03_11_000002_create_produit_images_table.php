@@ -14,24 +14,24 @@ return new class extends Migration
         Schema::create('produit_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('produit_id')->constrained('produits')->onDelete('cascade');
-            
+
             // Stockage Cloudinary
             $table->string('cloudinary_public_id')->unique();
             $table->string('cloudinary_url');
             $table->string('cloudinary_secure_url');
-            
+
             // Métadonnées
             $table->integer('width')->nullable();
             $table->integer('height')->nullable();
             $table->integer('file_size')->nullable();
             $table->string('format')->nullable();
-            
+
             // Gestion
             $table->integer('order')->default(0); // Ordre dans la galerie
             $table->boolean('is_primary')->default(false); // Image principale
-            
+
             $table->timestamps();
-            
+
             $table->index('produit_id');
             $table->index('is_primary');
         });

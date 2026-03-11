@@ -1,152 +1,219 @@
 @extends('layouts.admin-layout')
 
+@section('title', 'Litiges — Supply Admin')
+
+@section('breadcrumb')
+    Espace Admin &nbsp;/&nbsp; Litiges
+@endsection
+
 @section('content')
-<div class="p-6">
-    <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">⚖️ Litiges</h1>
-        <p class="text-gray-600 mt-2">Gérez les réclamations et litiges des clients</p>
+<div class="pb-16">
+
+    {{-- HEADER --}}
+    <div class="bg-[#0a0a0a] px-8 pt-10 pb-8 mb-8">
+        <div class="text-[10px] font-medium tracking-[0.15em] uppercase text-white/40 mb-3">Administration</div>
+        <h1 class="font-serif text-[32px] tracking-tight text-white leading-none">Litiges</h1>
+        <div class="flex items-center gap-6 mt-6 pt-6 border-t border-white/10 flex-wrap">
+            @foreach([
+                ['v' => $openCount       ?? 0, 'l' => 'Ouverts',   'c' => 'text-[#f87171]'],
+                ['v' => $inProgressCount ?? 0, 'l' => 'En cours',  'c' => 'text-[#fbbf24]'],
+                ['v' => $resolvedCount   ?? 0, 'l' => 'Résolus',   'c' => 'text-white'],
+                ['v' => number_format($totalAmount ?? 0, 0, ',', ' '), 'l' => 'Montant total', 'c' => 'text-white', 'u' => 'FCFA'],
+            ] as $i => $k)
+                @if($i > 0)<div class="w-px h-8 bg-white/10"></div>@endif
+                <div>
+                    <div class="font-mono text-[22px] font-medium {{ $k['c'] }} leading-none">
+                        {{ $k['v'] }}@isset($k['u'])<span class="text-[11px] text-white/35 font-sans font-light ml-0.5">{{ $k['u'] }}</span>@endisset
+                    </div>
+                    <div class="text-[10px] text-white/40 tracking-[0.08em] uppercase mt-1">{{ $k['l'] }}</div>
+                </div>
+            @endforeach
+        </div>
     </div>
 
-    <!-- Filters -->
-    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
-                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <option value="">Tous</option>
-                    <option value="open" @selected(request('status') === 'open')>Ouvert</option>
-                    <option value="in_progress" @selected(request('status') === 'in_progress')>En cours</option>
-                    <option value="resolved" @selected(request('status') === 'resolved')>Résolu</option>
-                    <option value="closed" @selected(request('status') === 'closed')>Fermé</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
-                <input type="text" name="search" placeholder="Chercher..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" value="{{ request('search') }}">
-            </div>
-            <div class="flex items-end">
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
-                    🔍 Filtrer
-                </button>
-            </div>
-        </form>
-    </div>
+    <div class="px-8 space-y-5">
 
-    <!-- Disputes List -->
-    <div class="bg-white rounded-xl shadow-lg p-6">
-        @if($disputes->isEmpty())
-            <div class="text-center py-12">
-                <p class="text-gray-500 text-lg">Aucun litige</p>
-                <p class="text-gray-400 text-sm mt-2">Tous les litiges ont été résolus!</p>
-            </div>
-        @else
-            <div class="space-y-4">
-                @foreach($disputes as $dispute)
-                    <div class="border border-gray-200 rounded-xl p-6 hover:bg-off-white transition">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <h3 class="text-lg font-semibold text-gray-900">{{ $dispute->subject ?? 'Litige #' . $dispute->id }}</h3>
-                                    @if($dispute->status === 'open')
-                                        <span class="badge badge-err">Ouvert</span>
-                                    @elseif($dispute->status === 'in_progress')
-                                        <span class="badge badge-warn">En cours</span>
-                                    @elseif($dispute->status === 'resolved')
-                                        <span class="badge badge-ok">Résolu</span>
-                                    @else
-                                        <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-semibold">Fermé</span>
-                                    @endif
-                                </div>
+    {{-- Filtres --}}
+    <form method="GET"
+          class="bg-white border border-[#e0e0dc] rounded-xl px-5 py-4 flex items-end gap-4 flex-wrap">
+        <div class="w-44">
+            <label class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">Statut</label>
+            <select name="status"
+                    class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                           focus:bg-white focus:border-[#0a0a0a] outline-none transition-all">
+                <option value="">Tous</option>
+                <option value="open"        @selected(request('status') === 'open')>Ouvert</option>
+                <option value="in_progress" @selected(request('status') === 'in_progress')>En cours</option>
+                <option value="resolved"    @selected(request('status') === 'resolved')>Résolu</option>
+                <option value="closed"      @selected(request('status') === 'closed')>Fermé</option>
+            </select>
+        </div>
+        <div class="flex-1 min-w-[180px]">
+            <label class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">Rechercher</label>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Titre, demandeur…"
+                   class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                          placeholder-[#a0a09a] focus:bg-white focus:border-[#0a0a0a] outline-none transition-all">
+        </div>
+        <button type="submit"
+                class="bg-[#0a0a0a] text-white text-[12px] font-medium px-4 py-2 rounded-lg hover:opacity-85 transition-opacity flex items-center gap-1.5">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Filtrer
+        </button>
+        @if(request('status') || request('search'))
+            <a href="{{ route('admin.disputes.index') }}"
+               class="text-[11px] text-[#a0a09a] hover:text-[#0a0a0a] transition-colors border-b border-[#e0e0dc] pb-px self-end mb-0.5">
+                Réinitialiser
+            </a>
+        @endif
+    </form>
 
-                                <p class="text-gray-600 text-sm">{{ $dispute->description ?? 'Aucune description' }}</p>
+    {{-- Liste --}}
+    @if($disputes->isEmpty())
+        <div class="bg-white border border-[#e0e0dc] rounded-xl px-5 py-16 text-center">
+            <div class="w-10 h-10 border border-[#e0e0dc] rounded-xl flex items-center justify-center mx-auto mb-3">
+                <svg class="w-5 h-5 text-[#a0a09a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </div>
+            <p class="text-[13px] font-medium text-[#0a0a0a] mb-1">Aucun litige</p>
+            <p class="text-[12px] text-[#a0a09a] font-light">Tous les litiges ont été résolus</p>
+        </div>
+    @else
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            @foreach($disputes as $dispute)
+                @php
+                    $b = match($dispute->status ?? 'open') {
+                        'open'        => ['bg-[#fef2f2] text-[#dc2626]','bg-[#f87171]','Ouvert'],
+                        'in_progress' => ['bg-[#fdf6ec] text-[#b45309]','bg-[#f59e0b]','En cours'],
+                        'resolved'    => ['bg-[#f0fdf4] text-[#15803d]','bg-[#22c55e]','Résolu'],
+                        default       => ['bg-[#f7f7f5] text-[#a0a09a]','bg-[#a0a09a]','Fermé'],
+                    };
+                @endphp
+                <div class="border-b border-[#efefed] last:border-b-0 px-5 py-5 hover:bg-[#f7f7f5] transition-colors">
+
+                    {{-- Row haut --}}
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2.5 mb-1.5">
+                                <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded {{ $b[0] }}">
+                                    <span class="w-1.5 h-1.5 rounded-full {{ $b[1] }}"></span>{{ $b[2] }}
+                                </span>
+                                <span class="font-mono text-[10px] text-[#a0a09a]">#{{ $dispute->id }}</span>
                             </div>
-                            <a href="{{ route('admin.disputes.show', $dispute->id) }}" class="text-black hover:opacity-70 font-semibold ml-4">
-                                Voir →
-                            </a>
+                            <div class="text-[14px] font-medium text-[#0a0a0a] truncate">
+                                {{ $dispute->subject ?? 'Litige #' . $dispute->id }}
+                            </div>
+                            @if($dispute->description)
+                                <p class="text-[12px] text-[#666660] font-light mt-1 line-clamp-1">{{ $dispute->description }}</p>
+                            @endif
+                        </div>
+                        <a href="{{ route('admin.disputes.show', $dispute->id) }}"
+                           class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
+                                  hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all flex-shrink-0">
+                            Voir →
+                        </a>
+                    </div>
+
+                    {{-- Méta --}}
+                    <div class="flex items-center gap-6 border-t border-[#efefed] pt-3.5">
+                        <div>
+                            <div class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-0.5">Demandeur</div>
+                            <div class="text-[12px] font-medium text-[#0a0a0a]">{{ $dispute->requester->name ?? '—' }}</div>
+                        </div>
+                        <div class="w-px h-6 bg-[#e0e0dc]"></div>
+                        <div>
+                            <div class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-0.5">Mis en cause</div>
+                            <div class="text-[12px] font-medium text-[#0a0a0a]">{{ $dispute->respondent->name ?? '—' }}</div>
+                        </div>
+                        <div class="w-px h-6 bg-[#e0e0dc]"></div>
+                        <div>
+                            <div class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-0.5">Montant</div>
+                            <div class="font-mono text-[12px] font-medium text-[#0a0a0a]">
+                                {{ number_format($dispute->resolution_amount ?? 0, 0, ',', ' ') }}
+                                <span class="text-[10px] text-[#a0a09a] font-sans">FCFA</span>
+                            </div>
+                        </div>
+                        <div class="w-px h-6 bg-[#e0e0dc]"></div>
+                        <div>
+                            <div class="text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-0.5">Créé</div>
+                            <div class="font-mono text-[11px] text-[#a0a09a]">{{ $dispute->created_at->format('d/m/Y') }}</div>
                         </div>
 
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-                            <div>
-                                <p class="text-xs text-gray-600 font-medium">DEMANDEUR</p>
-                                <p class="text-sm font-semibold text-gray-900 mt-1">{{ $dispute->requester->name ?? 'N/A' }}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-600 font-medium">DEMANDÉ</p>
-                                <p class="text-sm font-semibold text-gray-900 mt-1">{{ $dispute->respondent->name ?? 'N/A' }}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-600 font-medium">MONTANT</p>
-                                <p class="text-sm font-semibold text-green-600 mt-1">
-                                    {{ number_format($dispute->resolution_amount ?? 0, 0, ',', ' ') }} XOF
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-600 font-medium">CRÉÉ LE</p>
-                                <p class="text-sm font-semibold text-gray-900 mt-1">{{ $dispute->created_at->format('d/m/Y') }}</p>
-                            </div>
-                        </div>
-
+                        {{-- Actions rapides --}}
                         @if($dispute->status === 'open')
-                            <div class="mt-4 flex gap-2">
+                            <div class="ml-auto">
                                 <form method="POST" action="{{ route('admin.disputes.update-status', $dispute->id) }}" class="inline">
                                     @csrf
                                     <input type="hidden" name="status" value="in_progress">
-                                    <button type="submit" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-semibold rounded-lg transition">
-                                        Marquer en cours
+                                    <button type="submit"
+                                            class="text-[11px] font-medium text-[#b45309] border border-[#fde68a] px-2.5 py-1.5 rounded-lg
+                                                   hover:bg-[#fdf6ec] transition-all">
+                                        Prendre en charge
                                     </button>
                                 </form>
                             </div>
                         @elseif($dispute->status === 'in_progress')
-                            <div class="mt-4 flex gap-2">
+                            <div class="ml-auto flex items-center gap-1.5">
                                 <form method="POST" action="{{ route('admin.disputes.resolve', $dispute->id) }}" class="inline">
                                     @csrf
-                                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition">
-                                        Marquer résolu
+                                    <button type="submit"
+                                            class="text-[11px] font-medium text-[#15803d] border border-[#bbf7d0] px-2.5 py-1.5 rounded-lg
+                                                   hover:bg-[#f0fdf4] transition-all">
+                                        Résoudre
                                     </button>
                                 </form>
                                 <form method="POST" action="{{ route('admin.disputes.close', $dispute->id) }}" class="inline">
                                     @csrf
-                                    <button type="submit" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition">
+                                    <button type="submit"
+                                            class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
+                                                   hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
                                         Fermer
                                     </button>
                                 </form>
                             </div>
                         @endif
                     </div>
-                @endforeach
-            </div>
 
-            <!-- Pagination -->
-            @if($disputes->total() > 15)
-                <div class="mt-6 flex justify-center">
-                    {{ $disputes->links() }}
                 </div>
-            @endif
+            @endforeach
+        </div>
+
+        {{-- Pagination --}}
+        @if($disputes->hasPages())
+            <div class="flex items-center justify-between">
+                <div class="text-[11px] font-mono text-[#a0a09a]">
+                    {{ $disputes->firstItem() }}–{{ $disputes->lastItem() }} / {{ $disputes->total() }}
+                </div>
+                <div class="flex items-center gap-1">
+                    @if($disputes->onFirstPage())
+                        <span class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#e0e0dc] text-[11px] cursor-default">←</span>
+                    @else
+                        <a href="{{ $disputes->previousPageUrl() }}"
+                           class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
+                                  hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all text-[11px]">←</a>
+                    @endif
+                    @foreach($disputes->getUrlRange(max(1,$disputes->currentPage()-2),min($disputes->lastPage(),$disputes->currentPage()+2)) as $page => $url)
+                        @if($page == $disputes->currentPage())
+                            <span class="w-8 h-8 flex items-center justify-center bg-[#0a0a0a] text-white rounded-lg text-[11px] font-mono">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
+                                  hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all text-[11px] font-mono">{{ $page }}</a>
+                        @endif
+                    @endforeach
+                    @if($disputes->hasMorePages())
+                        <a href="{{ $disputes->nextPageUrl() }}"
+                           class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
+                                  hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all text-[11px]">→</a>
+                    @else
+                        <span class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#e0e0dc] text-[11px] cursor-default">→</span>
+                    @endif
+                </div>
+            </div>
         @endif
-    </div>
+    @endif
 
-    <!-- Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-        <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl shadow-lg p-6">
-            <h3 class="text-sm font-medium text-gray-700">Ouverts</h3>
-            <p class="text-3xl font-bold text-red-600 mt-2">{{ $openCount ?? 0 }}</p>
-        </div>
-
-        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl shadow-lg p-6">
-            <h3 class="text-sm font-medium text-gray-700">En Cours</h3>
-            <p class="text-3xl font-bold text-yellow-600 mt-2">{{ $inProgressCount ?? 0 }}</p>
-        </div>
-
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-lg p-6">
-            <h3 class="text-sm font-medium text-gray-700">Résolus</h3>
-            <p class="text-3xl font-bold text-blue-600 mt-2">{{ $resolvedCount ?? 0 }}</p>
-        </div>
-
-        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-lg p-6">
-            <h3 class="text-sm font-medium text-gray-700">Montant Total</h3>
-            <p class="text-3xl font-bold text-green-600 mt-2">{{ number_format($totalAmount ?? 0, 0, ',', ' ') }} XOF</p>
-        </div>
     </div>
 </div>
 @endsection

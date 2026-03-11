@@ -24,12 +24,20 @@
                     </div>
                 </div>
             </div>
-            <a href="{{ route('admin.products.critical-stock') }}"
-               class="flex items-center gap-2 bg-white/10 border border-white/20 text-white text-[12px] font-medium
-                      px-4 py-2.5 rounded-lg hover:bg-white/20 transition-all mt-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b]"></span>
-                Stock critique
-            </a>
+            <div class="flex flex-col gap-2">
+                <a href="{{ route('admin.products.featured') }}"
+                   class="flex items-center gap-2 bg-white/10 border border-white/20 text-white text-[12px] font-medium
+                          px-4 py-2.5 rounded-lg hover:bg-white/20 transition-all">
+                    <span class="text-lg">⭐</span>
+                    Vedettes
+                </a>
+                <a href="{{ route('admin.products.critical-stock') }}"
+                   class="flex items-center gap-2 bg-white/10 border border-white/20 text-white text-[12px] font-medium
+                          px-4 py-2.5 rounded-lg hover:bg-white/20 transition-all">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b]"></span>
+                    Stock critique
+                </a>
+            </div>
         </div>
     </div>
 
@@ -173,6 +181,16 @@
                                         </button>
                                     </form>
                                 @endif
+
+                                <form method="POST" action="{{ route('admin.products.toggle-featured', $produit) }}" class="inline">
+                                    @csrf
+                                    <button type="submit"
+                                            class="text-[11px] font-medium {{ $produit->featured ? 'text-[#dc2626] border border-[#fecaca]' : 'text-[#7c3aed] border border-[#ddd6fe]' }} px-2.5 py-1.5 rounded-lg
+                                                   {{ $produit->featured ? 'hover:bg-[#fef2f2]' : 'hover:bg-[#f5f3ff]' }} transition-all"
+                                            title="{{ $produit->featured ? 'Retirer de vedettes' : 'Ajouter aux vedettes' }}">
+                                        {{ $produit->featured ? 'Retirer ⭐' : 'Vedette ⭐' }}
+                                    </button>
+                                </form>
 
                                 <form method="POST" action="{{ route('admin.products.destroy', $produit) }}" class="inline"
                                       data-confirm="Supprimer ce produit ? Cette action est irréversible."

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProduitImage extends Model
 {
     protected $table = 'produit_images';
-    
+
     protected $fillable = [
         'produit_id',
         'cloudinary_public_id',

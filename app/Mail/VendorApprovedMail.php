@@ -26,6 +26,7 @@ class VendorApprovedMail extends Mailable
     {
         return new Envelope(
             from: new Address('noreply@supply.local', 'Supply - Plateforme E-commerce'),
+            to: [new Address($this->vendor->email, $this->vendor->name)],
             subject: '✅ Félicitations ! Votre compte vendeur a été approuvé',
         );
     }

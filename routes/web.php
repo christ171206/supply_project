@@ -101,6 +101,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/commandes/{id}/download-pdf', [CommandeController::class, 'downloadPDF'])->name('commandes.download-pdf');
     Route::post('/commandes', [CommandeController::class, 'store'])->name('commandes.store');
     Route::get('/commandes/{id}/payment-success', [CommandeController::class, 'paymentSuccess'])->name('commandes.payment-success');
+    Route::get('/commandes/{id}/payment-test', [CommandeController::class, 'paymentTest'])->name('commandes.payment-test');
 
     // Paiement Stripe
     Route::get('/commandes/{id}/payment', [PaymentController::class, 'show'])->name('payment.show');
@@ -181,12 +182,12 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
     Route::get('/api/statistics/customers', [VendorStatisticsController::class, 'getCustomerMetrics'])->name('statistics.customers');
 
     // Cloudinary Image Management
-    Route::prefix('produits/{produitId}/images')->group(function () {
-        Route::get('/', [CloudinaryImageController::class, 'gallery'])->name('vendeur.images.gallery');
-        Route::post('/upload', [CloudinaryImageController::class, 'upload'])->name('vendeur.images.upload');
-        Route::delete('/{imageId}', [CloudinaryImageController::class, 'delete'])->name('vendeur.images.delete');
-        Route::patch('/{imageId}/primary', [CloudinaryImageController::class, 'setPrimary'])->name('vendeur.images.set-primary');
-        Route::post('/reorder', [CloudinaryImageController::class, 'reorder'])->name('vendeur.images.reorder');
+    Route::prefix('produits/{produit}/images')->name('produits.')->group(function () {
+        Route::get('/', [CloudinaryImageController::class, 'gallery'])->name('gallery');
+        Route::post('/upload', [CloudinaryImageController::class, 'upload'])->name('upload');
+        Route::delete('/{image}', [CloudinaryImageController::class, 'delete'])->name('delete');
+        Route::patch('/{image}/primary', [CloudinaryImageController::class, 'setPrimary'])->name('set-primary');
+        Route::post('/reorder', [CloudinaryImageController::class, 'reorder'])->name('reorder');
     });
 
     // Role Switching - Vendeur to Client only

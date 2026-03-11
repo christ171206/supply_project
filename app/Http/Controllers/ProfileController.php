@@ -18,15 +18,15 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         $user = $request->user();
-        
+
         // Récupérer les stats du client
         $commandes = $user->commandes()->orderBy('created_at', 'desc')->get();
         $totalDépensé = $commandes->sum('total');
         $nombreCommandes = $commandes->count();
-        
+
         // Produits favoris
         $favoris = $user->favorites()->with('produit')->get();
-        
+
         // Catégories d'achat (top 5)
         $categoriesAchat = DB::table('ligne_commandes')
             ->join('commandes', 'ligne_commandes.commande_id', '=', 'commandes.id')
@@ -38,7 +38,7 @@ class ProfileController extends Controller
             ->orderByDesc('total')
             ->limit(5)
             ->get();
-        
+
         // Produits achetés (top 5)
         $produitsAchetes = DB::table('ligne_commandes')
             ->join('commandes', 'ligne_commandes.commande_id', '=', 'commandes.id')
@@ -49,7 +49,7 @@ class ProfileController extends Controller
             ->orderByDesc('total_quantite')
             ->limit(5)
             ->get();
-        
+
         // Dépenses par mois (derniers 6 mois)
         $depensesParMois = DB::table('commandes')
             ->where('user_id', $user->id)
@@ -60,7 +60,7 @@ class ProfileController extends Controller
             ->get()
             ->reverse()
             ->values();
-        
+
         return view('profile.edit', [
             'user' => $user,
             'commandes' => $commandes->take(5),

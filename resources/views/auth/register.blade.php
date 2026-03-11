@@ -69,7 +69,7 @@
                     type="text"
                     name="name"
                     value="{{ old('name') }}"
-                    placeholder="Jean Dupont"
+                    placeholder="Kouassi Jean"
                     required
                     autofocus
                     class="w-full px-3 py-2.5 border border-[#e0e0dc] rounded-lg text-[13px] text-[#0a0a0a] placeholder:text-[#a0a09a] outline-none focus:border-[#0a0a0a] hover:border-[#a0a09a] transition-colors bg-white"
@@ -234,9 +234,9 @@
                 <label class="flex items-start gap-3 cursor-pointer group">
                     <input type="checkbox" name="terms" required class="w-4 h-4 mt-0.5 accent-[#0a0a0a] cursor-pointer flex-shrink-0" />
                     <span class="text-[12px] text-[#666660] font-light leading-relaxed">
-                        J'accepte les 
+                        J'accepte les
                         <a href="#" class="text-[#0a0a0a] font-medium hover:underline">conditions d'utilisation</a>
-                        et la 
+                        et la
                         <a href="#" class="text-[#0a0a0a] font-medium hover:underline">politique de confidentialité</a>
                     </span>
                 </label>
@@ -279,12 +279,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!checkedRadio) return;
 
         const checkedRole = checkedRadio.getAttribute('data-role');
-        
+
         // Update all cards
         roleRadios.forEach((radio, index) => {
             const card = roleCards[index];
             const isChecked = radio.checked;
-            
+
             if (isChecked) {
                 card.className = 'role-card p-4 border-2 border-[#0a0a0a] rounded-lg text-center transition-all bg-[#f7f7f5] cursor-pointer';
             } else {

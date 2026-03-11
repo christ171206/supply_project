@@ -100,7 +100,7 @@
                             <input type="text" id="cardholder-name" required
                                    value="{{ auth()->user()->name }}"
                                    class="w-full px-4 py-3 border border-[#e0e0dc] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0a0a0a] focus:border-transparent"
-                                   placeholder="Jean Dupont">
+                                   placeholder=" Kouassi jean">
                         </div>
 
                         <!-- Message d'erreur général -->

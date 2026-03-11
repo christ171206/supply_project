@@ -17,10 +17,10 @@ return new class extends Migration
             $table->string('stripe_charge_id')->nullable();
             $table->json('stripe_response')->nullable(); // Stocker la réponse complète Stripe
             $table->enum('payment_type', ['cinetpay', 'stripe', 'manual'])->default('cinetpay');
-            
+
             // Statuts enrichis
             $table->enum('stripe_status', ['requires_action', 'requires_confirmation', 'requires_payment_method', 'processing', 'succeeded', 'failed', 'canceled'])->nullable();
-            
+
             // Timestamps pour webhook tracing
             $table->timestamp('stripe_webhook_received_at')->nullable();
             $table->string('idempotency_key')->nullable()->unique(); // Éviter les doubles paiements

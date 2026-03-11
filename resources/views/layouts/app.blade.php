@@ -11,7 +11,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/css/modals.css', 'resources/js/app.js', 'resources/js/pusher-notifications.js'])
+        @vite(['resources/css/app.css', 'resources/css/modals.css', 'resources/js/app.js'])
 
         <!-- Socket.io Client Library -->
         <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
@@ -342,7 +342,7 @@
             // Sync on page load if user just logged in
             document.addEventListener('DOMContentLoaded', function() {
                 syncLocalFavoritesToDatabase();
-                
+
                 // Check favorite status for all favorite buttons on the page
                 const favoriteButtons = document.querySelectorAll('[data-favorite-btn]');
                 favoriteButtons.forEach(btn => {

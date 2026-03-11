@@ -287,7 +287,7 @@
 
     {{-- Order strip --}}
     <div class="order-strip">
-        <span class="order-number">#{{ $commande->id }}</span>
+        <span class="order-number">{{ $commande->numero ?? 'CMD-' . $commande->id }}</span>
         <span class="order-date">{{ $commande->created_at->format('d/m/Y · H:i') }}</span>
     </div>
 

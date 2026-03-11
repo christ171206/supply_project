@@ -186,6 +186,9 @@ class AdminUserController extends Controller
     /**
      * Approuver un vendeur
      */
+    /**
+     * Approuver un vendeur
+     */
     public function approveVendor(User $user)
     {
         if ($user->role !== 'vendor') {
@@ -198,7 +201,17 @@ class AdminUserController extends Controller
                 'vendor_approved_at' => now(),
             ])->save();
 
-            return back()->with('success', 'Vendeur approuvé avec succès');
+            // Envoyer l'email d'approbation
+            try {
+                \Illuminate\Support\Facades\Mail::to($user)->send(new \App\Mail\VendorApprovedMail($user));
+            } catch (\Exception $emailError) {
+                \Illuminate\Support\Facades\Log::warning(
+                    "Erreur envoi email approbation vendeur #" . $user->id . ": " . $emailError->getMessage()
+                );
+                // Continuer même si l'email échoue
+            }
+
+            return back()->with('success', 'Vendeur approuvé avec succès. Un email de confirmation a été envoyé.');
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de l\'approbation : ' . $e->getMessage());
         }

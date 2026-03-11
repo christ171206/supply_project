@@ -16,6 +16,7 @@ class Produit extends Model
         'stock',
         'stock_minimum',
         'est_actif',
+        'featured',
         'image',
         'images',
     ];

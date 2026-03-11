@@ -122,5 +122,4 @@ class ProduitController extends Controller
             'distributionNotes' => $distributionNotes,
         ]);
     }
-
 }

@@ -29,7 +29,7 @@ class VendorApprovalStatusChanged implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('vendor-approval.'.$this->vendor->id),
+            new PrivateChannel('vendor-approval.' . $this->vendor->id),
         ];
     }
 

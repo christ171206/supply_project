@@ -47,26 +47,28 @@
          FILTRES
     ══════════════════════════════ --}}
     <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
-        <form method="GET" class="flex items-center divide-x divide-[#efefed]">
-            <div class="flex-1 flex items-center gap-3 px-4">
+        <form method="GET" class="flex items-center divide-x divide-[#efefed] flex-wrap md:flex-nowrap gap-0">
+            <div class="flex-1 flex items-center gap-3 px-4 py-3.5 min-w-[250px]">
                 <svg class="w-3.5 h-3.5 text-[#a0a09a] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" name="search" placeholder="Rechercher un produit…"
                        value="{{ request('search') }}"
-                       class="flex-1 py-3.5 text-[13px] text-[#0a0a0a] placeholder-[#a0a09a] bg-transparent outline-none font-light">
+                       class="flex-1 text-[13px] text-[#0a0a0a] placeholder-[#a0a09a] bg-transparent outline-none font-light">
             </div>
-            <div class="px-4">
+            <div class="px-4 py-3.5">
                 <select name="categorie"
-                        class="py-3.5 text-[13px] text-[#0a0a0a] bg-transparent outline-none font-light cursor-pointer">
+                        class="text-[13px] text-[#0a0a0a] bg-white outline-none font-light cursor-pointer">
                     <option value="">Toutes les catégories</option>
-                    @foreach($categories as $cat)
+                    @forelse($categories as $cat)
                         <option value="{{ $cat->id }}" {{ request('categorie') == $cat->id ? 'selected' : '' }}>
                             {{ $cat->nom }}
                         </option>
-                    @endforeach
+                    @empty
+                        <option disabled>Aucune catégorie</option>
+                    @endforelse
                 </select>
             </div>
             <button type="submit"
-                    class="px-5 py-3.5 text-[12px] font-medium text-[#0a0a0a] hover:bg-[#f7f7f5] transition-colors">
+                    class="px-5 py-3.5 text-[12px] font-medium text-[#0a0a0a] hover:bg-[#f7f7f5] transition-colors whitespace-nowrap">
                 Filtrer →
             </button>
         </form>
@@ -159,7 +161,8 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit"
-                                    class="w-9 h-9 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#a0a09a] hover:border-[#dc2626] hover:text-[#dc2626] transition-all">
+                                    class="w-9 h-9 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#a0a09a] hover:border-[#dc2626] hover:text-[#dc2626] transition-all"
+                                    title="Supprimer">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                             </button>
                         </form>

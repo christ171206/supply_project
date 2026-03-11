@@ -47,7 +47,7 @@ class RealtimeNotifications {
             // Subscribe to all channels
             channels.forEach(channelName => {
                 const channel = this.pusher.subscribe(channelName);
-                
+
                 // Listen to order created event
                 channel.bind('order.created', (data) => {
                     this.handleOrderCreated(data);
@@ -182,7 +182,7 @@ class RealtimeNotifications {
      */
     showNotification(notification) {
         const toastContainer = document.getElementById('notification-container');
-        
+
         if (!toastContainer) {
             this.createNotificationContainer();
         }
@@ -329,7 +329,7 @@ class RealtimeNotifications {
         if (seconds < 60) return 'à l\'instant';
         if (minutes < 60) return `il y a ${minutes}m`;
         if (hours < 24) return `il y a ${hours}h`;
-        
+
         return date.toLocaleDateString('fr-FR');
     }
 
@@ -355,7 +355,7 @@ class RealtimeNotifications {
 document.addEventListener('DOMContentLoaded', async () => {
     const notifications = new RealtimeNotifications();
     await notifications.init();
-    
+
     // Make available globally for debugging
     window.RealtimeNotifications = notifications;
 });

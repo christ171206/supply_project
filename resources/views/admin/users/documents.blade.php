@@ -88,19 +88,33 @@
                 @foreach($documents->get('pending', []) as $doc)
                     <div class="flex items-start justify-between px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
                         <div class="flex-1 min-w-0 mr-4">
-                            <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
-                            <div class="font-mono text-[11px] text-[#a0a09a] mt-1">{{ $doc->created_at->format('d/m/Y · H:i') }}</div>
-                            @if($doc->file_path)
-                                <div class="text-[11px] text-[#a0a09a] font-light mt-0.5">{{ basename($doc->file_path) }}</div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
+                                @if($doc->document_side)
+                                    <span class="inline-flex items-center text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md
+                                           bg-[#efefed] text-[#666660]">
+                                        {{ ucfirst($doc->document_side) }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                @if($doc->document_number)
+                                    <span class="font-mono text-[12px] font-medium text-[#0a0a0a]">{{ $doc->document_number }}</span>
+                                    <span class="text-[11px] text-[#a0a09a] font-light">·</span>
+                                @endif
+                                <span class="font-mono text-[11px] text-[#a0a09a]">{{ $doc->created_at->format('d/m/Y · H:i') }}</span>
+                            </div>
+                            @if($doc->document_path)
+                                <div class="text-[11px] text-[#a0a09a] font-light mt-0.5">{{ basename($doc->document_path) }}</div>
                             @endif
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0">
-                            @if($doc->file_path)
-                                <a href="{{ asset('storage/'.$doc->file_path) }}" target="_blank"
+                            @if($doc->document_path)
+                                <button type="button" onclick="openPreview('{{ asset('storage/'.$doc->document_path) }}', '{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}{{ $doc->document_number ? ' - ' . $doc->document_number : '' }}')"
                                    class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
                                           hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
                                     Voir
-                                </a>
+                                </button>
                             @endif
                             <form method="POST" action="{{ route('admin.users.approve-document', $doc->id) }}" class="inline">
                                 @csrf
@@ -134,8 +148,22 @@
                 @foreach($documents->get('verified', []) as $doc)
                     <div class="flex items-start justify-between px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
                         <div class="flex-1 min-w-0 mr-4">
-                            <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
-                            <div class="font-mono text-[11px] text-[#a0a09a] mt-1">{{ $doc->created_at->format('d/m/Y · H:i') }}</div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
+                                @if($doc->document_side)
+                                    <span class="inline-flex items-center text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md
+                                           bg-[#efefed] text-[#666660]">
+                                        {{ ucfirst($doc->document_side) }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                @if($doc->document_number)
+                                    <span class="font-mono text-[12px] font-medium text-[#0a0a0a]">{{ $doc->document_number }}</span>
+                                    <span class="text-[11px] text-[#a0a09a] font-light">·</span>
+                                @endif
+                                <span class="font-mono text-[11px] text-[#a0a09a]">{{ $doc->created_at->format('d/m/Y · H:i') }}</span>
+                            </div>
                             @if($doc->verified_at)
                                 <div class="flex items-center gap-1.5 mt-1">
                                     <svg class="w-3 h-3 text-[#22c55e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -143,12 +171,12 @@
                                 </div>
                             @endif
                         </div>
-                        @if($doc->file_path)
-                            <a href="{{ asset('storage/'.$doc->file_path) }}" target="_blank"
+                        @if($doc->document_path)
+                            <button type="button" onclick="openPreview('{{ asset('storage/'.$doc->document_path) }}', '{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}{{ $doc->document_number ? ' - ' . $doc->document_number : '' }}')"
                                class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
                                       hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all flex-shrink-0">
                                 Voir
-                            </a>
+                            </button>
                         @endif
                     </div>
                 @endforeach
@@ -165,8 +193,22 @@
                 @foreach($documents->get('rejected', []) as $doc)
                     <div class="flex items-start justify-between px-5 py-4 border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
                         <div class="flex-1 min-w-0 mr-4">
-                            <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
-                            <div class="font-mono text-[11px] text-[#a0a09a] mt-1">{{ $doc->created_at->format('d/m/Y · H:i') }}</div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <div class="text-[13px] font-medium text-[#0a0a0a]">{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}</div>
+                                @if($doc->document_side)
+                                    <span class="inline-flex items-center text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md
+                                           bg-[#efefed] text-[#666660]">
+                                        {{ ucfirst($doc->document_side) }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                @if($doc->document_number)
+                                    <span class="font-mono text-[12px] font-medium text-[#0a0a0a]">{{ $doc->document_number }}</span>
+                                    <span class="text-[11px] text-[#a0a09a] font-light">·</span>
+                                @endif
+                                <span class="font-mono text-[11px] text-[#a0a09a]">{{ $doc->created_at->format('d/m/Y · H:i') }}</span>
+                            </div>
                             @if($doc->rejection_reason)
                                 <div class="mt-2 px-3 py-2 bg-[#fef2f2] border border-[#fecaca] rounded-lg">
                                     <span class="text-[11px] text-[#dc2626] font-light">{{ $doc->rejection_reason }}</span>
@@ -174,12 +216,12 @@
                             @endif
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0">
-                            @if($doc->file_path)
-                                <a href="{{ asset('storage/'.$doc->file_path) }}" target="_blank"
+                            @if($doc->document_path)
+                                <button type="button" onclick="openPreview('{{ asset('storage/'.$doc->document_path) }}', '{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}{{ $doc->document_number ? ' - ' . $doc->document_number : '' }}')"
                                    class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
                                           hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
                                     Voir
-                                </a>
+                                </button>
                             @endif
                             <form method="POST" action="{{ route('admin.users.approve-document', $doc->id) }}" class="inline">
                                 @csrf
@@ -196,6 +238,76 @@
         @endif
 
     @endif
+
     </div>
 </div>
+
+{{-- Document Preview Modal --}}
+<div id="previewModal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4 transition-opacity duration-200"
+     onclick="closePreview(event)">
+    <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+         onclick="event.stopPropagation()">
+        {{-- Header --}}
+        <div class="flex items-center justify-between px-6 py-4 border-b border-[#e0e0dc]">
+            <div>
+                <h3 id="previewTitle" class="font-serif text-[18px] text-[#0a0a0a]">Document</h3>
+            </div>
+            <button type="button" onclick="closePreview()"
+                    class="w-8 h-8 flex items-center justify-center text-[#a0a09a] hover:text-[#0a0a0a] hover:bg-[#f7f7f5] rounded-lg transition-all">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Content --}}
+        <div class="flex-1 overflow-auto flex items-center justify-center bg-[#f7f7f5] p-6">
+            <img id="previewImage" src="" alt="Document preview" class="max-h-full max-w-full object-contain rounded-lg">
+        </div>
+
+        {{-- Footer --}}
+        <div class="px-6 py-4 border-t border-[#e0e0dc] bg-[#f7f7f5] flex items-center justify-between">
+            <div class="text-[12px] text-[#a0a09a] font-light">
+                Cliquez sur l'image pour l'agrandir ou utilisez votre navigateur
+            </div>
+            <a id="downloadLink" href="#" download
+               class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-3 py-1.5 rounded-lg
+                      hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all inline-block">
+                Télécharger
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openPreview(imagePath, title) {
+        const modal = document.getElementById('previewModal');
+        const img = document.getElementById('previewImage');
+        const titleEl = document.getElementById('previewTitle');
+        const downloadLink = document.getElementById('downloadLink');
+
+        titleEl.textContent = title;
+        img.src = imagePath;
+        downloadLink.href = imagePath;
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePreview(event) {
+        // Allow closing by clicking outside the modal content
+        if (event && event.target.id !== 'previewModal') return;
+
+        const modal = document.getElementById('previewModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closePreview();
+        }
+    });
+</script>
 @endsection

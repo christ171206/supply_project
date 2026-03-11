@@ -16,7 +16,7 @@
                     Commande confirmée
                 </h1>
                 <div class="flex items-center gap-3 mt-3">
-                    <span class="font-mono text-[13px] text-white/50">#{{ $commande->id }}</span>
+                    <span class="font-mono text-[13px] text-white/50">{{ $commande->numero ?? 'CMD-' . $commande->id }}</span>
                     <span class="w-1 h-1 rounded-full bg-white/20"></span>
                     <span class="font-mono text-[13px] text-white/50">{{ $commande->created_at->format('d/m/Y · H:i') }}</span>
                 </div>

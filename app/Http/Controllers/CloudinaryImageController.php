@@ -15,17 +15,13 @@ class CloudinaryImageController extends Controller
     public function __construct(CloudinaryImageService $cloudinary)
     {
         $this->cloudinary = $cloudinary;
-        $this->middleware('auth');
     }
 
     /**
      * Afficher la galerie d'images d'un produit
-     * GET /vendeur/produits/{produitId}/images
      */
-    public function gallery($produitId)
+    public function gallery(Produit $produit)
     {
-        $produit = Produit::findOrFail($produitId);
-
         // Vérifier que c'est le vendeur propriétaire
         if (auth()->user()->id !== $produit->user_id) {
             abort(403, 'Non autorisé');
@@ -42,12 +38,9 @@ class CloudinaryImageController extends Controller
 
     /**
      * Uploader une image pour un produit
-     * POST /vendeur/produits/{produitId}/images/upload
      */
-    public function upload(Request $request, $produitId)
+    public function upload(Request $request, Produit $produit)
     {
-        $produit = Produit::findOrFail($produitId);
-
         // Vérifier l'autorisation
         if (auth()->user()->id !== $produit->user_id) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -63,7 +56,7 @@ class CloudinaryImageController extends Controller
 
         try {
             $file = $request->file('image');
-            
+
             // Upload vers Cloudinary
             $result = $this->cloudinary->upload(
                 $file,
@@ -122,18 +115,13 @@ class CloudinaryImageController extends Controller
 
     /**
      * Supprimer une image
-     * DELETE /vendeur/produits/{produitId}/images/{imageId}
      */
-    public function delete($produitId, $imageId)
+    public function delete(Produit $produit, ProduitImage $image)
     {
-        $produit = Produit::findOrFail($produitId);
-
         // Vérifier l'autorisation
         if (auth()->user()->id !== $produit->user_id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-
-        $image = ProduitImage::findOrFail($imageId);
 
         if ($image->produit_id !== $produit->id) {
             return response()->json(['error' => 'Image not found'], 404);
@@ -150,7 +138,8 @@ class CloudinaryImageController extends Controller
             }
 
             // Supprimer de la base de données
-            $wasoPrimary = $image->is_primary;
+            $wasPrimary = $image->is_primary;
+            $imageId = $image->id;
             $image->delete();
 
             // Si c'était l'image principale, en définir une autre
@@ -178,18 +167,13 @@ class CloudinaryImageController extends Controller
 
     /**
      * Définir une image comme principale
-     * PATCH /vendeur/produits/{produitId}/images/{imageId}/primary
      */
-    public function setPrimary($produitId, $imageId)
+    public function setPrimary(Produit $produit, ProduitImage $image)
     {
-        $produit = Produit::findOrFail($produitId);
-
         // Vérifier l'autorisation
         if (auth()->user()->id !== $produit->user_id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-
-        $image = ProduitImage::findOrFail($imageId);
 
         if ($image->produit_id !== $produit->id) {
             return response()->json(['error' => 'Image not found'], 404);
@@ -211,12 +195,9 @@ class CloudinaryImageController extends Controller
 
     /**
      * Réorganiser les images
-     * POST /vendeur/produits/{produitId}/images/reorder
      */
-    public function reorder(Request $request, $produitId)
+    public function reorder(Request $request, Produit $produit)
     {
-        $produit = Produit::findOrFail($produitId);
-
         // Vérifier l'autorisation
         if (auth()->user()->id !== $produit->user_id) {
             return response()->json(['error' => 'Unauthorized'], 403);

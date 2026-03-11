@@ -179,7 +179,7 @@
                         <p class="text-sm font-medium text-blue-900">✨ Galerie d'images Cloudinary</p>
                         <p class="text-xs text-blue-700 mt-1">Gères les images du produit avec optimisation automatique</p>
                     </div>
-                    <a href="{{ route('vendeur.images.gallery', $produit->id) }}" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                    <a href="{{ route('vendeur.produits.gallery', $produit) }}" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
                         Accéder à la galerie
                     </a>
                 </div>
@@ -207,7 +207,7 @@
     let selectedFiles = new DataTransfer();
 
     dropZone.addEventListener('click', () => fileInput.click());
-    
+
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropZone.classList.add('border-[#0a0a0a]', 'bg-[#f7f7f5]');

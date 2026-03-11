@@ -195,4 +195,35 @@ class AdminProductController extends Controller
         $produit->delete();
         return redirect()->back()->with('success', "Produit « $nom » supprimé avec succès.");
     }
+
+    /**
+     * Afficher les produits vedettes
+     */
+    public function featured(Request $request)
+    {
+        $query = Produit::with('vendeur', 'categorie')
+            ->where('featured', true);
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('nom', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+        }
+
+        $produits = $query->paginate(15);
+
+        return view('admin.products.featured', [
+            'produits' => $produits,
+        ]);
+    }
+
+    /**
+     * Basculer le statut vedette d'un produit
+     */
+    public function toggleFeatured(Produit $produit)
+    {
+        $produit->update(['featured' => !$produit->featured]);
+        $status = $produit->featured ? 'ajouté aux' : 'retiré des';
+        return redirect()->back()->with('success', "Produit « {$produit->nom} » $status produits vedettes.");
+    }
 }

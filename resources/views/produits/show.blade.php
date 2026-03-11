@@ -400,38 +400,6 @@
         @endauth
     </div>
 
-                        <div>
-                            <div class="text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Commentaire</div>
-                            <textarea
-                                name="commentaire"
-                                rows="3"
-                                placeholder="Partagez votre expérience…"
-                                required
-                                class="w-full border border-[#e0e0dc] rounded-lg px-3 py-2.5 text-[13px] font-light text-[#0a0a0a] placeholder:text-[#a0a09a] outline-none focus:border-[#0a0a0a] hover:border-[#a0a09a] transition-colors resize-none bg-white"
-                            ></textarea>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <button type="submit" class="bg-[#0a0a0a] text-white text-[12px] font-medium px-5 py-2.5 rounded-lg hover:opacity-85 transition-opacity">
-                                Publier
-                            </button>
-                            <button type="reset" class="text-[12px] text-[#666660] border border-[#e0e0dc] px-5 py-2.5 rounded-lg hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
-                                Réinitialiser
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        @else
-            <div class="bg-white border border-[#e0e0dc] rounded-xl p-6 text-center">
-                <p class="text-[13px] text-[#a0a09a] font-light mb-4">Connectez-vous pour laisser un avis</p>
-                <a href="{{ route('login') }}" class="inline-block bg-[#0a0a0a] text-white text-[12px] font-medium px-5 py-2.5 rounded-lg hover:opacity-85 transition-opacity">
-                    Se connecter
-                </a>
-            </div>
-        @endauth
-    </div>
-
     {{-- ══════════════════════════════
          PRODUITS SIMILAIRES
     ══════════════════════════════ --}}

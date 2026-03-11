@@ -208,15 +208,31 @@ class VendeurProduitController extends Controller
     /**
      * Afficher la liste des produits
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $produits = Produit::where('user_id', $user->id)
-            ->with('categorie')
-            ->latest()
-            ->paginate(15);
+        $query = Produit::where('user_id', $user->id)
+            ->with('categorie');
 
-        $categories = Categorie::all();
+        // Filtre de recherche
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('nom', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtre par catégorie
+        if ($request->filled('categorie')) {
+            $query->where('categorie_id', $request->input('categorie'));
+        }
+
+        $produits = $query->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $categories = Categorie::orderBy('nom', 'asc')->get();
 
         return view('vendeur.produits.index', compact('produits', 'categories'));
     }
@@ -828,7 +844,7 @@ class VendeurProduitController extends Controller
 
         $callback = function () use ($user, $stats, $periode) {
             $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
 
             // En-tête
             fputcsv($file, ['STATISTIQUES VENDEUR'], ';');
@@ -882,7 +898,7 @@ class VendeurProduitController extends Controller
 
         $callback = function () use ($user, $stats, $periode) {
             $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8
 
             // En-tête
             fputcsv($file, ['STATISTIQUES VENDEUR COMPLÈTES'], ';');
@@ -950,7 +966,9 @@ class VendeurProduitController extends Controller
 
         // Génération du graphique ASCII pour la répartition par catégorie
         $chartCategories = $this->generateASCIIChart(
-            array_map(function ($v) { return $v['montant']; }, $stats['repartitionCategories']),
+            array_map(function ($v) {
+                return $v['montant'];
+            }, $stats['repartitionCategories']),
             'Répartition par Catégorie',
             array_keys($stats['repartitionCategories'])
         );

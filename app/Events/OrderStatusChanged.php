@@ -29,8 +29,8 @@ class OrderStatusChanged implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('user-notifications.'.$this->commande->user_id),
-            new PrivateChannel('vendor-notifications.'.$this->commande->vendeur_id),
+            new PrivateChannel('user-notifications.' . $this->commande->user_id),
+            new PrivateChannel('vendor-notifications.' . $this->commande->vendeur_id),
         ];
     }
 
@@ -63,7 +63,7 @@ class OrderStatusChanged implements ShouldBroadcastNow
             'old_status_label' => $statusLabels[$this->oldStatus] ?? $this->oldStatus,
             'new_status_label' => $statusLabels[$this->newStatus] ?? $this->newStatus,
             'updated_at' => $this->commande->updated_at->format('Y-m-d H:i:s'),
-            'message' => 'Commande #'.$this->commande->numero.': '.($statusLabels[$this->newStatus] ?? $this->newStatus),
+            'message' => 'Commande #' . $this->commande->numero . ': ' . ($statusLabels[$this->newStatus] ?? $this->newStatus),
         ];
     }
 }

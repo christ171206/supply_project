@@ -37,19 +37,19 @@
             </button>
             <div class="absolute right-0 top-full mt-2 w-56 bg-white border border-[#e0e0dc] rounded-lg shadow-lg p-4 hidden group-hover:block z-10">
                 <p class="text-[11px] font-medium text-[#a0a09a] uppercase mb-3">Format d'export</p>
-                <a href="{{ route('vendeur.statistiques.export', ['format' => 'csv-complet', 'periode' => request('periode', 7)]) }}" 
+                <a href="{{ route('vendeur.statistiques.export', ['format' => 'csv-complet', 'periode' => request('periode', 7)]) }}"
                    id="exportCsvLink"
                    class="block w-full px-3 py-2 border border-[#e0e0dc] text-[#0a0a0a] rounded-lg hover:bg-[#f7f7f5] transition font-medium text-[13px] mb-2">
                     CSV Complet (Données + Graphiques)
                 </a>
-                <a href="{{ route('vendeur.statistiques.export', ['format' => 'pdf-complet', 'periode' => request('periode', 7)]) }}" 
+                <a href="{{ route('vendeur.statistiques.export', ['format' => 'pdf-complet', 'periode' => request('periode', 7)]) }}"
                    id="exportPdfLink"
                    class="block w-full px-3 py-2 bg-[#0a0a0a] text-white rounded-lg hover:opacity-85 transition font-medium text-[13px] mb-2">
                     PDF Complet (Incluant graphiques)
                 </a>
                 <hr class="my-2 border-[#e0e0dc]">
                 <p class="text-[11px] text-[#a0a09a] mb-2">Exports rapides</p>
-                <a href="{{ route('vendeur.statistiques.export', ['format' => 'csv', 'periode' => request('periode', 7)]) }}" 
+                <a href="{{ route('vendeur.statistiques.export', ['format' => 'csv', 'periode' => request('periode', 7)]) }}"
                    id="exportCsvLiteLink"
                    class="block w-full px-3 py-2 border border-[#e0e0dc] text-[#0a0a0a] rounded-lg hover:bg-[#f7f7f5] transition text-[12px] mb-2">
                     CSV (KPIs seulement)

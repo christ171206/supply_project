@@ -1,4 +1,4 @@
-@extends('admin.layout')
+@extends('layouts.admin-layout')
 
 @section('content')
 <div class="container-fluid py-4">
@@ -70,7 +70,7 @@
                 <div class="card-body">
                     <p><strong>Date de création :</strong> {{ $category->created_at->format('d/m/Y H:i') }}</p>
                     <p><strong>Dernière modification :</strong> {{ $category->updated_at->format('d/m/Y H:i') }}</p>
-                    <p><strong>Statut :</strong> 
+                    <p><strong>Statut :</strong>
                         @if($category->is_active)
                             <span class="badge bg-success">Actif</span>
                         @else

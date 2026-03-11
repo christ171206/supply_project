@@ -8,6 +8,7 @@ class Commande extends Model
 {
     protected $fillable = [
         'user_id',
+        'numero',
         'total',
         'statut',
         'payment_method',
@@ -27,6 +28,22 @@ class Commande extends Model
     protected $casts = [
         'paiement_confirme' => 'boolean',
     ];
+
+    /**
+     * Générer automatiquement le numéro de commande
+     */
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            if (empty($model->numero)) {
+                // Générer un numéro unique : CMD + date + random
+                // Format : CMD-2026031100123 (CMD-YYYYMMDDxxxxx)
+                $timestamp = now()->format('YmdHis');
+                $random = str_pad(rand(1, 99999), 5, '0', STR_PAD_LEFT);
+                $model->numero = 'CMD-' . $timestamp . $random;
+            }
+        });
+    }
 
     public function user()
     {

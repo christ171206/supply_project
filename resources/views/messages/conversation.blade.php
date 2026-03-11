@@ -1,29 +1,29 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+<div class="min-h-screen bg-[#f7f7f5] py-8">
     <div class="max-w-5xl mx-auto px-4 h-[calc(100vh-8rem)]">
-        <div class="bg-white rounded-2xl shadow-2xl h-full flex flex-col overflow-hidden">
+        <div class="bg-white rounded-2xl border border-[#e0e0dc] h-full flex flex-col overflow-hidden">
 
             <!-- Header Conversation avec Indicateurs -->
-            <div class="border-b border-gray-200 p-6 bg-gradient-to-r from-primary-50 to-accent-50">
+            <div class="border-b border-[#e0e0dc] p-6 bg-white">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-xl relative">
+                        <div class="w-14 h-14 bg-[#0a0a0a] rounded-full flex items-center justify-center text-white font-bold text-xl relative">
                             {{ strtoupper(substr($otherUser->name, 0, 1)) }}
                             <!-- Indicateur de présence (point vert/gris) -->
-                            <span id="vendor-presence" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gray-300 border-2 border-white animate-pulse" title="Chargement du statut..."></span>
+                            <span id="vendor-presence" class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#a0a09a] border-2 border-white animate-pulse" title="Chargement du statut..."></span>
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-2">
-                                <h1 class="text-2xl font-bold text-gray-900">{{ $otherUser->name }}</h1>
+                                <h1 class="text-2xl font-bold text-[#0a0a0a]" style="font-family: 'Instrument Serif', serif;">{{ $otherUser->name }}</h1>
                             </div>
-                            <p class="text-sm text-gray-600">{{ $otherUser->shop_name ?? 'Client' }}</p>
+                            <p class="text-sm text-[#a0a09a]">{{ $otherUser->shop_name ?? 'Client' }}</p>
                             <!-- Indicateur "En train d'écrire..." -->
-                            <p id="typing-indicator" class="text-xs text-primary-600 italic font-semibold mt-1 min-h-4 transition-all"></p>
+                            <p id="typing-indicator" class="text-xs text-[#666660] italic font-semibold mt-1 min-h-4 transition-all"></p>
                         </div>
                     </div>
-                    <a href="{{ route('client.messages') }}" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-semibold transition">
+                    <a href="{{ route('client.messages') }}" class="px-4 py-2 text-[#a0a09a] hover:text-[#0a0a0a] hover:bg-[#f7f7f5] rounded-lg font-semibold transition">
                         ← Retour
                     </a>
                 </div>
@@ -36,34 +36,38 @@
                         <div class="block space-y-2">
                             <!-- Produit associé (si existe) -->
                             @if($msg->produit)
-                                <div class="max-w-xs lg:max-w-md bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-lg p-3">
+                                <div class="max-w-xs lg:max-w-md bg-[#f7f7f5] border border-[#e0e0dc] rounded-xl p-4">
                                     <div class="flex gap-3">
                                         @if($msg->produit->images && is_array($msg->produit->images) && count($msg->produit->images) > 0)
-                                            <img src="{{ asset('storage/' . $msg->produit->images[0]) }}" alt="{{ $msg->produit->nom }}" class="w-16 h-16 object-cover rounded">
+                                            <img src="{{ asset('storage/' . $msg->produit->images[0]) }}" alt="{{ $msg->produit->nom }}" class="w-20 h-20 object-cover rounded-lg border border-[#e0e0dc]">
                                         @elseif($msg->produit->image)
-                                            <img src="{{ asset('storage/produits/' . $msg->produit->image) }}" alt="{{ $msg->produit->nom }}" class="w-16 h-16 object-cover rounded">
+                                            <img src="{{ asset('storage/produits/' . $msg->produit->image) }}" alt="{{ $msg->produit->nom }}" class="w-20 h-20 object-cover rounded-lg border border-[#e0e0dc]">
                                         @else
-                                            <div class="w-16 h-16 bg-gray-300 rounded flex items-center justify-center"><x-heroicon-o-cube class="w-8 h-8" /></div>
+                                            <div class="w-20 h-20 bg-[#e0e0dc] rounded-lg flex items-center justify-center text-[#a0a09a]">
+                                                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                                </svg>
+                                            </div>
                                         @endif
-                                        <div class="flex-1">
-                                            <p class="text-xs text-blue-600 font-semibold flex items-center gap-1"><x-heroicon-o-cube class="w-4 h-4" /><span>PRODUIT</span></p>
-                                            <p class="text-sm font-bold text-gray-900 line-clamp-1">{{ $msg->produit->nom }}</p>
-                                            <p class="text-xs text-blue-700 font-semibold">{{ number_format($msg->produit->prix, 0, ',', ' ') }} FCFA</p>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-[11px] text-[#a0a09a] font-medium uppercase tracking-[0.05em]">Produit</p>
+                                            <p class="text-sm font-bold text-[#0a0a0a] line-clamp-2">{{ $msg->produit->nom }}</p>
+                                            <p class="text-[13px] font-mono font-bold text-[#0a0a0a] mt-1">{{ number_format($msg->produit->prix, 0, ',', ' ') }} FCFA</p>
                                         </div>
                                     </div>
                                 </div>
                             @endif
 
                             <!-- Message text -->
-                            <div class="max-w-xs lg:max-w-md {{ $msg->from_user_id === auth()->id() ? 'bg-primary-600 text-white rounded-3xl rounded-tr-none' : 'bg-gray-100 text-gray-900 rounded-3xl rounded-tl-none' }} px-5 py-3 shadow-md">
+                            <div class="max-w-xs lg:max-w-md {{ $msg->from_user_id === auth()->id() ? 'bg-[#0a0a0a] text-white rounded-2xl rounded-tr-none' : 'bg-[#f7f7f5] text-[#0a0a0a] rounded-2xl rounded-tl-none border border-[#e0e0dc]' }} px-5 py-3">
                                 <p class="text-sm leading-relaxed">{{ $msg->contenu }}</p>
                                 <div class="flex items-center gap-2 mt-2 {{ $msg->from_user_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
-                                    <p class="text-xs {{ $msg->from_user_id === auth()->id() ? 'text-primary-100' : 'text-gray-500' }}">
+                                    <p class="text-xs {{ $msg->from_user_id === auth()->id() ? 'text-white/60' : 'text-[#a0a09a]' }}">
                                         {{ $msg->created_at->format('H:i') }}
                                     </p>
-                                    <!-- Coches de confirmation de lecture (gris → bleu) -->
+                                    <!-- Coches de confirmation de lecture -->
                                     @if($msg->from_user_id === auth()->id())
-                                        <span class="text-xs {{ $msg->lu ? 'text-primary-300' : 'text-primary-400' }} font-semibold" title="{{ $msg->lu ? 'Lu' : 'Non lu' }}">
+                                        <span class="text-xs {{ $msg->lu ? 'text-white/80' : 'text-white/50' }} font-semibold" title="{{ $msg->lu ? 'Lu' : 'Non lu' }}">
                                             {{ $msg->lu ? '✓✓' : '✓' }}
                                         </span>
                                     @endif
@@ -72,21 +76,23 @@
                         </div>
                     </div>
                 @empty
-                    <div class="flex items-center justify-center h-full text-center text-gray-500">
+                    <div class="flex items-center justify-center h-full text-center">
                         <div>
-                            <p class="text-6xl mb-4"><x-heroicon-o-chat-bubble-left class="w-16 h-16" /></p>
-                            <p class="font-semibold text-lg">Aucun message</p>
-                            <p class="text-sm mt-2">Commencez la conversation ci-dessous</p>
+                            <svg class="w-16 h-16 mx-auto text-[#e0e0dc] mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <p class="font-semibold text-lg text-[#0a0a0a]">Aucun message</p>
+                            <p class="text-sm mt-2 text-[#a0a09a]">Commencez la conversation ci-dessous</p>
                         </div>
                     </div>
                 @endforelse
             </div>
 
             <!-- Formulaire d'envoi avec validation -->
-            <div class="border-t border-gray-200 p-6 bg-gray-50">
+            <div class="border-t border-[#e0e0dc] p-6 bg-white">
                 <form id="message-form" action="{{ route('messages.reply', $otherUser->id) }}" method="POST" class="space-y-3">
                     @csrf
-                    <div class="flex gap-3">
+                    <div class="flex gap-3 items-end">
                         <textarea
                             id="message-input"
                             name="contenu"
@@ -94,17 +100,17 @@
                             rows="2"
                             minlength="1"
                             required
-                            class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors resize-none text-sm"
+                            class="flex-1 px-4 py-2 border border-[#e0e0dc] rounded-lg focus:outline-none focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] transition text-[12px] text-[#0a0a0a] placeholder-[#a0a09a] resize-none"
                         ></textarea>
                         <button
                             type="submit"
                             id="send-btn"
-                            class="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-200 self-end hover:from-primary-700 hover:to-primary-800"
+                            class="px-4 py-2 bg-[#0a0a0a] text-white font-medium rounded-lg hover:bg-[#2a2a28] transition text-[12px] whitespace-nowrap h-fit"
                         >
                             📤 Envoyer
                         </button>
                     </div>
-                    <p id="char-count" class="text-xs text-gray-500 text-right"></p>
+                    <p id="char-count" class="text-xs text-[#a0a09a] text-right"></p>
                 </form>
                 <div id="alert" class="mt-3 hidden"></div>
             </div>
@@ -145,7 +151,7 @@
     // ========== INDICATEUR DE PRÉSENCE ==========
     socket.on('users-online-count', function(count) {
         if (presenceIndicator && count > 0) {
-            presenceIndicator.style.backgroundColor = '#22c55e';
+            presenceIndicator.style.backgroundColor = '#15803d';
             presenceIndicator.title = '✓ En ligne maintenant';
             presenceIndicator.classList.remove('animate-pulse');
         }
@@ -153,7 +159,7 @@
 
     socket.on('user-joined', function(data) {
         if (data.otherUserId === otherUserId && presenceIndicator) {
-            presenceIndicator.style.backgroundColor = '#22c55e';
+            presenceIndicator.style.backgroundColor = '#15803d';
             presenceIndicator.title = '✓ En ligne maintenant';
             presenceIndicator.classList.remove('animate-pulse');
         }
@@ -161,7 +167,7 @@
 
     socket.on('disconnect', function() {
         if (presenceIndicator) {
-            presenceIndicator.style.backgroundColor = '#d1d5db';
+            presenceIndicator.style.backgroundColor = '#a0a09a';
             presenceIndicator.title = '⊘ Statut indisponible';
             presenceIndicator.classList.add('animate-pulse');
         }
@@ -246,13 +252,13 @@
             const messageElement = document.createElement('div');
             messageElement.className = `flex justify-end`;
             messageElement.innerHTML = `
-                <div class="max-w-xs lg:max-w-md bg-primary-600 text-white rounded-3xl rounded-tr-none px-5 py-3 shadow-md">
+                <div class="max-w-xs lg:max-w-md bg-[#0a0a0a] text-white rounded-2xl rounded-tr-none px-5 py-3">
                     <p class="text-sm leading-relaxed">${escapeHtml(content)}</p>
                     <div class="flex items-center gap-2 mt-2 justify-end">
-                        <p class="text-xs text-primary-100">
+                        <p class="text-xs text-white/60">
                             ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                         </p>
-                        <span class="text-xs text-primary-400 font-semibold">✓</span>
+                        <span class="text-xs text-white/50 font-semibold">✓</span>
                     </div>
                 </div>
             `;
@@ -269,7 +275,7 @@
 
             // Afficher confirmation
             const alert = document.getElementById('alert');
-            alert.className = 'mt-3 p-3 bg-green-100 text-green-700 rounded-lg';
+            alert.className = 'mt-3 p-3 bg-[#f0fdf4] text-[#15803d] rounded-lg border border-[#bbf7d0]';
             alert.textContent = '✓ Message envoyé avec succès';
             alert.classList.remove('hidden');
             setTimeout(() => alert.classList.add('hidden'), 3000);
@@ -281,7 +287,7 @@
 
             // Afficher erreur
             const alert = document.getElementById('alert');
-            alert.className = 'mt-3 p-3 bg-red-100 text-red-700 rounded-lg';
+            alert.className = 'mt-3 p-3 bg-[#fef2f2] text-[#dc2626] rounded-lg border border-[#fecaca]';
             alert.textContent = 'Erreur lors de l\'envoi du message';
             alert.classList.remove('hidden');
             setTimeout(() => alert.classList.add('hidden'), 3000);

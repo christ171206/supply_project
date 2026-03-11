@@ -22,7 +22,7 @@ class SendVendorOrderNotification implements ShouldQueue
     {
         try {
             $commande = $event->commande;
-            
+
             // Récupérer les lignes de commande avec les infos du produit
             $lignesCommandes = $commande->ligneCommandes()->with('produit')->get();
 
@@ -47,7 +47,7 @@ class SendVendorOrderNotification implements ShouldQueue
                 try {
                     $vendor = \App\Models\User::find($vendorId);
                     if ($vendor && $vendor->email) {
-                        Mail::send(new VendorOrderNotification($commande, $vendor, $items));
+                        Mail::to($vendor)->send(new VendorOrderNotification($commande, $vendor, $items));
                     }
                 } catch (\Exception $emailError) {
                     \Illuminate\Support\Facades\Log::warning(

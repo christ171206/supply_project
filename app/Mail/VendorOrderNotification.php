@@ -33,7 +33,7 @@ class VendorOrderNotification extends Mailable implements ShouldQueue
         return new Envelope(
             from: new Address('noreply@supply.local', 'Supply - Plateforme E-commerce'),
             to: [new Address($this->vendor->email, $this->vendor->name)],
-            subject: '📦 Nouvelle commande reçue - ' . $this->commande->id,
+            subject: '📦 Nouvelle commande reçue - ' . ($this->commande->numero ?? 'CMD-' . $this->commande->id),
         );
     }
 
