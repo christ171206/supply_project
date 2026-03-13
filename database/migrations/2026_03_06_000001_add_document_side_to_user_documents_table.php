@@ -24,8 +24,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_documents', function (Blueprint $table) {
-            $table->dropColumn('document_side');
-            $table->dropColumn('document_number');
+            if (Schema::hasColumn('user_documents', 'document_side')) {
+                $table->dropColumn('document_side');
+            }
+            if (Schema::hasColumn('user_documents', 'document_number')) {
+                $table->dropColumn('document_number');
+            }
         });
     }
 };

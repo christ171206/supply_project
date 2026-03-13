@@ -37,7 +37,7 @@ class VendorApprovedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.vendor-approved',
+            markdown: 'emails.vendor-approved',
             with: [
                 'vendor' => $this->vendor,
                 'reviewNotes' => $this->reviewNotes,

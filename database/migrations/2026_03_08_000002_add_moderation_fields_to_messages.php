@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('deleted_by_admin')->nullable()->after('flagged_by_user');
             $table->timestamp('deleted_at')->nullable()->after('deleted_by_admin');
             $table->text('delete_reason')->nullable()->after('deleted_at');
-            
+
             // Indexes
             $table->foreign('flagged_by_user')->references('id')->on('users')->onDelete('set null');
             $table->foreign('deleted_by_admin')->references('id')->on('users')->onDelete('set null');
@@ -26,8 +26,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('messages', function (Blueprint $table) {
-            $table->dropForeignKey(['flagged_by_user']);
-            $table->dropForeignKey(['deleted_by_admin']);
             $table->dropColumn(['is_flagged', 'flag_reason', 'flagged_by_user', 'deleted_by_admin', 'deleted_at', 'delete_reason']);
         });
     }

@@ -77,8 +77,13 @@ class EmailVerificationCodeController extends Controller
 
         // Redirection basée sur le rôle
         if ($user->role === 'vendor') {
+            \Illuminate\Support\Facades\Log::info('✅ Vendeur authentifié, redirection vers soumission de documents', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
+            ]);
             // Rediriger vers la page de soumission des documents d'identité
-            return redirect()->route('vendor.documents.submit');
+            return redirect()->route('vendor.documents.submit')->with('success', 'Email vérifié ! Veuillez maintenant soumettre vos documents d\'identité.');
         }
 
         return redirect()->route('accueil');

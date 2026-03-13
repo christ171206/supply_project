@@ -20,6 +20,23 @@ use Illuminate\Support\Facades\Log;
 class VendeurProduitController extends Controller
 {
     /**
+     * Afficher la page d'attente d'approbation du vendeur
+     */
+    public function waitingApproval()
+    {
+        $user = Auth::user();
+
+        // Vérifier que l'utilisateur est un vendeur
+        if ($user->role !== 'vendor') {
+            return redirect()->route('accueil');
+        }
+
+        return view('vendor.waiting-approval', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
      * Dashboard du vendeur
      */
     public function dashboard()

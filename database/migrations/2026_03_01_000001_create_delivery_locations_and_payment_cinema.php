@@ -61,12 +61,25 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->dropColumn(['payment_code', 'provider_transaction_id', 'payment_status', 'response_data', 'payment_initiated_at', 'payment_confirmed_at']);
+            $cols = ['payment_code', 'provider_transaction_id', 'payment_status', 'response_data', 'payment_initiated_at', 'payment_confirmed_at'];
+            foreach ($cols as $col) {
+                if (Schema::hasColumn('payments', $col)) {
+                    $table->dropColumn($col);
+                }
+            }
         });
 
         Schema::table('commandes', function (Blueprint $table) {
-            $table->dropForeign(['quartier_id']);
-            $table->dropColumn(['quartier_id', 'adresse_detail', 'telephone_livraison']);
+            if (Schema::hasColumn('commandes', 'quartier_id')) {
+                $table->dropForeign(['quartier_id']);
+                $table->dropColumn('quartier_id');
+            }
+            if (Schema::hasColumn('commandes', 'adresse_detail')) {
+                $table->dropColumn('adresse_detail');
+            }
+            if (Schema::hasColumn('commandes', 'telephone_livraison')) {
+                $table->dropColumn('telephone_livraison');
+            }
         });
 
         Schema::dropIfExists('quartiers');

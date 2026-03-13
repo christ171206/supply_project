@@ -24,18 +24,19 @@ class AdminNewVendorRegistrationMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        // Utiliser l'admin passé en paramètre, sinon trouver le premier admin
         $admin = $this->admin ?? User::whereJsonContains('roles', 'super_admin')
             ->orWhere('is_admin', true)
             ->first();
 
         $adminEmail = $admin?->email ?? config('mail.from.address', 'admin@supply.local');
-        $adminName = $admin?->name ?? 'Admin Supply';
+        $adminName  = $admin?->name  ?? 'Admin Supply';
+
+        $shopName = $this->vendor->shop_name ?? $this->vendor->name;
 
         return new Envelope(
-            from: new Address('noreply@supply.local', 'Supply - Plateforme E-commerce'),
+            from: new Address('noreply@supply.local', 'Supply'),
             to: [new Address($adminEmail, $adminName)],
-            subject: '📌 Nouvelle demande d\'inscription vendeur : ' . ($this->vendor->shop_name ?? $this->vendor->name),
+            subject: 'Nouvelle demande vendeur : ' . $shopName,
         );
     }
 
@@ -45,11 +46,11 @@ class AdminNewVendorRegistrationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.admin-new-vendor-registration',
+            view: 'emails.admin-vendor-notification',
             with: [
-                'vendor' => $this->vendor,
+                'vendor'            => $this->vendor,
                 'adminDashboardUrl' => route('admin.vendors.index'),
-                'vendorDetailsUrl' => route('admin.users.show', $this->vendor->id),
+                'vendorDetailsUrl'  => route('admin.users.show', $this->vendor->id),
             ],
         );
     }

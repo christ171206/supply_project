@@ -36,7 +36,7 @@ class VendorRejectedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.vendor-rejected',
+            markdown: 'emails.vendor-rejected',
             with: [
                 'vendor' => $this->vendor,
                 'rejectionReason' => $this->rejectionReason,

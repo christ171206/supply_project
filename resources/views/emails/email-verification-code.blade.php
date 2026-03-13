@@ -11,8 +11,17 @@
             background: #f7f7f5;
             color: #0a0a0a;
             -webkit-font-smoothing: antialiased;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
-        .wrapper { max-width: 560px; margin: 40px auto; padding: 0 20px 60px; }
+        .wrapper {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+            width: 100%;
+        }
 
         /* Header */
         .header {

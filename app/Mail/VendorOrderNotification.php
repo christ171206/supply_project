@@ -43,7 +43,7 @@ class VendorOrderNotification extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.vendor-order-notification',
+            markdown: 'emails.vendor-order-notification',
             with: [
                 'vendor' => $this->vendor,
                 'commande' => $this->commande,

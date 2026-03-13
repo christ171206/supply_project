@@ -47,7 +47,7 @@ class DeliveryReminderMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.delivery-reminder',
+            markdown: 'emails.delivery-reminder',
             with: [
                 'client'            => $this->client,
                 'commande'          => $this->commande,

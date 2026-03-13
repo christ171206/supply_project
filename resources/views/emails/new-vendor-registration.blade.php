@@ -1,115 +1,245 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle demande vendeur</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f9fafb; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
-        .header h1 { margin: 0; font-size: 24px; font-weight: bold; }
-        .header p { margin: 10px 0 0 0; opacity: 0.9; }
-        .content-box { background: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .detail-box { background: #f0f4ff; padding: 20px; border-left: 4px solid #667eea; margin: 20px 0; border-radius: 4px; }
-        .detail-row { display: flex; margin: 10px 0; font-size: 14px; }
-        .detail-label { font-weight: bold; width: 120px; color: #667eea; }
-        .detail-value { flex: 1; color: #555; }
-        .status-badge { display: inline-block; background: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin: 10px 0; }
-        .button { 
-            display: inline-block; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; 
-            padding: 14px 32px; 
-            text-decoration: none; 
-            border-radius: 6px; 
-            margin: 20px 0;
-            font-weight: bold;
-            text-align: center;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+            background: #f7f7f5;
+            color: #0a0a0a;
+            -webkit-font-smoothing: antialiased;
         }
-        .button:hover { opacity: 0.9; }
-        .action-needed { 
-            background: #fee2e2; 
-            border-left: 4px solid #dc2626; 
-            padding: 20px; 
-            margin: 20px 0; 
-            border-radius: 4px;
+        .wrap {
+            max-width: 560px;
+            margin: 40px auto;
+            background: #f7f7f5;
         }
-        .action-needed h3 { margin: 0 0 10px 0; color: #991b1b; font-size: 16px; }
-        .steps { margin: 15px 0; }
-        .step { margin: 8px 0; padding-left: 25px; position: relative; }
-        .step:before { content: counter(step-counter); counter-increment: step-counter; position: absolute; left: 0; background: #667eea; color: white; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; font-size: 12px; font-weight: bold; }
-        .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; }
-        .timestamp { color: #999; font-size: 12px; margin-top: 10px; }
-        counter-reset: step-counter 1;
+
+        /* Header */
+        .header {
+            background: #0a0a0a;
+            padding: 28px 32px;
+            border-radius: 12px 12px 0 0;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .logo-mark {
+            width: 28px; height: 28px;
+            background: #fff;
+            border-radius: 5px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .logo-name {
+            font-size: 15px; font-weight: 600; color: #fff; letter-spacing: -0.01em;
+        }
+        .header-label {
+            font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
+            text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 6px;
+        }
+        .header-title {
+            font-size: 22px; font-weight: 600; color: #fff;
+            letter-spacing: -0.02em; line-height: 1.2;
+        }
+
+        /* Card */
+        .card {
+            background: #fff;
+            border: 1px solid #e0e0dc;
+            border-top: none;
+            padding: 32px;
+        }
+
+        .intro {
+            font-size: 13px; color: #666660; font-weight: 300; margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .intro strong { color: #0a0a0a; font-weight: 500; }
+
+        /* Section label */
+        .section-label {
+            font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+            text-transform: uppercase; color: #a0a09a; margin-bottom: 12px;
+        }
+
+        /* Details table */
+        .details {
+            width: 100%; border-collapse: collapse;
+            border: 1px solid #e0e0dc; border-radius: 8px; overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .details tr { border-bottom: 1px solid #efefed; }
+        .details tr:last-child { border-bottom: none; }
+        .details tr:nth-child(odd) { background: #f7f7f5; }
+        .details tr:nth-child(even) { background: #fff; }
+        .details td {
+            padding: 10px 14px; font-size: 12px; vertical-align: middle;
+        }
+        .details td:first-child {
+            font-size: 10px; font-weight: 600; letter-spacing: 0.05em;
+            text-transform: uppercase; color: #a0a09a; width: 34%;
+        }
+        .details td:last-child { color: #0a0a0a; font-weight: 400; }
+        .mono { font-family: 'Courier New', monospace; font-size: 11px; }
+
+        /* Status badge */
+        .badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-family: 'Courier New', monospace; font-weight: 600;
+            padding: 3px 8px; border-radius: 4px;
+            background: #fdf6ec; color: #b45309;
+        }
+        .badge-dot {
+            width: 5px; height: 5px; border-radius: 50%; background: #f59e0b; display: inline-block;
+        }
+
+        /* Divider */
+        .divider { border: none; border-top: 1px solid #efefed; margin: 24px 0; }
+
+        /* Steps */
+        .steps { margin-bottom: 24px; }
+        .step {
+            display: flex; gap: 12px; align-items: flex-start;
+            padding: 10px 0; border-bottom: 1px solid #efefed;
+        }
+        .step:last-child { border-bottom: none; }
+        .step-num {
+            width: 20px; height: 20px; border: 1px solid #e0e0dc; border-radius: 4px;
+            font-family: 'Courier New', monospace; font-size: 10px; font-weight: 600;
+            color: #a0a09a; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 1px;
+        }
+        .step-text { font-size: 12px; color: #666660; font-weight: 300; line-height: 1.5; }
+
+        /* Action block */
+        .action-block {
+            background: #f7f7f5;
+            border: 1px solid #e0e0dc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .action-title { font-size: 12px; font-weight: 600; color: #0a0a0a; margin-bottom: 6px; }
+        .action-text { font-size: 12px; color: #666660; font-weight: 300; line-height: 1.5; margin-bottom: 16px; }
+        .btn {
+            display: inline-block; background: #0a0a0a; color: #fff !important;
+            text-decoration: none; font-size: 12px; font-weight: 600;
+            padding: 10px 22px; border-radius: 7px; letter-spacing: -0.01em;
+        }
+
+        /* Footer */
+        .footer {
+            background: #f7f7f5;
+            border: 1px solid #e0e0dc; border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 18px 32px; text-align: center;
+        }
+        .footer p { font-size: 11px; color: #a0a09a; font-weight: 300; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📌 Nouvelle demande d'inscription vendeur</h1>
-            <p>Une nouvelle demande vient d'être reçue</p>
-        </div>
-        
-        <div class="content-box">
-            <p>Bonjour Admin,</p>
-            
-            <p>Une nouvelle demande d'inscription de <strong>vendeur</strong> a été reçue sur <strong>Supply</strong>.</p>
-            
-            <h2 style="color: #667eea; margin-top: 30px;">📋 Détails du vendeur</h2>
-            <div class="detail-box">
-                <div class="detail-row">
-                    <div class="detail-label">Nom :</div>
-                    <div class="detail-value">{{ $vendor->name }}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Email :</div>
-                    <div class="detail-value">{{ $vendor->email }}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Boutique :</div>
-                    <div class="detail-value">{{ $vendor->shop_name ?? 'Non spécifiée' }}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Téléphone :</div>
-                    <div class="detail-value">{{ $vendor->phone ?? 'Non fourni' }}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Adresse :</div>
-                    <div class="detail-value">{{ $vendor->address ?? 'Non fournie' }}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Pays :</div>
-                    <div class="detail-value">{{ $vendor->country ?? 'Non spécifié' }}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Date :</div>
-                    <div class="detail-value">{{ $vendor->created_at->format('d/m/Y à H:i') }}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Statut :</div>
-                    <div class="detail-value"><span class="status-badge">⏳ En attente de vérification email</span></div>
-                </div>
+<div class="wrap">
+
+    <div class="header">
+        <div class="logo">
+            <div class="logo-mark">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
             </div>
-            
-            <h2 style="color: #667eea; margin-top: 30px;">🔄 Étapes suivantes</h2>
-            <div class="steps" style="counter-reset: step-counter;">
-                <div class="step">Le vendeur doit d'abord vérifier son email (code à 6 chiffres)</div>
-                <div class="step">Il soumettra ensuite ses documents d'identité (CN I/CMU/Passeport recto + verso)</div>
-                <div class="step">Vous recevrez une notification pour examiner et approuver/rejeter les documents</div>
-            </div>
-            
-            <div class="action-needed">
-                <h3>🎯 Votre action requise</h3>
-                <p>Consultez régulièrement votre tableau de bord pour examiner les documents d'identité soumis et prendre une décision (approbation ou rejet).</p>
-                <a href="{{ $adminDashboardUrl }}" class="button">Voir le tableau de bord</a>
-            </div>
-            
-            <p style="color: #666; font-size: 14px; margin-top: 20px;">Vous recevrez une autre notification une fois que le vendeur aura soumis ses documents d'identité.</p>
+            <span class="logo-name">Supply</span>
         </div>
-        
-        <div class="footer">
-            <p>© 2026 Supply - Plateforme E-commerce</p>
-            <p style="color: #999;">Cet email a été généré automatiquement. Veuillez ne pas répondre directement.</p>
-        </div>
+        <div class="header-label">Administration</div>
+        <div class="header-title">Nouvelle demande vendeur</div>
     </div>
+
+    <div class="card">
+        <p class="intro">
+            Bonjour,<br><br>
+            Une nouvelle demande d'inscription vendeur a été reçue sur <strong>Supply</strong>.
+            Le vendeur doit encore vérifier son adresse email avant de pouvoir soumettre ses documents.
+        </p>
+
+        <div class="section-label">Informations du vendeur</div>
+        <table class="details">
+            <tr>
+                <td>Nom</td>
+                <td>{{ $vendor->name }}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td class="mono">{{ $vendor->email }}</td>
+            </tr>
+            <tr>
+                <td>Boutique</td>
+                <td>{{ $vendor->shop_name ?? '—' }}</td>
+            </tr>
+            <tr>
+                <td>Téléphone</td>
+                <td class="mono">{{ $vendor->phone ?? '—' }}</td>
+            </tr>
+            <tr>
+                <td>Adresse</td>
+                <td>{{ $vendor->address ?? '—' }}</td>
+            </tr>
+            <tr>
+                <td>Pays</td>
+                <td>{{ $vendor->country ?? '—' }}</td>
+            </tr>
+            <tr>
+                <td>Inscrit le</td>
+                <td class="mono">{{ $vendor->created_at->format('d/m/Y · H:i') }}</td>
+            </tr>
+            <tr>
+                <td>Statut</td>
+                <td>
+                    <span class="badge">
+                        <span class="badge-dot"></span>
+                        En attente — vérification email
+                    </span>
+                </td>
+            </tr>
+        </table>
+
+        <div class="section-label">Étapes suivantes</div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-text">Le vendeur vérifie son adresse email (code à 6 chiffres)</div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text">Il soumet ses documents d'identité (CNI ou passeport, recto + verso)</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">Vous recevrez une notification pour approuver ou rejeter les documents</div>
+            </div>
+        </div>
+
+        <div class="action-block">
+            <div class="action-title">Action requise</div>
+            <div class="action-text">
+                Consultez le tableau de bord pour suivre l'avancement de cette demande et examiner les documents une fois soumis.
+            </div>
+            <a href="{{ $adminDashboardUrl }}" class="btn">Voir le tableau de bord</a>
+        </div>
+
+        <p style="font-size:11px; color:#a0a09a; font-weight:300; line-height:1.6;">
+            Vous recevrez une nouvelle notification dès que le vendeur aura soumis ses documents d'identité.
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>© {{ date('Y') }} Supply. Cet email a été généré automatiquement.</p>
+    </div>
+
+</div>
 </body>
 </html>

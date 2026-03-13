@@ -45,7 +45,7 @@ class AdminNewClientRegistrationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.admin-new-client-registration',
+            markdown: 'emails.admin-new-client-registration',
             with: [
                 'client' => $this->client,
                 'adminDashboardUrl' => route('admin.users.index'),

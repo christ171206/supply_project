@@ -1,62 +1,65 @@
 @component('mail::layout')
+
 {{-- Header --}}
 @slot('header')
 @component('mail::header', ['url' => url('/')])
-{{ config('app.name') }} - Admin
+Supply
 @endcomponent
 @endslot
 
 {{-- Body --}}
-# 📌 Nouvelle demande d'inscription vendeur
 
 Bonjour,
 
-Une nouvelle demande d'inscription vendeur a été reçue et attend votre approbation.
+Une nouvelle demande d'inscription vendeur a été reçue sur **Supply**.
+Le vendeur doit encore vérifier son adresse email avant de pouvoir soumettre ses documents.
 
-## 👤 Informations du vendeur
+---
 
-| Information | Détail |
-|------------|--------|
-| **Nom** | {{ $vendor->name }} |
-| **Email** | {{ $vendor->email }} |
-| **Numéro de tél** | {{ $vendor->phone ?? 'N/A' }} |
-| **Nom de boutique** | {{ $vendor->shop_name ?? 'N/A' }} |
-| **Date d\'inscription** | {{ $vendor->created_at->locale('fr')->format('d M Y à H:i') }} |
+**Informations du vendeur**
 
-## 📝 Description
+| Champ | Valeur |
+|---|---|
+| Nom | {{ $vendor->name }} |
+| Email | {{ $vendor->email }} |
+| Boutique | {{ $vendor->shop_name ?? '—' }} |
+| Téléphone | {{ $vendor->phone ?? '—' }} |
+| Adresse | {{ $vendor->address ?? '—' }} |
+| Pays | {{ $vendor->country ?? '—' }} |
+| Inscrit le | {{ $vendor->created_at->format('d/m/Y à H:i') }} |
+| Statut | En attente — vérification email |
 
-{{ $vendor->description ?? 'Aucune description fournie' }}
+---
 
-## 🔍 Action requise
+**Étapes suivantes**
 
-Veuillez examiner les documents du vendeur (CNI recto/verso, autres pièces justificatives) et approuver ou rejeter leur demande.
+1. Le vendeur vérifie son adresse email (code à 6 chiffres)
+2. Il soumet ses documents d'identité (CNI ou passeport, recto + verso)
+3. Vous recevrez une notification pour approuver ou rejeter les documents
 
-Vous pouvez accéder au tableau de bord des vendeurs ou consulter les détails du demandeur en utilisant les boutons ci-dessous :
+---
+
+**Action requise**
+
+Consultez le tableau de bord pour suivre cette demande et examiner les documents une fois soumis.
 
 @component('mail::button', ['url' => $adminDashboardUrl, 'color' => 'primary'])
-Voir tous les demandeurs
+Voir le tableau de bord
 @endcomponent
 
-@component('mail::button', ['url' => $vendorDetailsUrl, 'color' => 'info'])
-Voir les détails du vendeur
+@if(isset($vendorDetailsUrl))
+@component('mail::button', ['url' => $vendorDetailsUrl, 'color' => 'primary'])
+Voir le profil du vendeur
 @endcomponent
+@endif
 
----
-
-**Rappels importants :**
-- Vérifiez que tous les documents requis sont fournis
-- Assurez-vous que les informations sont complètes et exactes
-- Approuvez ou rejetez la demande avec des commentaires clairs si rejet
-
----
-
-Cordialement,
-**L'équipe Supply**
+Vous recevrez une nouvelle notification dès que le vendeur aura soumis ses documents d'identité.
 
 {{-- Footer --}}
 @slot('footer')
 @component('mail::footer')
-© {{ date('Y') }} {{ config('app.name') }}. Tous droits réservés.
+© {{ date('Y') }} {{ config('app.name', 'Supply') }}. Cet email a été généré automatiquement.
 @endcomponent
 @endslot
+
 @endcomponent

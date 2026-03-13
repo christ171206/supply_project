@@ -24,9 +24,11 @@ class NewVendorRegistrationNotification extends Mailable
      */
     public function envelope(): Envelope
     {
+        $shopName = $this->vendor->shop_name ?? $this->vendor->name;
+
         return new Envelope(
-            from: new Address('noreply@supply.local', 'Supply - Plateforme E-commerce'),
-            subject: '📌 Nouvelle demande d\'inscription vendeur : ' . $this->vendor->shop_name,
+            from: new Address('noreply@supply.local', 'Supply'),
+            subject: 'Nouvelle demande vendeur : ' . $shopName,
         );
     }
 
@@ -36,11 +38,11 @@ class NewVendorRegistrationNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.new-vendor-registration',
+            view: 'emails.admin-vendor-notification',
             with: [
-                'vendor' => $this->vendor,
+                'vendor'            => $this->vendor,
                 'adminDashboardUrl' => route('admin.vendors.index'),
-                'vendorDetailsUrl' => route('admin.users.show', $this->vendor),
+                'vendorDetailsUrl'  => route('admin.users.show', $this->vendor),
             ],
         );
     }

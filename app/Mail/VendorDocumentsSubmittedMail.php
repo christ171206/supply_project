@@ -6,19 +6,18 @@ use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class WelcomeEmail extends Mailable
+class VendorDocumentsSubmittedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public User $user) {}
+    public function __construct(public User $vendor) {}
 
     /**
      * Get the message envelope.
@@ -26,8 +25,7 @@ class WelcomeEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('noreply@supply.local', 'Supply - Plateforme E-commerce'),
-            subject: '🎉 Bienvenue sur Supply, ' . $this->user->name . '!',
+            subject: '📄 Documents d\'identité à vérifier - ' . ($this->vendor->shop_name ?? $this->vendor->name),
         );
     }
 
@@ -37,12 +35,9 @@ class WelcomeEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.welcome',
+            markdown: 'emails.vendor-documents-submitted',
             with: [
-                'user' => $this->user,
-                'userName' => $this->user->name,
-                'userEmail' => $this->user->email,
-                'userRole' => $this->user->role === 'vendor' ? 'Vendeur' : 'Client',
+                'vendor' => $this->vendor,
             ],
         );
     }

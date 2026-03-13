@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -26,9 +25,9 @@ class EmailVerificationCodeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('noreply@supply.local', 'Supply - Plateforme E-commerce'),
+            from: new Address('noreply@supply.local', 'Supply'),
             to: [new Address($this->user->email, $this->user->name)],
-            subject: '🔐 Code de vérification Supply - Confirmez votre inscription',
+            subject: 'Confirmez votre adresse email',
         );
     }
 
@@ -38,19 +37,17 @@ class EmailVerificationCodeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.email-verification-code',
+            markdown: 'emails.email-verification-code',
             with: [
-                'user' => $this->user,
+                'user'             => $this->user,
                 'verificationCode' => $this->verificationCode,
-                'userName' => $this->user->name,
+                'userName'         => $this->user->name,
             ],
         );
     }
 
     /**
      * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
     public function attachments(): array
     {

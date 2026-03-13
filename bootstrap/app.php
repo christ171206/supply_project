@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'vendeur' => \App\Http\Middleware\VendeurMiddleware::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'vendor-approved' => \App\Http\Middleware\VendorApproved::class,
         ]);
 
         // Ajouter le middleware global pour la sécurité logging

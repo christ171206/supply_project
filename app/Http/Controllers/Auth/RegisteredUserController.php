@@ -107,7 +107,13 @@ class RegisteredUserController extends Controller
         ]);
 
         // Envoyer l'email avec le code (en queue tout de suite)
-        Mail::to($user->email)->queue(new EmailVerificationCodeMail($user, $verificationCode));
+        try {
+            Mail::to($user->email)->queue(new EmailVerificationCodeMail($user, $verificationCode));
+            Log::info('Email de vérification mis en queue', ['email' => $user->email]);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la mise en queue de l\'email de vérification: ' . $e->getMessage());
+            // Important: Ne pas bloquer l'inscription si l'email échoue
+        }
 
         // Si c'est un vendeur, créer une notification dans le dashboard pour l'admin
         // ET envoyer un email à l'admin

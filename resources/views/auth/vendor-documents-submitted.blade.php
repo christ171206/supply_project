@@ -82,5 +82,13 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Quand le back button est appuyé, rediriger vers l'accueil
+        history.replaceState(null, '', window.location.href);
+        window.addEventListener('popstate', function() {
+            window.location.href = '{{ route("accueil") }}';
+        });
+    </script>
 </body>
 </html>

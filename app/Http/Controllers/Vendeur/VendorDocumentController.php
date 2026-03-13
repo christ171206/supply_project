@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserDocument;
 use App\Models\Notification;
+use App\Mail\VendorDocumentsSubmittedMail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class VendorDocumentController extends Controller
@@ -21,7 +23,7 @@ class VendorDocumentController extends Controller
     public function submit(): View
     {
         $user = Auth::user();
-        
+
         // Vérifier que l'utilisateur est un vendeur
         if ($user->role !== 'vendor') {
             return redirect()->route('accueil');
@@ -94,9 +96,10 @@ class VendorDocumentController extends Controller
             // Mettre à jour le statut du vendeur
             $user->update(['vendor_status' => 'pending_validation']);
 
-            // Créer des notifications pour les admins
+            // Créer des notifications pour les admins et envoyer des emails
             $admins = User::where('is_admin', true)->get();
             foreach ($admins as $admin) {
+                // Notification en base de données
                 Notification::create([
                     'user_id' => $admin->id,
                     'type' => 'vendor_documents_submitted',
@@ -104,6 +107,17 @@ class VendorDocumentController extends Controller
                     'message' => $user->shop_name . ' a soumis ses documents d\'identité. À vérifier et approuver.',
                     'lu' => false,
                 ]);
+
+                // Envoyer un email
+                try {
+                    Mail::to($admin->email)->send(new VendorDocumentsSubmittedMail($user));
+                } catch (\Exception $e) {
+                    Log::error('Erreur envoi email admin documents', [
+                        'admin_id' => $admin->id,
+                        'vendor_id' => $user->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
 
             Log::info('Documents d\'identité soumis', [

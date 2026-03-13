@@ -14,7 +14,7 @@ return new class extends Migration
             $table->unsignedBigInteger('deleted_by_admin')->nullable()->after('report_reason');
             $table->timestamp('deleted_at')->nullable()->after('deleted_by_admin');
             $table->text('delete_reason')->nullable()->after('deleted_at');
-            
+
             // Indexes
             $table->foreign('deleted_by_admin')->references('id')->on('users')->onDelete('set null');
             $table->index('is_appropriate');
@@ -24,7 +24,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('avis', function (Blueprint $table) {
-            $table->dropForeignKey(['deleted_by_admin']);
             $table->dropColumn(['is_appropriate', 'report_reason', 'deleted_by_admin', 'deleted_at', 'delete_reason']);
         });
     }

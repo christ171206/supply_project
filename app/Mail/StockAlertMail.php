@@ -49,7 +49,7 @@ class StockAlertMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.stock-alert',
+            markdown: 'emails.stock-alert',
             with: [
                 'vendor' => $this->vendor,
                 'produit' => $this->produit,

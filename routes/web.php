@@ -136,10 +136,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
     Route::delete('/notifications/{notification}', [NotificationController::class, 'delete'])->name('notifications.delete');
     Route::post('/notifications/delete-all-read', [NotificationController::class, 'deleteAllRead'])->name('notifications.delete-all-read');
+
+    // Page d'attente d'approbation pour les vendeurs
+    Route::get('/vendeur/en-attente', [VendeurProduitController::class, 'waitingApproval'])->name('vendor.waiting-approval');
 });
 
 // Routes Vendeur
-Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->group(function () {
+Route::middleware(['auth', 'vendeur', 'vendor-approved'])->prefix('vendeur')->name('vendeur.')->group(function () {
     Route::get('/dashboard', [VendeurProduitController::class, 'dashboard'])->name('dashboard');
     Route::get('/apercu', [VendeurProduitController::class, 'apercu'])->name('apercu');
 

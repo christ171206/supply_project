@@ -17,10 +17,10 @@
 
         {{-- Erreurs --}}
         @if ($errors->any())
-            <div class="mb-6 px-4 py-3 bg-[#fef2f2] border border-[#fecaca] rounded-lg text-[13px] text-[#dc2626]">
-                <div class="font-medium mb-2">Erreur d'inscription</div>
+            <div class="mb-6 px-4 py-3 bg-[#fef2f2] border border-[#fecaca] rounded-lg">
+                <div class="font-medium mb-2 text-[13px] text-[#dc2626]">❌ Erreur lors de l'inscription</div>
                 @foreach ($errors->all() as $error)
-                    <div class="text-[12px] font-light">• {{ $error }}</div>
+                    <div class="text-[12px] font-light text-[#dc2626] mb-1">• {{ $error }}</div>
                 @endforeach
             </div>
         @endif
@@ -195,7 +195,8 @@
             </div>
 
             <button type="submit"
-                    class="w-full py-3 bg-[#0a0a0a] text-white text-[13px] font-medium rounded-lg hover:opacity-85 transition-opacity">
+                    class="w-full py-3 bg-[#0a0a0a] text-white text-[13px] font-medium rounded-lg hover:opacity-85 transition-opacity disabled:opacity-50"
+                    id="submit-btn">
                 Créer mon compte
             </button>
         </form>
@@ -217,6 +218,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const cards        = document.querySelectorAll('.role-card');
     const roleInput    = document.getElementById('role-input');
     const vendorFields = document.getElementById('vendor-fields');
+    const submitBtn    = document.getElementById('submit-btn');
+    const form         = document.querySelector('form');
 
     const ACTIVE   = 'role-card p-4 border-2 border-[#0a0a0a] rounded-lg text-center transition-all bg-[#f7f7f5] cursor-pointer';
     const INACTIVE = 'role-card p-4 border-2 border-[#e0e0dc] rounded-lg text-center transition-all cursor-pointer';
@@ -254,6 +257,14 @@ document.addEventListener('DOMContentLoaded', function () {
         radios[i].checked = true;
         update();
     }));
+
+    // Ajouter un état de chargement au bouton de soumission
+    if (form && submitBtn) {
+        form.addEventListener('submit', function() {
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ En cours...';
+        });
+    }
 
     update();
 });
