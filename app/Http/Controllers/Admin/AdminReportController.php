@@ -258,4 +258,130 @@ class AdminReportController extends Controller
     {
         // Implémentation similaire
     }
+
+    /**
+     * Rapport annuel complet avec chiffre d'affaires par mois
+     */
+    public function annualReport(Request $request)
+    {
+        $year = $request->input('year', now()->year);
+
+        // Initialiser les données
+        $monthlyRevenue = [];
+        $monthlyOrders = [];
+        $monthlyLabels = [];
+        $monthlyGrowth = [];
+
+        $janStartLastYear = now()->setYear($year - 1)->startOfYear();
+        $currentLastYear = now()->setYear($year - 1)->endOfYear();
+
+        // Calcul pour chaque mois
+        for ($month = 1; $month <= 12; $month++) {
+            $startDate = now()->setYear($year)->setMonth($month)->startOfMonth();
+            $endDate = now()->setYear($year)->setMonth($month)->endOfMonth();
+
+            $revenue = Commande::whereBetween('created_at', [$startDate, $endDate])
+                ->where('statut', 'livree')
+                ->sum('total');
+
+            $orders = Commande::whereBetween('created_at', [$startDate, $endDate])
+                ->where('statut', 'livree')
+                ->count();
+
+            // Calcul de la croissance vs année précédente
+            $lastYearStart = now()->setYear($year - 1)->setMonth($month)->startOfMonth();
+            $lastYearEnd = now()->setYear($year - 1)->setMonth($month)->endOfMonth();
+
+            $lastYearRevenue = Commande::whereBetween('created_at', [$lastYearStart, $lastYearEnd])
+                ->where('statut', 'livree')
+                ->sum('total');
+
+            $growth = $lastYearRevenue > 0
+                ? round((($revenue - $lastYearRevenue) / $lastYearRevenue) * 100, 1)
+                : 0;
+
+            $monthlyRevenue[] = round($revenue, 0);
+            $monthlyOrders[] = $orders;
+            $monthlyLabels[] = trans('months.' . $month);
+            $monthlyGrowth[] = $growth;
+        }
+
+        // Totaux annuels
+        $totalAnnualRevenue = array_sum($monthlyRevenue);
+        $totalAnnualOrders = array_sum($monthlyOrders);
+        $averageMonthlyRevenue = round($totalAnnualRevenue / 12, 0);
+
+        // Comparaison avec l'année précédente
+        $lastYearRevenue = Commande::whereYear('created_at', $year - 1)
+            ->where('statut', 'livree')
+            ->sum('total');
+
+        $yearOverYearGrowth = $lastYearRevenue > 0
+            ? round((($totalAnnualRevenue - $lastYearRevenue) / $lastYearRevenue) * 100, 1)
+            : 0;
+
+        // Top vendeurs de l'année
+        $topVendors = User::where('role', 'vendor')
+            ->select('users.id', 'users.name', 'users.shop_name')
+            ->selectRaw('COUNT(DISTINCT commandes.id) as total_orders')
+            ->selectRaw('SUM(commandes.total) as total_revenue')
+            ->leftJoin('produits', 'users.id', '=', 'produits.user_id')
+            ->leftJoin('ligne_commandes', 'produits.id', '=', 'ligne_commandes.produit_id')
+            ->leftJoin('commandes', 'ligne_commandes.commande_id', '=', 'commandes.id')
+            ->whereYear('commandes.created_at', $year)
+            ->where('commandes.statut', 'livree')
+            ->groupBy('users.id', 'users.name', 'users.shop_name')
+            ->orderByDesc('total_revenue')
+            ->limit(10)
+            ->get();
+
+        // Top produits de l'année
+        $topProducts = Produit::select('produits.id', 'produits.nom', 'produits.prix')
+            ->selectRaw('COUNT(ligne_commandes.id) as times_sold')
+            ->selectRaw('SUM(ligne_commandes.quantite) as total_quantity')
+            ->selectRaw('SUM(ligne_commandes.prix_unitaire * ligne_commandes.quantite) as total_revenue')
+            ->leftJoin('ligne_commandes', 'produits.id', '=', 'ligne_commandes.produit_id')
+            ->leftJoin('commandes', 'ligne_commandes.commande_id', '=', 'commandes.id')
+            ->whereYear('commandes.created_at', $year)
+            ->where('commandes.statut', 'livree')
+            ->groupBy('produits.id', 'produits.nom', 'produits.prix')
+            ->orderByDesc('total_revenue')
+            ->limit(10)
+            ->get();
+
+        // Statistiques d'activité
+        $newUsersCount = User::whereYear('created_at', $year)->count();
+        $newVendorsCount = User::where('role', 'vendor')->whereYear('created_at', $year)->count();
+        $totalProductsSold = LigneCommande::whereYear('created_at', $year)->sum('quantite');
+        $averageOrderValue = $totalAnnualOrders > 0 ? round($totalAnnualRevenue / $totalAnnualOrders, 0) : 0;
+
+        return view('admin.reports.annual', [
+            'year' => $year,
+            'monthlyRevenue' => $monthlyRevenue,
+            'monthlyOrders' => $monthlyOrders,
+            'monthlyLabels' => $monthlyLabels,
+            'monthlyGrowth' => $monthlyGrowth,
+            'totalAnnualRevenue' => $totalAnnualRevenue,
+            'totalAnnualOrders' => $totalAnnualOrders,
+            'averageMonthlyRevenue' => $averageMonthlyRevenue,
+            'yearOverYearGrowth' => $yearOverYearGrowth,
+            'lastYearRevenue' => $lastYearRevenue,
+            'topVendors' => $topVendors,
+            'topProducts' => $topProducts,
+            'newUsersCount' => $newUsersCount,
+            'newVendorsCount' => $newVendorsCount,
+            'totalProductsSold' => $totalProductsSold,
+            'averageOrderValue' => $averageOrderValue,
+        ]);
+    }
+
+    private function exportVendorReport()
+    {
+        // Implémentation similaire
+    }
+
+    private function exportProductReport()
+    {
+        // Implémentation similaire
+    }
 }

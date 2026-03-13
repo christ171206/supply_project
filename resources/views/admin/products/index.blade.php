@@ -9,9 +9,7 @@
 @section('content')
 <div class="pb-16">
 
-    {{-- ══════════════════════════════
-         HEADER
-    ══════════════════════════════ --}}
+    {{-- HEADER --}}
     <div class="bg-[#0a0a0a] px-8 pt-10 pb-8 mb-8">
         <div class="text-[10px] font-medium tracking-[0.15em] uppercase text-white/40 mb-3">Administration</div>
         <div class="flex items-start justify-between">
@@ -24,11 +22,13 @@
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2 mt-1">
                 <a href="{{ route('admin.products.featured') }}"
                    class="flex items-center gap-2 bg-white/10 border border-white/20 text-white text-[12px] font-medium
                           px-4 py-2.5 rounded-lg hover:bg-white/20 transition-all">
-                    <span class="text-lg">⭐</span>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
                     Vedettes
                 </a>
                 <a href="{{ route('admin.products.critical-stock') }}"
@@ -44,12 +44,10 @@
     <div class="px-8 space-y-5">
 
     {{-- Filtres --}}
-    <form method="GET"
+    <form method="GET" action="{{ route('admin.products.index') }}"
           class="bg-white border border-[#e0e0dc] rounded-xl px-5 py-4 flex items-end gap-4 flex-wrap">
         <div class="flex-1 min-w-[200px]">
-            <label class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">
-                Rechercher
-            </label>
+            <label class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">Rechercher</label>
             <input type="text" name="search" value="{{ request('search') }}"
                    placeholder="Nom du produit…"
                    class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
@@ -97,46 +95,31 @@
             <tbody>
                 @forelse($produits as $produit)
                     @php
-                        $stockDot = $produit->stock <= 5
-                            ? 'bg-[#f87171]'
-                            : ($produit->stock <= 10 ? 'bg-[#f59e0b]' : 'bg-[#22c55e]');
-                        $stockText = $produit->stock <= 5
-                            ? 'text-[#dc2626]'
-                            : ($produit->stock <= 10 ? 'text-[#b45309]' : 'text-[#15803d]');
+                        $stockDot  = $produit->stock <= 5 ? 'bg-[#f87171]'   : ($produit->stock <= 10 ? 'bg-[#f59e0b]'  : 'bg-[#22c55e]');
+                        $stockText = $produit->stock <= 5 ? 'text-[#dc2626]' : ($produit->stock <= 10 ? 'text-[#b45309]' : 'text-[#15803d]');
                     @endphp
                     <tr class="border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
 
-                        {{-- Produit --}}
                         <td class="px-5 py-3.5">
                             <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $produit->nom }}</div>
                             <div class="font-mono text-[10px] text-[#a0a09a] mt-0.5">#{{ $produit->id }}</div>
                         </td>
-
-                        {{-- Vendeur --}}
                         <td class="px-5 py-3.5 text-[13px] text-[#2a2a28]">
                             {{ $produit->vendeur?->shop_name ?? $produit->vendeur?->name ?? '—' }}
                         </td>
-
-                        {{-- Catégorie --}}
                         <td class="px-5 py-3.5 text-[13px] text-[#666660]">
                             {{ $produit->categorie?->nom ?? '—' }}
                         </td>
-
-                        {{-- Prix --}}
                         <td class="px-5 py-3.5 text-right font-mono text-[13px] font-medium text-[#0a0a0a]">
                             {{ number_format($produit->prix, 0, ',', ' ') }}
                             <span class="text-[10px] text-[#a0a09a] font-sans">FCFA</span>
                         </td>
-
-                        {{-- Stock --}}
                         <td class="px-5 py-3.5 text-center">
                             <span class="inline-flex items-center gap-1.5 font-mono text-[11px] font-medium {{ $stockText }}">
                                 <span class="w-1.5 h-1.5 rounded-full {{ $stockDot }}"></span>
                                 {{ $produit->stock }}
                             </span>
                         </td>
-
-                        {{-- Statut --}}
                         <td class="px-5 py-3.5 text-center">
                             @if($produit->est_actif)
                                 <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded bg-[#f0fdf4] text-[#15803d]">
@@ -148,8 +131,6 @@
                                 </span>
                             @endif
                         </td>
-
-                        {{-- Actions --}}
                         <td class="px-5 py-3.5">
                             <div class="flex items-center gap-1.5 justify-end">
                                 <a href="{{ route('admin.products.show', $produit) }}"
@@ -161,13 +142,10 @@
                                 @if($produit->est_actif)
                                     <form method="POST" action="{{ route('admin.products.disable', $produit) }}" class="inline"
                                           data-confirm="Désactiver ce produit ?"
-                                          data-confirm-title="Désactiver le produit"
-                                          data-confirm-type="warning"
-                                          data-confirm-button="Désactiver">
+                                          data-confirm-type="warning" data-confirm-button="Désactiver">
                                         @csrf
                                         <button type="submit"
-                                                class="text-[11px] font-medium text-[#b45309] border border-[#fde68a] px-2.5 py-1.5 rounded-lg
-                                                       hover:bg-[#fdf6ec] transition-all">
+                                                class="text-[11px] font-medium text-[#b45309] border border-[#fde68a] px-2.5 py-1.5 rounded-lg hover:bg-[#fdf6ec] transition-all">
                                             Désactiver
                                         </button>
                                     </form>
@@ -175,8 +153,7 @@
                                     <form method="POST" action="{{ route('admin.products.enable', $produit) }}" class="inline">
                                         @csrf
                                         <button type="submit"
-                                                class="text-[11px] font-medium text-[#15803d] border border-[#bbf7d0] px-2.5 py-1.5 rounded-lg
-                                                       hover:bg-[#f0fdf4] transition-all">
+                                                class="text-[11px] font-medium text-[#15803d] border border-[#bbf7d0] px-2.5 py-1.5 rounded-lg hover:bg-[#f0fdf4] transition-all">
                                             Activer
                                         </button>
                                     </form>
@@ -185,22 +162,22 @@
                                 <form method="POST" action="{{ route('admin.products.toggle-featured', $produit) }}" class="inline">
                                     @csrf
                                     <button type="submit"
-                                            class="text-[11px] font-medium {{ $produit->featured ? 'text-[#dc2626] border border-[#fecaca]' : 'text-[#7c3aed] border border-[#ddd6fe]' }} px-2.5 py-1.5 rounded-lg
-                                                   {{ $produit->featured ? 'hover:bg-[#fef2f2]' : 'hover:bg-[#f5f3ff]' }} transition-all"
-                                            title="{{ $produit->featured ? 'Retirer de vedettes' : 'Ajouter aux vedettes' }}">
-                                        {{ $produit->featured ? 'Retirer ⭐' : 'Vedette ⭐' }}
+                                            class="text-[11px] font-medium px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1
+                                                   {{ $produit->featured ? 'text-[#dc2626] border border-[#fecaca] hover:bg-[#fef2f2]' : 'text-[#7c3aed] border border-[#ddd6fe] hover:bg-[#f5f3ff]' }}"
+                                            title="{{ $produit->featured ? 'Retirer des vedettes' : 'Ajouter aux vedettes' }}">
+                                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                        </svg>
+                                        {{ $produit->featured ? 'Retirer' : 'Vedette' }}
                                     </button>
                                 </form>
 
                                 <form method="POST" action="{{ route('admin.products.destroy', $produit) }}" class="inline"
                                       data-confirm="Supprimer ce produit ? Cette action est irréversible."
-                                      data-confirm-title="Supprimer le produit"
-                                      data-confirm-type="danger"
-                                      data-confirm-button="Supprimer">
+                                      data-confirm-type="danger" data-confirm-button="Supprimer">
                                     @csrf @method('DELETE')
                                     <button type="submit"
-                                            class="text-[11px] font-medium text-[#dc2626] border border-[#fecaca] px-2.5 py-1.5 rounded-lg
-                                                   hover:bg-[#fef2f2] transition-all">
+                                            class="text-[11px] font-medium text-[#dc2626] border border-[#fecaca] px-2.5 py-1.5 rounded-lg hover:bg-[#fef2f2] transition-all">
                                         Supprimer
                                     </button>
                                 </form>
@@ -239,17 +216,14 @@
                        class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
                               hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all text-[11px]">←</a>
                 @endif
-
-                @foreach($produits->getUrlRange(max(1, $produits->currentPage()-2), min($produits->lastPage(), $produits->currentPage()+2)) as $page => $url)
+                @foreach($produits->getUrlRange(max(1,$produits->currentPage()-2),min($produits->lastPage(),$produits->currentPage()+2)) as $page => $url)
                     @if($page == $produits->currentPage())
                         <span class="w-8 h-8 flex items-center justify-center bg-[#0a0a0a] text-white rounded-lg text-[11px] font-mono">{{ $page }}</span>
                     @else
-                        <a href="{{ $url }}"
-                           class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
-                                  hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all text-[11px] font-mono">{{ $page }}</a>
+                        <a href="{{ $url }}" class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
+                              hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all text-[11px] font-mono">{{ $page }}</a>
                     @endif
                 @endforeach
-
                 @if($produits->hasMorePages())
                     <a href="{{ $produits->nextPageUrl() }}"
                        class="w-8 h-8 flex items-center justify-center border border-[#e0e0dc] rounded-lg text-[#666660]
@@ -261,6 +235,6 @@
         </div>
     @endif
 
-    </div>{{-- /px-8 --}}
+    </div>
 </div>
 @endsection

@@ -24,7 +24,7 @@ class SearchController extends Controller
         }
 
         // Search products by name, description, or category
-        $produits = Produit::where('statut', 'actif')
+        $produits = Produit::where('est_actif', true)
             ->where(function ($q) use ($query) {
                 $q->where('nom', 'LIKE', "%{$query}%")
                     ->orWhere('description', 'LIKE', "%{$query}%");
@@ -76,7 +76,7 @@ class SearchController extends Controller
 
         // Get distinct product names and categories that match the query
         $suggestions = Produit::select('nom')
-            ->where('statut', 'actif')
+            ->where('est_actif', true)
             ->where('nom', 'LIKE', "%{$query}%")
             ->distinct()
             ->limit(6)
@@ -86,5 +86,20 @@ class SearchController extends Controller
             'success' => true,
             'suggestions' => $suggestions
         ]);
+    }
+
+    /**
+     * Afficher la page de recherche avec résultats
+     */
+    public function index(Request $request)
+    {
+        $recherche = $request->get('q') ?? $request->get('recherche', '');
+
+        if (!$recherche) {
+            return redirect()->route('produits.catalogue');
+        }
+
+        // Rediriger vers le catalogue avec le paramètre recherche
+        return redirect()->route('produits.catalogue', ['recherche' => $recherche]);
     }
 }

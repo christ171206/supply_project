@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\EmailVerificationCodeMail;
 use App\Mail\NewVendorRegistrationNotification;
 use App\Mail\AdminNewVendorRegistrationMail;
+use App\Mail\AdminNewClientRegistrationMail;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -130,6 +131,29 @@ class RegisteredUserController extends Controller
                 }
             }
             Log::info('Notification vendeur créée', ['vendor_id' => $user->id]);
+        }
+
+        // Si c'est un client, notifier l'admin
+        if ($request->role === 'client') {
+            $admins = User::where('is_admin', true)->get();
+            foreach ($admins as $admin) {
+                // Créer une notification dans le dashboard
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'type' => 'new_client_registration',
+                    'titre' => '👤 Nouveau client inscrit',
+                    'message' => $user->name . ' (' . $user->email . ') s\'est inscrit en tant que client.',
+                    'lu' => false,
+                ]);
+
+                // Envoyer l'email à l'admin
+                try {
+                    Mail::to($admin->email)->send(new AdminNewClientRegistrationMail($user, $admin));
+                } catch (\Exception $e) {
+                    Log::error('Erreur envoi email admin nouveau client: ' . $e->getMessage());
+                }
+            }
+            Log::info('Notification client créée', ['client_id' => $user->id]);
         }
 
         // Sauvegarder l'email en session pour la vérification

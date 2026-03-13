@@ -51,3 +51,19 @@ Route::middleware('auth:sanctum')->prefix('notifications')->group(function () {
 
 // Webhook de notification de paiement (publique)
 Route::post('payment-webhook', [PaymentCinemaController::class, 'webhook'])->name('payment-webhook');
+
+// PWA API Routes
+Route::get('pwa/status', fn() => response()->json([
+    'pwa' => [
+        'manifest' => file_exists(public_path('manifest.json')) ? 'OK' : 'MISSING',
+        'service_worker' => file_exists(public_path('service-worker.js')) ? 'OK' : 'MISSING',
+        'offline_page' => file_exists(public_path('offline.html')) ? 'OK' : 'MISSING',
+    ],
+    'status' => 'ready',
+    'timestamp' => now()->toIso8601String(),
+]))->name('pwa.status');
+
+Route::get('health/pwa', fn() => response()->json([
+    'pwa_healthy' => true,
+    'timestamp' => now()->toIso8601String(),
+]))->name('health.pwa');

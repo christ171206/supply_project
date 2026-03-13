@@ -233,6 +233,33 @@ class CommandeController extends Controller
                 // Continuer même si l'event dispatch échoue - la commande est créée
             }
 
+            // Créer un rappel de livraison (3 jours avant la livraison estimée)
+            try {
+                $estimatedDeliveryDate = now()->addDays(5); // Estimation par défaut
+                $reminderDate = $estimatedDeliveryDate->copy()->subDays(3);
+
+                \App\Models\DeliveryReminder::create([
+                    'commande_id' => $commande->id,
+                    'user_id' => $commande->user_id,
+                    'days_before' => 3,
+                    'scheduled_for' => $reminderDate,
+                    'status' => 'pending',
+                ]);
+
+                // Mettre à jour les dates estimées de livraison
+                $commande->update([
+                    'estimated_delivery_date' => $estimatedDeliveryDate,
+                ]);
+
+                Log::info('✅ Rappel de livraison créé', [
+                    'commande_id' => $commande->id,
+                    'scheduled_for' => $reminderDate,
+                ]);
+            } catch (\Exception $reminderError) {
+                Log::warning('⚠️ Erreur création rappel livraison: ' . $reminderError->getMessage());
+                // Continuer même si la création du rappel échoue
+            }
+
             // Rediriger vers la page de confirmation avec possibilité de paiement
             $redirectUrl = route('commandes.show', $commande->id);
 

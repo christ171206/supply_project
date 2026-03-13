@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply — Hors ligne</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            color: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        p {
+            color: #666660;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .offline-info {
+            background: #f7f7f5;
+            border: 1px solid #e0e0dc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .offline-info ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .offline-info li {
+            padding: 0.5rem 0;
+            color: #666660;
+        }
+
+        .offline-info li::before {
+            content: "✓ ";
+            color: #0a0a0a;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-direction: column;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #0a0a0a;
+            border: 1px solid #e0e0dc;
+        }
+
+        .btn-secondary:active {
+            background: #f7f7f5;
+        }
+
+        .cached-pages {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0dc;
+        }
+
+        .cached-pages h3 {
+            font-size: 0.9rem;
+            color: #a0a09a;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .cached-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .cached-link {
+            padding: 0.5rem 1rem;
+            background: #f7f7f5;
+            border: 1px solid #e0e0dc;
+            border-radius: 4px;
+            color: #0a0a0a;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .cached-link:active {
+            background: #efefed;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <span class="offline-icon">📡</span>
+        <h1>Vous êtes hors ligne</h1>
+        <p>Supply a perdu la connexion Internet. Certaines fonctionnalités ne sont pas disponibles, mais vous pouvez continuer à naviguer dans le contenu en cache.</p>
+
+        <div class="offline-info">
+            <ul>
+                <li>Catalogue des produits (en cache)</li>
+                <li>Pages précédemment visitées</li>
+                <li>Informations en mémoire locale</li>
+            </ul>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-primary" onclick="location.reload()">
+                🔄 Réessayer maintenant
+            </button>
+            <button class="btn-secondary" onclick="goBack()">
+                ← Retourner en arrière
+            </button>
+        </div>
+
+        <div class="cached-pages">
+            <h3>Pages disponibles hors ligne</h3>
+            <div class="cached-list">
+                <a href="/" class="cached-link">🏠 Accueil</a>
+                <a href="/catalogue" class="cached-link">🛍️ Catalogue</a>
+                <a href="/cart" class="cached-link">🛒 Mon panier</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/';
+            }
+        }
+
+        // Auto-reload when connection is restored
+        window.addEventListener('online', () => {
+            console.log('[Offline] Connection restored, reloading...');
+            location.reload();
+        });
+    </script>
+</body>
+</html>

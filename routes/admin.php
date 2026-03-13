@@ -38,17 +38,17 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->name('admin.')->group
     // Gestion des produits et stock (Supervision uniquement - Lecture seule)
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [AdminProductController::class, 'index'])->name('index');
+        // Routes spécifiques AVANT la route paramétrée
+        Route::get('critical-stock', [AdminProductController::class, 'criticalStock'])->name('critical-stock');
+        Route::get('featured', [AdminProductController::class, 'featured'])->name('featured');
+        Route::get('stock-audit', [AdminProductController::class, 'stockAudit'])->name('stock-audit');
+        // Routes paramétrées APRÈS
         Route::get('{produit}', [AdminProductController::class, 'show'])->name('show');
         Route::post('{produit}/disable', [AdminProductController::class, 'disable'])->name('disable');
         Route::post('{produit}/enable', [AdminProductController::class, 'enable'])->name('enable');
         Route::post('{produit}/toggle-featured', [AdminProductController::class, 'toggleFeatured'])->name('toggle-featured');
         Route::delete('{produit}', [AdminProductController::class, 'destroy'])->name('destroy');
-        // RETRAIT: adjust-stock (Gestion du stock = Responsabilité du Vendeur)
-        // RETRAIT: configure-alert (Configuration = Responsabilité du Vendeur)
-        Route::get('critical-stock', [AdminProductController::class, 'criticalStock'])->name('critical-stock');
-        Route::get('featured', [AdminProductController::class, 'featured'])->name('featured');
         Route::get('{produit}/stock-history', [AdminProductController::class, 'stockHistory'])->name('stock-history');
-        Route::get('stock-audit', [AdminProductController::class, 'stockAudit'])->name('stock-audit');
     });
 
     // Gestion des commandes (Supervision uniquement - Lecture seule)
@@ -155,6 +155,7 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->name('admin.')->group
         Route::get('product-popularity', [AdminReportController::class, 'productPopularityReport'])->name('product-popularity');
         Route::get('user-activity', [AdminReportController::class, 'userActivityReport'])->name('user-activity');
         Route::get('stock-audit', [AdminReportController::class, 'stockAuditReport'])->name('stock-audit');
+        Route::get('annual', [AdminReportController::class, 'annualReport'])->name('annual');
         Route::post('export', [AdminReportController::class, 'exportReport'])->name('export');
     });
 

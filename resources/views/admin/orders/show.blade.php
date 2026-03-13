@@ -63,13 +63,13 @@
                 </div>
                 <div class="px-5 py-4 flex items-center gap-3">
                     <div class="w-9 h-9 bg-[#0a0a0a] rounded-md flex items-center justify-center text-white text-[11px] font-medium flex-shrink-0">
-                        {{ strtoupper(substr($commande->user->name, 0, 1)) }}
+                        {{ strtoupper(substr($commande->user?->name ?? 'U', 0, 1)) }}
                     </div>
                     <div>
-                        <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $commande->user->name }}</div>
-                        <div class="font-mono text-[11px] text-[#a0a09a]">{{ $commande->user->email }}</div>
-                        @if($commande->user->phone)
-                            <div class="font-mono text-[11px] text-[#a0a09a]">{{ $commande->user->phone }}</div>
+                        <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $commande->user?->name ?? 'Utilisateur inconnu' }}</div>
+                        <div class="font-mono text-[11px] text-[#a0a09a]">{{ $commande->user?->email ?? '—' }}</div>
+                        @if($commande->user?->phone)
+                            <div class="font-mono text-[11px] text-[#a0a09a]">{{ $commande->user?->phone }}</div>
                         @endif
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                                 <tr class="border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
                                     <td class="px-5 py-3.5">
                                         <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $ligne->produit->nom ?? 'Produit supprimé' }}</div>
-                                        <div class="text-[11px] text-[#a0a09a] font-light">{{ $ligne->produit->user->shop_name ?? '—' }}</div>
+                                        <div class="text-[11px] text-[#a0a09a] font-light">{{ $ligne->produit?->user?->shop_name ?? '—' }}</div>
                                     </td>
                                     <td class="px-5 py-3.5 text-center font-mono text-[12px] text-[#666660]">{{ $ligne->quantite }}</td>
                                     <td class="px-5 py-3.5 text-right font-mono text-[12px] text-[#666660]">

@@ -18,12 +18,16 @@ class AdminProductController extends Controller
     {
         $query = Produit::with('vendeur', 'categorie');
 
+        // Recherche (groupée pour OR condition)
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where('nom', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('nom', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
         }
 
+        // Filtres (toujours combinés avec AND)
         if ($request->filled('vendor_id')) {
             $query->where('user_id', $request->input('vendor_id'));
         }
@@ -50,10 +54,12 @@ class AdminProductController extends Controller
     {
         $produit->load('vendeur', 'categorie', 'stocks', 'mouvementsStock');
         $stockAlert = StockAlert::where('produit_id', $produit->id)->first();
+        $stockHistory = $produit->mouvementsStock()->latest()->get();
 
         return view('admin.products.show', [
             'produit' => $produit,
             'stockAlert' => $stockAlert,
+            'stockHistory' => $stockHistory,
         ]);
     }
 
@@ -171,29 +177,29 @@ class AdminProductController extends Controller
     /**
      * Désactiver un produit
      */
-    public function disable(Produit $produit)
+    public function disable(Request $request, Produit $produit)
     {
         $produit->update(['est_actif' => false]);
-        return redirect()->back()->with('success', 'Produit désactivé avec succès.');
+        return redirect()->route('admin.products.index', $request->query())->with('success', 'Produit désactivé avec succès.');
     }
 
     /**
      * Activer un produit
      */
-    public function enable(Produit $produit)
+    public function enable(Request $request, Produit $produit)
     {
         $produit->update(['est_actif' => true]);
-        return redirect()->back()->with('success', 'Produit activé avec succès.');
+        return redirect()->route('admin.products.index', $request->query())->with('success', 'Produit activé avec succès.');
     }
 
     /**
      * Supprimer un produit
      */
-    public function destroy(Produit $produit)
+    public function destroy(Request $request, Produit $produit)
     {
         $nom = $produit->nom;
         $produit->delete();
-        return redirect()->back()->with('success', "Produit « $nom » supprimé avec succès.");
+        return redirect()->route('admin.products.index', $request->query())->with('success', "Produit « $nom » supprimé avec succès.");
     }
 
     /**
@@ -220,10 +226,10 @@ class AdminProductController extends Controller
     /**
      * Basculer le statut vedette d'un produit
      */
-    public function toggleFeatured(Produit $produit)
+    public function toggleFeatured(Request $request, Produit $produit)
     {
         $produit->update(['featured' => !$produit->featured]);
         $status = $produit->featured ? 'ajouté aux' : 'retiré des';
-        return redirect()->back()->with('success', "Produit « {$produit->nom} » $status produits vedettes.");
+        return redirect()->route('admin.products.index', $request->query())->with('success', "Produit « {$produit->nom} » $status produits vedettes.");
     }
 }

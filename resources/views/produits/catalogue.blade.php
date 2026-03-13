@@ -38,7 +38,7 @@
                     {{-- Catégories --}}
                     <div class="p-4 border-b border-[#efefed]">
                         <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-3">Catégories</div>
-                        <div class="flex flex-col gap-0.5">
+                        <div class="flex flex-col gap-0.5" id="category-filter">
                             <label class="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors hover:bg-[#f7f7f5] {{ !request('categorie') ? 'bg-[#0a0a0a]' : '' }} group">
                                 <div class="w-3.5 h-3.5 rounded-[3px] border flex-shrink-0 flex items-center justify-center transition-all
                                     {{ !request('categorie') ? 'border-transparent bg-white' : 'border-[#e0e0dc]' }}">
@@ -46,7 +46,7 @@
                                         <svg class="w-2.5 h-2.5 text-[#0a0a0a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                                     @endif
                                 </div>
-                                <input type="checkbox" value="" class="hidden" {{ !request('categorie') ? 'checked' : '' }}>
+                                <input type="radio" name="categorie-radio" value="" class="hidden" data-category-filter {{ !request('categorie') ? 'checked' : '' }}>
                                 <span class="text-[12px] flex-1 {{ !request('categorie') ? 'text-white font-medium' : 'text-[#666660]' }}">Toutes</span>
                                 <span class="text-[10px] font-mono {{ !request('categorie') ? 'text-white/60' : 'text-[#a0a09a]' }}">{{ $produits->total() ?? count($produits) }}</span>
                             </label>
@@ -59,7 +59,7 @@
                                             <svg class="w-2.5 h-2.5 text-[#0a0a0a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                                         @endif
                                     </div>
-                                    <input type="checkbox" name="categorie" value="{{ $cat->id }}" class="hidden" {{ request('categorie') == $cat->id ? 'checked' : '' }}>
+                                    <input type="radio" name="categorie-radio" value="{{ $cat->id }}" class="hidden" data-category-filter {{ request('categorie') == $cat->id ? 'checked' : '' }}>
                                     <span class="text-[12px] flex-1 {{ request('categorie') == $cat->id ? 'text-white font-medium' : 'text-[#666660]' }}">{{ $cat->nom }}</span>
                                 </label>
                             @endforeach
@@ -110,6 +110,9 @@
 
                     {{-- Actions --}}
                     <div class="p-4 flex gap-2">
+                        <!-- Hidden input for category value -->
+                        <input type="hidden" name="categorie" id="categorie-hidden" value="{{ request('categorie') }}">
+
                         <button
                             type="submit"
                             class="flex-1 bg-[#0a0a0a] text-white text-[12px] font-medium py-2 rounded-lg hover:opacity-85 transition-opacity"
@@ -197,4 +200,49 @@
         </div>
     </div>
 </div>
+
+<script>
+// Category filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryRadios = document.querySelectorAll('input[name="categorie-radio"]');
+    const categorieHidden = document.getElementById('categorie-hidden');
+    const filterForm = categoryRadios[0]?.closest('form');
+
+    categoryRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Update the hidden input with the selected value
+            categorieHidden.value = this.value;
+
+            // Update the visual state of checkboxes
+            categoryRadios.forEach(r => {
+                const label = r.closest('label');
+                const checkbox = label.querySelector('div');
+                const icon = label.querySelector('svg');
+                const span = label.querySelector('span');
+
+                if (r.checked) {
+                    label.classList.add('bg-[#0a0a0a]');
+                    checkbox.classList.remove('border-[#e0e0dc]');
+                    checkbox.classList.add('border-transparent', 'bg-white');
+                    if (!icon) {
+                        checkbox.innerHTML = '<svg class="w-2.5 h-2.5 text-[#0a0a0a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+                    }
+                    span.classList.add('text-white', 'font-medium');
+                } else {
+                    label.classList.remove('bg-[#0a0a0a]');
+                    checkbox.classList.add('border-[#e0e0dc]');
+                    checkbox.classList.remove('border-transparent', 'bg-white');
+                    checkbox.innerHTML = '';
+                    span.classList.remove('text-white', 'font-medium');
+                }
+            });
+
+            // Auto-submit the form
+            if (filterForm) {
+                filterForm.submit();
+            }
+        });
+    });
+});
+</script>
 @endsection

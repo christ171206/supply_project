@@ -117,8 +117,8 @@
                     <tr class="border-b border-[#efefed] last:border-b-0 hover:bg-[#f7f7f5] transition-colors">
                         <td class="px-5 py-3.5 font-mono text-[12px] text-[#666660]">#{{ $commande->id }}</td>
                         <td class="px-5 py-3.5">
-                            <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $commande->user->name }}</div>
-                            <div class="font-mono text-[11px] text-[#a0a09a]">{{ $commande->user->email }}</div>
+                            <div class="text-[13px] font-medium text-[#0a0a0a]">{{ $commande->user?->name ?? 'Utilisateur inconnu' }}</div>
+                            <div class="font-mono text-[11px] text-[#a0a09a]">{{ $commande->user?->email ?? '—' }}</div>
                         </td>
                         <td class="px-5 py-3.5 text-right font-mono text-[13px] font-medium text-[#0a0a0a]">
                             {{ number_format($commande->total, 0, ',', ' ') }}

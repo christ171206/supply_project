@@ -21,6 +21,8 @@ use App\Http\Controllers\NotificationController;
 Route::get('/', [ProduitController::class, 'index'])->name('accueil');
 Route::get('/produits', [ProduitController::class, 'catalogue'])->name('produits.catalogue');
 Route::get('/produits/{id}', [ProduitController::class, 'show'])->name('produits.show');
+Route::get('/recherche', [SearchController::class, 'index'])->name('search.index');
+Route::get('/pwa-install', fn() => view('pwa-demo'))->name('pwa.install');
 
 // API Routes
 Route::get('/api/produits/{id}', function ($id) {

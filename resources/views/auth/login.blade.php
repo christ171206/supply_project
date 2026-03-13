@@ -51,7 +51,8 @@
                     placeholder="votre@email.com"
                     required
                     autofocus
-                    class="w-full px-3 py-2.5 border border-[#e0e0dc] rounded-lg text-[13px] text-[#0a0a0a] placeholder:text-[#a0a09a] outline-none focus:border-[#0a0a0a] hover:border-[#a0a09a] transition-colors bg-white"
+                    class="w-full px-3 py-2.5 bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg text-[13px] text-[#0a0a0a]
+                           placeholder-[#a0a09a] outline-none focus:bg-white focus:border-[#0a0a0a] transition-all"
                 />
                 @error('email')
                     <div class="mt-1 text-[11px] text-[#dc2626] font-light">{{ $message }}</div>
@@ -69,14 +70,15 @@
                         name="password"
                         placeholder="••••••••"
                         required
-                        class="w-full px-3 py-2.5 border border-[#e0e0dc] rounded-lg text-[13px] text-[#0a0a0a] placeholder:text-[#a0a09a] outline-none focus:border-[#0a0a0a] hover:border-[#a0a09a] transition-colors bg-white pr-10"
+                        class="w-full px-3 py-2.5 pr-10 bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg text-[13px] text-[#0a0a0a]
+                               placeholder-[#a0a09a] outline-none focus:bg-white focus:border-[#0a0a0a] transition-all"
                     />
                     <button
                         type="button"
                         class="absolute right-3 top-1/2 -translate-y-1/2 text-[#a0a09a] hover:text-[#0a0a0a] transition-colors"
                         onclick="const input = document.getElementById('password'); input.type = input.type === 'password' ? 'text' : 'password';"
                     >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                             <circle cx="12" cy="12" r="3"/>
                         </svg>
@@ -127,60 +129,61 @@
             </div>
 
             <div class="space-y-2">
-                {{-- Client Test --}}
-                <button
-                    type="button"
-                    onclick="
-                        document.getElementById('email').value = 'client@test.com';
-                        document.getElementById('password').value = 'password';
-                        document.getElementById('email').focus();
-                    "
-                    class="w-full p-3 border border-[#e0e0dc] rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition-all text-left group"
-                >
-                    <div class="text-[12px] font-medium text-[#0a0a0a]">👤 Client Test</div>
-                    <div class="text-[11px] text-[#a0a09a] font-mono mt-1">
-                        <span class="block">client@test.com</span>
-                        <span class="block text-[10px] text-[#666660] font-light">password</span>
+                {{-- Client --}}
+                <button type="button"
+                    onclick="document.getElementById('email').value='client@test.com';document.getElementById('password').value='password';document.getElementById('email').focus();"
+                    class="w-full p-3 border border-[#e0e0dc] rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition-all text-left">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-5 h-5 bg-[#0a0a0a] rounded flex items-center justify-center flex-shrink-0">
+                            <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <span class="text-[12px] font-medium text-[#0a0a0a]">Client</span>
+                    </div>
+                    <div class="font-mono text-[11px] text-[#a0a09a] pl-7">client@test.com
+                        <span class="text-[10px] text-[#666660] font-sans font-light ml-2">password</span>
                     </div>
                 </button>
 
-                {{-- Vendeur Test --}}
-                <button
-                    type="button"
-                    onclick="
-                        document.getElementById('email').value = 'testshop@supply.ci';
-                        document.getElementById('password').value = 'testshop123';
-                        document.getElementById('email').focus();
-                    "
-                    class="w-full p-3 border border-[#e0e0dc] rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition-all text-left group"
-                >
-                    <div class="text-[12px] font-medium text-[#0a0a0a]">🏪 Vendeur Test</div>
-                    <div class="text-[11px] text-[#a0a09a] font-mono mt-1">
-                        <span class="block">testshop@supply.ci</span>
-                        <span class="block text-[10px] text-[#666660] font-light">testshop123</span>
+                {{-- Vendeur --}}
+                <button type="button"
+                    onclick="document.getElementById('email').value='testshop@supply.ci';document.getElementById('password').value='testshop123';document.getElementById('email').focus();"
+                    class="w-full p-3 border border-[#e0e0dc] rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition-all text-left">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-5 h-5 bg-[#0a0a0a] rounded flex items-center justify-center flex-shrink-0">
+                            <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                            </svg>
+                        </div>
+                        <span class="text-[12px] font-medium text-[#0a0a0a]">Vendeur</span>
+                    </div>
+                    <div class="font-mono text-[11px] text-[#a0a09a] pl-7">testshop@supply.ci
+                        <span class="text-[10px] text-[#666660] font-sans font-light ml-2">testshop123</span>
                     </div>
                 </button>
 
-                {{-- Admin Test --}}
-                <button
-                    type="button"
-                    onclick="
-                        document.getElementById('email').value = 'admin@supply.ci';
-                        document.getElementById('password').value = 'admin123';
-                        document.getElementById('email').focus();
-                    "
-                    class="w-full p-3 border border-[#e0e0dc] rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition-all text-left group"
-                >
-                    <div class="text-[12px] font-medium text-[#0a0a0a]">👨‍💼 Admin Test</div>
-                    <div class="text-[11px] text-[#a0a09a] font-mono mt-1">
-                        <span class="block">admin@supply.ci</span>
-                        <span class="block text-[10px] text-[#666660] font-light">admin123</span>
+                {{-- Admin --}}
+                <button type="button"
+                    onclick="document.getElementById('email').value='admin@supply.ci';document.getElementById('password').value='admin123';document.getElementById('email').focus();"
+                    class="w-full p-3 border border-[#e0e0dc] rounded-lg hover:border-[#0a0a0a] hover:bg-[#f7f7f5] transition-all text-left">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-5 h-5 bg-[#0a0a0a] rounded flex items-center justify-center flex-shrink-0">
+                            <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                        </div>
+                        <span class="text-[12px] font-medium text-[#0a0a0a]">Admin</span>
+                    </div>
+                    <div class="font-mono text-[11px] text-[#a0a09a] pl-7">admin@supply.ci
+                        <span class="text-[10px] text-[#666660] font-sans font-light ml-2">admin123</span>
                     </div>
                 </button>
             </div>
 
-            <div class="mt-4 p-3 bg-[#fef3c7] border border-[#fde68a] rounded-lg text-[11px] text-[#92400e] font-light">
-                💡 <strong>Astuce:</strong> Cliquez sur un compte pour remplir automatiquement les champs
+            {{-- Astuce --}}
+            <div class="mt-4 p-3 bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg text-[11px] text-[#666660] font-light">
+                Cliquez sur un compte pour remplir automatiquement les champs de connexion.
             </div>
         </div>
 

@@ -23,6 +23,7 @@ class Produit extends Model
 
     protected $casts = [
         'est_actif' => 'boolean',
+        'featured' => 'boolean',
         'images' => 'array',
     ];
 
@@ -74,6 +75,11 @@ class Produit extends Model
         return $this->hasMany(StockMouvement::class);
     }
 
+    public function stockAlert()
+    {
+        return $this->hasOne(StockAlert::class);
+    }
+
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
@@ -88,6 +94,52 @@ class Produit extends Model
     public function isStockCritique()
     {
         return $this->stock <= $this->stock_minimum;
+    }
+
+    /**
+     * Vérifier et déclencher une alerte si nécessaire
+     */
+    public function checkAndTriggerStockAlert(): void
+    {
+        try {
+            $alert = $this->stockAlert;
+
+            // Si pas d'alerte configurée, on ne fait rien
+            if (!$alert || !$alert->is_active) {
+                return;
+            }
+
+            // Vérifier si on doit envoyer une alerte
+            $isBelowThreshold = $this->stock <= $alert->alert_threshold;
+
+            if ($isBelowThreshold) {
+                // Déterminer le type d'alerte
+                $alertType = $this->stock === 0 ? 'critical' : 'low';
+
+                // Vérifier si on a déjà envoyé une alerte aujourd'hui
+                $lastAlert = $alert->last_alert_sent;
+                $shouldSendAlert = !$lastAlert || $lastAlert->diffInHours(now()) >= 24;
+
+                if ($shouldSendAlert) {
+                    // Déclencher l'événement
+                    \App\Events\StockAlertTriggered::dispatch($this, $alert, $alertType);
+
+                    // Mettre à jour last_alert_sent
+                    $alert->update(['last_alert_sent' => now()]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("Erreur vérification alerte stock: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Mettre à jour le stock et déclencher les alertes
+     */
+    public function updateStockWithAlert(int $newQuantity, string $movementType, string $reason, ?int $commandeId = null): void
+    {
+        $this->update(['stock' => $newQuantity]);
+        $this->checkAndTriggerStockAlert();
     }
 
     // Méthode pour enregistrer un mouvement de stock

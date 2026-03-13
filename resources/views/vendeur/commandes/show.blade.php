@@ -203,4 +203,170 @@
         </div>
     </div>
 </div>
+
+<script>
+// Order confirmation payment animation
+document.addEventListener('DOMContentLoaded', function() {
+    // Find the "Confirmer" form (changing status to "confirmee")
+    const confirmForms = Array.from(document.querySelectorAll('form[action*="update-status"]'))
+        .filter(form => {
+            const hidden = form.querySelector('input[name="statut"]')
+            return hidden && hidden.value === 'confirmee'
+        })
+
+    confirmForms.forEach(form => {
+        const submitBtn = form.querySelector('button[type="submit"]')
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault()
+
+                // Show payment simulation modal
+                Swal.fire({
+                    title: 'Confirmer la commande',
+                    html: `
+                        <div style="text-align: center; padding: 20px;">
+                            <p style="color: #666660; margin-bottom: 20px; font-family: Geist, sans-serif; font-size: 14px;">
+                                Cette action confirmera la commande et simulera le traitement du paiement.
+                            </p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    iconColor: '#0a0a0a',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0a0a0a',
+                    cancelButtonColor: '#e0e0dc',
+                    confirmButtonText: 'Confirmer',
+                    cancelButtonText: 'Annuler',
+                    customClass: {
+                        popup: 'supply-order-confirm-modal',
+                        title: 'supply-modal-title',
+                        htmlContainer: 'supply-modal-content',
+                        confirmButton: 'supply-btn-confirm',
+                        cancelButton: 'supply-btn-cancel'
+                    },
+                    didOpen: (modal) => {
+                        // Apply Supply theme styling
+                        const popup = modal.querySelector('.supply-order-confirm-modal')
+                        if (popup) {
+                            popup.style.borderRadius = '8px'
+                            popup.style.border = '1px solid #e0e0dc'
+                            popup.style.backgroundColor = '#ffffff'
+                        }
+
+                        const title = modal.querySelector('.supply-modal-title')
+                        if (title) {
+                            title.style.color = '#0a0a0a'
+                            title.style.fontFamily = 'Instrument Serif, serif'
+                            title.style.fontSize = '20px'
+                            title.style.marginBottom = '12px'
+                        }
+
+                        const confirmBtn = modal.querySelector('.supply-btn-confirm')
+                        if (confirmBtn) {
+                            confirmBtn.style.backgroundColor = '#0a0a0a'
+                            confirmBtn.style.color = '#ffffff'
+                            confirmBtn.style.border = 'none'
+                            confirmBtn.style.borderRadius = '6px'
+                            confirmBtn.style.padding = '10px 24px'
+                            confirmBtn.style.fontWeight = '500'
+                            confirmBtn.style.cursor = 'pointer'
+                        }
+
+                        const cancelBtn = modal.querySelector('.supply-btn-cancel')
+                        if (cancelBtn) {
+                            cancelBtn.style.backgroundColor = 'transparent'
+                            cancelBtn.style.color = '#666660'
+                            cancelBtn.style.border = '1px solid #e0e0dc'
+                            cancelBtn.style.borderRadius = '6px'
+                            cancelBtn.style.padding = '10px 24px'
+                            cancelBtn.style.fontWeight = '500'
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading animation
+                        Swal.fire({
+                            title: 'Traitement du paiement',
+                            html: `
+                                <div style="text-align: center; padding: 40px 20px;">
+                                    <svg style="width: 60px; height: 60px; animation: spin 2s linear infinite; margin-bottom: 20px;" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10" stroke-dasharray="62.8" stroke-dashoffset="15.7" stroke-linecap="round"></circle>
+                                    </svg>
+                                    <p style="color: #666660; font-family: Geist, sans-serif; font-size: 14px; margin-bottom: 20px;">
+                                        Vérification du paiement en cours...
+                                    </p>
+                                    <div style="width: 100%; height: 4px; background: #e0e0dc; border-radius: 2px; overflow: hidden;">
+                                        <div style="width: 0%; height: 100%; background: #0a0a0a; animation: progress 3s ease-in-out forwards;"></div>
+                                    </div>
+                                </div>
+                                <style>
+                                    @keyframes spin {
+                                        from { transform: rotate(0deg); }
+                                        to { transform: rotate(360deg); }
+                                    }
+                                    @keyframes progress {
+                                        from { width: 0%; }
+                                        to { width: 100%; }
+                                    }
+                                </style>
+                            `,
+                            icon: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            customClass: {
+                                popup: 'supply-loading-modal'
+                            },
+                            didOpen: (modal) => {
+                                const popup = modal.querySelector('.supply-loading-modal')
+                                if (popup) {
+                                    popup.style.borderRadius = '8px'
+                                    popup.style.border = '1px solid #e0e0dc'
+                                    popup.style.backgroundColor = '#ffffff'
+                                }
+                            }
+                        })
+
+                        // Simulate payment processing (3 seconds)
+                        setTimeout(() => {
+                            // Show success message
+                            Swal.fire({
+                                title: 'Paiement confirmé! ✅',
+                                html: `
+                                    <div style="text-align: center; padding: 20px;">
+                                        <p style="color: #666660; font-family: Geist, sans-serif; font-size: 14px; margin-bottom: 10px;">
+                                            La commande a été confirmée et le paiement a été traité avec succès.
+                                        </p>
+                                        <p style="color: #15803d; font-family: Geist Mono, monospace; font-size: 12px; margin-top: 15px;">
+                                            La page sera actualisée...
+                                        </p>
+                                    </div>
+                                `,
+                                icon: 'success',
+                                iconColor: '#15803d',
+                                confirmButtonColor: '#0a0a0a',
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    popup: 'supply-success-modal',
+                                    title: 'supply-modal-title'
+                                },
+                                didOpen: (modal) => {
+                                    const popup = modal.querySelector('.supply-success-modal')
+                                    if (popup) {
+                                        popup.style.borderRadius = '8px'
+                                        popup.style.border = '1px solid #e0e0dc'
+                                        popup.style.backgroundColor = '#ffffff'
+                                    }
+                                }
+                            }).then(() => {
+                                // Submit the actual form after animation
+                                form.submit()
+                            })
+                        }, 3000)
+                    }
+                })
+            })
+        }
+    })
+})
+</script>
 @endsection

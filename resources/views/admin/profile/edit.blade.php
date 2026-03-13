@@ -1,126 +1,133 @@
 @extends('layouts.admin-layout')
 
-@section('title', 'Éditer Profil')
+@section('title', 'Profil — Supply Admin')
+
+@section('breadcrumb')
+    Espace Admin &nbsp;/&nbsp; Profil
+@endsection
 
 @section('content')
-<div class="max-w-2xl mx-auto">
-    <!-- Header -->
-    <div class="mb-8">
-        <div class="flex items-center gap-3 mb-2">
-            <x-heroicon-o-user class="w-8 h-8 text-blue-600" />
-            <h1 class="text-3xl font-bold text-gray-900">Éditer Profil</h1>
-        </div>
-        <p class="text-gray-600">Gérez les informations de votre profil administrateur</p>
+<div class="pb-16">
+
+    {{-- HEADER --}}
+    <div class="bg-[#0a0a0a] px-8 pt-10 pb-8 mb-8">
+        <div class="text-[10px] font-medium tracking-[0.15em] uppercase text-white/40 mb-2">Administration</div>
+        <h1 class="font-serif text-[32px] tracking-tight text-white leading-none">Profil</h1>
+        <p class="text-[13px] text-white/40 font-light mt-1.5">Informations de votre compte administrateur</p>
     </div>
 
-    <!-- Success Message -->
-    @if (session('success'))
-        <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p class="text-sm text-green-800">{{ session('success') }}</p>
+    <div class="px-8">
+    <div class="max-w-xl space-y-5">
+
+        {{-- Flash success --}}
+        @if(session('success'))
+            <div class="flex items-center gap-2 px-4 py-3 bg-[#f0fdf4] border border-[#bbf7d0] rounded-xl">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#22c55e] flex-shrink-0"></span>
+                <p class="text-[12px] text-[#15803d]">{{ session('success') }}</p>
+            </div>
+        @endif
+
+        {{-- Avatar + infos --}}
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            <div class="px-6 py-5 flex items-center gap-5 border-b border-[#efefed]">
+                <div class="w-12 h-12 bg-[#0a0a0a] rounded-md flex items-center justify-center flex-shrink-0">
+                    <span class="text-white text-[16px] font-medium font-mono">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[14px] font-medium text-[#0a0a0a] truncate">{{ auth()->user()->name }}</div>
+                    <div class="text-[12px] text-[#a0a09a] font-light mt-0.5">{{ auth()->user()->email }}</div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded bg-[#f0fdf4] text-[#15803d] flex-shrink-0">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#22c55e]"></span>Administrateur
+                </span>
+            </div>
+            <div class="px-6 py-3">
+                <p class="text-[11px] text-[#a0a09a] font-light">
+                    Pour modifier votre email ou mot de passe, rendez-vous dans
+                    <a href="{{ route('admin.security.index') }}" class="text-[#0a0a0a] underline underline-offset-2">Sécurité</a>.
+                </p>
+            </div>
         </div>
-    @endif
 
-    <!-- Profile Form -->
-    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6 space-y-6">
-        <!-- Avatar Section -->
-        <div class="flex items-center gap-6 pb-6 border-b border-gray-200">
-            <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                {{ substr(auth()->user()->name, 0, 1) }}
-            </div>
-            <div>
-                <p class="text-sm font-semibold text-gray-700 mb-2">Photo de profil</p>
-                <button type="button" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
-                    Changer la photo
-                </button>
-            </div>
-        </div>
+        {{-- Formulaire --}}
+        <form action="{{ route('admin.profile.update') }}" method="POST">
+            @csrf @method('PUT')
 
-        <!-- Form -->
-        <form action="{{ route('admin.profile.update') }}" method="POST" class="space-y-6">
-            @csrf
-            @method('PUT')
+            <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+                <div class="px-6 py-4 border-b border-[#efefed]">
+                    <span class="text-[12px] font-medium text-[#0a0a0a]">Modifier les informations</span>
+                </div>
 
-            <!-- Name -->
-            <div>
-                <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Nom Complet
-                </label>
-                <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    value="{{ auth()->user()->name }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
-            </div>
+                <div class="divide-y divide-[#efefed]">
 
-            <!-- Email (Read-only) -->
-            <div>
-                <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Email
-                </label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    value="{{ auth()->user()->email }}"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-                    disabled
-                >
-                <p class="text-xs text-gray-500 mt-1">L'email ne peut pas être modifié</p>
-            </div>
+                    {{-- Nom --}}
+                    <div class="px-6 py-4">
+                        <label for="name" class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">
+                            Nom complet
+                        </label>
+                        <input type="text" id="name" name="name"
+                               value="{{ old('name', auth()->user()->name) }}"
+                               class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                                      focus:bg-white focus:border-[#0a0a0a] outline-none transition-all"
+                               required>
+                        @error('name')
+                            <p class="text-[11px] text-[#dc2626] mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-            <!-- Phone (Optional) -->
-            <div>
-                <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Téléphone (Optionnel)
-                </label>
-                <input 
-                    type="tel" 
-                    id="phone" 
-                    name="phone"
-                    placeholder="+225 XX XX XX XX"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-            </div>
+                    {{-- Email (readonly) --}}
+                    <div class="px-6 py-4">
+                        <label class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">
+                            Email
+                        </label>
+                        <input type="email" value="{{ auth()->user()->email }}"
+                               class="w-full bg-[#efefed] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#a0a09a]
+                                      cursor-not-allowed"
+                               disabled>
+                        <p class="text-[11px] text-[#a0a09a] font-light mt-1">Non modifiable depuis cette page</p>
+                    </div>
 
-            <!-- Bio (Optional) -->
-            <div>
-                <label for="bio" class="block text-sm font-semibold text-gray-700 mb-2">
-                    Bio (Optionnel)
-                </label>
-                <textarea 
-                    id="bio" 
-                    name="bio"
-                    rows="4"
-                    placeholder="Décrivez votre rôle et responsabilités..."
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                ></textarea>
-            </div>
+                    {{-- Téléphone --}}
+                    <div class="px-6 py-4">
+                        <label for="phone" class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">
+                            Téléphone <span class="normal-case tracking-normal font-light">— optionnel</span>
+                        </label>
+                        <input type="tel" id="phone" name="phone"
+                               value="{{ old('phone', auth()->user()->phone ?? '') }}"
+                               placeholder="+225 XX XX XX XX"
+                               class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                                      placeholder-[#a0a09a] focus:bg-white focus:border-[#0a0a0a] outline-none transition-all">
+                    </div>
 
-            <!-- Buttons -->
-            <div class="flex gap-3 pt-6 border-t border-gray-200">
-                <button 
-                    type="submit" 
-                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
-                >
-                    Enregistrer les modifications
-                </button>
-                <a 
-                    href="{{ route('admin.dashboard') }}" 
-                    class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold"
-                >
-                    Annuler
-                </a>
+                    {{-- Bio --}}
+                    <div class="px-6 py-4">
+                        <label for="bio" class="block text-[10px] font-medium tracking-[0.06em] uppercase text-[#a0a09a] mb-1.5">
+                            Bio <span class="normal-case tracking-normal font-light">— optionnel</span>
+                        </label>
+                        <textarea id="bio" name="bio" rows="3"
+                                  placeholder="Décrivez votre rôle et responsabilités…"
+                                  class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2 text-[13px] text-[#0a0a0a]
+                                         placeholder-[#a0a09a] focus:bg-white focus:border-[#0a0a0a] outline-none transition-all resize-none">{{ old('bio', auth()->user()->bio ?? '') }}</textarea>
+                    </div>
+
+                </div>
+
+                {{-- Footer --}}
+                <div class="px-6 py-4 border-t border-[#efefed] flex items-center gap-3">
+                    <button type="submit"
+                            class="bg-[#0a0a0a] text-white text-[12px] font-medium px-5 py-2 rounded-lg hover:opacity-85 transition-opacity">
+                        Enregistrer
+                    </button>
+                    <a href="{{ route('admin.dashboard') }}"
+                       class="text-[12px] font-medium text-[#666660] border border-[#e0e0dc] px-5 py-2 rounded-lg
+                              hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                        Annuler
+                    </a>
+                </div>
             </div>
         </form>
-    </div>
 
-    <!-- Additional Info -->
-    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p class="text-sm text-blue-900">
-            <strong>Note :</strong> Votre adresse email est liée à votre compte de connexion. Pour modifier votre email ou votre mot de passe, veuillez accéder à la section <a href="{{ route('admin.security.index') }}" class="text-blue-600 hover:text-blue-700 font-semibold">Sécurité</a>.
-        </p>
+    </div>
     </div>
 </div>
 @endsection
