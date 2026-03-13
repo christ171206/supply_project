@@ -45,6 +45,7 @@
             @php
                 $navItems = [
                     ['route'=>'admin.dashboard',      'label'=>'Dashboard',    'icon'=>'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>'],
+                    ['route'=>'admin.statistics.index','label'=>'Statistiques', 'icon'=>'<path d="M3 3v18h18"/><path d="M18 17V9m-5 8V5m-5 12v-3m-5 3V11"/><circle cx="8" cy="11" r="1"/><circle cx="13" cy="5" r="1"/><circle cx="18" cy="9" r="1"/>'],
                     ['route'=>'admin.users.index',    'label'=>'Utilisateurs', 'icon'=>'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'],
                     ['route'=>'admin.products.index', 'label'=>'Produits',     'icon'=>'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>'],
                     ['route'=>'admin.categories.index','label'=>'Catégories',  'icon'=>'<rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/>'],
@@ -65,13 +66,23 @@
                 </a>
             @endforeach
 
-            <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/15 px-3 pt-5 pb-2">Rapports</div>
-            <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] text-white/20 cursor-not-allowed select-none">
-                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                </svg>
-                Audit Logs
-            </div>
+            <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/15 px-3 pt-5 pb-2">Rapports & Analyses</div>
+            @php
+                $reportItems = [
+                    ['route' => 'admin.reports.index', 'label' => 'Rapports détaillés', 'icon' => '<path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M3 9v6c0 1.105 4.03 2 9 2s9-.895 9-2V9"/><path d="M3 15v6c0 1.105 4.03 2 9 2s9-.895 9-2v-6"/>'],
+                ];
+            @endphp
+            @foreach($reportItems as $item)
+                @php $active = str_contains(Route::currentRouteName(), str_replace('admin.', '', $item['route'])); @endphp
+                <a href="{{ route($item['route']) }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+                          {{ $active ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        {!! $item['icon'] !!}
+                    </svg>
+                    {{ $item['label'] }}
+                </a>
+            @endforeach
         </nav>
 
         {{-- User row --}}

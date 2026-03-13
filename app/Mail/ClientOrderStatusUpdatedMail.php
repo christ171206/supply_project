@@ -16,7 +16,6 @@ class ClientOrderStatusUpdatedMail extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     private string $statusLabel;
-    private string $statusIcon;
     private string $statusColor;
 
     /**
@@ -35,34 +34,28 @@ class ClientOrderStatusUpdatedMail extends Mailable implements ShouldQueue
         $statusMap = [
             'en_attente' => [
                 'label' => 'En attente de confirmation',
-                'icon' => '⏳',
                 'color' => '#f59e0b',
             ],
             'confirmee' => [
                 'label' => 'Confirmée',
-                'icon' => '✅',
-                'color' => '#10b981',
+                'color' => '#60a5fa',
             ],
             'expediee' => [
                 'label' => 'Expédiée',
-                'icon' => '📦',
-                'color' => '#3b82f6',
+                'color' => '#a78bfa',
             ],
             'livree' => [
                 'label' => 'Livrée',
-                'icon' => '🎉',
-                'color' => '#8b5cf6',
+                'color' => '#22c55e',
             ],
             'annulee' => [
                 'label' => 'Annulée',
-                'icon' => '❌',
-                'color' => '#ef4444',
+                'color' => '#f87171',
             ],
         ];
 
         $info = $statusMap[$status] ?? $statusMap['en_attente'];
         $this->statusLabel = $info['label'];
-        $this->statusIcon = $info['icon'];
         $this->statusColor = $info['color'];
     }
 
@@ -72,15 +65,15 @@ class ClientOrderStatusUpdatedMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         $subject = match ($this->commande->statut) {
-            'confirmee' => '✅ Votre commande a été confirmée',
-            'expediee' => '📦 Votre commande a été expédiée',
-            'livree' => '🎉 Votre commande a été livrée',
-            'annulee' => '❌ Votre commande a été annulée',
-            default => '⏳ Mise à jour de votre commande',
+            'confirmee' => 'Votre commande a été confirmée',
+            'expediee'  => 'Votre commande a été expédiée',
+            'livree'    => 'Votre commande a été livrée',
+            'annulee'   => 'Votre commande a été annulée',
+            default     => 'Mise à jour de votre commande',
         };
 
         return new Envelope(
-            from: new Address('noreply@supply.local', 'Supply - Plateforme E-commerce'),
+            from: new Address('noreply@supply.local', 'Supply'),
             to: [new Address($this->commande->user->email, $this->commande->user->name)],
             subject: $subject,
         );
@@ -94,11 +87,10 @@ class ClientOrderStatusUpdatedMail extends Mailable implements ShouldQueue
         return new Content(
             view: 'emails.client-order-status-updated',
             with: [
-                'commande' => $this->commande,
+                'commande'    => $this->commande,
                 'statusLabel' => $this->statusLabel,
-                'statusIcon' => $this->statusIcon,
                 'statusColor' => $this->statusColor,
-                'orderUrl' => route('commandes.show', $this->commande),
+                'orderUrl'    => route('commandes.show', $this->commande),
             ],
         );
     }

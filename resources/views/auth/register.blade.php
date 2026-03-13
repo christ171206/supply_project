@@ -170,9 +170,9 @@
                                   placeholder-[#a0a09a] outline-none focus:bg-white focus:border-[#0a0a0a] transition-all" />
                 </div>
                 <div>
-                    <label for="address" class="block text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Adresse</label>
+                    <label for="address" class="block text-[11px] font-medium tracking-[0.05em] uppercase text-[#a0a09a] mb-2">Adresse de la boutique</label>
                     <input id="address" type="text" name="address" value="{{ old('address') }}"
-                           placeholder="123 Rue de la Paix"
+                           placeholder="Treicheville, Abidjan"
                            class="w-full px-3 py-2.5 bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg text-[13px] text-[#0a0a0a]
                                   placeholder-[#a0a09a] outline-none focus:bg-white focus:border-[#0a0a0a] transition-all" />
                 </div>

@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminDisputeController;
 use App\Http\Controllers\Admin\AdminConfigurationController;
 use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\AdminReportsController;
+use App\Http\Controllers\Admin\AdminStatisticsController;
 use App\Http\Controllers\Admin\AdminVendorController;
 use App\Http\Controllers\Admin\AdminAuditController;
 use App\Http\Controllers\Admin\AdminCategoryController;
@@ -157,6 +159,34 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->name('admin.')->group
         Route::get('stock-audit', [AdminReportController::class, 'stockAuditReport'])->name('stock-audit');
         Route::get('annual', [AdminReportController::class, 'annualReport'])->name('annual');
         Route::post('export', [AdminReportController::class, 'exportReport'])->name('export');
+    });
+
+    // Statistiques avec graphiques et exports
+    Route::prefix('statistics')->name('statistics.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'index'])->name('index');
+
+        // API endpoints pour les graphiques
+        Route::get('api/daily-revenue', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'dailyRevenueChart'])->name('api.daily-revenue');
+        Route::get('api/top-vendors', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'topVendorsChart'])->name('api.top-vendors');
+        Route::get('api/top-products', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'topProductsChart'])->name('api.top-products');
+        Route::get('api/monthly-growth', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'monthlyGrowthChart'])->name('api.monthly-growth');
+        Route::get('api/order-status', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'orderStatusChart'])->name('api.order-status');
+        Route::get('api/categories', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'categoriesChart'])->name('api.categories');
+        Route::get('api/user-growth', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'userGrowthChart'])->name('api.user-growth');
+        Route::get('api/detailed-stats', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'detailedStats'])->name('api.detailed-stats');
+
+        // Exports
+        Route::get('export/csv', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'exportCSV'])->name('export.csv');
+        Route::get('export/pdf', [\App\Http\Controllers\Admin\AdminStatisticsController::class, 'exportPDF'])->name('export.pdf');
+    });
+
+    // Rapports avancés
+    Route::prefix('reports-advanced')->name('reports.')->group(function () {
+        Route::get('/', [AdminReportsController::class, 'index'])->name('index');
+        Route::get('sales-by-period', [AdminReportsController::class, 'salesByPeriod'])->name('sales-by-period');
+        Route::get('orders', [AdminReportsController::class, 'ordersReport'])->name('orders');
+        Route::get('export/csv', [AdminReportsController::class, 'exportCSV'])->name('export.csv');
+        Route::get('export/pdf', [AdminReportsController::class, 'exportPDF'])->name('export.pdf');
     });
 
     // Mode Visualisation Client

@@ -196,5 +196,19 @@ Route::middleware(['auth', 'vendeur'])->prefix('vendeur')->name('vendeur.')->gro
     Route::post('/switch-client', [VendeurProduitController::class, 'switchToClient'])->name('switch-client');
 });
 
+// Notifications (pour tous les utilisateurs authentifiés)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [\App\Http\Controllers\NotificationCenterController::class, 'index'])->name('notifications.center');
+    Route::get('/api/notifications/recent', [\App\Http\Controllers\NotificationCenterController::class, 'getRecent'])->name('notifications.recent');
+    Route::get('/api/notifications/unread-count', [\App\Http\Controllers\NotificationCenterController::class, 'getUnreadCount'])->name('notifications.unread-count');
+    Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationCenterController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationCenterController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationCenterController::class, 'destroy'])->name('notifications.destroy');
+    Route::post('/notifications/clear-read', [\App\Http\Controllers\NotificationCenterController::class, 'clearRead'])->name('notifications.clear-read');
+
+    // Alertes vendeur
+    Route::get('/vendeur/alerts', [\App\Http\Controllers\VendorAlertsController::class, 'index'])->name('vendor.alerts');
+});
+
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';

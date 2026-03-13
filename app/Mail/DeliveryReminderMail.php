@@ -30,10 +30,14 @@ class DeliveryReminderMail extends Mailable implements ShouldQueue
      */
     public function envelope(): Envelope
     {
+        $days = $this->daysUntilDelivery === 1
+            ? 'demain'
+            : 'dans ' . $this->daysUntilDelivery . ' jours';
+
         return new Envelope(
-            from: new Address('noreply@supply.local', 'Supply - Suivi Livraison'),
+            from: new Address('noreply@supply.local', 'Supply'),
             to: [new Address($this->client->email, $this->client->name)],
-            subject: '📦 Rappel: Votre colis arrive dans ' . $this->daysUntilDelivery . ' jour(s)',
+            subject: 'Votre colis arrive ' . $days,
         );
     }
 
@@ -45,13 +49,13 @@ class DeliveryReminderMail extends Mailable implements ShouldQueue
         return new Content(
             view: 'emails.delivery-reminder',
             with: [
-                'client' => $this->client,
-                'commande' => $this->commande,
+                'client'            => $this->client,
+                'commande'          => $this->commande,
                 'daysUntilDelivery' => $this->daysUntilDelivery,
-                'totalAmount' => $this->commande->total,
-                'orderNumber' => $this->commande->numero ?? 'CMD-' . $this->commande->id,
-                'trackingUrl' => route('commandes.track', $this->commande),
-                'commandeDetails' => route('commandes.show', $this->commande),
+                'totalAmount'       => $this->commande->total,
+                'orderNumber'       => $this->commande->numero ?? 'CMD-' . $this->commande->id,
+                'trackingUrl'       => route('commandes.track', $this->commande),
+                'commandeDetails'   => route('commandes.show', $this->commande),
             ],
         );
     }

@@ -17,7 +17,7 @@ class CoteIvoireLocationSeeder extends Seeder
     {
         // Abidjan
         $abidjan = Region::create(['name' => 'Abidjan', 'code' => 'ABJ']);
-        
+
         // Districts d'Abidjan
         $cocody = District::create(['region_id' => $abidjan->id, 'name' => 'Cocody']);
         $plateau = District::create(['region_id' => $abidjan->id, 'name' => 'Plateau']);

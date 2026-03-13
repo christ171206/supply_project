@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
-        
+
         // Register notification composer for admin layout
         View::composer('layouts.admin-layout', AdminNotificationComposer::class);
     }
