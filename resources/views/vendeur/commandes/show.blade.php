@@ -28,7 +28,7 @@
         <p class="text-[13px] text-[#666660]">Passée le {{ $commande->created_at->format('d/m/Y à H:i') }}</p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
         <!-- Colonne principale: Produits et détails -->
         <div class="lg:col-span-2 space-y-8">
             <!-- Articles commandés -->
@@ -81,15 +81,24 @@
                     <div class="space-y-3">
                         <div class="flex justify-between p-3 bg-[#f7f7f5] rounded text-[13px]">
                             <p class="text-[#666660]">Méthode</p>
-                            <p class="font-medium text-[#0a0a0a]">{{ ucfirst($commande->payment->methode_paiement) }}</p>
+                            <p class="font-medium text-[#0a0a0a]">{{ ucfirst($commande->payment->typePayement ?? 'N/A') }}</p>
+                        </div>
+                        <div class="flex justify-between p-3 bg-[#f7f7f5] rounded text-[13px]">
+                            <p class="text-[#666660]">Montant</p>
+                            <p class="font-mono font-bold text-[#0a0a0a]">{{ number_format($commande->payment->montant ?? $commande->total, 0, ',', ' ') }} CFA</p>
                         </div>
                         <div class="flex justify-between p-3 bg-[#f7f7f5] rounded text-[13px]">
                             <p class="text-[#666660]">Statut</p>
                             <p class="font-medium">
-                                @if($commande->payment->statut == 'complete')
-                                    <span class="text-[#15803d]">Complété</span>
-                                @else
+                                @php
+                                    $status = strtolower($commande->payment->payment_status ?? 'pending');
+                                @endphp
+                                @if($status == 'confirmee' || $status == 'completed')
+                                    <span class="text-[#15803d]">Confirmé</span>
+                                @elseif($status == 'pending' || $status == 'enattente' || $status == 'en_attente')
                                     <span class="text-[#92400e]">En attente</span>
+                                @else
+                                    <span class="text-[#666660]">{{ ucfirst(str_replace('_', ' ', $commande->payment->payment_status ?? 'N/A')) }}</span>
                                 @endif
                             </p>
                         </div>
@@ -101,7 +110,7 @@
         </div>
 
         <!-- Colonne sidebar: Résumé et actions -->
-        <div class="space-y-6">
+        <div class="space-y-6 sticky top-8">
             <!-- Résumé commande -->
             <div class="bg-white border border-[#e0e0dc] rounded-lg p-6">
                 <h2 class="text-lg font-medium text-[#0a0a0a] mb-6">Résumé</h2>

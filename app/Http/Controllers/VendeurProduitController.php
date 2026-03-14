@@ -252,6 +252,12 @@ class VendeurProduitController extends Controller
      */
     public function store(Request $request)
     {
+        // Vérifier la taille totale du POST avant la validation
+        $contentLength = $request->server('CONTENT_LENGTH');
+        if ($contentLength > 10485760) { // 10 MB max
+            return back()->withErrors(['images' => 'Les fichiers uploadés sont trop volumineux. Taille maximale: 10 MB au total. Vérifiez que chaque image ne dépasse pas 2 MB.']);
+        }
+
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'description' => 'required|string',
@@ -260,9 +266,12 @@ class VendeurProduitController extends Controller
             'stock_minimum' => 'required|integer|min:0',
             'est_actif' => 'required|boolean',
             'categorie_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'images' => 'nullable|array|max:5',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'images.*.max' => 'Chaque image ne doit pas dépasser 2 MB.',
+            'image.max' => 'L\'image ne doit pas dépasser 2 MB.',
         ]);
 
         $data = [
@@ -335,6 +344,12 @@ class VendeurProduitController extends Controller
         $user = Auth::user();
         $produit = Produit::where('user_id', $user->id)->findOrFail($id);
 
+        // Vérifier la taille totale du POST avant la validation
+        $contentLength = $request->server('CONTENT_LENGTH');
+        if ($contentLength > 10485760) { // 10 MB max
+            return back()->withErrors(['images' => 'Les fichiers uploadés sont trop volumineux. Taille maximale: 10 MB au total. Vérifiez que chaque image ne dépasse pas 2 MB.']);
+        }
+
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'description' => 'required|string',
@@ -343,10 +358,14 @@ class VendeurProduitController extends Controller
             'stock_minimum' => 'required|integer|min:0',
             'est_actif' => 'required|boolean',
             'categorie_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'images' => 'nullable|array|max:5',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'images.*.max' => 'Chaque image ne doit pas dépasser 2 MB.',
+            'image.max' => 'L\'image ne doit pas dépasser 2 MB.',
         ]);
+
 
         $data = [
             'nom' => $validated['nom'],
@@ -579,14 +598,18 @@ class VendeurProduitController extends Controller
         $noteMoyenne = (clone $avis)->avg('note') ?? 0;
         $nombreAvis = (clone $avis)->count();
 
-        // Top produits
+        // Top produits - Requête directe sur les ventes
         $topProduits = Produit::where('user_id', $user->id)
-            ->with(['ligneCommandes' => function ($q) use ($periode) {
-                $q->whereHas('commande', function ($q2) use ($periode) {
-                    $q2->where('created_at', '>=', now()->subDays($periode));
+            ->withCount(['ligneCommandes as total_ventes' => function ($q) use ($dateDebut) {
+                $q->whereHas('commande', function ($q2) use ($dateDebut) {
+                    $q2->where('created_at', '>=', $dateDebut);
                 });
             }])
-            ->limit(5)
+            ->with(['ligneCommandes' => function ($q) use ($dateDebut) {
+                $q->whereHas('commande', function ($q2) use ($dateDebut) {
+                    $q2->where('created_at', '>=', $dateDebut);
+                });
+            }])
             ->get()
             ->map(function ($p) {
                 $p->ventes_nombre = $p->ligneCommandes->count();
@@ -594,7 +617,10 @@ class VendeurProduitController extends Controller
                     return $lc->quantite * $lc->prix_unitaire;
                 });
                 return $p;
-            });
+            })
+            ->sortByDesc('ventes_total')
+            ->take(5)
+            ->values();
 
         // Commandes par statut
         $commandesEnAttente = Commande::whereHas('ligneCommandes.produit', function ($q) use ($user) {

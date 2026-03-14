@@ -193,7 +193,7 @@
             <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
                 <div class="px-6 py-4 border-b border-[#efefed] flex items-center justify-between">
                     <span class="text-[12px] font-medium text-[#0a0a0a] tracking-tight">Images</span>
-                    <span class="text-[11px] text-[#a0a09a] font-mono">max 5 · JPG, PNG · 5 MB</span>
+                    <span class="text-[11px] text-[#a0a09a] font-mono">max 5 · JPG, PNG · 2 MB chacune</span>
                 </div>
                 <div class="px-6 py-5 space-y-4">
 
@@ -296,6 +296,7 @@ const dropZone        = document.getElementById('dropZone');
 const fileInput       = document.getElementById('images');
 const previewContainer= document.getElementById('preview-container');
 const MAX_IMAGES      = 5;
+const MAX_FILE_SIZE   = 2 * 1024 * 1024; // 2 MB
 let   selectedFiles   = new DataTransfer();
 
 dropZone.addEventListener('click', () => fileInput.click());
@@ -316,9 +317,33 @@ fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
 function handleFiles(files) {
     selectedFiles = new DataTransfer();
-    Array.from(files).slice(0, MAX_IMAGES).forEach(file => {
-        if (file.type.startsWith('image/')) selectedFiles.items.add(file);
+    let skipped = 0;
+    let tooLarge = [];
+    
+    Array.from(files).forEach(file => {
+        // Vérifier la taille
+        if (file.size > MAX_FILE_SIZE) {
+            tooLarge.push(file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)');
+            return;
+        }
+        // Vérifier le type
+        if (!file.type.startsWith('image/')) {
+            skipped++;
+            return;
+        }
+        // Vérifier le nombre max
+        if (selectedFiles.items.length >= MAX_IMAGES) {
+            skipped++;
+            return;
+        }
+        selectedFiles.items.add(file);
     });
+    
+    // Afficher les erreurs
+    if (tooLarge.length > 0) {
+        alert('Les fichiers suivants sont trop volumineux (max 2 MB chacun):\n\n' + tooLarge.join('\n'));
+    }
+    
     fileInput.files = selectedFiles.files;
     showPreviews(selectedFiles.files);
 }

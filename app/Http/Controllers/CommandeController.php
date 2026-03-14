@@ -29,7 +29,7 @@ class CommandeController extends Controller
      */
     public function show($id)
     {
-        $commande = Commande::findOrFail($id);
+        $commande = Commande::with('payment')->findOrFail($id);
 
         // Vérifier que l'utilisateur est propriétaire ou vendeur
         if (auth()->user()->id !== $commande->user_id && auth()->user()->role !== 'vendeur') {
@@ -409,6 +409,13 @@ class CommandeController extends Controller
 
         // Mettre à jour le statut
         $commande->update(['statut' => $newStatus]);
+
+        // Si la commande est marquée comme livrée, marquer le paiement comme confirmé
+        if ($newStatus === 'livree' && $commande->payment) {
+            $commande->payment->update([
+                'payment_status' => 'confirmee'
+            ]);
+        }
 
         // Envoyer un email au client si le statut a changé
         try {
