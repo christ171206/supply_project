@@ -142,6 +142,17 @@
                                 <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded bg-[#fef2f2] text-[#dc2626]">
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#f87171]"></span>Banni
                                 </span>
+                            @elseif($user->role === 'vendor')
+                                @php
+                                    $vendorStatus = match($user->vendor_status ?? '') {
+                                        'approved' => ['bg-[#f0fdf4] text-[#15803d]', 'bg-[#22c55e]', 'Approuvé'],
+                                        'rejected' => ['bg-[#fef2f2] text-[#dc2626]', 'bg-[#f87171]', 'Rejeté'],
+                                        default    => ['bg-[#fdf6ec] text-[#b45309]', 'bg-[#f59e0b]', 'En attente'],
+                                    };
+                                @endphp
+                                <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded {{ $vendorStatus[0] }}">
+                                    <span class="w-1.5 h-1.5 rounded-full {{ $vendorStatus[1] }}"></span>{{ $vendorStatus[2] }}
+                                </span>
                             @else
                                 <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-medium px-2 py-1 rounded bg-[#f0fdf4] text-[#15803d]">
                                     <span class="w-1.5 h-1.5 rounded-full bg-[#22c55e]"></span>Actif
@@ -162,7 +173,7 @@
                                           hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
                                     Voir
                                 </a>
-                                @if($user->role === 'vendor')
+                                @if($user->role === 'vendor' && ($user->vendor_status ?? '') === 'approved')
                                     <a href="{{ route('admin.users.documents', $user) }}"
                                        class="text-[11px] font-medium text-[#666660] border border-[#e0e0dc] px-2.5 py-1.5 rounded-lg
                                               hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">

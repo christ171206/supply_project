@@ -333,12 +333,21 @@
                         </form>
                     </div>
                     <div class="col-md-6">
-                        <form action="{{ route('admin.vendors.reject', $vendor) }}" method="POST">
+                        <form action="{{ route('admin.vendors.reject', $vendor) }}" method="POST" data-confirm="Êtes-vous sûr de vouloir rejeter ce vendeur ?" data-confirm-title="Confirmation du rejet" data-confirm-type="danger" data-confirm-button="Rejeter">
                             @csrf
                             <div class="mb-3">
-                                <label for="reason" class="form-label">Raison du rejet *</label>
-                                <textarea name="reason" id="reason" class="form-control" rows="3" 
-                                    placeholder="Expliquer pourquoi ce vendeur est rejeté..." required></textarea>
+                                <label for="review_notes" class="form-label">
+                                    <i class="fas fa-exclamation-triangle"></i> Raison du rejet <span class="text-danger">*</span>
+                                </label>
+                                <textarea name="review_notes" id="review_notes" class="form-control @error('review_notes') is-invalid @enderror" 
+                                    rows="4" placeholder="Exemple: Documents d'identification manquants ou invalides, justificatif de domicile exprimé..." 
+                                    required>{{ old('review_notes') }}</textarea>
+                                @error('review_notes')
+                                    <div class="invalid-feedback" style="display: block;">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted d-block mt-2">
+                                    💡 <strong>Conseil:</strong> Soyez précis dans la raison du rejet (documents manquants, invalides, données insuffisantes, etc.)
+                                </small>
                             </div>
                             <button type="submit" class="btn btn-danger w-100">
                                 <i class="fas fa-times"></i> Rejeter Vendeur

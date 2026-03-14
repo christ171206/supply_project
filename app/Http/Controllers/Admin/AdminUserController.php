@@ -6,8 +6,11 @@ use App\Models\User;
 use App\Models\UserDocument;
 use App\Models\UserBan;
 use App\Models\AdminRole;
+use App\Services\AuditService;
+use App\Mail\DocumentRejectedMail;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Mail;
 
 class AdminUserController extends Controller
 {
@@ -38,6 +41,7 @@ class AdminUserController extends Controller
         }
 
         $users = $query->with('adminRole', 'activeBan')
+            ->orderBy('created_at', 'desc')
             ->paginate(15);
 
         $adminRoles = AdminRole::all();
@@ -101,13 +105,39 @@ class AdminUserController extends Controller
     public function rejectDocument(Request $request, UserDocument $document)
     {
         $request->validate([
-            'reason' => 'required|string|max:255',
+            'reason' => 'required|string|max:500',
         ]);
 
         $admin = auth()->user();
-        $document->reject($admin, $request->input('reason'));
+        $reason = $request->input('reason');
 
-        return redirect()->back()->with('success', 'Document rejeté avec raison.');
+        // Rejeter le document
+        $document->reject($admin, $reason);
+
+        // Envoyer un mail au vendeur (avec gestion d'erreur)
+        $user = $document->user;
+        try {
+            Mail::to($user->email)->send(new \App\Mail\DocumentRejectedMail($user, $document, $reason));
+        } catch (\Exception $e) {
+            // Logger l'erreur mais ne pas bloquer l'action
+            \Illuminate\Support\Facades\Log::error('Erreur envoi email rejet document', [
+                'document_id' => $document->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Log dans l'audit
+        AuditService::logUpdate(
+            'UserDocument',
+            $document->id,
+            "Document {$document->document_type} de {$user->name}",
+            ['status' => 'pending'],
+            ['status' => 'rejected', 'rejection_reason' => $reason],
+            "Document rejeté: {$reason}"
+        );
+
+        return redirect()->back()->with('success', 'Document rejeté avec succès. Un email a été envoyé au vendeur.');
     }
 
     /**

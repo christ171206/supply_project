@@ -37,7 +37,7 @@ class UserDocument extends Model
     public function approve(User $admin): void
     {
         $this->update([
-            'status' => 'approved',
+            'status' => 'verified',
             'verified_by' => $admin->id,
             'verified_at' => now(),
             'rejection_reason' => null,

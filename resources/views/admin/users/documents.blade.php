@@ -124,14 +124,11 @@
                                     Approuver
                                 </button>
                             </form>
-                            <form method="POST" action="{{ route('admin.users.reject-document', $doc->id) }}" class="inline">
-                                @csrf
-                                <button type="submit"
-                                        class="text-[11px] font-medium text-[#dc2626] border border-[#fecaca] px-2.5 py-1.5 rounded-lg
-                                               hover:bg-[#fef2f2] transition-all">
-                                    Rejeter
-                                </button>
-                            </form>
+                            <button type="button" onclick="openRejectModal('{{ $doc->id }}', '{{ ucfirst(str_replace('_', ' ', $doc->document_type)) }}{{ $doc->document_side ? (' - ' . $doc->document_side) : '' }}')"
+                                    class="text-[11px] font-medium text-[#dc2626] border border-[#fecaca] px-2.5 py-1.5 rounded-lg
+                                           hover:bg-[#fef2f2] transition-all">
+                                Rejeter
+                            </button>
                         </div>
                     </div>
                 @endforeach
@@ -307,7 +304,113 @@
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closePreview();
+            closeRejectModal();
         }
     });
+
+    // Gestion du rejet de document avec modal
+    function openRejectModal(docId, docName) {
+        const modal = document.getElementById('rejectModal');
+        const form = document.getElementById('rejectForm');
+        document.getElementById('rejectDocName').textContent = docName;
+        document.getElementById('rejectReason').value = '';
+        
+        // Set the form action to the correct route
+        form.action = '{{ route("admin.users.reject-document", ":id") }}'.replace(':id', docId);
+        
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('rejectReason').focus();
+    }
+
+    function closeRejectModal() {
+        const modal = document.getElementById('rejectModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    function submitRejectForm() {
+        const form = document.getElementById('rejectForm');
+        const reason = document.getElementById('rejectReason').value.trim();
+        
+        if (!reason) {
+            alert('Veuillez expliquer la raison du rejet');
+            return;
+        }
+        
+        form.submit();
+    }
+
+    // Fermer la modal en cliquant sur le backdrop
+    document.getElementById('rejectModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeRejectModal();
+    });
+</script>
+
+{{-- MODAL: REJET DOCUMENT --}}
+<div id="rejectModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md border border-[#e0e0dc] animate-in fade-in zoom-in-95 duration-200">
+        {{-- Header --}}
+        <div class="px-6 py-5 border-b border-[#efefed]">
+            <h3 class="text-[15px] font-semibold text-[#0a0a0a]">Rejeter le document</h3>
+            <p class="text-[12px] text-[#a0a09a] font-light mt-1">
+                <span id="rejectDocName"></span>
+            </p>
+        </div>
+
+        {{-- Content --}}
+        <div class="px-6 py-4">
+            <form id="rejectForm" method="POST" class="space-y-4">
+                @csrf
+                
+                <div>
+                    <label for="rejectReason" class="block text-[12px] font-medium text-[#0a0a0a] mb-2">
+                        <i class="fas fa-exclamation-triangle text-[#dc2626]"></i> Raison du rejet <span class="text-[#dc2626]">*</span>
+                    </label>
+                    <textarea 
+                        id="rejectReason" 
+                        name="reason" 
+                        class="w-full px-3 py-2.5 border border-[#e0e0dc] rounded-lg text-[13px] focus:border-[#0a0a0a] focus:ring-1 focus:ring-[#0a0a0a] outline-none transition-all resize-none"
+                        placeholder="Exemple: Photo floue, document expiré, informations incomplètes, mauvaise qualité..."
+                        rows="4"
+                        required></textarea>
+                    <small class="text-[11px] text-[#a0a09a] block mt-1.5">
+                        💡 Le motif sera envoyé au vendeur par email
+                    </small>
+                </div>
+            </form>
+        </div>
+
+        {{-- Buttons --}}
+        <div class="flex items-center justify-end gap-2 px-6 py-4 border-t border-[#efefed] bg-[#f7f7f5]">
+            <button type="button" onclick="closeRejectModal()"
+                    class="text-[12px] font-medium text-[#666660] border border-[#e0e0dc] px-4 py-2 rounded-lg
+                           hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
+                Annuler
+            </button>
+            <button type="button" onclick="submitRejectForm()"
+                    class="bg-[#dc2626] text-white text-[12px] font-medium px-4 py-2 rounded-lg
+                           hover:bg-[#991b1b] transition-colors flex items-center gap-1.5">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+                Rejeter
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Correction du formulaire de rejet
+document.addEventListener('DOMContentLoaded', function() {
+    const rejectForm = document.getElementById('rejectForm');
+    if (rejectForm) {
+        rejectForm.addEventListener('submit', function(e) {
+            const docId = document.getElementById('rejectDocId').value;
+            const route = '{{ route("admin.users.reject-document", ":id") }}'.replace(':id', docId);
+            rejectForm.action = route;
+        });
+    }
+});
 </script>
 @endsection

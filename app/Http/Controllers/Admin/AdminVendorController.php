@@ -98,12 +98,20 @@ class AdminVendorController extends Controller
             'Vendeur approuvé'
         );
 
-        // Envoyer l'email d'approbation au vendeur
-        Mail::to($vendor->email)->send(new VendorApprovedMail($vendor, $validated['review_notes'] ?? null));
+        // Envoyer l'email d'approbation au vendeur (avec gestion d'erreur)
+        try {
+            Mail::to($vendor->email)->send(new VendorApprovedMail($vendor, $validated['review_notes'] ?? null));
+        } catch (\Exception $e) {
+            // Logger l'erreur mais ne pas bloquer l'action
+            \Illuminate\Support\Facades\Log::error('Erreur envoi email approbation vendeur', [
+                'vendor_id' => $vendor->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return redirect()
             ->route('admin.vendors.show', $validation)
-            ->with('success', "Vendeur {$vendor->name} approuvé avec succès ! Email envoyé.");
+            ->with('success', "Vendeur {$vendor->name} approuvé avec succès !");
     }
 
     /**
@@ -128,12 +136,20 @@ class AdminVendorController extends Controller
             $validated['review_notes']
         );
 
-        // Envoyer l'email de rejet au vendeur
-        Mail::to($vendor->email)->send(new VendorRejectedMail($vendor, $validated['review_notes']));
+        // Envoyer l'email de rejet au vendeur (avec gestion d'erreur)
+        try {
+            Mail::to($vendor->email)->send(new VendorRejectedMail($vendor, $validated['review_notes']));
+        } catch (\Exception $e) {
+            // Logger l'erreur mais ne pas bloquer l'action
+            \Illuminate\Support\Facades\Log::error('Erreur envoi email rejet vendeur', [
+                'vendor_id' => $vendor->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return redirect()
             ->route('admin.vendors.index')
-            ->with('success', "Demande de vendeur de {$vendor->name} rejetée. Email envoyé.");
+            ->with('success', "Demande de vendeur de {$vendor->name} rejetée.");
     }
 
     /**

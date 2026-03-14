@@ -136,6 +136,8 @@
                 document.getElementById('modal-quantity').max = stock;
 
                 updateModalPrice();
+                // Prevent layout shift by hiding scrollbar
+                document.body.style.overflow = 'hidden';
                 modal.classList.remove('modal-hidden');
                 modal.classList.add('modal-shown');
             }
@@ -145,6 +147,8 @@
                 if(modal) {
                     modal.classList.remove('modal-shown');
                     modal.classList.add('modal-hidden');
+                    // Restore scrollbar
+                    document.body.style.overflow = 'auto';
                 }
             }
 

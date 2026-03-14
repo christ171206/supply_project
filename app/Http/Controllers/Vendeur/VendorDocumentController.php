@@ -22,6 +22,11 @@ class VendorDocumentController extends Controller
      */
     public function submit(): View
     {
+        // Vérifier que l'utilisateur est authentifié
+        if (!Auth::check()) {
+            return redirect()->route('accueil');
+        }
+
         $user = Auth::user();
 
         // Vérifier que l'utilisateur est un vendeur
@@ -39,6 +44,11 @@ class VendorDocumentController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Vérifier que l'utilisateur est authentifié
+        if (!Auth::check()) {
+            return redirect()->route('accueil');
+        }
+
         $user = Auth::user();
 
         // Vérifier que l'utilisateur est un vendeur
@@ -140,8 +150,13 @@ class VendorDocumentController extends Controller
     /**
      * Afficher la page de confirmation après soumission des documents
      */
-    public function confirmation(): View
+    public function confirmation()
     {
+        // Vérifier que l'utilisateur est authentifié
+        if (!Auth::check()) {
+            return redirect()->route('accueil');
+        }
+
         $user = Auth::user();
 
         // Vérifier que l'utilisateur est un vendeur en attente de validation

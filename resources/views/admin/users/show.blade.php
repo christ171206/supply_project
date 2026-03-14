@@ -30,7 +30,13 @@
             </div>
             @php
                 if ($user->is_banned)              { $st = ['bg-[#fef2f2] text-[#dc2626]','bg-[#f87171]','Banni']; }
-                elseif ($user->role === 'vendor' && ($user->vendor_status ?? '') === 'pending') { $st = ['bg-[#fdf6ec] text-[#b45309]','bg-[#f59e0b]','En attente']; }
+                elseif ($user->role === 'vendor') {
+                    $st = match($user->vendor_status ?? '') {
+                        'approved' => ['bg-[#f0fdf4] text-[#15803d]','bg-[#22c55e]','Approuvé'],
+                        'rejected' => ['bg-[#fef2f2] text-[#dc2626]','bg-[#f87171]','Rejeté'],
+                        default    => ['bg-[#fdf6ec] text-[#b45309]','bg-[#f59e0b]','En attente'],
+                    };
+                }
                 elseif ($user->email_verified_at)  { $st = ['bg-[#f0fdf4] text-[#15803d]','bg-[#22c55e]','Vérifié']; }
                 else                               { $st = ['bg-[#f7f7f5] text-[#a0a09a]','bg-[#a0a09a]','Non vérifié']; }
             @endphp

@@ -14,6 +14,21 @@
     transition: opacity 0.3s ease-in-out;
 }
 
+/* Ensure sticky gallery doesn't overlap with modal content */
+#quantity-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Ensure modal stays on top of all content */
+#quantity-modal.modal-shown {
+    z-index: 9999;
+}
+
+/* Prevent layout shift when scrollbar disappears */
+html.modal-open {
+    overflow: hidden;
+}
+
 /* Animations pour notifications */
 @keyframes slideIn {
     from {
