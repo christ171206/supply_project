@@ -6,6 +6,7 @@ use App\Models\Commande;
 use App\Models\User;
 use App\Models\Produit;
 use App\Models\StockMouvement;
+use App\Models\LigneCommande;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;

@@ -113,7 +113,11 @@
                         <h5 class="mb-0"><i class="fas fa-check-circle"></i> Approuver le Vendeur</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.vendors.approve', $validation) }}" method="POST">
+                        <form action="{{ route('admin.vendors.approve', $validation) }}" method="POST"
+                              data-confirm="Approuver cette demande de vendeur ?"
+                              data-confirm-title="Approuver le vendeur"
+                              data-confirm-type="success"
+                              data-confirm-button="Approuver">
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label">Notes (optionnel)</label>
@@ -133,7 +137,11 @@
                         <h5 class="mb-0"><i class="fas fa-times-circle"></i> Rejeter le Vendeur</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.vendors.reject', $validation) }}" method="POST">
+                        <form action="{{ route('admin.vendors.reject', $validation) }}" method="POST"
+                              data-confirm="Rejeter cette demande de vendeur ?"
+                              data-confirm-title="Rejeter le vendeur"
+                              data-confirm-type="danger"
+                              data-confirm-button="Rejeter">
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label">Raison du Rejet *</label>

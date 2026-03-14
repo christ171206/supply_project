@@ -163,7 +163,10 @@
                             Éditer
                         </a>
                         <form method="POST" action="{{ route('vendeur.produits.destroy', $produit->id) }}"
-                              onsubmit="return confirm('Supprimer ce produit ? Cette action est définitive.')">
+                              data-confirm="Supprimer ce produit ? Cette action est définitive."
+                              data-confirm-title="Supprimer le produit"
+                              data-confirm-type="danger"
+                              data-confirm-button="Supprimer">
                             @csrf
                             @method('DELETE')
                             <button type="submit"

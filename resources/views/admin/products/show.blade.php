@@ -249,7 +249,10 @@
                     </a>
 
                     <form method="POST" action="{{ route('admin.products.destroy', $produit->id) }}"
-                          onsubmit="return confirm('Supprimer ce produit ? Cette action est irréversible.')">
+                          data-confirm="Supprimer ce produit ? Cette action est irréversible."
+                          data-confirm-title="Supprimer le produit"
+                          data-confirm-type="danger"
+                          data-confirm-button="Supprimer">
                         @csrf @method('DELETE')
                         <button type="submit"
                                 class="w-full text-[12px] font-medium text-[#dc2626] border border-[#fecaca] px-4 py-2.5 rounded-lg

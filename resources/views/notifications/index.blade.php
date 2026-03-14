@@ -75,7 +75,11 @@
                                 </form>
                             @endif
                             
-                            <form action="{{ route('notifications.delete', $notification) }}" method="POST" class="inline" onsubmit="return confirm('Supprimer cette notification?')">
+                            <form action="{{ route('notifications.delete', $notification) }}" method="POST" class="inline"
+                                  data-confirm="Supprimer cette notification ?"
+                                  data-confirm-title="Supprimer la notification"
+                                  data-confirm-type="danger"
+                                  data-confirm-button="Supprimer">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold transition">

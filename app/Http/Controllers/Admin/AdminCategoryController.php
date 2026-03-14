@@ -185,15 +185,13 @@ class AdminCategoryController extends Controller
         $oldStatus = $category->is_active;
         $category->update(['is_active' => !$category->is_active]);
 
-        AuditService::logAction(
-            'toggle_category',
+        AuditService::logUpdate(
             'Categorie',
             $category->id,
-            [
-                'old_status' => $oldStatus,
-                'new_status' => $category->is_active,
-            ],
-            "Admin a " . ($category->is_active ? 'activé' : 'désactivé') . " la catégorie '{$category->nom}'"
+            $category->nom,
+            ['is_active' => $oldStatus],
+            ['is_active' => $category->is_active],
+            ($category->is_active ? 'Catégorie activée' : 'Catégorie désactivée')
         );
 
         return back()->with('success', 'Catégorie mise à jour !');
@@ -208,12 +206,13 @@ class AdminCategoryController extends Controller
 
         Categorie::whereIn('id', $ids)->update(['is_active' => true]);
 
-        AuditService::logAction(
-            'bulk_enable_categories',
+        AuditService::logUpdate(
             'Categorie',
             0,
-            ['ids' => $ids],
-            "Admin a activé " . count($ids) . " catégories"
+            'Catégories (Bulk)',
+            ['ids' => $ids, 'is_active' => false],
+            ['ids' => $ids, 'is_active' => true],
+            'Activation en masse'
         );
 
         return back()->with('success', count($ids) . ' catégories activées !');
@@ -228,12 +227,13 @@ class AdminCategoryController extends Controller
 
         Categorie::whereIn('id', $ids)->update(['is_active' => false]);
 
-        AuditService::logAction(
-            'bulk_disable_categories',
+        AuditService::logUpdate(
             'Categorie',
             0,
-            ['ids' => $ids],
-            "Admin a désactivé " . count($ids) . " catégories"
+            'Catégories (Bulk)',
+            ['ids' => $ids, 'is_active' => true],
+            ['ids' => $ids, 'is_active' => false],
+            'Désactivation en masse'
         );
 
         return back()->with('success', count($ids) . ' catégories désactivées !');
@@ -257,12 +257,12 @@ class AdminCategoryController extends Controller
 
         Categorie::whereIn('id', $ids)->delete();
 
-        AuditService::logAction(
-            'bulk_delete_categories',
+        AuditService::logDelete(
             'Categorie',
             0,
+            'Catégories (Bulk)',
             ['ids' => $ids],
-            "Admin a supprimé " . count($ids) . " catégories"
+            'Suppression en masse'
         );
 
         return back()->with('success', count($ids) . ' catégories supprimées !');
