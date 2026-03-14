@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Commande;
 use App\Models\User;
 use App\Models\Produit;
-use App\Models\Review;
+use App\Models\Avis;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -105,16 +105,19 @@ class AdminStatisticsController extends Controller
     {
         $limit = $request->input('limit', 10);
 
-        $products = Produit::selectRaw('produits.nom, COUNT(ligne_commandes.id) as sold')
+        $products = Produit::selectRaw('produits.nom, COUNT(ligne_commandes.id) as sold, SUM(ligne_commandes.quantite * ligne_commandes.prix_unitaire) as revenue')
             ->leftJoin('ligne_commandes', 'produits.id', '=', 'ligne_commandes.produit_id')
+            ->leftJoin('commandes', 'ligne_commandes.commande_id', '=', 'commandes.id')
+            ->where('commandes.statut', 'livree')
             ->groupBy('produits.id', 'produits.nom')
             ->orderByDesc('sold')
             ->limit($limit)
             ->get();
 
         return response()->json([
-            'labels' => $products->pluck('nom'),
-            'data' => $products->pluck('sold'),
+            'labels' => $products->pluck('nom')->toArray(),
+            'data' => $products->pluck('sold')->toArray(),
+            'revenue' => $products->pluck('revenue')->toArray(),
         ]);
     }
 
@@ -237,24 +240,33 @@ class AdminStatisticsController extends Controller
         $startDate = $request->input('start_date', now()->startOfMonth());
         $endDate = $request->input('end_date', now()->endOfMonth());
 
+        // Vérifier que les dates sont au bon format
+        if (is_string($startDate)) {
+            $startDate = \Carbon\Carbon::parse($startDate)->startOfDay();
+        }
+        if (is_string($endDate)) {
+            $endDate = \Carbon\Carbon::parse($endDate)->endOfDay();
+        }
+
+        // Récupérer les commandes livrées dans la période
+        $commandes = Commande::whereBetween('created_at', [$startDate, $endDate])
+            ->where('statut', 'livree');
+
+        $totalOrders = $commandes->count() ?? 0;
+        $totalRevenue = $commandes->sum('total') ?? 0;
+
         $stats = [
-            'totalRevenue' => Commande::whereBetween('created_at', [$startDate, $endDate])
-                ->where('statut', 'livree')
-                ->sum('total'),
-            'totalOrders' => Commande::whereBetween('created_at', [$startDate, $endDate])
-                ->where('statut', 'livree')
-                ->count(),
-            'averageOrderValue' => isset($totalOrders) && $totalOrders > 0
-                ? round(Commande::whereBetween('created_at', [$startDate, $endDate])->where('statut', 'livree')->sum('total') / Commande::whereBetween('created_at', [$startDate, $endDate])->where('statut', 'livree')->count(), 2)
-                : 0,
+            'totalRevenue' => $totalRevenue,
+            'totalOrders' => $totalOrders,
+            'averageOrderValue' => $totalOrders > 0 ? round($totalRevenue / $totalOrders, 2) : 0,
             'newCustomers' => User::whereBetween('created_at', [$startDate, $endDate])
                 ->where('role', 'client')
-                ->count(),
+                ->count() ?? 0,
             'newVendors' => User::whereBetween('created_at', [$startDate, $endDate])
                 ->where('role', 'vendor')
-                ->count(),
-            'totalReviews' => Review::whereBetween('created_at', [$startDate, $endDate])->count(),
-            'averageRating' => Review::whereBetween('created_at', [$startDate, $endDate])->avg('note') ?? 0,
+                ->count() ?? 0,
+            'totalReviews' => Avis::whereBetween('created_at', [$startDate, $endDate])->count() ?? 0,
+            'averageRating' => Avis::whereBetween('created_at', [$startDate, $endDate])->avg('note') ?? 0,
             'conversionRate' => $this->calculateConversionRate($startDate, $endDate),
         ];
 
@@ -298,14 +310,13 @@ class AdminStatisticsController extends Controller
                 fputcsv($file, ['Vendeur', 'Commandes', 'Chiffre d\'affaires', 'Note moyenne']);
 
                 $vendors = User::where('role', 'vendor')
-                    ->selectRaw('users.shop_name, COUNT(commandes.id) as orders, SUM(commandes.total) as revenue')
-                    ->selectRaw('AVG(avis.note) as rating')
+                    ->selectRaw('users.id, users.shop_name, COUNT(commandes.id) as orders, SUM(commandes.total) as revenue, AVG(avis.note) as rating')
                     ->leftJoin('produits', 'users.id', '=', 'produits.user_id')
+                    ->leftJoin('avis', 'produits.id', '=', 'avis.produit_id')
                     ->leftJoin('ligne_commandes', 'produits.id', '=', 'ligne_commandes.produit_id')
                     ->leftJoin('commandes', 'ligne_commandes.commande_id', '=', 'commandes.id')
-                    ->leftJoin('avis', 'commandes.id', '=', 'avis.commande_id')
-                    ->whereRaw('commandes.created_at BETWEEN ? AND ?', [$startDate, $endDate])
                     ->where('commandes.statut', 'livree')
+                    ->whereBetween('commandes.created_at', [$startDate, $endDate])
                     ->groupBy('users.id', 'users.shop_name')
                     ->get();
 
