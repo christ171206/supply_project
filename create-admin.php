@@ -22,7 +22,7 @@ try {
         'email' => 'admin@supply.local',
         'password' => Hash::make('admin123456'),
         'email_verified_at' => now(),
-        'role' => 'admin',
+        'role' => 'client', // Les admins sont des clients avec is_admin = true
         'is_admin' => true,
         'country' => 'CI',
     ]);

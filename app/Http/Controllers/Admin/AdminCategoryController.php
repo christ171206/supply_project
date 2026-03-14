@@ -7,6 +7,7 @@ use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class AdminCategoryController extends Controller
 {
@@ -52,12 +53,20 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255|unique:categories,nom',
             'description' => 'nullable|string|max:1000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_active' => 'boolean',
         ]);
+
+        // Gérer l'upload d'image si fourni
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('categories', 'public');
+        }
 
         $category = Categorie::create([
             'nom' => $validated['nom'],
             'description' => $validated['description'] ?? null,
+            'image' => $imagePath,
             'is_active' => $validated['is_active'] ?? true,
         ]);
 
@@ -101,16 +110,28 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255|unique:categories,nom,' . $category->id,
             'description' => 'nullable|string|max:1000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_active' => 'boolean',
         ]);
 
-        $oldValues = $category->only(['nom', 'description', 'is_active']);
+        $oldValues = $category->only(['nom', 'description', 'is_active', 'image']);
 
-        $category->update([
+        $updateData = [
             'nom' => $validated['nom'],
             'description' => $validated['description'] ?? null,
             'is_active' => $validated['is_active'] ?? true,
-        ]);
+        ];
+
+        // Gérer l'upload d'image si fourni
+        if ($request->hasFile('image')) {
+            // Supprimer l'ancienne image si elle existe
+            if ($category->image && Storage::disk('public')->exists($category->image)) {
+                Storage::disk('public')->delete($category->image);
+            }
+            $updateData['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        $category->update($updateData);
 
         // Log l'action
         AuditService::logUpdate(
@@ -118,7 +139,7 @@ class AdminCategoryController extends Controller
             $category->id,
             $category->nom,
             $oldValues,
-            $category->only(['nom', 'description', 'is_active'])
+            $category->only(['nom', 'description', 'is_active', 'image'])
         );
 
         return back()->with('success', "Catégorie '{$category->nom}' mise à jour avec succès !");
@@ -136,7 +157,12 @@ class AdminCategoryController extends Controller
 
         $categoryName = $category->nom;
         $categoryId = $category->id;
-        $deletedValues = $category->only(['nom', 'description', 'is_active']);
+        $deletedValues = $category->only(['nom', 'description', 'is_active', 'image']);
+
+        // Supprimer l'image si elle existe
+        if ($category->image && Storage::disk('public')->exists($category->image)) {
+            Storage::disk('public')->delete($category->image);
+        }
 
         $category->delete();
 

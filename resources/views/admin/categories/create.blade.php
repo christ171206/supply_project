@@ -22,15 +22,15 @@
         <h1 class="font-serif text-[32px] tracking-tight text-white leading-none">Nouvelle catégorie</h1>
     </div>
 
-    <div class="px-8">
-        <div class="max-w-xl">
+    <div class="flex justify-center px-8">
+        <div class="max-w-xl w-full">
 
             <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
                 <div class="px-6 py-5 border-b border-[#efefed]">
                     <span class="text-[13px] font-medium text-[#0a0a0a]">Informations</span>
                 </div>
 
-                <form action="{{ route('admin.categories.store') }}" method="POST">
+                <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="px-6 py-5 space-y-5">
 
@@ -47,6 +47,26 @@
                                           placeholder-[#a0a09a] focus:bg-white focus:border-[#0a0a0a] outline-none transition-all
                                           @error('nom') border-[#f87171] bg-[#fef2f2] @enderror">
                             @error('nom')
+                                <p class="text-[11px] text-[#dc2626] mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Image --}}
+                        <div>
+                            <label for="image" class="block text-[11px] font-medium text-[#666660] mb-1.5">
+                                Image de la catégorie
+                            </label>
+                            <div class="relative">
+                                <input type="file" name="image" id="image"
+                                       accept="image/*"
+                                       class="w-full bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg px-3 py-2.5 text-[13px] text-[#0a0a0a]
+                                              placeholder-[#a0a09a] focus:bg-white focus:border-[#0a0a0a] outline-none transition-all
+                                              file:mr-3 file:py-2 file:px-3 file:rounded-md file:bg-[#0a0a0a] file:text-white file:cursor-pointer
+                                              file:text-[11px] file:font-medium file:border-0
+                                              @error('image') border-[#f87171] bg-[#fef2f2] @enderror">
+                                <p class="text-[11px] text-[#a0a09a] mt-1">Format: JPG, PNG, WebP — Max 2 MB</p>
+                            </div>
+                            @error('image')
                                 <p class="text-[11px] text-[#dc2626] mt-1">{{ $message }}</p>
                             @enderror
                         </div>

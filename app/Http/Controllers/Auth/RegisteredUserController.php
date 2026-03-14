@@ -90,7 +90,7 @@ class RegisteredUserController extends Controller
             $userData['shop_name'] = $request->shop_name;
             $userData['phone'] = $request->phone;
             $userData['address'] = $request->address;
-            $userData['vendor_status'] = 'pending'; // En attente de vérification des documents d'identité
+            $userData['vendor_status'] = 'approved'; // Activé automatiquement
         }
 
         // Créer l'utilisateur

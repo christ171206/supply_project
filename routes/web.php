@@ -136,9 +136,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
     Route::delete('/notifications/{notification}', [NotificationController::class, 'delete'])->name('notifications.delete');
     Route::post('/notifications/delete-all-read', [NotificationController::class, 'deleteAllRead'])->name('notifications.delete-all-read');
-
-    // Page d'attente d'approbation pour les vendeurs
-    Route::get('/vendeur/en-attente', [VendeurProduitController::class, 'waitingApproval'])->name('vendor.waiting-approval');
 });
 
 // Routes Vendeur
@@ -201,7 +198,7 @@ Route::middleware(['auth', 'vendeur', 'vendor-approved'])->prefix('vendeur')->na
 
 // Notifications (pour tous les utilisateurs authentifiés)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/notifications', [\App\Http\Controllers\NotificationCenterController::class, 'index'])->name('notifications.center');
+    Route::get('/notifications-center', [\App\Http\Controllers\NotificationCenterController::class, 'index'])->name('notifications.center');
     Route::get('/api/notifications/recent', [\App\Http\Controllers\NotificationCenterController::class, 'getRecent'])->name('notifications.recent');
     Route::get('/api/notifications/unread-count', [\App\Http\Controllers\NotificationCenterController::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationCenterController::class, 'markAsRead'])->name('notifications.mark-read');

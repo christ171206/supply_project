@@ -24,8 +24,8 @@ class VendorApproved
 
         // Vérifier que le vendeur est approuvé
         if ($user->vendor_status !== 'approved') {
-            // Rediriger vers une page d'attente d'approbation avec un message
-            return redirect()->route('vendor.waiting-approval')
+            // Rediriger vers l'accueil
+            return redirect()->route('accueil')
                 ->with('warning', 'Votre compte vendeur est en cours de vérification. Veuillez vérifier votre email pour plus de détails.');
         }
 

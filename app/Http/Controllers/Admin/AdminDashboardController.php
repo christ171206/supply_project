@@ -23,6 +23,7 @@ class AdminDashboardController extends Controller
         // Statistiques générales
         $totalUsers = User::count();
         $totalVendors = User::where('role', 'vendor')->count();
+        $activeVendors = User::where('role', 'vendor')->where('vendor_status', 'approved')->count();
         $totalClients = User::where('role', 'client')->orWhereNull('role')->count();
         $totalProducts = Produit::count();
         $totalOrders = Commande::count();
@@ -172,6 +173,7 @@ class AdminDashboardController extends Controller
         return view('admin.dashboard', [
             'totalUsers' => $totalUsers,
             'totalVendors' => $totalVendors,
+            'activeVendors' => $activeVendors,
             'totalClients' => $totalClients,
             'totalProducts' => $totalProducts,
             'totalOrders' => $totalOrders,

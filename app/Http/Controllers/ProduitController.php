@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Categorie;
 use App\Models\Produit;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -42,7 +43,7 @@ class ProduitController extends Controller
             'produits' => $produits,
             'categories' => $categories,
             'total_produits' => Cache::remember('total_produits', 86400, fn() => Produit::where('est_actif', true)->count()),
-            'total_vendeurs' => Cache::remember('total_vendeurs', 86400, fn() => Produit::where('est_actif', true)->distinct('user_id')->count()),
+            'total_vendeurs' => Cache::remember('total_vendeurs', 86400, fn() => User::where('role', 'vendor')->where('vendor_status', 'approved')->count()),
         ];
 
         return view('accueil', $data);

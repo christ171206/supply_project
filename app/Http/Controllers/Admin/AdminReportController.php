@@ -374,14 +374,4 @@ class AdminReportController extends Controller
             'averageOrderValue' => $averageOrderValue,
         ]);
     }
-
-    private function exportVendorReport()
-    {
-        // Implémentation similaire
-    }
-
-    private function exportProductReport()
-    {
-        // Implémentation similaire
-    }
 }

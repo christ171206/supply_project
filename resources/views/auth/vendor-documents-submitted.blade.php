@@ -84,8 +84,7 @@
     </div>
 
     <script>
-        // Quand le back button est appuyé, rediriger vers l'accueil
-        history.replaceState(null, '', window.location.href);
+        // Empêcher uniquement le back button du navigateur
         window.addEventListener('popstate', function() {
             window.location.href = '{{ route("accueil") }}';
         });

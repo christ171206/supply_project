@@ -23,7 +23,7 @@
                 $kpis = [
                     ['value' => number_format($totalRevenue ?? 0, 0, ',', ' '), 'unit' => 'FCFA', 'label' => "Chiffre d'affaires"],
                     ['value' => number_format($totalCommission ?? 0, 0, ',', ' '), 'unit' => 'FCFA', 'label' => "Commission {$commissionRate}%"],
-                    ['value' => $totalVendors,   'unit' => '',     'label' => 'Vendeurs actifs'],
+                    ['value' => $activeVendors, 'unit' => '',     'label' => 'Vendeurs actifs'],
                     ['value' => $satisfactionRate.'%', 'unit' => '', 'label' => 'Satisfaction'],
                     ['value' => $totalOrders,    'unit' => '',     'label' => 'Commandes'],
                     ['value' => $totalClients,   'unit' => '',     'label' => 'Clients'],
