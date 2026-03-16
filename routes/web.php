@@ -14,6 +14,9 @@ use App\Http\Controllers\ValidationController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\VendorStatisticsController;
 use App\Http\Controllers\CloudinaryImageController;
+use App\Http\Controllers\PromoCodeController;
+use App\Http\Controllers\FlashSaleController;
+use App\Http\Controllers\BundleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NotificationController;
 
@@ -31,6 +34,56 @@ Route::get('/api/produits/{id}', function ($id) {
         'success' => true,
         'data' => $produit
     ]);
+});
+
+// Recommendation API (Client - Public)
+Route::prefix('api/recommendations')->name('recommendations.')->group(function () {
+    Route::get('/similar/{product}', [\App\Http\Controllers\RecommendationController::class, 'getSimilarProducts'])->name('similar');
+    Route::get('/popular/{product}', [\App\Http\Controllers\RecommendationController::class, 'getPopularInCategory'])->name('popular');
+    Route::get('/bought-together/{product}', [\App\Http\Controllers\RecommendationController::class, 'getFrequentlyBoughtTogether'])->name('bought-together');
+    Route::get('/trending', [\App\Http\Controllers\RecommendationController::class, 'getTrendingProducts'])->name('trending');
+    Route::middleware('auth')->group(function () {
+        Route::get('/personalized', [\App\Http\Controllers\RecommendationController::class, 'getPersonalizedRecommendations'])->name('personalized');
+    });
+});
+
+// Smart Search API
+Route::prefix('api/search')->name('search.')->group(function () {
+    Route::get('/autocomplete', [\App\Http\Controllers\SmartSearchController::class, 'autocomplete'])->name('autocomplete');
+    Route::get('/search', [\App\Http\Controllers\SmartSearchController::class, 'search'])->name('search');
+    Route::get('/trending', [\App\Http\Controllers\SmartSearchController::class, 'trendingSuggestions'])->name('trending');
+});
+
+// Search Results Pages
+Route::get('/search/results', [\App\Http\Controllers\SmartSearchController::class, 'results'])->name('search.results');
+
+// Vendor Shop (Public)
+Route::prefix('vendor')->name('vendor.')->group(function () {
+    Route::get('/{vendor}', [\App\Http\Controllers\VendorShopController::class, 'show'])->name('show');
+    Route::get('/{vendor}/search', [\App\Http\Controllers\VendorShopController::class, 'search'])->name('search');
+    Route::post('/{vendor}/follow', [\App\Http\Controllers\VendorShopController::class, 'follow'])->name('follow');
+});
+
+// Advanced Reviews API
+Route::prefix('api/reviews')->name('reviews.')->group(function () {
+    Route::post('/{product}', [\App\Http\Controllers\AdvancedReviewController::class, 'store'])->name('store');
+    Route::get('/{product}/advanced', [\App\Http\Controllers\AdvancedReviewController::class, 'getAdvancedReviews'])->name('advanced');
+    Route::post('/{review}/helpful', [\App\Http\Controllers\AdvancedReviewController::class, 'markHelpful'])->name('helpful');
+});
+
+// Gamification API
+Route::middleware('auth')->prefix('api/gamification')->name('gamification.')->group(function () {
+    Route::get('/profile', [\App\Http\Controllers\GamificationController::class, 'getProfile'])->name('profile');
+    Route::get('/badges', [\App\Http\Controllers\GamificationController::class, 'getAvailableBadges'])->name('badges');
+});
+
+// Promotions API
+Route::prefix('api/promotions')->name('promotions.')->group(function () {
+    Route::get('/rules', [\App\Http\Controllers\PromotionController::class, 'getPromoRules'])->name('rules');
+    Route::post('/validate', [\App\Http\Controllers\PromotionController::class, 'validatePromoCode'])->name('validate');
+    Route::middleware('auth')->group(function () {
+        Route::get('/vendor', [\App\Http\Controllers\PromotionController::class, 'getVendorPromotions'])->name('vendor');
+    });
 });
 
 // Currency Converter API
@@ -99,11 +152,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/commandes', [CommandeController::class, 'index'])->name('commandes.index');
     Route::get('/commandes/paiement', [CommandeController::class, 'create'])->name('commandes.create');
     Route::get('/commandes/{id}', [CommandeController::class, 'show'])->name('commandes.show');
+    Route::get('/commandes/{id}/simulation', [CommandeController::class, 'paymentSimulation'])->name('commandes.payment-simulation');
+    Route::get('/commandes/{id}/succes', [CommandeController::class, 'paymentSuccess'])->name('commandes.payment-success');
     Route::get('/commandes/{id}/facture', [CommandeController::class, 'facture'])->name('commandes.facture');
     Route::get('/commandes/{id}/download-pdf', [CommandeController::class, 'downloadPDF'])->name('commandes.download-pdf');
     Route::post('/commandes', [CommandeController::class, 'store'])->name('commandes.store');
-    Route::get('/commandes/{id}/payment-success', [CommandeController::class, 'paymentSuccess'])->name('commandes.payment-success');
     Route::get('/commandes/{id}/payment-test', [CommandeController::class, 'paymentTest'])->name('commandes.payment-test');
+
+    // Invoices (Factures)
+    Route::middleware('auth')->prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/{commande}', [\App\Http\Controllers\InvoiceController::class, 'show'])->name('show');
+        Route::get('/{commande}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('download');
+        Route::post('/{commande}/email', [\App\Http\Controllers\InvoiceController::class, 'sendEmail'])->name('send-email');
+        Route::get('/{commande}/data', [\App\Http\Controllers\InvoiceController::class, 'getInvoiceData'])->name('data');
+    });
 
     // Paiement Stripe
     Route::get('/commandes/{id}/payment', [PaymentController::class, 'show'])->name('payment.show');
@@ -153,6 +215,16 @@ Route::middleware(['auth', 'vendeur', 'vendor-approved'])->prefix('vendeur')->na
     Route::get('/statistiques', [VendeurProduitController::class, 'statistiques'])->name('statistiques');
     Route::get('/statistiques/export', [VendeurProduitController::class, 'exportStatistiques'])->name('statistiques.export');
 
+    // API Analytics (pour ApexCharts)
+    Route::prefix('api/analytics')->name('analytics.')->group(function () {
+        Route::get('/daily-sales', [\App\Http\Controllers\VendorAnalyticsController::class, 'getDailySalesData'])->name('daily-sales');
+        Route::get('/sales-by-category', [\App\Http\Controllers\VendorAnalyticsController::class, 'getSalesByCategory'])->name('sales-category');
+        Route::get('/top-products', [\App\Http\Controllers\VendorAnalyticsController::class, 'getTopProducts'])->name('top-products');
+        Route::get('/global-stats', [\App\Http\Controllers\VendorAnalyticsController::class, 'getGlobalStats'])->name('global-stats');
+        Route::get('/month-comparison', [\App\Http\Controllers\VendorAnalyticsController::class, 'getMonthComparison'])->name('month-comparison');
+        Route::get('/stock-forecasts', [\App\Http\Controllers\VendorAnalyticsController::class, 'getStockForecasts'])->name('stock-forecasts');
+    });
+
     // Messages
     Route::get('/messages', [VendeurProduitController::class, 'messages'])->name('messages');
     Route::get('/messages/{userId}', [VendeurProduitController::class, 'messagesShow'])->name('messages.show');
@@ -177,6 +249,41 @@ Route::middleware(['auth', 'vendeur', 'vendor-approved'])->prefix('vendeur')->na
     Route::patch('/commandes/{id}/status', [CommandeController::class, 'updateCommandeStatus'])->name('commandes.update-status');
     Route::post('/commandes/{id}/cancel', [CommandeController::class, 'cancelCommande'])->name('commandes.cancel');
     Route::delete('/commandes/{id}', [CommandeController::class, 'deleteCommande'])->name('commandes.delete');
+
+    // Codes Promo
+    Route::get('/promo-codes', [\App\Http\Controllers\PromoCodeController::class, 'index'])->name('promo-codes.index');
+    Route::get('/promo-codes/create', [\App\Http\Controllers\PromoCodeController::class, 'create'])->name('promo-codes.create');
+    Route::post('/promo-codes', [\App\Http\Controllers\PromoCodeController::class, 'store'])->name('promo-codes.store');
+    Route::get('/promo-codes/{promoCode}', [\App\Http\Controllers\PromoCodeController::class, 'show'])->name('promo-codes.show');
+    Route::get('/promo-codes/{promoCode}/edit', [\App\Http\Controllers\PromoCodeController::class, 'edit'])->name('promo-codes.edit');
+    Route::put('/promo-codes/{promoCode}', [\App\Http\Controllers\PromoCodeController::class, 'update'])->name('promo-codes.update');
+    Route::post('/promo-codes/{promoCode}/duplicate', [\App\Http\Controllers\PromoCodeController::class, 'duplicate'])->name('promo-codes.duplicate');
+    Route::delete('/promo-codes/{promoCode}', [\App\Http\Controllers\PromoCodeController::class, 'destroy'])->name('promo-codes.destroy');
+    Route::patch('/promo-codes/{promoCode}/toggle-archive', [\App\Http\Controllers\PromoCodeController::class, 'toggleArchive'])->name('promo-codes.toggle-archive');
+
+    // API Promo
+    Route::get('/api/promo-codes/generate', [\App\Http\Controllers\PromoCodeController::class, 'generateCode'])->name('promo-codes.generate');
+    Route::post('/api/promo-codes/check', [\App\Http\Controllers\PromoCodeController::class, 'checkCode'])->name('promo-codes.check');
+
+    // Flash Sales
+    Route::get('/flash-sales', [FlashSaleController::class, 'index'])->name('flash-sales.index');
+    Route::get('/flash-sales/create', [FlashSaleController::class, 'create'])->name('flash-sales.create');
+    Route::post('/flash-sales', [FlashSaleController::class, 'store'])->name('flash-sales.store');
+    Route::get('/flash-sales/{flashSale}', [FlashSaleController::class, 'show'])->name('flash-sales.show');
+    Route::get('/flash-sales/{flashSale}/edit', [FlashSaleController::class, 'edit'])->name('flash-sales.edit');
+    Route::put('/flash-sales/{flashSale}', [FlashSaleController::class, 'update'])->name('flash-sales.update');
+    Route::delete('/flash-sales/{flashSale}', [FlashSaleController::class, 'destroy'])->name('flash-sales.destroy');
+    Route::patch('/flash-sales/{flashSale}/toggle', [FlashSaleController::class, 'toggle'])->name('flash-sales.toggle');
+
+    // Bundles
+    Route::get('/bundles', [BundleController::class, 'index'])->name('bundles.index');
+    Route::get('/bundles/create', [BundleController::class, 'create'])->name('bundles.create');
+    Route::post('/bundles', [BundleController::class, 'store'])->name('bundles.store');
+    Route::get('/bundles/{bundle}', [BundleController::class, 'show'])->name('bundles.show');
+    Route::get('/bundles/{bundle}/edit', [BundleController::class, 'edit'])->name('bundles.edit');
+    Route::put('/bundles/{bundle}', [BundleController::class, 'update'])->name('bundles.update');
+    Route::delete('/bundles/{bundle}', [BundleController::class, 'destroy'])->name('bundles.destroy');
+    Route::patch('/bundles/{bundle}/toggle', [BundleController::class, 'toggle'])->name('bundles.toggle');
 
     // Vendor Statistics (Premium Feature)
     Route::get('/api/statistics/sales', [VendorStatisticsController::class, 'getSalesData'])->name('statistics.sales');

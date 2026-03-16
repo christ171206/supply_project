@@ -30,10 +30,11 @@ class AuthenticatedSessionController extends Controller
 
         // Redirection selon le rôle (forcer la destination)
         if (Auth::user()->isAdmin()) {
-            return redirect('/admin');
+            return redirect('/admin/dashboard');
         }
 
-        if (Auth::user()->role === 'vendor') {
+        // Rediriger les vendeurs APPROUVÉS seulement vers le dashboard
+        if (Auth::user()->role === 'vendor' && Auth::user()->vendor_status === 'approved') {
             return redirect()->route('vendeur.dashboard');
         }
 

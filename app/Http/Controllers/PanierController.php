@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Panier;
 use App\Models\PanierItem;
 use App\Models\Produit;
+use App\Models\Bundle;
 use Illuminate\Http\Request;
 
 class PanierController extends Controller
@@ -17,21 +18,39 @@ class PanierController extends Controller
         if (auth()->check()) {
             $user = auth()->user();
             $panier = $user->panier;
-            return $panier ? $panier->items()->with('produit.vendeur')->get() : collect();
+            return $panier ? $panier->items()->with('produit.vendeur', 'bundle.produits')->get() : collect();
         } else {
             $cartSession = session()->get('cart', []);
             $items = collect();
 
-            foreach ($cartSession as $productId => $quantity) {
-                $produit = Produit::with('vendeur')->find($productId);
-                if ($produit) {
-                    $items->push((object)[
-                        'id' => $productId,
-                        'produit_id' => $productId,
-                        'quantite' => $quantity['qty'],
-                        'prix_unitaire' => $quantity['price'],
-                        'produit' => $produit,
-                    ]);
+            foreach ($cartSession as $key => $data) {
+                // Détecter si c'est un bundle (préfixe 'bundle_')
+                if (strpos($key, 'bundle_') === 0) {
+                    $bundleId = (int)str_replace('bundle_', '', $key);
+                    $bundle = Bundle::with('produits')->find($bundleId);
+                    if ($bundle) {
+                        $items->push((object)[
+                            'id' => $key,
+                            'bundle_id' => $bundleId,
+                            'quantite' => $data['qty'],
+                            'prix_unitaire' => $data['price'],
+                            'bundle' => $bundle,
+                            'is_bundle' => true,
+                        ]);
+                    }
+                } else {
+                    // C'est un produit
+                    $produit = Produit::with('vendeur')->find($key);
+                    if ($produit) {
+                        $items->push((object)[
+                            'id' => $key,
+                            'produit_id' => $key,
+                            'quantite' => $data['qty'],
+                            'prix_unitaire' => $data['price'],
+                            'produit' => $produit,
+                            'is_bundle' => false,
+                        ]);
+                    }
                 }
             }
             return $items;
@@ -79,44 +98,130 @@ class PanierController extends Controller
     {
         // Les administrateurs ne peuvent pas ajouter d'articles au panier
         if (auth()->check() && auth()->user()->is_admin) {
-            return back()->with('error', 'Les administrateurs n\'ont pas le droit d\'ajouter des articles au panier. Activez le mode client pour tester la plateforme.');
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Les administrateurs n\'ont pas le droit d\'ajouter des articles au panier.'
+                ], 403);
+            }
+            return back()->with('error', 'Les administrateurs n\'ont pas le droit d\'ajouter des articles au panier.');
         }
 
-        $request->validate([
-            'quantite' => 'required|integer|min:1',
-        ]);
+        // Vérifier si c'est un bundle ou un produit
+        $bundle = Bundle::where('id', $produitId)->where('statut', 'actif')->first();
+        $produit = $bundle ? null : Produit::find($produitId);
 
-        $produit = Produit::findOrFail($produitId);
-        $quantite = intval($request->quantite);
+        if (!$bundle && !$produit) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Article non trouvé'
+                ], 404);
+            }
+            return back()->with('error', 'Article non trouvé');
+        }
+
+        // Article à ajouter (produit ou bundle)
+        $article = $bundle ?: $produit;
+        $isBundle = (bool)$bundle;
+        $prix = $isBundle ? $bundle->prix_bundle : $produit->prix;
+        $nom = $article->nom;
+
+        // Pour les produits, vérifier le stock
+        if (!$isBundle && $article->stock <= 0) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Produit indisponible'
+                ], 422);
+            }
+            return back()->with('error', 'Produit indisponible');
+        }
+
+        // Récupérer la quantité
+        $rawQuantite = null;
+
+        if ($request->isJson()) {
+            $data = $request->json()->all();
+            $rawQuantite = $data['quantite'] ?? null;
+        } else {
+            $rawQuantite = $request->input('quantite');
+        }
+
+        // Sécuriser la conversion
+        $quantite = 1;
+        if ($rawQuantite !== null && $rawQuantite !== '') {
+            $strValue = strval($rawQuantite);
+            $cleanQuantite = (int)preg_replace('/[^0-9]/', '', $strValue);
+            if ($cleanQuantite > 0) {
+                $quantite = $cleanQuantite;
+            }
+        }
+
+        if ($quantite < 1 || !is_int($quantite)) {
+            $quantite = 1;
+        }
+
+        // Pour les produits, vérifier le stock
+        if (!$isBundle && $quantite > $article->stock) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stock insuffisant. Maximum disponible: ' . $article->stock
+                ], 422);
+            }
+            return back()->with('error', 'Stock insuffisant. Maximum disponible: ' . $article->stock);
+        }
 
         if (auth()->check()) {
             $user = auth()->user();
             $panier = $user->panier ?? Panier::create(['user_id' => $user->id]);
 
-            $panierItem = PanierItem::where('panier_id', $panier->id)
-                ->where('produit_id', $produitId)
-                ->first();
+            // Chercher un item existant
+            if ($isBundle) {
+                $panierItem = PanierItem::where('panier_id', $panier->id)
+                    ->where('bundle_id', $produitId)
+                    ->first();
+            } else {
+                $panierItem = PanierItem::where('panier_id', $panier->id)
+                    ->where('produit_id', $produitId)
+                    ->where('bundle_id', null)
+                    ->first();
+            }
 
             if ($panierItem) {
                 $panierItem->quantite += $quantite;
                 $panierItem->save();
             } else {
-                PanierItem::create([
-                    'panier_id' => $panier->id,
-                    'produit_id' => $produitId,
-                    'quantite' => $quantite,
-                    'prix_unitaire' => $produit->prix,
-                ]);
+                if ($isBundle) {
+                    PanierItem::create([
+                        'panier_id' => $panier->id,
+                        'bundle_id' => $produitId,
+                        'quantite' => $quantite,
+                        'prix_unitaire' => $prix,
+                    ]);
+                } else {
+                    PanierItem::create([
+                        'panier_id' => $panier->id,
+                        'produit_id' => $produitId,
+                        'quantite' => $quantite,
+                        'prix_unitaire' => $prix,
+                    ]);
+                }
             }
         } else {
             $cart = session()->get('cart', []);
 
-            if (isset($cart[$produitId])) {
-                $cart[$produitId]['qty'] += $quantite;
+            // Utiliser un préfixe pour les bundles en session
+            $cartKey = $isBundle ? 'bundle_' . $produitId : $produitId;
+
+            if (isset($cart[$cartKey])) {
+                $cart[$cartKey]['qty'] += $quantite;
             } else {
-                $cart[$produitId] = [
+                $cart[$cartKey] = [
                     'qty' => $quantite,
-                    'price' => floatval($produit->prix),
+                    'price' => floatval($prix),
+                    'is_bundle' => $isBundle,
                 ];
             }
 
@@ -127,11 +232,11 @@ class PanierController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => '✓ Produit ajouté au panier!'
+                'message' => '✓ ' . ($isBundle ? 'Bundle' : 'Produit') . ' ajouté au panier!'
             ]);
         }
 
-        return redirect()->back()->with('success', '✓ Produit ajouté au panier!');
+        return redirect()->back()->with('success', '✓ ' . ($isBundle ? 'Bundle' : 'Produit') . ' ajouté au panier!');
     }
 
     /**

@@ -45,7 +45,12 @@
 
                             {{-- Thumb --}}
                             <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border border-[#e0e0dc] bg-[#f7f7f5] overflow-hidden flex items-center justify-center flex-shrink-0">
-                                @if($item->produit->images && is_array($item->produit->images) && count($item->produit->images) > 0)
+                                @if(isset($item->is_bundle) && $item->is_bundle)
+                                    {{-- Bundle Icon --}}
+                                    <svg class="w-6 h-6 text-[#a0a09a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                                    </svg>
+                                @elseif($item->produit->images && is_array($item->produit->images) && count($item->produit->images) > 0)
                                     @php
                                         $imgPath = $item->produit->images[0];
                                         $fullPath = strpos($imgPath, 'produits/') === 0 ? $imgPath : 'produits/' . $imgPath;
@@ -60,13 +65,25 @@
 
                             {{-- Infos --}}
                             <div class="flex-1 min-w-0">
-                                <a href="{{ route('produits.show', $item->produit->id) }}"
-                                   class="text-[13px] font-medium text-[#0a0a0a] hover:text-[#666660] transition-colors line-clamp-1">
-                                    {{ $item->produit->nom }}
-                                </a>
-                                <div class="text-[11px] text-[#a0a09a] font-light mt-0.5 mb-3">
-                                    {{ Str::limit($item->produit->description, 60) }}
-                                </div>
+                                @if(isset($item->is_bundle) && $item->is_bundle)
+                                    <div class="text-[13px] font-medium text-[#0a0a0a]">
+                                        {{ $item->bundle->nom }}
+                                    </div>
+                                    <div class="text-[11px] text-[#a0a09a] font-light mt-0.5 mb-2">
+                                        <span class="inline-flex items-center gap-1">
+                                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                                            {{ $item->bundle->produits->count() }} produit{{ $item->bundle->produits->count() > 1 ? 's' : '' }}
+                                        </span>
+                                    </div>
+                                @else
+                                    <a href="{{ route('produits.show', $item->produit->id) }}"
+                                       class="text-[13px] font-medium text-[#0a0a0a] hover:text-[#666660] transition-colors line-clamp-1">
+                                        {{ $item->produit->nom }}
+                                    </a>
+                                    <div class="text-[11px] text-[#a0a09a] font-light mt-0.5 mb-3">
+                                        {{ Str::limit($item->produit->description, 60) }}
+                                    </div>
+                                @endif
 
                                 {{-- Qty control --}}
                                 <form action="{{ route('panier.modifier', $item->id) }}" method="POST" class="inline-flex items-center">
@@ -76,7 +93,7 @@
                                             class="w-7 h-7 flex items-center justify-center text-[#666660] hover:bg-[#f7f7f5] hover:text-[#0a0a0a] transition-colors text-sm">−</button>
                                         <div class="w-px h-4 bg-[#e0e0dc]"></div>
                                         <input type="number" id="qty_{{ $item->id }}" name="quantite"
-                                            value="{{ $item->quantite }}" min="1" max="{{ $item->produit->stock }}"
+                                            value="{{ $item->quantite }}" min="1" max="999"
                                             class="w-9 text-center text-[12px] font-mono font-medium text-[#0a0a0a] border-none outline-none bg-transparent">
                                         <div class="w-px h-4 bg-[#e0e0dc]"></div>
                                         <button type="button" onclick="stepQty('qty_{{ $item->id }}', 1, this.closest('form'))"
@@ -159,12 +176,41 @@
                         <span class="text-[#666660] font-light">Sous-total</span>
                         <span class="font-mono font-medium text-[#0a0a0a]">{{ number_format($total ?? 0, 0, ',', ' ') }} FCFA</span>
                     </div>
+
+                    {{-- Free Shipping Progress --}}
                     @if($items && count($items) > 0)
+                        @php
+                            $shippingThreshold = 100000; // 100,000 FCFA
+                            $remainingForFreeShipping = max(0, $shippingThreshold - ($total ?? 0));
+                            $progressPercent = min(100, (($total ?? 0) / $shippingThreshold) * 100);
+                        @endphp
+                        <div class="pt-1 space-y-2">
+                            <div class="flex items-center justify-between text-[12px]">
+                                <span class="text-[#666660] font-light">Livraison</span>
+                                @if(($total ?? 0) >= $shippingThreshold)
+                                    <span class="font-mono font-medium text-[#15803d] flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                                        Gratuite
+                                    </span>
+                                @else
+                                    <span class="text-[#a0a09a] text-[11px]">
+                                        {{ number_format($remainingForFreeShipping, 0, ',', ' ') }} FCFA de plus
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="w-full h-2 bg-[#efefed] rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-[#0a0a0a] to-[#2a2a28] rounded-full transition-all duration-300"
+                                     style="width: {{ $progressPercent }}%"></div>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px] text-[#a0a09a]">
+                                <span>{{ number_format($total ?? 0, 0, ',', ' ') }} FCFA</span>
+                                <span>{{ number_format($shippingThreshold, 0, ',', ' ') }} FCFA</span>
+                            </div>
+                        </div>
+                    @else
                         <div class="flex items-center justify-between text-[13px]">
                             <span class="text-[#666660] font-light">Livraison</span>
-                            <span class="font-mono font-medium {{ ($total ?? 0) > 100 ? 'text-[#15803d]' : 'text-[#0a0a0a]' }}">
-                                {{ ($total ?? 0) > 100 ? 'Gratuite' : '2 500 FCFA' }}
-                            </span>
+                            <span class="font-mono font-medium text-[#0a0a0a]">À calculer</span>
                         </div>
                     @endif
                 </div>
@@ -174,7 +220,11 @@
                     <div class="text-right">
                         <div class="font-mono text-[18px] font-medium text-[#0a0a0a] tracking-tight">
                             @if($items && count($items) > 0)
-                                {{ number_format(($total ?? 0) + (($total ?? 0) > 100 ? 0 : 2500), 0, ',', ' ') }}
+                                @php
+                                    $shippingCost = ($total ?? 0) >= 100000 ? 0 : 2500;
+                                    $finalTotal = ($total ?? 0) + $shippingCost;
+                                @endphp
+                                {{ number_format($finalTotal, 0, ',', ' ') }}
                             @else
                                 0
                             @endif

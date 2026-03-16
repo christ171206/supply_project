@@ -22,9 +22,6 @@ Route::middleware('guest')->group(function () {
     Route::get('verify-email-code', [EmailVerificationCodeController::class, 'show'])
         ->name('verification.code.show');
 
-    Route::post('verify-email-code', [EmailVerificationCodeController::class, 'verify'])
-        ->name('verification.code.verify');
-
     Route::post('verify-email-code/resend', [EmailVerificationCodeController::class, 'resend'])
         ->name('verification.code.resend');
 
@@ -50,6 +47,10 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 });
+
+// Route de vérification du code - SANS middleware guest pour permettre la redirection après l'authentification
+Route::post('verify-email-code', [EmailVerificationCodeController::class, 'verify'])
+    ->name('verification.code.verify');
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)

@@ -322,8 +322,13 @@
         <div class="page-header">
             <div class="page-header-top">
                 <div>
-                    <div class="invoice-brand">Facture</div>
-                    <div class="invoice-brand-sub">Supply · Marketplace</div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                        <div style="width: 32px; height: 32px; background: white; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                            <span style="color: #0a0a0a; font-weight: bold; font-size: 18px; font-family: 'Instrument Serif';">S</span>
+                        </div>
+                        <div class="invoice-brand">Supply</div>
+                    </div>
+                    <div class="invoice-brand-sub">Marketplace B2B • Tech & Informatique</div>
                 </div>
                 <div class="invoice-meta">
                     <div class="invoice-number">#{{ str_pad($commande->id, 6, '0', STR_PAD_LEFT) }}</div>

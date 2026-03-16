@@ -273,6 +273,365 @@
 
     </div>
 
+    {{-- ══════════════════════════════
+         ANALYTIQUE AVANCÉE — ApexCharts
+    ══════════════════════════════ --}}
+    <div class="mt-12 pt-8 border-t border-[#e0e0dc]">
+        <div class="text-[10px] font-medium tracking-[0.1em] uppercase text-[#a0a09a] mb-6">Analytique avancée</div>
+
+        {{-- Comparaison mois --}}
+        <div id="monthComparisonContainer" class="mb-8 bg-white border border-[#e0e0dc] rounded-xl p-6 hidden">
+            <h3 class="text-[14px] font-medium text-[#0a0a0a] mb-6">Comparaison mois courant vs précédent</h3>
+            <div id="monthComparisonChart"></div>
+        </div>
+
+        {{-- Graphiques en grille --}}
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            {{-- Ventes sur 30 jours --}}
+            <div class="bg-white border border-[#e0e0dc] rounded-xl p-6">
+                <h3 class="text-[14px] font-medium text-[#0a0a0a] mb-6">Chiffre d'affaires (30 jours)</h3>
+                <div id="dailySalesChart"></div>
+            </div>
+
+            {{-- Ventes par catégorie --}}
+            <div class="bg-white border border-[#e0e0dc] rounded-xl p-6">
+                <h3 class="text-[14px] font-medium text-[#0a0a0a] mb-6">Distribution par catégorie</h3>
+                <div id="categorySalesChart"></div>
+            </div>
+        </div>
+
+        {{-- Top produits --}}
+        <div class="bg-white border border-[#e0e0dc] rounded-xl p-6 mb-8">
+            <h3 class="text-[14px] font-medium text-[#0a0a0a] mb-6">Produits les plus performants</h3>
+            <div id="topProductsChart"></div>
+        </div>
+
+        {{-- Prévisions rupture stock --}}
+        <div class="bg-white border border-[#e0e0dc] rounded-xl p-6">
+            <h3 class="text-[14px] font-medium text-[#0a0a0a] mb-6">🚨 Prévisions rupture de stock</h3>
+            <div id="stockForecastsContainer" class="space-y-3">
+                <div class="text-center py-6 text-[13px] text-[#a0a09a]">Chargement...</div>
+            </div>
+        </div>
+    </div>
+
     </div>{{-- /px-8 --}}
 </div>
+
+{{-- ApexCharts + Analytics Script --}}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@latest"></script>
+<script>
+const vendorApiBase = '/vendeur/api/analytics';
+
+// Fonction helper pour les couleurs Supply
+const supplyColors = {
+    primary: '#0a0a0a',
+    success: '#22c55e',
+    warning: '#f59e0b',
+    danger: '#ef4444',
+    info: '#3b82f6',
+    purple: '#a78bfa',
+    gray: '#a0a09a',
+    border: '#e0e0dc',
+};
+
+// ═══════════════════════════════════════
+// 1. VENTES QUOTIDIENNES (30 jours)
+// ═══════════════════════════════════════
+fetch(`${vendorApiBase}/daily-sales`)
+    .then(res => res.json())
+    .then(data => {
+        const options = {
+            chart: {
+                type: 'area',
+                fontFamily: 'Geist, sans-serif',
+                toolbar: { show: false },
+                sparkline: { enabled: false },
+                animations: { enabled: true }
+            },
+            color: [supplyColors.primary],
+            stroke: { curve: 'smooth', width: 2, colors: [supplyColors.primary] },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.1,
+                    opacityTo: 0,
+                    stops: [0, 100]
+                }
+            },
+            dataLabels: { enabled: false },
+            xaxis: {
+                categories: data.dates,
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                labels: {
+                    style: { colors: supplyColors.gray, fontSize: '11px' },
+                    formatter: (val) => val
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: supplyColors.gray, fontSize: '11px' },
+                    formatter: (val) => `${(val / 1000).toFixed(0)}K`
+                }
+            },
+            grid: {
+                borderColor: supplyColors.border,
+                strokeDashArray: 3,
+                xaxis: { lines: { show: false } }
+            },
+            tooltip: {
+                theme: 'light',
+                style: { fontSize: '12px' },
+                x: { formatter: (val) => data.dates[val - 1] || val },
+                y: {
+                    formatter: (val) => `${number_format(val, 0, ',', ' ')} FCFA`
+                }
+            },
+            series: [
+                {
+                    name: 'Chiffre d\'affaires',
+                    data: data.sales
+                }
+            ]
+        };
+
+        new ApexCharts(document.querySelector('#dailySalesChart'), options).render();
+    });
+
+// ═══════════════════════════════════════
+// 2. VENTES PAR CATÉGORIE (Pie)
+// ═══════════════════════════════════════
+fetch(`${vendorApiBase}/sales-by-category`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.categories.length === 0) return;
+
+        const options = {
+            chart: {
+                type: 'donut',
+                fontFamily: 'Geist, sans-serif',
+                toolbar: { show: false }
+            },
+            colors: [
+                supplyColors.primary,
+                supplyColors.info,
+                supplyColors.warning,
+                supplyColors.purple,
+                supplyColors.success,
+                supplyColors.danger
+            ],
+            plotOptions: {
+                pie: {
+                    expandOnClick: true,
+                    donut: {
+                        size: '65%',
+                        labels: {
+                            show: true,
+                            name: { fontSize: '11px', color: supplyColors.gray },
+                            value: { fontSize: '14px', fontWeight: 600, color: supplyColors.primary }
+                        }
+                    }
+                }
+            },
+            labels: data.categories,
+            legend: {
+                position: 'right',
+                fontSize: '11px',
+                labels: { colors: supplyColors.primary }
+            },
+            dataLabels: { enabled: false },
+            tooltip: {
+                theme: 'light',
+                style: { fontSize: '12px' },
+                y: {
+                    formatter: (val) => `${number_format(val, 0, ',', ' ')} FCFA`
+                }
+            },
+            series: data.totals
+        };
+
+        new ApexCharts(document.querySelector('#categorySalesChart'), options).render();
+    });
+
+// ═══════════════════════════════════════
+// 3. TOP PRODUITS (Bar horizontal)
+// ═══════════════════════════════════════
+fetch(`${vendorApiBase}/top-products`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.products.length === 0) return;
+
+        const options = {
+            chart: {
+                type: 'bar',
+                fontFamily: 'Geist, sans-serif',
+                toolbar: { show: false },
+                sparkline: { enabled: false }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                    barHeight: '70%',
+                    dataLabels: { position: 'top' }
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                textAnchor: 'start',
+                style: { fontSize: '11px', fontWeight: 500, colors: [supplyColors.primary] },
+                formatter: (val) => `${number_format(val, 0, ',', ' ')} FCFA`,
+                offsetX: 0
+            },
+            colors: [supplyColors.primary],
+            xaxis: {
+                categories: data.products.map(p => p.nom.length > 20 ? p.nom.substring(0, 20) + '...' : p.nom),
+                axisBorder: { show: false },
+                labels: { show: false }
+            },
+            yaxis: {
+                labels: {
+                    style: { fontSize: '11px', colors: supplyColors.primary }
+                }
+            },
+            grid: { xaxis: { lines: { show: false } }, }
+        };
+
+        const series = [
+            {
+                name: 'Chiffre d\'affaires',
+                data: data.products.map(p => p.revenus)
+            }
+        ];
+
+        new ApexCharts(document.querySelector("#topProductsChart"), { ...options, series }).render();
+    });
+
+// ═══════════════════════════════════════
+// 4. COMPARAISON MOIS
+// ═══════════════════════════════════════
+fetch(`${vendorApiBase}/month-comparison`)
+    .then(res => res.json())
+    .then(data => {
+        if (!data.current_month_sales) return;
+
+        const container = document.getElementById('monthComparisonContainer');
+        container.classList.remove('hidden');
+
+        const options = {
+            chart: {
+                type: 'bar',
+                fontFamily: 'Geist, sans-serif',
+                toolbar: { show: false }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '60%',
+                    endingShape: 'rounded'
+                }
+            },
+            colors: [data.is_positive ? supplyColors.success : supplyColors.danger, supplyColors.border],
+            xaxis: {
+                categories: ['Mois précédent', 'Mois courant'],
+                axisBorder: { show: false },
+                labels: { style: { fontSize: '11px', colors: supplyColors.primary } }
+            },
+            yaxis: {
+                labels: {
+                    style: { fontSize: '11px', colors: supplyColors.gray },
+                    formatter: (val) => `${(val / 1000).toFixed(0)}K`
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                style: { fontSize: '12px', fontWeight: 600 },
+                formatter: (val) => `${number_format(val, 0, ',', ' ')} F`
+            },
+            grid: { borderColor: supplyColors.border },
+            tooltip: {
+                theme: 'light',
+                y: { formatter: (val) => `${number_format(val, 0, ',', ' ')} FCFA` }
+            },
+            series: [
+                {
+                    name: 'Chiffre d\'affaires',
+                    data: [data.previous_month_sales, data.current_month_sales]
+                }
+            ]
+        };
+
+        new ApexCharts(document.querySelector('#monthComparisonChart'), options).render();
+
+        // Afficher variation %
+        const variation = data.variation_percentage;
+        const variationEl = document.createElement('div');
+        variationEl.className = 'mt-4 text-[13px] font-medium';
+        variationEl.innerHTML = `
+            Variation: <span class="${data.is_positive ? 'text-green-600' : 'text-red-600'}">
+                ${data.is_positive ? '↑' : '↓'} ${Math.abs(variation)}%
+            </span>
+        `;
+        container.querySelector('h3').insertAdjacentElement('afterend', variationEl);
+    });
+
+// ═══════════════════════════════════════
+// 5. PRÉVISIONS RUPTURE STOCK
+// ═══════════════════════════════════════
+fetch(`${vendorApiBase}/stock-forecasts`)
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('stockForecastsContainer');
+        container.innerHTML = '';
+
+        if (data.forecasts.length === 0) {
+            container.innerHTML = '<div class="text-center py-6 text-[13px] text-[#a0a09a]">✓ Aucun produit à risque</div>';
+            return;
+        }
+
+        data.forecasts.forEach((forecast, idx) => {
+            const statusClass = forecast.critique
+                ? 'bg-[#fef2f2] border-[#fecaca]'
+                : forecast.alerte
+                  ? 'bg-[#fffbeb] border-[#fede8d]'
+                  : 'bg-[#f0fdf4] border-[#bbf7d0]';
+
+            const textClass = forecast.critique
+                ? 'text-[#dc2626]'
+                : forecast.alerte
+                  ? 'text-[#92400e]'
+                  : 'text-[#15803d]';
+
+            const html = `
+                <div class="p-4 border ${statusClass} rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="font-medium text-[13px] text-[#0a0a0a]">${forecast.nom}</div>
+                            <div class="text-[11px] text-[#666660] mt-1">
+                                Stock: <strong>${forecast.stock}</strong> |
+                                Ventes/j: <strong>${forecast.ventes_par_jour}</strong>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-mono font-bold text-[14px] ${textClass}">
+                                ${forecast.jours_restants}j
+                            </div>
+                            <div class="text-[10px] text-[#666660] mt-0.5">restants</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', html);
+        });
+    });
+
+// Fonction helper pour formater les nombres
+function number_format(num, decimals = 0, decPoint = '.', thousandsSep = ',') {
+    const parts = num.toFixed(decimals).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
+    return parts.join(decPoint);
+}
+</script>
 @endsection

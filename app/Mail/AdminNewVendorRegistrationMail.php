@@ -46,7 +46,7 @@ class AdminNewVendorRegistrationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.admin-vendor-notification',
+            view: 'emails.admin-new-vendor-registration',
             with: [
                 'vendor'            => $this->vendor,
                 'adminDashboardUrl' => route('admin.vendors.index'),

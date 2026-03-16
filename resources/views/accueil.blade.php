@@ -3,7 +3,7 @@
 @section('content')
 @auth
     {{-- ========== VENDOR DASHBOARD ========== --}}
-    @if(auth()->user()->role === 'vendor')
+    @if(auth()->user()->role === 'vendor' && auth()->user()->vendor_status === 'approved')
     <div class="bg-off-white min-h-screen">
         {{-- Header --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12 border-b border-gray-200">

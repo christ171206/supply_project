@@ -71,7 +71,7 @@
 
                     <!-- Buttons -->
                     <div class="border-t border-[#e0e0dc] pt-6 flex gap-3">
-                        <a href="{{ route('accueil') }}" class="flex-1 bg-[#0a0a0a] text-white text-center py-2 rounded-lg hover:opacity-85 font-medium text-sm transition">
+                        <a href="/" class="flex-1 bg-[#0a0a0a] text-white text-center py-2 rounded-lg hover:opacity-85 font-medium text-sm transition">
                             Retour à l'accueil
                         </a>
                         <a href="mailto:support@supply.ci" class="flex-1 border border-[#e0e0dc] text-center text-[#0a0a0a] py-2 rounded-lg hover:bg-[#f7f7f5] font-medium text-sm transition">
@@ -82,12 +82,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        // Empêcher uniquement le back button du navigateur
-        window.addEventListener('popstate', function() {
-            window.location.href = '{{ route("accueil") }}';
-        });
-    </script>
 </body>
 </html>

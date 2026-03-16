@@ -202,4 +202,38 @@ class User extends Authenticatable
 
         return $ban;
     }
+
+    /**
+     * Relation avec les badges de gamification
+     */
+    public function badges()
+    {
+        return $this->belongsToMany(BadgeType::class, 'user_badges')
+            ->withPivot('awarded_at', 'reason')
+            ->withTimestamps();
+    }
+
+    /**
+     * Relation avec les points de gamification
+     */
+    public function points()
+    {
+        return $this->hasOne(UserPoints::class);
+    }
+
+    /**
+     * Relation avec l'historique des points
+     */
+    public function pointTransactions()
+    {
+        return $this->hasMany(PointTransaction::class);
+    }
+
+    /**
+     * Relation avec les avis reçus (en tant que vendeur)
+     */
+    public function avisRecus()
+    {
+        return $this->hasManyThrough(Avis::class, Produit::class, 'user_id', 'produit_id');
+    }
 }

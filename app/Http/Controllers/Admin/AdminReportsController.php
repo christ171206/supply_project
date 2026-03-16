@@ -57,7 +57,7 @@ class AdminReportsController extends Controller
             ->leftJoin('produits', 'users.id', '=', 'produits.user_id')
             ->leftJoin('ligne_commandes', 'produits.id', '=', 'ligne_commandes.produit_id')
             ->leftJoin('commandes', 'ligne_commandes.commande_id', '=', 'commandes.id')
-            ->leftJoin('avis', 'commandes.id', '=', 'avis.commande_id')
+            ->leftJoin('avis', 'produits.id', '=', 'avis.produit_id')
             ->whereRaw('commandes.created_at BETWEEN ? AND ?', [$startDate, $endDate])
             ->where('commandes.statut', 'livree')
             ->groupBy('users.id', 'users.shop_name')

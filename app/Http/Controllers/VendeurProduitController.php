@@ -10,6 +10,7 @@ use App\Models\Avis;
 use App\Models\User;
 use App\Models\StockMouvement;
 use App\Services\StockService;
+use App\Helpers\ImageOptimizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -286,7 +287,7 @@ class VendeurProduitController extends Controller
             'categorie_id' => $validated['categorie_id'],
         ];
 
-        // Traiter les images multiples
+        // Traiter les images multiples avec optimisation
         $imagesPaths = [];
 
         if ($request->hasFile('images')) {
@@ -294,15 +295,25 @@ class VendeurProduitController extends Controller
             // Limiter à 5 images
             foreach (array_slice($uploadedImages, 0, 5) as $image) {
                 if ($image->isValid()) {
-                    $imagesPaths[] = $image->store('produits', 'public');
+                    try {
+                        $imagesPaths[] = ImageOptimizer::optimizeProduct($image);
+                    } catch (\Exception $e) {
+                        Log::error('Erreur optimisation image produit: ' . $e->getMessage());
+                        return back()->with('error', 'Erreur lors de l\'upload d\'une image: ' . $e->getMessage());
+                    }
                 }
             }
         }
 
         // Si pas d'images multiples mais une image unique (legacy)
         if (!$imagesPaths && $request->hasFile('image')) {
-            $imagesPaths[] = $request->file('image')->store('produits', 'public');
-            $data['image'] = $imagesPaths[0];
+            try {
+                $imagesPaths[] = ImageOptimizer::optimizeProduct($request->file('image'));
+                $data['image'] = $imagesPaths[0];
+            } catch (\Exception $e) {
+                Log::error('Erreur optimisation image produit: ' . $e->getMessage());
+                return back()->with('error', 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage());
+            }
         }
 
         if ($imagesPaths) {
@@ -378,14 +389,12 @@ class VendeurProduitController extends Controller
             'categorie_id' => $validated['categorie_id'],
         ];
 
-        // Traiter les images multiples
+        // Traiter les images multiples avec optimisation
         if ($request->hasFile('images')) {
             // Supprimer les anciennes images
             if ($produit->images && is_array($produit->images)) {
                 foreach ($produit->images as $oldImage) {
-                    if (Storage::disk('public')->exists($oldImage)) {
-                        Storage::disk('public')->delete($oldImage);
-                    }
+                    ImageOptimizer::delete($oldImage);
                 }
             }
 
@@ -394,7 +403,12 @@ class VendeurProduitController extends Controller
             // Limiter à 5 images
             foreach (array_slice($uploadedImages, 0, 5) as $image) {
                 if ($image->isValid()) {
-                    $imagesPaths[] = $image->store('produits', 'public');
+                    try {
+                        $imagesPaths[] = ImageOptimizer::optimizeProduct($image);
+                    } catch (\Exception $e) {
+                        Log::error('Erreur optimisation image: ' . $e->getMessage());
+                        return back()->with('error', 'Erreur lors de l\'upload d\'une image: ' . $e->getMessage());
+                    }
                 }
             }
 
@@ -404,12 +418,17 @@ class VendeurProduitController extends Controller
             }
         } else if ($request->hasFile('image')) {
             // Supprimer l'ancienne image
-            if ($produit->image && Storage::disk('public')->exists($produit->image)) {
-                Storage::disk('public')->delete($produit->image);
+            if ($produit->image) {
+                ImageOptimizer::delete($produit->image);
             }
-            $newImage = $request->file('image')->store('produits', 'public');
-            $data['image'] = $newImage;
-            $data['images'] = [$newImage];
+            try {
+                $newImage = ImageOptimizer::optimizeProduct($request->file('image'));
+                $data['image'] = $newImage;
+                $data['images'] = [$newImage];
+            } catch (\Exception $e) {
+                Log::error('Erreur optimisation image: ' . $e->getMessage());
+                return back()->with('error', 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage());
+            }
         }
 
         $produit->update($data);

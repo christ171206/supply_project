@@ -10,6 +10,7 @@ class PanierItem extends Model
     protected $fillable = [
         'panier_id',
         'produit_id',
+        'bundle_id',
         'quantite',
         'prix_unitaire',
     ];
@@ -22,5 +23,10 @@ class PanierItem extends Model
     public function produit()
     {
         return $this->belongsTo(Produit::class);
+    }
+
+    public function bundle()
+    {
+        return $this->belongsTo(Bundle::class);
     }
 }

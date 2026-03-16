@@ -147,8 +147,7 @@
                 this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
                 // Auto-submit si 6 chiffres saisis
                 if (this.value.length === 6) {
-                    // Optional: auto-submit après un délai
-                    // this.form.submit();
+                    this.form.submit();
                 }
             });
 

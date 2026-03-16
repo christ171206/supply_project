@@ -70,6 +70,11 @@ class Produit extends Model
         return $this->hasMany(Promotion::class);
     }
 
+    public function promoCodes()
+    {
+        return $this->belongsToMany(PromoCode::class, 'promo_code_produit');
+    }
+
     public function mouvementsStock()
     {
         return $this->hasMany(StockMouvement::class);
@@ -94,6 +99,19 @@ class Produit extends Model
     public function isStockCritique()
     {
         return $this->stock <= $this->stock_minimum;
+    }
+
+    /**
+     * Récupérer les promo codes actifs applicables à ce produit
+     */
+    public function getActivePromoCodes()
+    {
+        return $this->promoCodes()
+            ->where('statut', 'actif')
+            ->where('archive', false)
+            ->where('date_debut', '<=', now())
+            ->where('date_fin', '>=', now())
+            ->get();
     }
 
     /**

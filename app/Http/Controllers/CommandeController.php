@@ -43,6 +43,35 @@ class CommandeController extends Controller
     }
 
     /**
+     * Afficher la page de simulation de paiement
+     */
+    public function paymentSimulation($id)
+    {
+        $commande = Commande::with('payment')->findOrFail($id);
+
+        // Vérifier que l'utilisateur est propriétaire
+        if (auth()->user()->id !== $commande->user_id) {
+            abort(403);
+        }
+
+        // Créer un enregistrement de paiement s'il n'existe pas
+        if (!$commande->payment) {
+            $paymentCode = 'PAY-' . strtoupper(\Illuminate\Support\Str::random(12));
+            Payment::create([
+                'commande_id' => $commande->id,
+                'montant' => $commande->total,
+                'typePayement' => $commande->payment_method,
+                'statut' => 'en_attente',
+                'payment_status' => 'en_attente',
+                'payment_code' => $paymentCode,
+            ]);
+            $commande->refresh();
+        }
+
+        return view('commandes.payment-simulation', compact('commande'));
+    }
+
+    /**
      * Afficher le formulaire de paiement
      * Redirection vers login si non authentifié
      */
@@ -108,6 +137,8 @@ class CommandeController extends Controller
             ],
             'accept_conditions' => 'required|accepted',
             'phone_payment' => 'nullable|string',
+            'applied_promo_code' => 'nullable|string|max:50',
+            'promo_reduction_amount' => 'nullable|numeric|min:0',
         ], [
             'quartier_id.required' => 'Veuillez sélectionner un quartier',
             'quartier_id.exists' => 'Le quartier sélectionné n\'existe pas',
@@ -141,8 +172,24 @@ class CommandeController extends Controller
 
             // Calculer le total
             $total = $panier->items()->sum(DB::raw('quantite * prix_unitaire'));
+            $promoReduction = 0;
+            $promoCode = null;
 
-            Log::info('Total calculé', ['total' => $total]);
+            // Vérifier et appliquer le code promo
+            if ($request->applied_promo_code) {
+                $promoCode = \App\Models\PromoCode::where('code', $request->applied_promo_code)->first();
+
+                if ($promoCode && $promoCode->canBeUsed()) {
+                    $promoReduction = (float) $request->promo_reduction_amount;
+                    $total = max(0, $total - $promoReduction); // Ne pas laisser le total négatif
+                    Log::info('Code promo appliqué', [
+                        'code' => $promoCode->code,
+                        'reduction' => $promoReduction,
+                    ]);
+                }
+            }
+
+            Log::info('Total calculé', ['total' => $total, 'reduction' => $promoReduction]);
 
             // Construire l'adresse complète (optionnelle si quartier fourni)
             $adresseLivraison = '';
@@ -216,6 +263,19 @@ class CommandeController extends Controller
 
             Log::info('Paiement créé', ['payment_id' => $payment->id, 'code' => $paymentCode]);
 
+            // Enregistrer l'utilisation du code promo
+            if ($promoCode && $promoReduction > 0) {
+                \App\Models\PromoCodeUtilisation::create([
+                    'promo_code_id' => $promoCode->id,
+                    'commande_id' => $commande->id,
+                    'user_id' => $user->id,
+                    'montant_reduction' => $promoReduction,
+                ]);
+
+                // Incrémenter le compteur d'utilisation
+                $promoCode->increment('utilisations');
+            }
+
             // Vider le panier
             $panier->items()->delete();
 
@@ -260,64 +320,8 @@ class CommandeController extends Controller
                 // Continuer même si la création du rappel échoue
             }
 
-            // Rediriger vers la page de confirmation avec possibilité de paiement
-            $redirectUrl = route('commandes.show', $commande->id);
-
-            // Si paiement par carte, rediriger vers Stripe
-            if ($request->payment_method === 'card') {
-                return redirect()->route('payment.show', $commande->id);
-            }
-
-            // Si paiement mobile, initier la transaction de paiement (CinetPay)
-            if (in_array($request->payment_method, ['wave', 'orange_money', 'mtn_money', 'moov_money'])) {
-                try {
-                    $paymentService = new PaymentService();
-
-                    $paymentData = [
-                        'transaction_id' => $paymentCode,
-                        'amount' => intval($commande->total),
-                        'currency' => 'XOF',
-                        'description' => "Commande #" . $commande->id . " - Supply Market",
-                        'customer_name' => auth()->user()->name,
-                        'customer_email' => auth()->user()->email,
-                        'customer_phone' => $request->phone_payment,
-                        'return_url' => route('commandes.show', $commande->id),
-                        'notify_url' => route('api.payment-webhook'),
-                    ];
-
-                    // Mapper les méthodes de paiement
-                    $paymentMethods = [
-                        'wave' => 'createWavePayment',
-                        'orange_money' => 'createOrangeMoneyPayment',
-                        'mtn_money' => 'createMobileMoneyPayment',
-                        'moov_money' => 'createMobileMoneyPayment',
-                    ];
-
-                    $method = $paymentMethods[$request->payment_method] ?? 'createPayment';
-                    $response = $paymentService->$method($paymentData);
-
-                    Log::info('Réponse API Paiement', $response);
-
-                    // Si succès, rediriger vers la plateforme de paiement
-                    if (isset($response['code']) && $response['code'] == 'SUCCESFUL') {
-                        return redirect()->to($response['payment_url'] ?? $redirectUrl)
-                            ->with('success', 'Veuillez confirmer votre paiement');
-                    } else {
-                        // En cas de problème, rediriger vers la commande avec un message
-                        return redirect()->to($redirectUrl)
-                            ->with('warning', 'Paiement en attente de confirmation');
-                    }
-                } catch (\Exception $paymentError) {
-                    Log::error('Erreur API Paiement: ' . $paymentError->getMessage());
-                    // Rediriger vers la commande même en cas d'erreur API
-                    return redirect()->to($redirectUrl)
-                        ->with('warning', 'Commande créée mais vérification paiement échouée. Veuillez réessayer.');
-                }
-            } else {
-                // Paiement à la livraison (cash)
-                return redirect()->to($redirectUrl)
-                    ->with('success', 'Commande créée avec succès! Vous paierez à la livraison.');
-            }
+            // Rediriger vers le résumé de la commande
+            return redirect()->route('commandes.show', $commande->id);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur création commande: ' . $e->getMessage(), [
@@ -493,15 +497,18 @@ class CommandeController extends Controller
             abort(403);
         }
 
-        $lignes = $commande->ligneCommandes()->with('produit')->get();
-        $payment = $commande->payment;
-
-        // If payment is not confirmed, show pending message
-        if ($payment && $payment->payment_status === 'en_attente') {
-            return view('commandes.payment-pending', compact('commande', 'lignes', 'payment'));
+        // Marquer le paiement comme confirmé
+        if ($commande->payment) {
+            $commande->payment->update([
+                'statut' => 'confirme',
+                'payment_status' => 'confirmee'
+            ]);
         }
 
-        return view('commandes.show', compact('commande', 'lignes', 'payment'));
+        // Mettre à jour le statut de la commande
+        $commande->update(['statut' => 'confirmee']);
+
+        return view('commandes.payment-success', compact('commande'));
     }
 
     /**

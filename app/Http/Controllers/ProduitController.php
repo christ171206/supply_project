@@ -22,14 +22,19 @@ class ProduitController extends Controller
             return redirect('/admin/dashboard');
         }
 
-        // Rediriger les vendeurs
-        if (auth()->check() && auth()->user()->role === 'vendor') {
+        // Rediriger les vendeurs APPROUVÉS seulement
+        if (auth()->check() && auth()->user()->role === 'vendor' && auth()->user()->vendor_status === 'approved') {
             return redirect()->route('vendeur.dashboard');
         }
 
-        // Cache categories pour 24h
-        $categories = Cache::remember('categories_homepage', 86400, function () {
-            return Categorie::select('id', 'nom', 'image')->get();
+        // Cache categories pour 12h - mais seulement celles avec des produits actifs, triées alphabétiquement
+        $categories = Cache::remember('categories_homepage', 43200, function () {
+            return Categorie::select('id', 'nom', 'image')
+                ->whereHas('produits', function ($query) {
+                    $query->where('est_actif', true);
+                })
+                ->orderBy('nom', 'asc')
+                ->get();
         });
 
         // Eager loading + select colonnes essentielles seulement
@@ -56,9 +61,14 @@ class ProduitController extends Controller
      */
     public function catalogue(Request $request)
     {
-        // Cache categories
-        $categories = Cache::remember('categories_catalogue', 86400, function () {
-            return Categorie::select('id', 'nom', 'image')->get();
+        // Cache categories - seulement celles avec des produits actifs, triées alphabétiquement
+        $categories = Cache::remember('categories_catalogue', 43200, function () {
+            return Categorie::select('id', 'nom', 'image')
+                ->whereHas('produits', function ($query) {
+                    $query->where('est_actif', true);
+                })
+                ->orderBy('nom', 'asc')
+                ->get();
         });
 
         // Optimize: select seulement colonnes nécessaires
@@ -125,14 +135,14 @@ class ProduitController extends Controller
             'categorie:id,nom'
         ])->findOrFail($id);
 
-        // Produits similaires avec eager loading
-        $produitsSimilaires = Produit::select('id', 'categorie_id', 'user_id', 'nom', 'slug', 'description', 'prix', 'stock', 'image', 'est_actif')
-            ->with('vendeur:id,name,shop_name')
-            ->where('categorie_id', $produit->categorie_id)
-            ->where('id', '!=', $id)
-            ->where('est_actif', true)
-            ->limit(4)
-            ->get();
+        // Service pour les recommandations
+        $recommendationService = app('App\Services\RecommendationService');
+
+        // Produits similaires
+        $similarProducts = $recommendationService->getSimilarProducts($id, 4);
+
+        // Produits fréquemment achetés ensemble
+        $frequentlyBought = $recommendationService->getFrequentlyBoughtTogether($id, 4);
 
         // Récupérer avis avec pagination
         $avis = $produit->avis()
@@ -154,7 +164,9 @@ class ProduitController extends Controller
 
         return view('produits.show', [
             'produit' => $produit,
-            'produitsSimilaires' => $produitsSimilaires,
+            'produitsSimilaires' => $similarProducts,
+            'similarProducts' => $similarProducts,
+            'frequentlyBought' => $frequentlyBought,
             'avis' => $avis,
             'noteMoyenne' => $noteMoyenne,
             'nombreAvis' => $nombreAvis,

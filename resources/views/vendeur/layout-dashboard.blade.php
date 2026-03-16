@@ -90,6 +90,33 @@
                 Commandes
             </a>
 
+            <a href="{{ route('vendeur.promo-codes.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.promo-codes*') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7M3 7V5a2 2 0 012-2h14a2 2 0 012 2v2"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="2"/><path d="M7 12h10"/>
+                </svg>
+                Codes Promo
+            </a>
+
+            <a href="{{ route('vendeur.flash-sales.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.flash-sales*') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                Soldes Éclair
+            </a>
+
+            <a href="{{ route('vendeur.bundles.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.bundles*') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M9 2v4"/><path d="M15 2v4"/><line x1="6" y1="10" x2="18" y2="10"/>
+                </svg>
+                Bundles
+            </a>
+
             {{-- Client --}}
             <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/25 px-3 pt-4 pb-2">Client</div>
 

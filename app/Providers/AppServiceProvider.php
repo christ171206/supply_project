@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use App\View\Composers\AdminNotificationComposer;
+use App\Models\Categorie;
+use App\Observers\CategorieObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,5 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Register notification composer for admin layout
         View::composer('layouts.admin-layout', AdminNotificationComposer::class);
+
+        // Observateurs pour invalider le cache
+        Categorie::observe(CategorieObserver::class);
     }
 }

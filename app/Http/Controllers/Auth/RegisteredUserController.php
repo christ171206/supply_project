@@ -90,7 +90,7 @@ class RegisteredUserController extends Controller
             $userData['shop_name'] = $request->shop_name;
             $userData['phone'] = $request->phone;
             $userData['address'] = $request->address;
-            $userData['vendor_status'] = 'approved'; // Activé automatiquement
+            $userData['vendor_status'] = 'pending_validation'; // En attente de soumission de documents
         }
 
         // Créer l'utilisateur
@@ -106,12 +106,12 @@ class RegisteredUserController extends Controller
             'email_verification_code_sent_at' => now(),
         ]);
 
-        // Envoyer l'email avec le code (en queue tout de suite)
+        // Envoyer l'email avec le code (immédiatement)
         try {
-            Mail::to($user->email)->queue(new EmailVerificationCodeMail($user, $verificationCode));
-            Log::info('Email de vérification mis en queue', ['email' => $user->email]);
+            Mail::to($user->email)->send(new EmailVerificationCodeMail($user, $verificationCode));
+            Log::info('Email de vérification envoyé', ['email' => $user->email]);
         } catch (\Exception $e) {
-            Log::error('Erreur lors de la mise en queue de l\'email de vérification: ' . $e->getMessage());
+            Log::error('Erreur lors de l\'envoi de l\'email de vérification: ' . $e->getMessage());
             // Important: Ne pas bloquer l'inscription si l'email échoue
         }
 

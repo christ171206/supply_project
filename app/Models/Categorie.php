@@ -39,4 +39,9 @@ class Categorie extends Model
     {
         return $this->hasMany(Produit::class);
     }
+
+    public function flashSales()
+    {
+        return $this->hasMany(FlashSale::class);
+    }
 }

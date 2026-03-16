@@ -56,6 +56,34 @@
                     {{ $produit->categorie->nom }}
                 </span>
             @endif
+
+            {{-- Flash Sale Badge --}}
+            @php
+                $flashSale = null;
+                if($produit->categorie) {
+                    $flashSale = \App\Models\FlashSale::where('categorie_id', $produit->categorie->id)
+                        ->where('user_id', $produit->user_id)
+                        ->where('statut', 'actif')
+                        ->whereDate('date_fin', '>=', now())
+                        ->first();
+                }
+            @endphp
+            @if($flashSale && $flashSale->isActive())
+                <span class="bg-red-500 text-white px-2 py-0.5 rounded text-[10px] font-medium flex items-center gap-1">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    -{{ $flashSale->pourcentage_reduction }}%
+                </span>
+            @endif
+
+            @php
+                $activePromos = $produit->getActivePromoCodes();
+            @endphp
+            @if($activePromos->count() > 0)
+                <span class="bg-orange-500 text-white px-2 py-0.5 rounded text-[10px] font-medium flex items-center gap-1">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 00.948-.684l1.498-4.493a1 1 0 011.502 0l1.498 4.493a1 1 0 00.948.684H19a2 2 0 012 2v2h1a1 1 0 110 2h-1v6h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-3.28a1 1 0 00-.948.684l-1.498 4.493a1 1 0 01-1.502 0l-1.498-4.493a1 1 0 00-.948-.684H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V7H2a1 1 0 010-2h1V5z"/></svg>
+                    Promo
+                </span>
+            @endif
         </div>
 
         {{-- Favori --}}
@@ -98,9 +126,29 @@
 
         {{-- Prix --}}
         <div>
-            <div class="text-[15px] font-medium text-[#0a0a0a] font-mono tracking-tight leading-none">
-                {{ number_format($produit->prix, 0, ',', ' ') }}
-            </div>
+            @php
+                $flashSale = null;
+                if($produit->categorie) {
+                    $flashSale = \App\Models\FlashSale::where('categorie_id', $produit->categorie->id)
+                        ->where('user_id', $produit->user_id)
+                        ->where('statut', 'actif')
+                        ->whereDate('date_fin', '>=', now())
+                        ->first();
+                }
+                $prixAffiche = $flashSale && $flashSale->isActive() ? $flashSale->prixReduit($produit->prix) : $produit->prix;
+            @endphp
+            @if($flashSale && $flashSale->isActive())
+                <div class="text-[11px] text-[#a0a09a] line-through font-mono tracking-tight leading-none mb-1">
+                    {{ number_format($produit->prix, 0, ',', ' ') }}
+                </div>
+                <div class="text-[15px] font-medium text-[#0a0a0a] font-mono tracking-tight leading-none">
+                    {{ number_format($prixAffiche, 0, ',', ' ') }}
+                </div>
+            @else
+                <div class="text-[15px] font-medium text-[#0a0a0a] font-mono tracking-tight leading-none">
+                    {{ number_format($prixAffiche, 0, ',', ' ') }}
+                </div>
+            @endif
             <div class="text-[10px] text-[#a0a09a] mt-0.5">FCFA</div>
         </div>
 

@@ -77,6 +77,12 @@
                             id="modal-quantity"
                             value="1"
                             min="1"
+                            step="1"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            oninput="validateQuantity()"
+                            onchange="validateQuantity()"
+                            onkeydown="return /[0-9]/.test(event.key) || ['Backspace','Delete','Tab'].includes(event.key)"
                             class="flex-1 text-center text-xl font-bold py-2 border border-[#e0e0dc] rounded-lg focus:outline-none focus:border-[#0a0a0a] bg-white"
                         >
                         <button
@@ -87,6 +93,9 @@
                             +
                         </button>
                     </div>
+                    <p id="quantity-warning" class="text-sm text-red-600 mt-2 hidden">
+                        Quantité maximale: <span id="max-qty">0</span> unités
+                    </p>
                 </div>
 
                 <!-- Prix Total -->
@@ -130,12 +139,20 @@
                 quantityModalData = { productId, productName, stock, price };
 
                 const modal = document.getElementById('quantity-modal');
+                const input = document.getElementById('modal-quantity');
+
                 document.getElementById('modal-product-name').textContent = productName;
                 document.getElementById('modal-stock').textContent = stock + ' unités';
-                document.getElementById('modal-quantity').value = 1;
-                document.getElementById('modal-quantity').max = stock;
+
+                // Réinitialiser le champ de quantité
+                input.value = '1';
+                input.min = '1';
+                input.max = stock.toString();
+                document.getElementById('max-qty').textContent = stock;
+                document.getElementById('quantity-warning').classList.add('hidden');
 
                 updateModalPrice();
+
                 // Prevent layout shift by hiding scrollbar
                 document.body.style.overflow = 'hidden';
                 modal.classList.remove('modal-hidden');
@@ -152,20 +169,59 @@
                 }
             }
 
+            // Valider et limiter la quantité selon le stock
+            function validateQuantity() {
+                const input = document.getElementById('modal-quantity');
+                let value = input.value ? String(input.value).trim() : '1';
+
+                if (!value || value === '') {
+                    input.value = '1';
+                    updateModalPrice();
+                    return;
+                }
+
+                // Accepter seulement les chiffres
+                let cleanValue = value.replace(/[^0-9]/g, '');
+
+                if (!cleanValue) {
+                    input.value = '1';
+                    updateModalPrice();
+                    return;
+                }
+
+                let intValue = parseInt(cleanValue, 10);
+                const maxStock = quantityModalData.stock || 1;
+
+                if (intValue < 1) {
+                    intValue = 1;
+                } else if (intValue > maxStock) {
+                    intValue = maxStock;
+                }
+
+                input.value = String(intValue);
+                updateModalPrice();
+            }
+
             function decreaseQuantity() {
                 const input = document.getElementById('modal-quantity');
+                const warning = document.getElementById('quantity-warning');
                 if(parseInt(input.value) > 1) {
                     input.value = parseInt(input.value) - 1;
+                    warning.classList.add('hidden');
                     updateModalPrice();
                 }
             }
 
             function increaseQuantity() {
                 const input = document.getElementById('modal-quantity');
+                const warning = document.getElementById('quantity-warning');
                 const maxStock = quantityModalData.stock;
                 if(parseInt(input.value) < maxStock) {
                     input.value = parseInt(input.value) + 1;
+                    warning.classList.add('hidden');
                     updateModalPrice();
+                } else {
+                    warning.classList.remove('hidden');
                 }
             }
 
@@ -177,10 +233,46 @@
             }
 
             function submitAddToCart() {
-                const quantity = parseInt(document.getElementById('modal-quantity').value);
+                const input = document.getElementById('modal-quantity');
+
+                // Sécurité multiple pour garantir une valeur valide
+                let rawValue = input.value ? String(input.value).trim() : '';
+
+                // Si vide ou invalide, utiliser 1
+                if (!rawValue) {
+                    rawValue = '1';
+                    input.value = '1';
+                }
+
+                // Extraire les chiffres seulement
+                let cleanValue = rawValue.replace(/[^0-9]/g, '');
+
+                if (!cleanValue) {
+                    cleanValue = '1';
+                    input.value = '1';
+                }
+
+                // Convertir en entier sûr
+                let quantity = parseInt(cleanValue, 10);
+
+                // Vérifier que la conversion a fonctionné
+                if (isNaN(quantity) || quantity < 1) {
+                    quantity = 1;
+                    input.value = '1';
+                }
+
                 const productId = quantityModalData.productId;
+                const maxStock = quantityModalData.stock;
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
+                // Dernière vérification des limites
+                if (quantity > maxStock) {
+                    quantity = maxStock;
+                }
+
+                console.log('Envoi au serveur - Quantité:', quantity, 'Type:', typeof quantity);
+
+                // Envoyer au serveur
                 fetch('/panier/ajouter/' + productId, {
                     method: 'POST',
                     headers: {
@@ -192,26 +284,35 @@
                         quantite: quantity
                     })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         closeQuantityModal();
                         updateCartBadge();
                         showSuccessNotification(data.message);
                     } else {
-                        alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
+                        showErrorNotification(data.message || 'Une erreur est survenue');
                     }
                 })
                 .catch(error => {
                     console.error('Erreur:', error);
-                    alert('Une erreur est survenue lors de l\'ajout au panier');
+                    let errorMsg = 'Erreur de connexion';
+                    if (error && error.message) {
+                        errorMsg = error.message;
+                    }
+                    showErrorNotification(errorMsg);
                 });
             }
 
             // Afficher une notification de succès
             function showSuccessNotification(message) {
                 const notification = document.createElement('div');
-                notification.className = 'fixed top-4 right-4 bg-[#0a0a0a] text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                notification.className = 'fixed top-4 right-4 bg-[#0a0a0a] text-white px-6 py-3 rounded-lg shadow-lg z-50 font-semibold';
                 notification.textContent = message;
                 notification.style.animation = 'slideIn 0.3s ease-in-out';
                 document.body.appendChild(notification);
@@ -220,6 +321,20 @@
                     notification.style.animation = 'slideOut 0.3s ease-in-out';
                     setTimeout(() => notification.remove(), 300);
                 }, 3000);
+            }
+
+            // Afficher une notification d'erreur
+            function showErrorNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 font-semibold';
+                notification.textContent = message;
+                notification.style.animation = 'slideIn 0.3s ease-in-out';
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease-in-out';
+                    setTimeout(() => notification.remove(), 300);
+                }, 4000);
             }
 
             // Fermer le modal avec Escape

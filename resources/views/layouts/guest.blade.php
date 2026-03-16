@@ -22,7 +22,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
         <!-- Styles -->
-        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/pwa.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-body bg-white text-black antialiased">
         @yield('content')

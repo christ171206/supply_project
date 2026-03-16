@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Categorie;
 use App\Services\AuditService;
+use App\Helpers\ImageOptimizer;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\View\View;
@@ -25,8 +26,8 @@ class AdminCategoryController extends Controller
         }
 
         // Tri
-        $sortBy = $request->input('sort_by', 'created_at');
-        $sortOrder = $request->input('sort_order', 'DESC');
+        $sortBy = $request->input('sort_by', 'nom');
+        $sortOrder = $request->input('sort_order', 'ASC');
         $query->orderBy($sortBy, $sortOrder);
 
         $categories = $query->paginate(15);
@@ -53,14 +54,18 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255|unique:categories,nom',
             'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'is_active' => 'boolean',
         ]);
 
-        // Gérer l'upload d'image si fourni
+        // Gérer l'upload d'image avec optimisation
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('categories', 'public');
+            try {
+                $imagePath = ImageOptimizer::optimizeCategory($request->file('image'));
+            } catch (\Exception $e) {
+                return back()->with('error', 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage());
+            }
         }
 
         $category = Categorie::create([
@@ -110,7 +115,7 @@ class AdminCategoryController extends Controller
         $validated = $request->validate([
             'nom' => 'required|string|max:255|unique:categories,nom,' . $category->id,
             'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'is_active' => 'boolean',
         ]);
 
@@ -122,13 +127,18 @@ class AdminCategoryController extends Controller
             'is_active' => $validated['is_active'] ?? true,
         ];
 
-        // Gérer l'upload d'image si fourni
+        // Gérer l'upload d'image avec optimisation
         if ($request->hasFile('image')) {
-            // Supprimer l'ancienne image si elle existe
-            if ($category->image && Storage::disk('public')->exists($category->image)) {
-                Storage::disk('public')->delete($category->image);
+            try {
+                // Supprimer l'ancienne image
+                if ($category->image) {
+                    ImageOptimizer::delete($category->image);
+                }
+                // Optimiser et sauvegarder la nouvelle
+                $updateData['image'] = ImageOptimizer::optimizeCategory($request->file('image'));
+            } catch (\Exception $e) {
+                return back()->with('error', 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage());
             }
-            $updateData['image'] = $request->file('image')->store('categories', 'public');
         }
 
         $category->update($updateData);

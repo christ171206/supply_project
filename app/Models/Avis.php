@@ -17,11 +17,26 @@ class Avis extends Model
         'deleted_by_admin',
         'deleted_at',
         'delete_reason',
+        // Critères avancés
+        'qualite_note',
+        'livraison_note',
+        'communication_note',
+        'rapport_qualite_prix',
+        'points_positifs',
+        'points_negatifs',
+        'recommande',
+        'utilite_votes',
+        'type_acheteur',
+        'contient_images',
+        'images_urls',
     ];
 
     protected $casts = [
         'lu' => 'boolean',
         'is_appropriate' => 'boolean',
+        'recommande' => 'boolean',
+        'contient_images' => 'boolean',
+        'images_urls' => 'array',
         'deleted_at' => 'datetime',
     ];
 

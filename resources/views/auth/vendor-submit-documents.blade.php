@@ -67,19 +67,21 @@
 
                         <!-- Front photo -->
                         <div>
-                            <label class="text-sm font-medium mb-2 block text-[#0a0a0a]">Recto (avant)</label>
+                            <label class="text-sm font-medium mb-2 block text-[#0a0a0a]">Recto (avant) 📸</label>
                             <input type="file" name="id_front" accept="image/*" required onchange="previewImage(this, 'preview_front')"
                                 class="w-full px-3 py-2 border border-[#e0e0dc] rounded-lg text-sm" />
                             <img id="preview_front" class="hidden mt-3 w-full rounded-lg border border-[#e0e0dc] max-h-40 object-cover" />
+                            <p class="text-xs text-[#a0a09a] mt-1.5">📋 Votre carte bien visible, tous les coins</p>
                             @error('id_front')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
 
                         <!-- Back photo -->
                         <div>
-                            <label class="text-sm font-medium mb-2 block text-[#0a0a0a]">Verso (arrière)</label>
+                            <label class="text-sm font-medium mb-2 block text-[#0a0a0a]">Verso (arrière) 📸</label>
                             <input type="file" name="id_back" accept="image/*" required onchange="previewImage(this, 'preview_back')"
                                 class="w-full px-3 py-2 border border-[#e0e0dc] rounded-lg text-sm" />
                             <img id="preview_back" class="hidden mt-3 w-full rounded-lg border border-[#e0e0dc] max-h-40 object-cover" />
+                            <p class="text-xs text-[#a0a09a] mt-1.5">📋 Numéro du document visible, bien éclairé</p>
                             @error('id_back')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
 

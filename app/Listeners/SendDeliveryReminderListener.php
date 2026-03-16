@@ -6,7 +6,7 @@ use App\Models\Notification;
 use App\Models\DeliveryReminder;
 use Illuminate\Support\Facades\Log;
 
-class SendDeliveryReminderNotification
+class SendDeliveryReminderListener
 {
     /**
      * Create the event listener.
@@ -51,7 +51,7 @@ class SendDeliveryReminderNotification
 
             Log::info("✅ Rappel de livraison créé - Commande: {$commande->numero}, Rappel dans {$daysBefore} jours");
         } catch (\Exception $error) {
-            Log::error('❌ Erreur SendDeliveryReminderNotification: ' . $error->getMessage(), ['exception' => $error]);
+            Log::error('❌ Erreur SendDeliveryReminderListener: ' . $error->getMessage(), ['exception' => $error]);
         }
     }
 }

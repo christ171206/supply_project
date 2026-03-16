@@ -5,6 +5,46 @@
 {{-- Toast container --}}
 <div id="notification-container" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
+<!-- Payment Processing Modal -->
+<div id="payment-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4">
+        <div class="flex flex-col items-center gap-6">
+            <!-- Animated spinner -->
+            <div class="relative w-16 h-16">
+                <div class="absolute inset-0 rounded-full border-4 border-[#efefed]"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-[#0a0a0a] border-r-[#0a0a0a] animate-spin"></div>
+            </div>
+
+            <!-- Status text -->
+            <div class="text-center">
+                <h3 class="text-[16px] font-medium text-[#0a0a0a] mb-1.5" id="payment-status">
+                    Traitement du paiement...
+                </h3>
+                <p class="text-[13px] text-[#a0a09a] font-light" id="payment-details">
+                    Veuillez patienter quelques secondes
+                </p>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="w-full bg-[#efefed] rounded-full h-1 overflow-hidden">
+                <div id="payment-progress" class="bg-[#0a0a0a] h-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <!-- Payment info -->
+            <div class="bg-[#f7f7f5] rounded-lg p-4 w-full text-[12px] text-[#2a2a28] space-y-1">
+                <div class="flex justify-between">
+                    <span class="text-[#a0a09a]">Montant :</span>
+                    <span class="font-mono font-medium" id="payment-amount">0 FCFA</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#a0a09a]">Moyen :</span>
+                    <span class="font-medium" id="payment-method-display">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="min-h-screen bg-[#f7f7f5]">
 <div class="max-w-5xl mx-auto px-4 py-10">
 
@@ -20,18 +60,24 @@
             @php $steps = ['Livraison','Paiement','Confirmation']; @endphp
             @foreach($steps as $i => $step)
                 <div class="flex items-center gap-0">
-                    <div class="flex flex-col items-center">
-                        <div class="w-7 h-7 rounded-sm flex items-center justify-center text-[11px] font-mono font-medium
-                            {{ $i < 2 ? 'bg-[#0a0a0a] text-white' : 'bg-[#efefed] text-[#a0a09a]' }}">
-                            {{ $i + 1 }}
+                    <button type="button" class="step-indicator cursor-pointer" data-step="{{ $i + 1 }}" style="border:none;background:none;padding:0;"
+                        title="Aller à l'étape {{ $i + 1 }}">
+                        <div class="flex flex-col items-center">
+                            <div class="w-7 h-7 rounded-sm flex items-center justify-center text-[11px] font-mono font-medium transition-all
+                                {{ $i === 0 ? 'bg-[#0a0a0a] text-white' : 'bg-[#efefed] text-[#a0a09a]' }}"
+                                id="step-{{ $i + 1 }}-indicator">
+                                {{ $i + 1 }}
+                            </div>
+                            <span class="text-[9px] font-medium tracking-[0.06em] uppercase mt-1.5 transition-all
+                                {{ $i === 0 ? 'text-[#0a0a0a]' : 'text-[#a0a09a]' }}"
+                                id="step-{{ $i + 1 }}-label">
+                                {{ $step }}
+                            </span>
                         </div>
-                        <span class="text-[9px] font-medium tracking-[0.06em] uppercase mt-1.5
-                            {{ $i < 2 ? 'text-[#0a0a0a]' : 'text-[#a0a09a]' }}">
-                            {{ $step }}
-                        </span>
-                    </div>
+                    </button>
                     @if(!$loop->last)
-                        <div class="w-10 h-px {{ $i < 1 ? 'bg-[#0a0a0a]' : 'bg-[#e0e0dc]' }} mx-2 mb-4"></div>
+                        <div class="w-10 h-px {{ $i === 0 ? 'bg-[#0a0a0a]' : 'bg-[#e0e0dc]' }} mx-2 mb-4 transition-colors"
+                             id="step-{{ $i + 1 }}-line"></div>
                     @endif
                 </div>
             @endforeach
@@ -47,6 +93,8 @@
         <form action="{{ route('commandes.store') }}" method="POST" id="payment-form" class="space-y-4">
         @csrf
 
+        <!-- STEP 1: LIVRAISON -->
+        <div class="step-section" data-step="1">
         {{-- ── Section Livraison ── --}}
         <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
             <div class="flex items-center gap-3 px-5 py-4 border-b border-[#efefed]">
@@ -145,7 +193,10 @@
 
             </div>
         </div>
+        </div><!-- End STEP 1 -->
 
+        <!-- STEP 2: PAIEMENT -->
+        <div class="step-section hidden" data-step="2">
         {{-- ── Section Paiement ── --}}
         <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
             <div class="flex items-center gap-3 px-5 py-4 border-b border-[#efefed]">
@@ -223,11 +274,31 @@
                            placeholder="+225 01 23 45 67 89"
                            class="w-full px-3.5 py-3 text-[13px] text-[#0a0a0a] bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg placeholder-[#a0a09a] focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-colors">
                 </div>
+
+                {{-- Code Promo --}}
+                <div class="mt-4">
+                    <label for="promo_code" class="block text-[10px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-2">
+                        Code promo (optionnel)
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" id="promo_code" name="promo_code"
+                               placeholder="Entrer un code promo..."
+                               class="flex-1 px-3.5 py-3 text-[13px] text-[#0a0a0a] bg-[#f7f7f5] border border-[#e0e0dc] rounded-lg placeholder-[#a0a09a] focus:outline-none focus:border-[#0a0a0a] focus:bg-white transition-colors"
+                               autocomplete="off">
+                        <button type="button" id="apply-promo-btn"
+                                class="px-4 py-3 bg-[#0a0a0a] text-white text-[13px] font-medium rounded-lg hover:opacity-85 transition-opacity">
+                            Appliquer
+                        </button>
+                    </div>
+                    <div id="promo-message" class="mt-2"></div>
+                    <input type="hidden" id="applied-promo-code" name="applied_promo_code" value="">
+                    <input type="hidden" id="promo-reduction-amount" name="promo_reduction_amount" value="0">
+                </div>
             </div>
         </div>
 
         {{-- ── Conditions ── --}}
-        <div class="bg-white border border-[#e0e0dc] rounded-xl px-5 py-4">
+        <div class="bg-white border border-[#e0e0dc] rounded-xl px-5 py-4 step-content" data-step="2">
             <label class="flex items-start gap-3 cursor-pointer">
                 <input type="checkbox" name="accept_conditions" required
                        class="mt-0.5 w-4 h-4 border border-[#e0e0dc] rounded cursor-pointer accent-[#0a0a0a] flex-shrink-0">
@@ -245,19 +316,85 @@
         <input type="hidden" id="hidden-quartier-id" name="quartier_id" value="">
         <input type="hidden" id="hidden-adresse-livraison" name="adresse_livraison" value="">
 
-        {{-- Boutons --}}
-        <div class="flex gap-3">
+        {{-- Boutons Step 1 & 2 --}}
+        <div class="flex gap-3 step-buttons" id="step-12-buttons">
             <a href="{{ route('panier.index') }}"
                class="flex items-center gap-2 px-4 py-3 border border-[#e0e0dc] rounded-lg text-[13px] font-medium text-[#666660] hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
                 Panier
             </a>
+            <button type="button" id="next-btn-step1" class="step-next-btn flex-1 flex items-center justify-center gap-2 bg-[#0a0a0a] text-white text-[13px] font-medium py-3 rounded-lg hover:opacity-85 transition-opacity" data-current-step="1">
+                Continuer vers le paiement
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button type="button" id="prev-btn-step2" class="hidden step-prev-btn px-4 py-3 border border-[#e0e0dc] rounded-lg text-[13px] font-medium text-[#666660] hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all gap-2 flex items-center">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Retour
+            </button>
+            <button type="button" id="next-btn-step2" class="hidden step-next-btn flex-1 flex items-center justify-center gap-2 bg-[#0a0a0a] text-white text-[13px] font-medium py-3 rounded-lg hover:opacity-85 transition-opacity" data-current-step="2">
+                Vérifier la commande
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+        </div><!-- End STEP 2 -->
+
+        <!-- STEP 3: CONFIRMATION -->
+        <div class="step-section hidden" data-step="3">
+        <div class="bg-white border border-[#e0e0dc] rounded-xl overflow-hidden">
+            <div class="flex items-center gap-3 px-5 py-4 border-b border-[#efefed]">
+                <div class="w-5 h-5 bg-[#0a0a0a] rounded-sm flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 16c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                </div>
+                <span class="text-[13px] font-medium text-[#0a0a0a]">Vérifier votre commande</span>
+            </div>
+
+            <div class="p-5 space-y-4">
+                <div class="bg-[#f7f7f5] rounded-lg p-4">
+                    <h4 class="text-[12px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-3">Adresse de livraison</h4>
+                    <div class="space-y-1">
+                        <p class="text-[13px] font-medium text-[#0a0a0a]" id="confirm-adresse"></p>
+                        <p class="text-[12px] text-[#666660]" id="confirm-phone"></p>
+                    </div>
+                </div>
+
+                <div class="bg-[#f7f7f5] rounded-lg p-4">
+                    <h4 class="text-[12px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-3">Méthode de paiement</h4>
+                    <p class="text-[13px] font-medium text-[#0a0a0a]" id="confirm-payment"></p>
+                </div>
+
+                <div class="bg-[#f7f7f5] rounded-lg p-4">
+                    <h4 class="text-[12px] font-medium tracking-[0.08em] uppercase text-[#a0a09a] mb-3">Récapitulatif</h4>
+                    <div class="space-y-2 text-[13px]">
+                        <div class="flex justify-between">
+                            <span class="text-[#666660]">Articles</span>
+                            <span class="font-mono" id="confirm-subtotal"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-[#666660]">Livraison</span>
+                            <span class="font-mono" id="confirm-shipping"></span>
+                        </div>
+                        <div class="border-t border-[#e0e0dc] pt-2 mt-2 flex justify-between font-medium">
+                            <span>Total</span>
+                            <span class="font-mono text-[14px]" id="confirm-total"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Boutons Step 3 --}}
+        <div class="flex gap-3">
+            <button type="button" id="prev-btn-step3" class="step-prev-btn px-4 py-3 border border-[#e0e0dc] rounded-lg text-[13px] font-medium text-[#666660] hover:border-[#2a2a28] hover:text-[#0a0a0a] transition-all gap-2 flex items-center">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Retour
+            </button>
             <button type="submit" id="submit-btn"
                     class="flex-1 flex items-center justify-center gap-2 bg-[#0a0a0a] text-white text-[13px] font-medium py-3 rounded-lg hover:opacity-85 transition-opacity">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                Confirmer la commande
+                Confirmer et payer
             </button>
         </div>
+        </div><!-- End STEP 3 -->
 
         </form>
 
@@ -389,12 +526,164 @@ input:-webkit-autofill {
 <script>
 const API_BASE = '{{ url("/api") }}';
 let searchTimeout;
+let currentStep = 1;
+const TOTAL_STEPS = 3;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadRegions();
     setupEventListeners();
     setupFormValidation();
+    setupPromoCodeHandlers();
+    setupMultiStepNavigation();
 });
+
+function setupMultiStepNavigation() {
+    // Step indicators click
+    document.querySelectorAll('.step-indicator').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetStep = parseInt(btn.dataset.step);
+            if (targetStep < currentStep || validateCurrentStep()) {
+                goToStep(targetStep);
+            }
+        });
+    });
+
+    // Next buttons
+    document.querySelectorAll('.step-next-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const nextStep = currentStep + 1;
+            if (nextStep <= TOTAL_STEPS && validateCurrentStep()) {
+                if (nextStep === 3) {
+                    populateConfirmationStep();
+                }
+                goToStep(nextStep);
+            }
+        });
+    });
+
+    // Previous buttons
+    document.querySelectorAll('.step-prev-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        });
+    });
+}
+
+function goToStep(step) {
+    if (step < 1 || step > TOTAL_STEPS) return;
+
+    // Hide all sections
+    document.querySelectorAll('.step-section').forEach(s => s.classList.add('hidden'));
+
+    // Show current section
+    document.querySelector(`.step-section[data-step="${step}"]`).classList.remove('hidden');
+
+    // Update stepper UI
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+        const indicator = document.getElementById(`step-${i}-indicator`);
+        const label = document.getElementById(`step-${i}-label`);
+        const line = document.getElementById(`step-${i}-line`);
+
+        const isActive = i === step;
+        const isPassed = i < step;
+
+        indicator.classList.toggle('bg-[#0a0a0a]', isActive || isPassed);
+        indicator.classList.toggle('text-white', isActive || isPassed);
+        indicator.classList.toggle('bg-[#efefed]', !isActive && !isPassed);
+        indicator.classList.toggle('text-[#a0a09a]', !isActive && !isPassed);
+
+        label.classList.toggle('text-[#0a0a0a]', isActive || isPassed);
+        label.classList.toggle('text-[#a0a09a]', !isActive && !isPassed);
+
+        if (line) {
+            line.classList.toggle('bg-[#0a0a0a]', isPassed);
+            line.classList.toggle('bg-[#e0e0dc]', !isPassed);
+        }
+    }
+
+    // Update buttons visibility
+    document.getElementById('next-btn-step1').classList.toggle('hidden', step !== 1);
+    document.getElementById('prev-btn-step2').classList.toggle('hidden', step !== 2);
+    document.getElementById('next-btn-step2').classList.toggle('hidden', step !== 2);
+    document.getElementById('prev-btn-step3').classList.toggle('hidden', step !== 3);
+    document.getElementById('submit-btn').classList.toggle('hidden', step !== 3);
+
+    currentStep = step;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateCurrentStep() {
+    const errors = [];
+
+    if (currentStep === 1) {
+        // Validate delivery address
+        const adresseDetail = document.getElementById('adresse_detail').value.trim();
+        const telephone = document.getElementById('telephone_livraison').value.trim();
+        const quartierOrSearch = document.getElementById('quartier').value || document.getElementById('location-search').value;
+
+        if (!adresseDetail || adresseDetail.length < 5) {
+            errors.push('Adresse détaillée invalide (min. 5 caractères)');
+        }
+        if (telephone.replace(/\D/g, '').length < 10) {
+            errors.push('Téléphone invalide (min. 10 chiffres)');
+        }
+        if (!quartierOrSearch) {
+            errors.push('Sélectionnez un quartier');
+        }
+    } else if (currentStep === 2) {
+        // Validate payment method and conditions
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        const phonePayment = document.getElementById('phone_payment').value.trim();
+        const phoneRequired = !document.getElementById('phone-payment-section').classList.contains('hidden');
+        const conditions = document.querySelector('input[name="accept_conditions"]:checked');
+
+        if (!paymentMethod) {
+            errors.push('Sélectionnez un moyen de paiement');
+        }
+        if (phoneRequired && !phonePayment) {
+            errors.push('Numéro de téléphone requis pour ce paiement');
+        }
+        if (!conditions) {
+            errors.push('Acceptez les conditions pour continuer');
+        }
+    }
+
+    if (errors.length) {
+        errors.forEach(err => showNotification(err, 'error'));
+        return false;
+    }
+    return true;
+}
+
+function populateConfirmationStep() {
+    const adresseDetail = document.getElementById('adresse_detail').value.trim();
+    const telephone = document.getElementById('telephone_livraison').value.trim();
+    const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value || '';
+    const total = document.getElementById('total-amount').textContent.trim();
+    const subtotal = @json($total);
+    const shipping = subtotal > 100 ? 'Gratuite' : '2 500 FCFA';
+
+    const paymentLabels = {
+        'wave': 'Wave',
+        'orange_money': 'Orange Money',
+        'mtn_money': 'MTN Money',
+        'moov_money': 'Moov Money',
+        'card': 'Carte Bancaire',
+        'cash': 'À la livraison'
+    };
+
+    document.getElementById('confirm-adresse').textContent = adresseDetail;
+    document.getElementById('confirm-phone').textContent = telephone;
+    document.getElementById('confirm-payment').textContent = paymentLabels[paymentMethod] || paymentMethod;
+    document.getElementById('confirm-subtotal').textContent = new Intl.NumberFormat('fr-FR').format(subtotal) + ' FCFA';
+    document.getElementById('confirm-shipping').textContent = shipping;
+    document.getElementById('confirm-total').textContent = total;
+}
 
 function setupEventListeners() {
     // Tabs
@@ -579,6 +868,129 @@ function togglePhoneSection() {
     if (!show) phone.value = '';
 }
 
+// Code Promo functionality
+function setupPromoCodeHandlers() {
+    const applyBtn = document.getElementById('apply-promo-btn');
+    const promoInput = document.getElementById('promo_code');
+    const messageDiv = document.getElementById('promo-message');
+
+    applyBtn?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const code = promoInput.value.trim().toUpperCase();
+
+        if (!code) {
+            setPromoMessage('Veuillez entrer un code', 'error');
+            return;
+        }
+
+        try {
+            applyBtn.disabled = true;
+            applyBtn.innerHTML = `<span class="opacity-50">Vérification...</span>`;
+
+            // Récupérer le CSRF token du formulaire
+            const formElement = document.getElementById('payment-form');
+            const csrfToken = formElement ? formElement.querySelector('input[name="_token"]').value : document.querySelector('meta[name="csrf-token"]')?.content;
+
+            const response = await fetch('{{ route("vendeur.promo-codes.check") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ code: code })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setPromoMessage(data.message || 'Code invalide ou expiré', 'error');
+                applyBtn.disabled = false;
+                applyBtn.innerHTML = 'Appliquer';
+                return;
+            }
+
+            // Code is valid
+            document.getElementById('applied-promo-code').value = code;
+            const reduction = Math.round(data.reduction) || 0;
+            document.getElementById('promo-reduction-amount').value = reduction;
+
+            // Update total
+            updateTotalWithPromo(reduction);
+
+            setPromoMessage(`Code appliqué! Réduction: ${number_format(reduction)} FCFA`, 'success');
+            promoInput.disabled = true;
+            applyBtn.disabled = true;
+            applyBtn.innerHTML = '✓ Appliqué';
+
+        } catch (error) {
+            console.error('Error:', error);
+            setPromoMessage('Erreur lors de la vérification', 'error');
+            applyBtn.disabled = false;
+            applyBtn.innerHTML = 'Appliquer';
+        }
+    });
+
+    // Permettre à l'utilisateur de supprimer le code
+    promoInput?.addEventListener('focus', function() {
+        if (this.disabled && document.getElementById('applied-promo-code').value) {
+            // Montrer option de supprimer
+            const msgDiv = document.getElementById('promo-message');
+            if (msgDiv.querySelector('.promo-remove-btn')) {
+                // Bouton existe déjà
+                return;
+            }
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'promo-remove-btn mt-2 text-[11px] text-blue-600 hover:underline';
+            btn.textContent = 'Supprimer ce code';
+            btn.onclick = removePromo;
+            msgDiv.appendChild(btn);
+        }
+    });
+}
+
+function setPromoMessage(message, type = 'info') {
+    const messageDiv = document.getElementById('promo-message');
+    const bgColor = type === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200';
+    const textColor = type === 'success' ? 'text-green-700' : 'text-red-700';
+    const iconColor = type === 'success' ? 'text-green-600' : 'text-red-600';
+
+    messageDiv.innerHTML = `
+        <div class="p-3 ${bgColor} border rounded-lg flex items-start gap-2">
+            <svg class="w-4 h-4 ${iconColor} mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                ${type === 'success' ? '<polyline points="20 6 9 17 4 12"/>' : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'}
+            </svg>
+            <span class="text-[12px] ${textColor}">${message}</span>
+        </div>
+    `;
+}
+
+function updateTotalWithPromo(reduction) {
+    const subtotal = @json($total);
+    const shipping = subtotal > 100 ? 0 : 2500;
+    const newTotal = subtotal + shipping - reduction;
+
+    document.getElementById('total-amount').textContent = number_format(newTotal) + ' FCFA';
+}
+
+function removePromo() {
+    document.getElementById('applied-promo-code').value = '';
+    document.getElementById('promo-reduction-amount').value = '0';
+    document.getElementById('promo_code').disabled = false;
+    document.getElementById('apply-promo-btn').disabled = false;
+    document.getElementById('apply-promo-btn').innerHTML = 'Appliquer';
+    document.getElementById('promo-message').innerHTML = '';
+
+    const subtotal = @json($total);
+    const shipping = subtotal > 100 ? 0 : 2500;
+    document.getElementById('total-amount').textContent = number_format(subtotal + shipping) + ' FCFA';
+}
+
+function number_format(number) {
+    return new Intl.NumberFormat('fr-FR').format(Math.round(number));
+}
+
 function setupFormValidation() {
     const form = document.getElementById('payment-form');
     if (!form) return;
@@ -586,41 +998,74 @@ function setupFormValidation() {
     form.addEventListener('submit', e => {
         e.preventDefault();
         const quartierIdFinal = document.getElementById('quartier').value || document.getElementById('hidden-quartier-id').value;
-        const adresseDetail   = document.getElementById('adresse_detail').value.trim();
-        const telephone       = document.getElementById('telephone_livraison').value.trim();
-        const paymentMethod   = document.querySelector('input[name="payment_method"]:checked');
-        const phonePayment    = document.getElementById('phone_payment').value.trim();
-        const phoneRequired   = !document.getElementById('phone-payment-section').classList.contains('hidden');
-        const conditions      = document.querySelector('input[name="accept_conditions"]:checked');
+        if (quartierIdFinal) document.getElementById('hidden-quartier-id').value = quartierIdFinal;
 
-        const errors = [];
-        if (!adresseDetail || adresseDetail.length < 5) errors.push('Adresse détaillée invalide (min. 5 caractères)');
-        if (telephone.replace(/\D/g, '').length < 10)  errors.push('Téléphone invalide (min. 10 chiffres)');
-        if (!paymentMethod)                             errors.push('Sélectionnez un moyen de paiement');
-        if (phoneRequired && !phonePayment)             errors.push('Numéro de téléphone requis pour ce paiement');
-        if (!conditions)                                errors.push('Acceptez les conditions pour continuer');
+        // Show payment modal
+        showPaymentAnimation();
+    });
+}
 
-        if (errors.length) {
-            errors.forEach(err => showNotification(err, 'error'));
+function showPaymentAnimation() {
+    const modal = document.getElementById('payment-modal');
+    const progressBar = document.getElementById('payment-progress');
+    const statusText = document.getElementById('payment-status');
+    const detailsText = document.getElementById('payment-details');
+    const amountDisplay = document.getElementById('payment-amount');
+    const methodDisplay = document.getElementById('payment-method-display');
+
+    // Get payment details
+    const total = document.getElementById('total-amount').textContent.trim();
+    const method = document.querySelector('input[name="payment_method"]:checked')?.value || '';
+
+    const methodLabels = {
+        'wave': 'Wave',
+        'orange_money': 'Orange Money',
+        'mtn_money': 'MTN Money',
+        'moov_money': 'Moov Money',
+        'card': 'Carte Bancaire',
+        'cash': 'À la livraison'
+    };
+
+    // Update modal content
+    amountDisplay.textContent = total;
+    methodDisplay.textContent = methodLabels[method] || method;
+
+    // Show modal
+    modal.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    statusText.textContent = 'Traitement du paiement...';
+    detailsText.textContent = 'Veuillez patienter quelques secondes';
+
+    // Simulate payment processing
+    const steps = [
+        { progress: 20, delay: 400, text: 'Vérification des données...', details: 'Validation de l\'adresse' },
+        { progress: 50, delay: 400, text: 'Connexion au prestataire...', details: 'Authentification sécurisée' },
+        { progress: 80, delay: 600, text: 'Confirmation du paiement...', details: 'Traitement en cours' },
+        { progress: 100, delay: 500, text: 'Paiement réussi! ✓', details: 'Redirection en cours...' }
+    ];
+
+    let currentStep = 0;
+
+    function processNextStep() {
+        if (currentStep >= steps.length) {
+            // Payment complete, submit form
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('payment-form').submit();
+            }, 800);
             return;
         }
 
-        if (quartierIdFinal) document.getElementById('hidden-quartier-id').value = quartierIdFinal;
+        const step = steps[currentStep];
+        progressBar.style.width = step.progress + '%';
+        statusText.textContent = step.text;
+        detailsText.textContent = step.details;
 
-        const btn = document.getElementById('submit-btn');
-        btn.disabled = true;
-        btn.innerHTML = 'Traitement en cours…';
-        showNotification('Commande en cours d\'envoi…', 'info');
+        currentStep++;
+        setTimeout(processNextStep, step.delay);
+    }
 
-        setTimeout(() => {
-            try { form.submit(); }
-            catch(err) {
-                showNotification(`Erreur: ${err.message}`, 'error');
-                btn.disabled = false;
-                btn.innerHTML = 'Confirmer la commande';
-            }
-        }, 800);
-    });
+    processNextStep();
 }
 
 function showNotification(message, type = 'info') {

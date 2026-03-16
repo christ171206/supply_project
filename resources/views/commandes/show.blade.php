@@ -185,6 +185,13 @@
 
             {{-- Actions --}}
             <div class="space-y-2">
+                @if($commande->statut !== 'confirmee')
+                    <a href="{{ route('commandes.payment-simulation', $commande->id) }}"
+                       class="flex items-center justify-center gap-2 w-full bg-[#0a0a0a] text-white text-[12px] font-medium py-3 rounded-lg hover:opacity-85 transition-opacity">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22m11-11H1m16-6l-4 4m4-4l-4-4"/></svg>
+                        Procéder au paiement
+                    </a>
+                @endif
                 <a href="{{ route('commandes.download-pdf', $commande->id) }}"
                    class="flex items-center justify-center gap-2 w-full bg-[#0a0a0a] text-white text-[12px] font-medium py-3 rounded-lg hover:opacity-85 transition-opacity">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

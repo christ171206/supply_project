@@ -108,18 +108,41 @@
 
             {{-- Prix --}}
             <div class="mb-4 sm:mb-5 pb-4 sm:pb-5 border-b border-[#efefed]">
-                <div class="flex flex-wrap items-baseline gap-2 sm:gap-3">
+                @php
+                    $flashSale = null;
+                    if($produit->categorie) {
+                        $flashSale = \App\Models\FlashSale::where('categorie_id', $produit->categorie->id)
+                            ->where('statut', 'actif')
+                            ->whereDate('date_fin', '>=', now())
+                            ->first();
+                    }
+                    $prixAffiche = $flashSale && $flashSale->isActive() ? $flashSale->prixReduit($produit->prix) : $produit->prix;
+                @endphp
+                <div class="flex flex-wrap items-baseline gap-2 sm:gap-3 mb-3">
+                    @if($flashSale && $flashSale->isActive())
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-[11px] font-medium">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            Vente Flash -{{ $flashSale->pourcentage_reduction }}%
+                        </span>
+                    @endif
                     <span class="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-[32px] font-medium tracking-tight text-[#0a0a0a] leading-none">
-                        {{ number_format($produit->prix, 0, ',', ' ') }}
+                        {{ number_format($prixAffiche, 0, ',', ' ') }}
                     </span>
                     <span class="text-[13px] sm:text-[14px] text-[#a0a09a] font-light">FCFA</span>
-                    @if($produit->prix_original && $produit->prix_original > $produit->prix)
+                    @if($flashSale && $flashSale->isActive())
+                        <span class="text-[13px] text-[#a0a09a] line-through font-mono">{{ number_format($produit->prix, 0, ',', ' ') }}</span>
+                    @elseif($produit->prix_original && $produit->prix_original > $produit->prix)
                         <span class="text-[13px] text-[#a0a09a] line-through font-mono">{{ number_format($produit->prix_original, 0, ',', ' ') }}</span>
                         <span class="text-[10px] font-medium bg-[#f0fdf4] text-[#15803d] px-2 py-0.5 rounded">
                             -{{ round((($produit->prix_original - $produit->prix) / $produit->prix_original) * 100) }}%
                         </span>
                     @endif
                 </div>
+                @if($flashSale && $flashSale->isActive())
+                    <p class="text-[12px] text-[#a0a09a]">
+                        ⏱ Offre valide jusqu'au {{ $flashSale->date_fin->format('d/m/Y') }}
+                    </p>
+                @endif
             </div>
 
             {{-- Stock --}}
@@ -409,6 +432,113 @@
     </div>
 
     {{-- ══════════════════════════════
+         BUNDLES CONTENANT CE PRODUIT
+    ══════════════════════════════ --}}
+    @php
+        $bundlesAvecProduit = \App\Models\Bundle::whereHas('produits', function($q) {
+            $q->where('produit_id', $produit->id);
+        })->where('statut', 'actif')->with('produits')->limit(4)->get();
+    @endphp
+    @if($bundlesAvecProduit && count($bundlesAvecProduit) > 0)
+        <div class="mb-12 md:mb-16">
+            <div class="flex items-baseline justify-between mb-6">
+                <h2 class="font-serif text-[22px] tracking-tight">
+                    Offres <em class="italic text-[#666660]">groupées</em>
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach($bundlesAvecProduit as $bundle)
+                    @php
+                        $prixOriginalBundle = $bundle->produits_sum_prix ?? 0;
+                        $economie = $prixOriginalBundle - $bundle->prix;
+                        $pourcentageEconomie = $prixOriginalBundle > 0 ? round(($economie / $prixOriginalBundle) * 100) : 0;
+                    @endphp
+                    <div class="border border-[#e0e0dc] rounded-xl overflow-hidden hover:border-[#2a2a28] hover:shadow-md transition-all duration-200 bg-white group cursor-pointer"
+                         onclick="openBundleModal({{ $bundle->id }}, '{{ addslashes($bundle->nom) }}', {{ $bundle->prix }}, {{ $prixOriginalBundle }})">
+                        {{-- En-tête du bundle --}}
+                        <div class="px-5 py-4 border-b border-[#efefed] bg-gradient-to-r from-[#f7f7f5] to-white">
+                            <div class="flex items-start justify-between gap-3 mb-2">
+                                <div class="flex-1">
+                                    <h3 class="font-serif text-[15px] text-[#0a0a0a] leading-tight mb-1">
+                                        {{ $bundle->nom }}
+                                    </h3>
+                                    <p class="text-[12px] text-[#a0a09a] font-light">
+                                        {{ $bundle->produits->count() }} produit{{ $bundle->produits->count() > 1 ? 's' : '' }}
+                                    </p>
+                                </div>
+                                @if($economie > 0)
+                                    <span class="inline-flex items-center px-2.5 py-1.5 bg-green-100 text-green-700 rounded-lg text-[10px] font-medium whitespace-nowrap">
+                                        Économisez {{ number_format($economie, 0, ',', ' ') }} FCFA
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- Contenu du bundle --}}
+                        <div class="px-5 py-4">
+                            {{-- Mini liste des produits --}}
+                            <div class="space-y-2 mb-4">
+                                @foreach($bundle->produits->take(2) as $itemBundle)
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-3.5 h-3.5 text-[#a0a09a] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                        <span class="text-[12px] text-[#666660] font-light">
+                                            {{ Str::limit($itemBundle->nom, 35) }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                                @if($bundle->produits->count() > 2)
+                                    <div class="flex items-center gap-2 pt-1">
+                                        <div class="w-3.5 h-3.5"></div>
+                                        <span class="text-[12px] text-[#a0a09a] italic">
+                                            +{{ $bundle->produits->count() - 2 }} autre{{ $bundle->produits->count() - 2 > 1 ? 's' : '' }}
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Séparateur --}}
+                            <div class="h-[1px] bg-[#efefed] my-4"></div>
+
+                            {{-- Pricing --}}
+                            <div class="flex items-end justify-between">
+                                <div>
+                                    <div class="text-[11px] text-[#a0a09a] font-light mb-1">Prix du bundle</div>
+                                    <div class="flex items-baseline gap-2">
+                                        <span class="font-mono font-medium text-[18px] text-[#0a0a0a]">
+                                            {{ number_format($bundle->prix, 0, ',', ' ') }}
+                                        </span>
+                                        <span class="text-[12px] text-[#a0a09a]">FCFA</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[11px] text-[#a0a09a] font-light mb-1">Au lieu de</div>
+                                    <div class="text-[12px] font-mono text-[#a0a09a] line-through">
+                                        {{ number_format($prixOriginalBundle, 0, ',', ' ') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Footer CTA --}}
+                        <div class="px-5 py-3 border-t border-[#efefed] bg-[#f7f7f5]">
+                            <button type="button" onclick="event.stopPropagation(); openQuantityModal({{ $bundle->id }}, '{{ addslashes($bundle->nom) }}', 999, {{ $bundle->prix_bundle }})"
+                                    class="w-full py-2.5 bg-[#0a0a0a] text-white text-[12px] font-medium rounded-lg
+                                    group-hover:opacity-85 transition-all duration-150 flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                                </svg>
+                                Ajouter au panier
+                            </button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    {{-- ══════════════════════════════
          PRODUITS SIMILAIRES
     ══════════════════════════════ --}}
     @if($produitsSimilaires && count($produitsSimilaires) > 0)
@@ -498,6 +628,17 @@
         </div>
     </div>
 </div>
+
+{{-- Recommandations produits --}}
+<x-product-recommendations
+    :products="$similarProducts ?? []"
+    title="Produits similaires"
+    type="similar" />
+
+<x-product-recommendations
+    :products="$frequentlyBought ?? []"
+    title="Les clients ont aussi acheté"
+    type="together" />
 
 <script>
 function openContactModal(vendorId, vendorName, productId, productName) {
@@ -629,6 +770,114 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+</script>
+
+{{-- ══════════════════════════════════════════
+    Section RECOMMANDATIONS
+══════════════════════════════════════════ --}}
+<div class="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-8 py-12 sm:py-16 border-t border-[#e0e0dc]">
+    {{-- Conteneur pour les recommandations --}}
+    <div id="recommendationsContainer" class="space-y-12">
+        {{-- Les recommandations seront chargées ici via JavaScript --}}
+    </div>
+</div>
+
+<script>
+// ═════════════════════════════════════════
+// SYSTÈME DE RECOMMANDATIONS
+// ═════════════════════════════════════════
+
+const productId = {{ $produit->id }};
+
+async function loadRecommendations() {
+    const container = document.getElementById('recommendationsContainer');
+    const recommendations = [
+        { endpoint: 'similar', order: 1 },
+        { endpoint: 'bought-together', order: 2 },
+        { endpoint: 'popular', order: 3 },
+    ];
+
+    // Charger les recommandations en parallèle
+    const promises = recommendations.map(rec =>
+        fetch(`/api/recommendations/${rec.endpoint}/${productId}`)
+            .then(r => r.json())
+            .then(data => ({ ...data, order: rec.order }))
+            .catch(() => null)
+    );
+
+    const results = await Promise.all(promises);
+    const validResults = results.filter(r => r && r.produits.length > 0).sort((a, b) => a.order - b.order);
+
+    // Afficher les recommandations
+    validResults.forEach(recommendation => {
+        container.insertAdjacentHTML('beforeend', renderRecommendationSection(recommendation));
+    });
+
+    // Si aucune recommandation, charger trending
+    if (validResults.length === 0) {
+        try {
+            const trending = await fetch('/api/recommendations/trending').then(r => r.json());
+            if (trending.produits.length > 0) {
+                container.insertAdjacentHTML('beforeend', renderRecommendationSection(trending));
+            }
+        } catch (e) {
+            console.log('Pas de recommandations disponibles');
+        }
+    }
+}
+
+function renderRecommendationSection(recommendation) {
+    const { titre, produits } = recommendation;
+
+    const productsHTML = produits.map(p => `
+        <a href="/produits/${p.id}" class="group">
+            <div class="border border-[#e0e0dc] rounded-lg overflow-hidden hover:border-[#0a0a0a] transition-all hover:shadow-sm">
+                {{-- Image --}}
+                <div class="aspect-square bg-[#f7f7f5] overflow-hidden flex items-center justify-center">
+                    <img
+                        src="${p.image ? '/storage/' + p.image : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23e0e0dc%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2248%22 text-anchor=%22middle%22 dy=%22.3em%22%3E📦%3C/text%3E%3C/svg%3E'}"
+                        alt="${p.nom}"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        loading="lazy"
+                    />
+                </div>
+                {{-- Info --}}
+                <div class="p-4">
+                    <h3 class="font-medium text-[13px] text-[#0a0a0a] line-clamp-2 mb-2">${p.nom}</h3>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="font-mono font-bold text-[14px] text-[#0a0a0a]">${new Intl.NumberFormat('fr-FR').format(p.prix)} F</span>
+                        ${p.badge ? `<span class="text-[10px] font-medium text-[#f59e0b]">${p.badge}</span>` : ''}
+                    </div>
+                    {{-- Notes --}}
+                    ${p.nombre_avis > 0 ? `
+                        <div class="flex items-center gap-1 mb-3">
+                            <div class="flex gap-0.5">
+                                ${'★'.repeat(Math.floor(p.note))}<span class="text-[#e0e0dc]">${'★'.repeat(5 - Math.floor(p.note))}</span>
+                            </div>
+                            <span class="text-[10px] text-[#a0a09a]">(${p.nombre_avis})</span>
+                        </div>
+                    ` : ''}
+                    {{-- Stock status --}}
+                    <div class="text-[11px] ${p.stock > 0 ? 'text-[#15803d]' : 'text-[#dc2626]'}">
+                        ${p.stock > 0 ? `✓ ${p.stock} en stock` : '✗ Rupture'}
+                    </div>
+                </div>
+            </div>
+        </a>
+    `).join('');
+
+    return `
+        <div>
+            <h2 class="text-[14px] font-medium text-[#0a0a0a] mb-6">${titre}</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                ${productsHTML}
+            </div>
+        </div>
+    `;
+}
+
+// Charger les recommandations au démarrage
+document.addEventListener('DOMContentLoaded', loadRecommendations);
 </script>
 
 @endsection
