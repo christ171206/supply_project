@@ -96,6 +96,7 @@
                 <div class="absolute right-0 mt-0 w-48 bg-white border border-[#e0e0dc] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 py-2 z-10">
                     <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-[13px] text-[#0a0a0a] hover:bg-[#f7f7f5]">Profil</a>
                     <a href="{{ route('commandes.index') }}" class="block px-4 py-2 text-[13px] text-[#0a0a0a] hover:bg-[#f7f7f5]">Mes commandes</a>
+                    <a href="{{ route('support.index') }}" class="block px-4 py-2 text-[13px] text-[#0a0a0a] hover:bg-[#f7f7f5]">Support</a>
                     <form method="POST" action="{{ route('logout') }}" class="block">
                         @csrf
                         <button type="submit" class="w-full text-left px-4 py-2 text-[13px] text-[#0a0a0a] hover:bg-[#f7f7f5]">Déconnexion</button>

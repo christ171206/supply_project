@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminAvisController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminBannedWordController;
+use App\Http\Controllers\Admin\AdminGlobalOfferController;
+use App\Http\Controllers\Admin\AdminAbuseRuleController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:web', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -218,5 +220,43 @@ Route::middleware(['auth:web', 'admin'])->prefix('admin')->name('admin.')->group
         Route::post('update', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('update');
         Route::post('export-data', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'exportData'])->name('export-data');
         Route::get('audit-logs', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'getAuditLogs'])->name('audit-logs');
+    });
+
+
+
+    // Global Offers Management (Admin only)
+    Route::prefix('global-offers')->name('global-offers.')->group(function () {
+        Route::get('/', [AdminGlobalOfferController::class, 'index'])->name('index');
+        Route::get('create', [AdminGlobalOfferController::class, 'create'])->name('create');
+        Route::post('/', [AdminGlobalOfferController::class, 'store'])->name('store');
+        Route::get('{offer}', [AdminGlobalOfferController::class, 'show'])->name('show');
+        Route::get('{offer}/edit', [AdminGlobalOfferController::class, 'edit'])->name('edit');
+        Route::put('{offer}', [AdminGlobalOfferController::class, 'update'])->name('update');
+        Route::post('{offer}/toggle', [AdminGlobalOfferController::class, 'toggle'])->name('toggle');
+        Route::post('{offer}/duplicate', [AdminGlobalOfferController::class, 'duplicate'])->name('duplicate');
+        Route::delete('{offer}', [AdminGlobalOfferController::class, 'destroy'])->name('destroy');
+
+        // API endpoints
+        Route::get('api/target-options', [AdminGlobalOfferController::class, 'getTargetOptions'])->name('api.target-options');
+        Route::post('api/test-calculation', [AdminGlobalOfferController::class, 'testCalculation'])->name('api.test-calculation');
+        Route::get('{offer}/stats', [AdminGlobalOfferController::class, 'getStats'])->name('stats');
+        Route::get('export/csv', [AdminGlobalOfferController::class, 'export'])->name('export');
+    });
+
+    // Anti-Abuse Rules Management (Admin only)
+    Route::prefix('abuse-rules')->name('abuse-rules.')->group(function () {
+        Route::get('/', [AdminAbuseRuleController::class, 'index'])->name('index');
+        Route::get('create', [AdminAbuseRuleController::class, 'create'])->name('create');
+        Route::post('/', [AdminAbuseRuleController::class, 'store'])->name('store');
+        Route::get('{rule}', [AdminAbuseRuleController::class, 'show'])->name('show');
+        Route::get('{rule}/edit', [AdminAbuseRuleController::class, 'edit'])->name('edit');
+        Route::put('{rule}', [AdminAbuseRuleController::class, 'update'])->name('update');
+        Route::post('{rule}/toggle', [AdminAbuseRuleController::class, 'toggle'])->name('toggle');
+        Route::delete('{rule}', [AdminAbuseRuleController::class, 'destroy'])->name('destroy');
+
+        // Violations log
+        Route::get('violations/list', [AdminAbuseRuleController::class, 'violations'])->name('violations');
+        Route::post('violations/{violation}/handle', [AdminAbuseRuleController::class, 'handleViolation'])->name('handle-violation');
+        Route::get('violations/export', [AdminAbuseRuleController::class, 'exportViolations'])->name('export-violations');
     });
 });

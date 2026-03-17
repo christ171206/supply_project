@@ -17,7 +17,7 @@
 
         .wrapper {
             max-width: 560px;
-            margin: 40px auto;
+            margin: 0;
             background: #ffffff;
             border: 1px solid #e0e0dc;
             border-radius: 12px;
@@ -28,6 +28,7 @@
         .header {
             background: #0a0a0a;
             padding: 28px 32px 24px;
+            text-align: center;
         }
         .header-label {
             font-size: 10px;
@@ -81,12 +82,14 @@
             font-size: 14px;
             color: #2a2a28;
             margin-bottom: 6px;
+            text-align: center;
         }
         .greeting-sub {
             font-size: 13px;
             color: #666660;
             font-weight: 300;
             margin-bottom: 28px;
+            text-align: center;
         }
 
         /* ── Section label ── */
@@ -97,6 +100,7 @@
             text-transform: uppercase;
             color: #a0a09a;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         /* ── Client block ── */
@@ -241,7 +245,8 @@
         .divider {
             border: none;
             border-top: 1px solid #efefed;
-            margin: 0 0 20px;
+            margin: 0 auto 20px auto;
+            width: 80%;
         }
 
         /* ── Sign-off ── */
@@ -250,6 +255,7 @@
             color: #666660;
             font-weight: 300;
             line-height: 1.7;
+            text-align: center;
         }
 
         /* ── Footer ── */
@@ -275,8 +281,17 @@
         }
     </style>
 </head>
-<body>
-<div class="wrapper">
+<body style="background-color: #f7f7f5; margin: 0; padding: 0;">
+
+<!-- Centering wrapper table for email clients -->
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7f7f5;">
+    <tr>
+        <td align="center" style="padding: 40px 20px;">
+            <table width="100%" style="max-width: 560px; background: #ffffff; border: 1px solid #e0e0dc; border-radius: 12px; overflow: hidden;">
+                <tr>
+                    <td>
+
+                        <div class="wrapper" style="margin: 0;">
 
     {{-- Header --}}
     <div class="header">
@@ -397,6 +412,12 @@
         Cet email a été envoyé automatiquement — merci de ne pas y répondre.</p>
     </div>
 
-</div>
+                        </td>
+                    </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
 </body>
 </html>

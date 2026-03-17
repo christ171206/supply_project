@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
-class SendStockAlertNotification implements ShouldQueue
+class SendStockAlertNotification
 {
     /**
      * Create the event listener.

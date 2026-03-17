@@ -27,12 +27,10 @@ class ProduitController extends Controller
             return redirect()->route('vendeur.dashboard');
         }
 
-        // Cache categories pour 12h - mais seulement celles avec des produits actifs, triées alphabétiquement
+        // Cache categories pour 12h - toutes celles actives, triées alphabétiquement
         $categories = Cache::remember('categories_homepage', 43200, function () {
             return Categorie::select('id', 'nom', 'image')
-                ->whereHas('produits', function ($query) {
-                    $query->where('est_actif', true);
-                })
+                ->where('is_active', true)
                 ->orderBy('nom', 'asc')
                 ->get();
         });
@@ -61,12 +59,10 @@ class ProduitController extends Controller
      */
     public function catalogue(Request $request)
     {
-        // Cache categories - seulement celles avec des produits actifs, triées alphabétiquement
+        // Cache categories - toutes celles actives, triées alphabétiquement
         $categories = Cache::remember('categories_catalogue', 43200, function () {
             return Categorie::select('id', 'nom', 'image')
-                ->whereHas('produits', function ($query) {
-                    $query->where('est_actif', true);
-                })
+                ->where('is_active', true)
                 ->orderBy('nom', 'asc')
                 ->get();
         });
@@ -135,14 +131,9 @@ class ProduitController extends Controller
             'categorie:id,nom'
         ])->findOrFail($id);
 
-        // Service pour les recommandations
-        $recommendationService = app('App\Services\RecommendationService');
-
-        // Produits similaires
-        $similarProducts = $recommendationService->getSimilarProducts($id, 4);
-
-        // Produits fréquemment achetés ensemble
-        $frequentlyBought = $recommendationService->getFrequentlyBoughtTogether($id, 4);
+        // Produits similaires et fréquemment achetés (via API calls in view if needed)
+        $similarProducts = [];
+        $frequentlyBought = [];
 
         // Récupérer avis avec pagination
         $avis = $produit->avis()

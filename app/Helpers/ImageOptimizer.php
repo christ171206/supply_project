@@ -71,7 +71,7 @@ class ImageOptimizer
         imagedestroy($source);
         imagedestroy($thumb);
 
-        return $fullPath;
+        return $filename;
     }
 
     /**
@@ -128,7 +128,7 @@ class ImageOptimizer
         imagedestroy($source);
         imagedestroy($resized);
 
-        return $fullPath;
+        return $filename;
     }
 
     /**

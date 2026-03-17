@@ -247,6 +247,9 @@ class CommandeController extends Controller
 
                 // Décrémenter le stock
                 $item->produit->decrement('stock', $item->quantite);
+
+                // Vérifier si le stock a atteint un seuil d'alerte
+                $item->produit->checkAndTriggerStockAlert();
             }
 
             Log::info('Lignes commande créées');
@@ -320,8 +323,8 @@ class CommandeController extends Controller
                 // Continuer même si la création du rappel échoue
             }
 
-            // Rediriger vers le résumé de la commande
-            return redirect()->route('commandes.show', $commande->id);
+            // Rediriger vers la page de confirmation/succès
+            return redirect()->route('commandes.payment-success', $commande->id)->with('success', 'Commande créée avec succès!');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur création commande: ' . $e->getMessage(), [
@@ -329,7 +332,10 @@ class CommandeController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            return redirect()->back()->with('error', 'Erreur: ' . $e->getMessage());
+            // Retourner un message d'erreur plus explicite
+            return redirect()->back()
+                ->with('error', 'Erreur lors de la création de la commande: ' . $e->getMessage())
+                ->withInput();
         }
     }
 
@@ -490,7 +496,7 @@ class CommandeController extends Controller
      */
     public function paymentSuccess($id)
     {
-        $commande = Commande::findOrFail($id);
+        $commande = Commande::with('payment')->findOrFail($id);
 
         // Vérifier que l'utilisateur est propriétaire
         if (auth()->user()->id !== $commande->user_id) {
@@ -508,7 +514,10 @@ class CommandeController extends Controller
         // Mettre à jour le statut de la commande
         $commande->update(['statut' => 'confirmee']);
 
-        return view('commandes.payment-success', compact('commande'));
+        // Charger les lignes de commande avec les produits
+        $lignes = $commande->ligneCommandes()->with('produit.vendeur')->get();
+
+        return view('commandes.payment-success', compact('commande', 'lignes'));
     }
 
     /**

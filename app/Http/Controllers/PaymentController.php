@@ -183,7 +183,7 @@ class PaymentController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'redirect' => route('commandes.show', $commande),
+                    'redirect' => route('commandes.payment-success', $commande),
                     'message' => 'Paiement confirmé',
                 ]);
             } elseif ($intentStatus === 'processing') {

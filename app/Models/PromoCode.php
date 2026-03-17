@@ -22,6 +22,8 @@ class PromoCode extends Model
         'date_fin',
         'statut',
         'archive',
+        'type_distribution',
+        'assigned_by',
     ];
 
     protected $casts = [
@@ -44,6 +46,16 @@ class PromoCode extends Model
     public function utilisations()
     {
         return $this->hasMany(PromoCodeUtilisation::class);
+    }
+
+    public function clientCoupons()
+    {
+        return $this->hasMany(ClientCoupon::class, 'promo_code_id');
+    }
+
+    public function assignedBy()
+    {
+        return $this->belongsTo(User::class, 'assigned_by');
     }
 
     // Scopes

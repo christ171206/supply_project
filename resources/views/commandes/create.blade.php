@@ -6,8 +6,8 @@
 <div id="notification-container" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
 <!-- Payment Processing Modal -->
-<div id="payment-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4">
+<div id="payment-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] backdrop-blur-sm animate-fadeIn">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 animate-slideUp">
         <div class="flex flex-col items-center gap-6">
             <!-- Animated spinner -->
             <div class="relative w-16 h-16">
@@ -26,12 +26,12 @@
             </div>
 
             <!-- Progress bar -->
-            <div class="w-full bg-[#efefed] rounded-full h-1 overflow-hidden">
-                <div id="payment-progress" class="bg-[#0a0a0a] h-full transition-all duration-500" style="width: 0%"></div>
+            <div class="w-full bg-[#efefed] rounded-full h-1.5 overflow-hidden">
+                <div id="payment-progress" class="bg-[#0a0a0a] h-full transition-all duration-500 rounded-full" style="width: 0%"></div>
             </div>
 
             <!-- Payment info -->
-            <div class="bg-[#f7f7f5] rounded-lg p-4 w-full text-[12px] text-[#2a2a28] space-y-1">
+            <div class="bg-[#f7f7f5] rounded-lg p-4 w-full text-[12px] text-[#2a2a28] space-y-2">
                 <div class="flex justify-between">
                     <span class="text-[#a0a09a]">Montant :</span>
                     <span class="font-mono font-medium" id="payment-amount">0 FCFA</span>
@@ -39,6 +39,13 @@
                 <div class="flex justify-between">
                     <span class="text-[#a0a09a]">Moyen :</span>
                     <span class="font-medium" id="payment-method-display">-</span>
+                </div>
+                <div class="flex justify-between text-[11px]">
+                    <span class="text-[#a0a09a]">Statut :</span>
+                    <span class="inline-flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span>
+                        <span id="payment-status-badge">En cours...</span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -389,9 +396,11 @@
                 Retour
             </button>
             <button type="submit" id="submit-btn"
-                    class="flex-1 flex items-center justify-center gap-2 bg-[#0a0a0a] text-white text-[13px] font-medium py-3 rounded-lg hover:opacity-85 transition-opacity">
+                    class="flex-1 flex items-center justify-center gap-2 bg-[#0a0a0a] text-white text-[13px] font-medium py-3 rounded-lg hover:opacity-85 active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                    data-idle-text="Confirmer et payer"
+                    data-loading-text="Traitement en cours...">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                Confirmer et payer
+                <span>Confirmer et payer</span>
             </button>
         </div>
         </div><!-- End STEP 3 -->
@@ -891,7 +900,7 @@ function setupPromoCodeHandlers() {
             const formElement = document.getElementById('payment-form');
             const csrfToken = formElement ? formElement.querySelector('input[name="_token"]').value : document.querySelector('meta[name="csrf-token"]')?.content;
 
-            const response = await fetch('{{ route("vendeur.promo-codes.check") }}', {
+            const response = await fetch('{{ route("promo-codes.check") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -997,10 +1006,36 @@ function setupFormValidation() {
 
     form.addEventListener('submit', e => {
         e.preventDefault();
+        console.log('✓ Form submit intercepted');
+        console.log('✓ Form action:', form.getAttribute('action'));
+        console.log('✓ Form method:', form.getAttribute('method'));
+
         const quartierIdFinal = document.getElementById('quartier').value || document.getElementById('hidden-quartier-id').value;
         if (quartierIdFinal) document.getElementById('hidden-quartier-id').value = quartierIdFinal;
 
+        // Disable submit button and show loading state
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.setAttribute('data-loading', 'true');
+
+        // Update button content
+        const btnText = submitBtn.querySelector('span');
+        const btnIcon = submitBtn.querySelector('svg');
+        if (btnText) btnText.textContent = submitBtn.getAttribute('data-loading-text');
+
+        // Replace icon with spinner
+        if (btnIcon) {
+            btnIcon.innerHTML = '';
+            btnIcon.classList.add('animate-spin');
+            btnIcon.setAttribute('viewBox', '0 0 24 24');
+            btnIcon.setAttribute('fill', 'none');
+            btnIcon.setAttribute('stroke', 'currentColor');
+            btnIcon.setAttribute('stroke-width', '2');
+            btnIcon.innerHTML = `<circle cx="12" cy="12" r="10" stroke-opacity="0.2"/><path stroke-linecap="round" d="M12 2a10 10 0 010 20" stroke-dasharray="62.8" stroke-dashoffset="0"/>`;
+        }
+
         // Show payment modal
+        console.log('✓ Calling showPaymentAnimation()');
         showPaymentAnimation();
     });
 }
@@ -1036,6 +1071,8 @@ function showPaymentAnimation() {
     statusText.textContent = 'Traitement du paiement...';
     detailsText.textContent = 'Veuillez patienter quelques secondes';
 
+    console.log('✓ Payment animation started');
+
     // Simulate payment processing
     const steps = [
         { progress: 20, delay: 400, text: 'Vérification des données...', details: 'Validation de l\'adresse' },
@@ -1049,9 +1086,27 @@ function showPaymentAnimation() {
     function processNextStep() {
         if (currentStep >= steps.length) {
             // Payment complete, submit form
+            console.log('✓ All animation steps complete, submitting form...');
+            console.log('✓ Form element:', document.getElementById('payment-form'));
+
             setTimeout(() => {
                 modal.classList.add('hidden');
-                document.getElementById('payment-form').submit();
+                const form = document.getElementById('payment-form');
+                console.log('✓ Submitting form to:', form.getAttribute('action'));
+                console.log('✓ Form method:', form.getAttribute('method'));
+                console.log('✓ Form ID:', form.id);
+
+                // Verify all required fields
+                const requiredFields = form.querySelectorAll('[required]');
+                console.log('✓ Required fields count:', requiredFields.length);
+                requiredFields.forEach((field, i) => {
+                    const isEmpty = field.type === 'checkbox' ? !field.checked : !field.value;
+                    console.log(`  Field ${i + 1} (${field.name}): ${isEmpty ? '❌ EMPTY' : '✓ filled'}`);
+                });
+
+                // Submit the form
+                form.submit();
+                console.log('✓ Form.submit() called!');
             }, 800);
             return;
         }
@@ -1080,5 +1135,104 @@ function showNotification(message, type = 'info') {
     }, 4000);
 }
 </script>
+
+<style>
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideUp {
+    animation: slideUp 0.4s ease-out cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Button loading state styles */
+#submit-btn[data-loading="true"] {
+    pointer-events: none;
+}
+
+#submit-btn[data-loading="true"] svg {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Toast notification styles */
+.toast-notification {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: #0a0a0a;
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.toast-notification.toast-success {
+    background-color: #10b981;
+}
+
+.toast-notification.toast-error {
+    background-color: #ef4444;
+}
+
+.toast-notification.hide {
+    animation: slideOutRight 0.3s ease-out forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Payment modal backdrop blur effect */
+#payment-modal.hidden {
+    display: none;
+}
+</style>
 
 @endsection

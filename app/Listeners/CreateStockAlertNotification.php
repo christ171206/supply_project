@@ -32,8 +32,8 @@ class CreateStockAlertNotification
                 : "⚠️ ALERTE: Stock bas pour {$produit->nom}";
 
             $alertMessage = $alertType === 'critical'
-                ? "Le stock du produit '{$produit->nom}' est CRITIQUE ! Quantité actuelle: {$alert->current_stock}. Stock minimum requis: {$alert->min_stock}. Action immédiate recommandée !"
-                : "Le stock du produit '{$produit->nom}' est bas. Quantité actuelle: {$alert->current_stock}. Stock minimum: {$alert->min_stock}.";
+                ? "Le stock du produit '{$produit->nom}' est CRITIQUE ! Quantité actuelle: {$produit->stock}. Seuil d'alerte: {$alert->alert_threshold}. Action immédiate recommandée !"
+                : "Le stock du produit '{$produit->nom}' est bas. Quantité actuelle: {$produit->stock}. Seuil d'alerte: {$alert->alert_threshold}.";
 
             Notification::create([
                 'user_id' => $produit->user_id,
@@ -47,11 +47,12 @@ class CreateStockAlertNotification
 
             // Notification pour admin (alerte critique)
             if ($alertType === 'critical') {
+                $vendeurName = $produit->vendeur?->name ?? 'Unknown';
                 Notification::create([
                     'user_id' => 1, // Admin ID (à adapter selon votre config)
                     'type' => 'stock_alert_critical_admin',
                     'titre' => "🚨 ALERTE STOCK CRITIQUE: {$produit->nom}",
-                    'message' => "Le produit '{$produit->nom}' (Vendeur: {$produit->user->shop_name}) a un stock critique ! Quantité: {$alert->current_stock} / Min: {$alert->min_stock}",
+                    'message' => "Le produit '{$produit->nom}' (Vendeur: {$vendeurName}) a un stock critique ! Quantité: {$produit->stock} / Seuil: {$alert->alert_threshold}",
                     'lu' => false,
                 ]);
 

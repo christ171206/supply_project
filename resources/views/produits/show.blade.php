@@ -435,8 +435,9 @@
          BUNDLES CONTENANT CE PRODUIT
     ══════════════════════════════ --}}
     @php
-        $bundlesAvecProduit = \App\Models\Bundle::whereHas('produits', function($q) {
-            $q->where('produit_id', $produit->id);
+        $produitId = $produit->id;
+        $bundlesAvecProduit = \App\Models\Bundle::whereHas('produits', function($q) use ($produitId) {
+            $q->where('produit_id', $produitId);
         })->where('statut', 'actif')->with('produits')->limit(4)->get();
     @endphp
     @if($bundlesAvecProduit && count($bundlesAvecProduit) > 0)

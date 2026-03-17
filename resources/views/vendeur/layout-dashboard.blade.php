@@ -139,6 +139,15 @@
                 <span id="notif-badge" class="ml-auto hidden w-4 h-4 bg-white text-[#0a0a0a] text-[9px] font-mono font-medium rounded-sm flex items-center justify-center">0</span>
             </a>
 
+            <a href="{{ route('vendeur.message-templates.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all
+               {{ request()->routeIs('vendeur.message-templates*') ? 'bg-white text-[#0a0a0a]' : 'text-white/60 hover:text-white hover:bg-white/10' }}">
+                <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M15 4H9a2 2 0 0 0-2 2v2h10V6a2 2 0 0 0-2-2z"/><path d="M7 8h10v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V8z"/><path d="M9 12h6"/><path d="M9 15h4"/>
+                </svg>
+                Modèles de messages
+            </a>
+
             {{-- Compte --}}
             <div class="text-[9px] font-medium tracking-[0.14em] uppercase text-white/25 px-3 pt-4 pb-2">Compte</div>
 

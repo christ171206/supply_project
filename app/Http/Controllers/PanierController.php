@@ -6,6 +6,10 @@ use App\Models\Panier;
 use App\Models\PanierItem;
 use App\Models\Produit;
 use App\Models\Bundle;
+use App\Models\PromoCode;
+use App\Models\ClientCoupon;
+use App\Models\GlobalOffer;
+use App\Services\PromoAbuseValidator;
 use Illuminate\Http\Request;
 
 class PanierController extends Controller
@@ -73,11 +77,184 @@ class PanierController extends Controller
         $items = $this->getCartItems();
         $total = $this->getCartTotal($items);
 
+        // Calculate applied global offers
+        $appliedOffers = $this->calculateAppliedOffers($items, $total);
+        $totalDiscount = $appliedOffers->sum('discount_amount');
+        $totalAfterOffers = $total - $totalDiscount;
+
+        // Get applied coupon if any
+        $appliedCoupon = session()->get('applied_coupon');
+        $couponDiscount = 0;
+        if ($appliedCoupon && auth()->check()) {
+            $coupon = ClientCoupon::find($appliedCoupon);
+            if ($coupon && $coupon->statut === 'actif' && !$coupon->isExpired()) {
+                $couponDiscount = $coupon->promoCode->valeur ?? 0;
+            } else {
+                session()->forget('applied_coupon');
+            }
+        }
+
+        $finalTotal = max(0, $totalAfterOffers - $couponDiscount);
+        $shippingCost = $finalTotal >= 100000 ? 0 : 5000;
+
         return view('panier.index', [
             'items' => $items,
             'total' => $total,
+            'appliedOffers' => $appliedOffers,
+            'totalDiscount' => $totalDiscount,
+            'appliedCoupon' => $appliedCoupon ? ClientCoupon::find($appliedCoupon) : null,
+            'couponDiscount' => $couponDiscount,
+            'subtotal' => $totalAfterOffers,
+            'shippingCost' => $shippingCost,
+            'finalTotal' => $finalTotal + $shippingCost,
             'isGuest' => !auth()->check(),
         ]);
+    }
+
+    /**
+     * Calculate which global offers apply to this cart
+     */
+    private function calculateAppliedOffers($items, $total)
+    {
+        $appliedOffers = collect();
+
+        // Get all active global offers
+        $offers = GlobalOffer::active()->get();
+
+        foreach ($offers as $offer) {
+            // Check if offer applies to this cart
+            if (!$offer->appliesToCart($items->pluck('produit')->filter(), $total)) {
+                continue;
+            }
+
+            // Calculate discount for this offer
+            $discount = $offer->calculateCartDiscount(
+                $items->map(fn($item) => [
+                    'produit_id' => $item->produit_id,
+                    'quantite' => $item->quantite,
+                    'prix' => $item->prix_unitaire,
+                ]),
+                $total
+            );
+
+            if ($discount > 0) {
+                $appliedOffers->push([
+                    'offer' => $offer,
+                    'discount_amount' => $discount,
+                    'offer_name' => $offer->name,
+                    'offer_type' => $offer->getTypeLabel(),
+                ]);
+            }
+        }
+
+        return $appliedOffers;
+    }
+
+    /**
+     * Apply a coupon to cart
+     */
+    public function applyCoupon(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous devez être connecté'
+            ], 401);
+        }
+
+        $request->validate([
+            'coupon_id' => 'required|integer',
+        ]);
+
+        $coupon = ClientCoupon::find($request->coupon_id);
+
+        if (!$coupon || $coupon->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Coupon non valide'
+            ], 422);
+        }
+
+        if ($coupon->statut !== 'actif') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce coupon n\'est pas actif'
+            ], 422);
+        }
+
+        if ($coupon->isExpired()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce coupon a expiré'
+            ], 422);
+        }
+
+        // Validate against abuse rules
+        $items = $this->getCartItems();
+        $total = $this->getCartTotal($items);
+        $validator = new PromoAbuseValidator($coupon->promoCode);
+        $validation = $validator->validatePromoUsage(auth()->user(), $items, $total);
+
+        if (!$validation['allowed']) {
+            return response()->json([
+                'success' => false,
+                'message' => $validation['reason'],
+                'severity' => $validation['severity']
+            ], 422);
+        }
+
+        session()->put('applied_coupon', $coupon->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => '✓ Coupon appliqué!',
+            'discount' => $coupon->promoCode->valeur ?? 0,
+        ]);
+    }
+
+    /**
+     * Apply global offer manually
+     */
+    public function applyOffer(Request $request)
+    {
+        $request->validate([
+            'offer_id' => 'required|integer',
+        ]);
+
+        $offer = GlobalOffer::find($request->offer_id);
+
+        if (!$offer || !$offer->is_active || !$offer->isActiveNow()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Offre non disponible'
+            ], 422);
+        }
+
+        $items = $this->getCartItems();
+        $total = $this->getCartTotal($items);
+
+        if (!$offer->appliesToCart($items->pluck('produit')->filter(), $total)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette offre ne s\'applique pas à votre panier'
+            ], 422);
+        }
+
+        session()->push('applied_offers', $offer->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => '✓ Offre appliquée!',
+        ]);
+    }
+
+    /**
+     * Remove coupon from cart
+     */
+    public function removeCoupon()
+    {
+        session()->forget('applied_coupon');
+        return redirect()->back()->with('success', '✓ Coupon retiré');
     }
 
     /**

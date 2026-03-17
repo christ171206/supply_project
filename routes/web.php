@@ -130,6 +130,13 @@ Route::patch('/panier/{itemId}', [PanierController::class, 'modifier'])->name('p
 Route::delete('/panier/{itemId}', [PanierController::class, 'supprimer'])->name('panier.supprimer');
 Route::post('/panier/vider', [PanierController::class, 'vider'])->name('panier.vider');
 
+// Panier - Coupons & Offers (auth required)
+Route::middleware('auth')->group(function () {
+    Route::post('/panier/appliquer-coupon', [PanierController::class, 'applyCoupon'])->name('panier.apply-coupon');
+    Route::post('/panier/appliquer-offre', [PanierController::class, 'applyOffer'])->name('panier.apply-offer');
+    Route::post('/panier/retirer-coupon', [PanierController::class, 'removeCoupon'])->name('panier.remove-coupon');
+});
+
 // Webhook Stripe (public - CSRF exempt via middleware)
 Route::post('/webhooks/stripe', [PaymentController::class, 'handleWebhook'])->name('webhooks.stripe')->withoutMiddleware('web');
 
@@ -158,6 +165,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/commandes/{id}/download-pdf', [CommandeController::class, 'downloadPDF'])->name('commandes.download-pdf');
     Route::post('/commandes', [CommandeController::class, 'store'])->name('commandes.store');
     Route::get('/commandes/{id}/payment-test', [CommandeController::class, 'paymentTest'])->name('commandes.payment-test');
+    Route::post('/api/promo-codes/check', [PromoCodeController::class, 'checkCode'])->name('promo-codes.check');
 
     // Invoices (Factures)
     Route::middleware('auth')->prefix('invoices')->name('invoices.')->group(function () {
@@ -165,6 +173,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/{commande}/pdf', [\App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('download');
         Route::post('/{commande}/email', [\App\Http\Controllers\InvoiceController::class, 'sendEmail'])->name('send-email');
         Route::get('/{commande}/data', [\App\Http\Controllers\InvoiceController::class, 'getInvoiceData'])->name('data');
+    });
+
+    // Support (Clients & Vendeurs)
+    Route::middleware('auth')->prefix('support')->name('support.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\SupportController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\SupportController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\SupportController::class, 'store'])->name('store');
+        Route::get('/{supportTicket}', [\App\Http\Controllers\SupportController::class, 'show'])->name('show');
+        Route::post('/{supportTicket}/message', [\App\Http\Controllers\SupportController::class, 'addMessage'])->name('add-message');
+        Route::post('/{supportTicket}/template', [\App\Http\Controllers\SupportController::class, 'useTemplate'])->name('use-template');
+        Route::patch('/{supportTicket}/close', [\App\Http\Controllers\SupportController::class, 'close'])->name('close');
+        Route::patch('/{supportTicket}/reopen', [\App\Http\Controllers\SupportController::class, 'reopen'])->name('reopen');
     });
 
     // Paiement Stripe
@@ -258,6 +278,17 @@ Route::middleware(['auth', 'vendeur', 'vendor-approved'])->prefix('vendeur')->na
     Route::get('/promo-codes/{promoCode}/edit', [\App\Http\Controllers\PromoCodeController::class, 'edit'])->name('promo-codes.edit');
     Route::put('/promo-codes/{promoCode}', [\App\Http\Controllers\PromoCodeController::class, 'update'])->name('promo-codes.update');
     Route::post('/promo-codes/{promoCode}/duplicate', [\App\Http\Controllers\PromoCodeController::class, 'duplicate'])->name('promo-codes.duplicate');
+
+    // Message Templates (pour lancer des promotions, etc)
+    Route::prefix('message-templates')->name('message-templates.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\VendorMessageTemplateController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\VendorMessageTemplateController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\VendorMessageTemplateController::class, 'store'])->name('store');
+        Route::get('/{template}/edit', [\App\Http\Controllers\VendorMessageTemplateController::class, 'edit'])->name('edit');
+        Route::put('/{template}', [\App\Http\Controllers\VendorMessageTemplateController::class, 'update'])->name('update');
+        Route::delete('/{template}', [\App\Http\Controllers\VendorMessageTemplateController::class, 'destroy'])->name('destroy');
+        Route::patch('/{template}/toggle', [\App\Http\Controllers\VendorMessageTemplateController::class, 'toggle'])->name('toggle');
+    });
     Route::delete('/promo-codes/{promoCode}', [\App\Http\Controllers\PromoCodeController::class, 'destroy'])->name('promo-codes.destroy');
     Route::patch('/promo-codes/{promoCode}/toggle-archive', [\App\Http\Controllers\PromoCodeController::class, 'toggleArchive'])->name('promo-codes.toggle-archive');
 

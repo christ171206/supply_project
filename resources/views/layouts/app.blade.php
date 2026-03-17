@@ -32,6 +32,23 @@
         <script>
             window.SOCKET_IO_URL = '{{ env('SOCKET_IO_URL', 'http://localhost:3000') }}';
         </script>
+
+        <!-- NProgress - Loading Progress Bar -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
+        <style>
+            #nprogress .bar {
+                background: #0a0a0a !important;
+                height: 3px !important;
+                box-shadow: 0 0 8px rgba(10, 10, 10, 0.6) !important;
+            }
+            #nprogress .peg {
+                box-shadow: 0 0 12px rgba(10, 10, 10, 0.8), 0 0 6px rgba(10, 10, 10, 0.6) !important;
+            }
+            #nprogress .spinner {
+                display: none !important;
+            }
+        </style>
     </head>
     <body class="font-body bg-off-white text-black antialiased">
         <div class="min-h-screen flex flex-col">
@@ -493,5 +510,42 @@
         @include('components.confirmation-modal')
 
         @yield('scripts')
+
+        <!-- NProgress Initialization -->
+        <script>
+            // Start progress on any link click
+            document.addEventListener('click', function(event) {
+                const link = event.target.closest('a, button[onclick*="location"], [data-navigate]');
+                if (link && !link.hasAttribute('data-no-progress')) {
+                    NProgress.start();
+                }
+            });
+
+            // Start progress on form submission
+            document.addEventListener('submit', function(event) {
+                const form = event.target;
+                if (!form.hasAttribute('data-no-progress')) {
+                    NProgress.start();
+                }
+            });
+
+            // Complete progress when page fully loads
+            window.addEventListener('load', function() {
+                NProgress.done();
+            });
+
+            // Fallback for beforeunload
+            window.addEventListener('beforeunload', function() {
+                if (NProgress.status === null) {
+                    NProgress.start();
+                }
+            });
+
+            // Livewire integration (if using Livewire)
+            if (typeof window.Livewire !== 'undefined') {
+                document.addEventListener('livewire:navigating', () => NProgress.start());
+                document.addEventListener('livewire:navigated', () => NProgress.done());
+            }
+        </script>
     </body>
 </html>

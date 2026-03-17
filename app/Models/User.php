@@ -149,6 +149,16 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class, 'admin_id');
     }
 
+    public function clientCoupons()
+    {
+        return $this->hasMany(ClientCoupon::class, 'user_id');
+    }
+
+    public function activeCoupons()
+    {
+        return $this->clientCoupons()->actif();
+    }
+
     /**
      * Relation avec la validation vendeur
      */
